@@ -1,0 +1,142 @@
+[
+  {
+    "id": 1,
+    "title": "apt-get без очистки кэша и объединения",
+    "code": "FROM ubuntu:22.04\nRUN apt-get update\nRUN apt-get install -y nginx curl\nCOPY . /app",
+    "bug": "Два RUN создают лишний слой. Кэш apt не очищен — образ раздувается. update и install в разных RUN: если install закэширован, а update нет — получим устаревший индекс пакетов.",
+    "fix": "FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y nginx curl && rm -rf /var/lib/apt/lists/*\nCOPY . /app",
+    "opts": [
+      "apt-get update и install в разных RUN + нет очистки кэша",
+      "Нельзя использовать ubuntu:22.04",
+      "COPY должен быть перед RUN",
+      "nginx и curl нельзя ставить вместе"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 2,
+    "title": "COPY . . — копирует мусор",
+    "code": "FROM node:18\nCOPY . .\nRUN npm ci --only=production\nCMD [\"node\", \"app.js\"]",
+    "bug": "COPY . . копирует ВСЁ: node_modules, .git, тесты, Dockerfile — лишний вес в образе и инвалидация кэша при любом изменении в проекте.",
+    "fix": "FROM node:18\nCOPY package.json package-lock.json ./\nRUN npm ci --only=production\nCOPY src/ ./src/\nCMD [\"node\", \"app.js\"]",
+    "opts": [
+      "COPY . . копирует node_modules, .git, тесты в образ",
+      "npm ci не работает с --only=production",
+      "CMD в exec-форме не нужен",
+      "node:18 не поддерживает npm ci"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 3,
+    "title": "CMD в shell-форме — сигналы не доходят",
+    "code": "FROM nginx:alpine\nCOPY nginx.conf /etc/nginx/nginx.conf\nCMD nginx -g 'daemon off;'",
+    "bug": "CMD в shell-форме запускается через /bin/sh -c. Сигнал SIGTERM от docker stop получает sh, а не nginx. Graceful shutdown не работает — контейнер убивается принудительно через 10с.",
+    "fix": "FROM nginx:alpine\nCOPY nginx.conf /etc/nginx/nginx.conf\nCMD [\"nginx\", \"-g\", \"daemon off;\"]",
+    "opts": [
+      "CMD в shell-форме — SIGTERM получает sh, а не nginx",
+      "nginx не поддерживает daemon off",
+      "nginx:alpine не существует",
+      "COPY не работает с .conf файлами"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 4,
+    "title": "Порядок слоёв: частые изменения перед редкими",
+    "code": "FROM python:3.11\nCOPY . /app\nWORKDIR /app\nRUN pip install -r requirements.txt\nCMD [\"python\", \"main.py\"]",
+    "bug": "COPY . перед RUN pip install: при любом изменении кода сбрасывается кэш pip install. requirements.txt меняется редко, код — часто. Правильно: сначала скопировать requirements.txt, установить зависимости, потом код.",
+    "fix": "FROM python:3.11\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install -r requirements.txt\nCOPY . .\nCMD [\"python\", \"main.py\"]",
+    "opts": [
+      "COPY . перед RUN pip install — кэш сбрасывается при каждом изменении кода",
+      "WORKDIR должен быть до FROM",
+      "pip install не работает без виртуального окружения",
+      "python:3.11 не поддерживает pip"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 5,
+    "title": "FROM ubuntu:latest — непредсказуемость",
+    "code": "FROM ubuntu:latest\nRUN apt-get update && apt-get install -y nginx\nCMD [\"nginx\", \"-g\", \"daemon off;\"]",
+    "bug": "latest — плавающий тег. Сегодня это 22.04, завтра 24.04, и образ может сломаться без изменений в Dockerfile. Сборка невоспроизводима.",
+    "fix": "FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*\nCMD [\"nginx\", \"-g\", \"daemon off;\"]",
+    "opts": [
+      "latest — плавающий тег, сборка невоспроизводима",
+      "ubuntu не подходит для Docker",
+      "nginx нельзя запускать в ubuntu",
+      "RUN apt-get update не нужен"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 6,
+    "title": "Запуск от root — проблема безопасности",
+    "code": "FROM node:18-alpine\nWORKDIR /app\nCOPY . .\nRUN npm ci --only=production\nCMD [\"node\", \"app.js\"]",
+    "bug": "Процесс запускается от root. Если злоумышленник получит доступ к приложению — получит root в контейнере. При пробросе томов может повредить файлы хоста.",
+    "fix": "FROM node:18-alpine\nRUN addgroup -S appgroup && adduser -S appuser -G appgroup\nWORKDIR /app\nCOPY --chown=appuser:appgroup . .\nUSER appuser\nRUN npm ci --only=production\nCMD [\"node\", \"app.js\"]",
+    "opts": [
+      "Процесс запускается от root — угроза безопасности",
+      "node:18-alpine не поддерживает npm ci",
+      "WORKDIR /app не нужен",
+      "--only=production не работает в alpine"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 7,
+    "title": "ENV NODE_ENV после npm install",
+    "code": "FROM node:18\nWORKDIR /app\nCOPY package*.json ./\nRUN npm install\nENV NODE_ENV=production\nCOPY . .\nCMD [\"node\", \"app.js\"]",
+    "bug": "ENV NODE_ENV=production стоит ПОСЛЕ npm install. При npm install NODE_ENV не был production → установились devDependencies. Образ содержит ненужные пакеты.",
+    "fix": "FROM node:18\nENV NODE_ENV=production\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci --only=production\nCOPY . .\nCMD [\"node\", \"app.js\"]",
+    "opts": [
+      "ENV NODE_ENV=production после npm install — установлены devDependencies",
+      "ENV не работает в Docker",
+      "npm install требует sudo",
+      "package*.json нельзя копировать"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 8,
+    "title": "Многослойный RUN — раздувание образа",
+    "code": "FROM alpine:3.19\nRUN apk add --no-cache curl\nRUN apk add --no-cache wget\nRUN apk add --no-cache git\nRUN apk add --no-cache bash\nCOPY script.sh /usr/local/bin/\nCMD [\"/usr/local/bin/script.sh\"]",
+    "bug": "Четыре отдельных RUN создают 4 слоя. Каждый слой добавляет метаданные — образ разбухает. --no-cache частично решает проблему, но слои всё равно создаются.",
+    "fix": "FROM alpine:3.19\nRUN apk add --no-cache curl wget git bash\nCOPY script.sh /usr/local/bin/\nCMD [\"/usr/local/bin/script.sh\"]",
+    "opts": [
+      "4 RUN создают 4 слоя — нужно объединить в один apk add",
+      "alpine не поддерживает apk",
+      "script.sh нельзя копировать в /usr/local/bin",
+      "CMD с путём не работает в alpine"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 9,
+    "title": "ADD вместо COPY — скрытое поведение",
+    "code": "FROM nginx:alpine\nADD app.tar.gz /usr/share/nginx/html/\nADD https://example.com/config.json /etc/nginx/\nCOPY nginx.conf /etc/nginx/nginx.conf",
+    "bug": "ADD автоматически распаковывает .tar.gz (может быть неожиданно). ADD с URL загружает файл без проверки SSL и без очистки — лишний слой. Всегда предпочитай COPY, если не нужна магия ADD.",
+    "fix": "FROM nginx:alpine\nCOPY app/ /usr/share/nginx/html/\nCOPY nginx.conf /etc/nginx/nginx.conf\n// Если нужна загрузка: RUN curl -o /etc/nginx/config.json https://example.com/config.json && rm ...",
+    "opts": [
+      "ADD распаковывает tar.gz автоматически + URL-загрузка без очистки",
+      "ADD не работает в nginx:alpine",
+      "COPY предпочтительнее ADD только для локальных файлов",
+      "nginx.conf должен быть в /etc/nginx/conf.d/"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 10,
+    "title": "EXPOSE без протокола и HEALTHCHECK",
+    "code": "FROM python:3.11-slim\nWORKDIR /app\nCOPY . .\nRUN pip install -r requirements.txt\nEXPOSE 5000\nCMD [\"python\", \"app.py\"]",
+    "bug": "1) EXPOSE без указания протокола — только документация, не открывает порт. 2) Нет HEALTHCHECK — Docker не знает живо ли приложение. 3) pip install без --no-cache-dir.",
+    "fix": "FROM python:3.11-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\nCOPY . .\nEXPOSE 5000/tcp\nHEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost:5000/health || exit 1\nCMD [\"python\", \"app.py\"]",
+    "opts": [
+      "EXPOSE без /tcp + нет HEALTHCHECK + pip без --no-cache-dir",
+      "python:3.11-slim не поддерживает pip",
+      "EXPOSE открывает порт автоматически",
+      "HEALTHCHECK замедляет запуск контейнера"
+    ],
+    "answer": 0
+  }
+]

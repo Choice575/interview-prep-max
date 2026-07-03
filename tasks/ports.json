@@ -1,0 +1,102 @@
+[
+  {
+    "service": "SSH",
+    "port": 22,
+    "id": 1
+  },
+  {
+    "service": "HTTP",
+    "port": 80,
+    "id": 2
+  },
+  {
+    "service": "HTTPS",
+    "port": 443,
+    "id": 3
+  },
+  {
+    "service": "DNS (TCP/UDP)",
+    "port": 53,
+    "id": 4
+  },
+  {
+    "service": "MySQL",
+    "port": 3306,
+    "id": 5
+  },
+  {
+    "service": "PostgreSQL",
+    "port": 5432,
+    "id": 6
+  },
+  {
+    "service": "Redis",
+    "port": 6379,
+    "id": 7
+  },
+  {
+    "service": "MongoDB",
+    "port": 27017,
+    "id": 8
+  },
+  {
+    "service": "Docker API",
+    "port": 2375,
+    "id": 9
+  },
+  {
+    "service": "Kubernetes API",
+    "port": 6443,
+    "id": 10
+  },
+  {
+    "service": "Nginx (default)",
+    "port": 80,
+    "id": 11
+  },
+  {
+    "service": "Grafana",
+    "port": 3000,
+    "id": 12
+  },
+  {
+    "service": "Prometheus",
+    "port": 9090,
+    "id": 13
+  },
+  {
+    "service": "Jenkins",
+    "port": 8080,
+    "id": 14
+  },
+  {
+    "service": "GitLab",
+    "port": 443,
+    "id": 15
+  },
+  {
+    "service": "SMTP",
+    "port": 25,
+    "id": 16
+  },
+  {
+    "service": "RabbitMQ",
+    "port": 5672,
+    "id": 17
+  },
+  {
+    "service": "Elasticsearch",
+    "port": 9200,
+    "id": 18
+  },
+  {
+    "service": "etcd",
+    "port": 2379,
+    "id": 19
+  },
+  {
+    "service": "Node Exporter",
+    "port": 9100,
+    "id": 20
+  }
+]

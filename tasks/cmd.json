@@ -1,0 +1,482 @@
+[
+  {
+    "id": 1,
+    "task": "Показать все TCP сокеты в состоянии LISTEN с указанием процесса",
+    "opts": [
+      "ss -tlnp",
+      "netstat -a",
+      "lsof -i tcp",
+      "ss -u"
+    ],
+    "answer": 0,
+    "exp": "ss -tlnp: -t TCP, -l listening, -n без разрешения имён, -p показать процесс"
+  },
+  {
+    "id": 2,
+    "task": "Найти все файлы, изменённые за последние 30 минут",
+    "opts": [
+      "find / -mmin -30",
+      "find / -mtime -1",
+      "ls -lt | head",
+      "locate -r '.*'"
+    ],
+    "answer": 0,
+    "exp": "find -mmin -30: modification minutes, минус означает менее 30 минут назад"
+  },
+  {
+    "id": 3,
+    "task": "Показать использование RAM в мегабайтах",
+    "opts": [
+      "free -m",
+      "cat /proc/meminfo",
+      "top -b -n1",
+      "vmstat -s"
+    ],
+    "answer": 0,
+    "exp": "free -m показывает total/used/free/buff/cache в MiB. -h для human-readable."
+  },
+  {
+    "id": 4,
+    "task": "Создать пользователя deploy без домашней директории, добавить в группы docker и sudo",
+    "opts": [
+      "useradd -M -G docker,sudo deploy",
+      "adduser deploy docker",
+      "useradd -d /home/deploy -g docker deploy",
+      "usermod -aG docker deploy"
+    ],
+    "answer": 0,
+    "exp": "-M: не создавать home, -G: дополнительные группы через запятую"
+  },
+  {
+    "id": 5,
+    "task": "Следить за последними 100 строками лога в реальном времени",
+    "opts": [
+      "tail -n 100 -f /var/log/app.log",
+      "cat /var/log/app.log | tail",
+      "less +F /var/log/app.log",
+      "watch tail /var/log/app.log"
+    ],
+    "answer": 0,
+    "exp": "tail -n 100 -f: -n количество строк, -f follow (читать новые данные)"
+  },
+  {
+    "id": 6,
+    "task": "Создать tar архив директории /app, исключая папку node_modules",
+    "opts": [
+      "tar -czf app.tar.gz --exclude=node_modules /app",
+      "tar -czf app.tar.gz /app --skip node_modules",
+      "zip -r app.zip /app -x node_modules",
+      "tar -czf app.tar.gz /app -ignore node_modules"
+    ],
+    "answer": 0,
+    "exp": "--exclude=pattern исключает по паттерну. Должен стоять перед аргументом источника."
+  },
+  {
+    "id": 7,
+    "task": "Показать все открытые файлы на порту 443",
+    "opts": [
+      "lsof -i :443",
+      "ss -tlnp sport = :443",
+      "netstat -tulnp | grep 443",
+      "fuser 443/tcp"
+    ],
+    "answer": 0,
+    "exp": "lsof -i :443 покажет процесс, PID, пользователя. fuser покажет только PID."
+  },
+  {
+    "id": 8,
+    "task": "Проверить синтаксис конфига nginx без перезапуска",
+    "opts": [
+      "nginx -t",
+      "nginx -s reload",
+      "systemctl check nginx",
+      "nginx --verify"
+    ],
+    "answer": 0,
+    "exp": "nginx -t тестирует конфиг и выходит. nginx -T выводит всю конфигурацию."
+  },
+  {
+    "id": 9,
+    "task": "Создать симлинк /usr/local/bin/python -> /usr/bin/python3 (правильный порядок аргументов)",
+    "opts": [
+      "ln -s /usr/bin/python3 /usr/local/bin/python",
+      "ln -s /usr/local/bin/python /usr/bin/python3",
+      "ln /usr/bin/python3 /usr/local/bin/python",
+      "link /usr/bin/python3 /usr/local/bin/python"
+    ],
+    "answer": 0,
+    "exp": "ln -s TARGET LINK_NAME: сначала то на что ссылаемся, потом имя ссылки"
+  },
+  {
+    "id": 10,
+    "task": "Найти какой процесс держит открытым файл /var/log/app.log",
+    "opts": [
+      "lsof /var/log/app.log",
+      "fuser -v /var/log/app.log",
+      "ss -p /var/log/app.log",
+      "find /proc -name app.log"
+    ],
+    "answer": 0,
+    "exp": "lsof filename покажет PID, имя процесса, пользователя"
+  },
+  {
+    "id": 11,
+    "task": "Применить Terraform только к конкретному ресурсу без подтверждения",
+    "opts": [
+      "terraform apply -target=aws_instance.web -auto-approve",
+      "terraform apply aws_instance.web",
+      "terraform plan -target=aws_instance.web",
+      "terraform apply --only aws_instance.web"
+    ],
+    "answer": 0,
+    "exp": "-target=resource_address ограничивает apply. -auto-approve пропускает подтверждение."
+  },
+  {
+    "id": 12,
+    "task": "Показать план уничтожения инфраструктуры без реального удаления",
+    "opts": [
+      "terraform plan -destroy",
+      "terraform destroy -dry-run",
+      "terraform plan -out=destroy.tfplan",
+      "terraform show -destroy"
+    ],
+    "answer": 0,
+    "exp": "terraform plan -destroy показывает что будет удалено без выполнения"
+  },
+  {
+    "id": 13,
+    "task": "Рекурсивно отформатировать все .tf файлы в проекте",
+    "opts": [
+      "terraform fmt -recursive",
+      "terraform fmt -all",
+      "terraform format --recursive",
+      "terraform fmt $(find . -name '*.tf')"
+    ],
+    "answer": 0,
+    "exp": "terraform fmt -recursive обрабатывает текущую директорию и поддиректории"
+  },
+  {
+    "id": 14,
+    "task": "Показать детальную информацию о конкретном ресурсе в Terraform state",
+    "opts": [
+      "terraform state show aws_instance.web",
+      "terraform show aws_instance.web",
+      "terraform state list aws_instance.web",
+      "terraform output aws_instance.web"
+    ],
+    "answer": 0,
+    "exp": "terraform state show address выводит все атрибуты ресурса из state"
+  },
+  {
+    "id": 15,
+    "task": "Запустить terraform apply передав переменную через флаг",
+    "opts": [
+      "terraform apply -var='instance_type=t3.large'",
+      "terraform apply --variable instance_type=t3.large",
+      "terraform apply -e instance_type=t3.large",
+      "terraform apply instance_type=t3.large"
+    ],
+    "answer": 0,
+    "exp": "-var='name=value'. Через env: TF_VAR_instance_type=t3.large. Через файл: -var-file=vars.tfvars"
+  },
+  {
+    "id": 16,
+    "task": "Запустить playbook только с тегами deploy, пропустить тег cleanup",
+    "opts": [
+      "ansible-playbook site.yml --tags deploy --skip-tags cleanup",
+      "ansible-playbook site.yml -t deploy --ignore cleanup",
+      "ansible-playbook site.yml --only-tags deploy",
+      "ansible-playbook site.yml --tags deploy -x cleanup"
+    ],
+    "answer": 0,
+    "exp": "--tags и --skip-tags комбинируются. -t краткая форма --tags"
+  },
+  {
+    "id": 17,
+    "task": "Проверить синтаксис playbook без выполнения",
+    "opts": [
+      "ansible-playbook site.yml --syntax-check",
+      "ansible-playbook site.yml --dry-run",
+      "ansible-playbook site.yml --check",
+      "ansible-lint site.yml"
+    ],
+    "answer": 0,
+    "exp": "--syntax-check только парсит. --check запускает dry-run без применения изменений"
+  },
+  {
+    "id": 18,
+    "task": "Запустить playbook в режиме проверки и показать diff файлов",
+    "opts": [
+      "ansible-playbook site.yml --check --diff",
+      "ansible-playbook site.yml --dry-run --verbose",
+      "ansible-playbook site.yml --simulate --diff",
+      "ansible-playbook site.yml -C -D"
+    ],
+    "answer": 0,
+    "exp": "--check: не применять, --diff: показать diff. -C и -D краткие формы"
+  },
+  {
+    "id": 19,
+    "task": "Запустить playbook только для группы webservers с параллелизмом 20",
+    "opts": [
+      "ansible-playbook site.yml -l webservers -f 20",
+      "ansible-playbook site.yml --hosts webservers --forks 20",
+      "ansible-playbook site.yml -i webservers --parallel 20",
+      "ansible-playbook site.yml --limit=webservers --jobs=20"
+    ],
+    "answer": 0,
+    "exp": "-l / --limit ограничивает хосты, -f / --forks задаёт параллелизм (default 5)"
+  },
+  {
+    "id": 20,
+    "task": "Выполнить ad-hoc команду uptime на группе серверов через модуль shell",
+    "opts": [
+      "ansible webservers -m shell -a 'uptime'",
+      "ansible webservers -c shell -r 'uptime'",
+      "ansible webservers --module shell --args uptime",
+      "ansible-playbook -m shell -a uptime webservers"
+    ],
+    "answer": 0,
+    "exp": "-m модуль, -a аргументы. shell поддерживает пайпы, command более безопасен"
+  },
+  {
+    "id": 21,
+    "task": "Запустить контейнер nginx с ограничением памяти 512MB и 0.5 CPU",
+    "opts": [
+      "docker run -d --memory=512m --cpus=0.5 nginx",
+      "docker run -d --mem=512m --cpu=0.5 nginx",
+      "docker run -d --memory-limit=512mb --cpu-shares=0.5 nginx",
+      "docker run -d -m 512 --cpu=50% nginx"
+    ],
+    "answer": 0,
+    "exp": "--memory=512m задаёт лимит RAM. --cpus=0.5 ограничивает до половины ядра CPU. Единицы: m=мегабайты, g=гигабайты. --cpu-shares задаёт относительный вес, не абсолютный лимит."
+  },
+  {
+    "id": 22,
+    "task": "Показать логи контейнера myapp за последние 10 минут",
+    "opts": [
+      "docker logs --since 10m myapp",
+      "docker logs --tail 10 myapp",
+      "docker logs --time 10m myapp",
+      "docker logs -n 10m myapp"
+    ],
+    "answer": 0,
+    "exp": "--since задаёт временной диапазон от текущего момента: 10m = 10 минут, 1h = 1 час, 2006-01-02T15:04:05 = конкретный момент. --tail задаёт количество строк, не время."
+  },
+  {
+    "id": 23,
+    "task": "Сохранить Docker образ myapp:v1.0 в tar-файл /tmp/myapp.tar",
+    "opts": [
+      "docker save -o /tmp/myapp.tar myapp:v1.0",
+      "docker export -o /tmp/myapp.tar myapp:v1.0",
+      "docker image save myapp:v1.0 > /tmp/myapp.tar",
+      "docker commit myapp:v1.0 /tmp/myapp.tar"
+    ],
+    "answer": 0,
+    "exp": "docker save сохраняет образ (image) со всеми слоями и метаданными. docker export сохраняет файловую систему запущенного контейнера (без истории слоёв). -o задаёт выходной файл."
+  },
+  {
+    "id": 24,
+    "task": "Загрузить Docker образ из файла /tmp/myapp.tar в локальный registry",
+    "opts": [
+      "docker load -i /tmp/myapp.tar",
+      "docker import /tmp/myapp.tar",
+      "docker pull /tmp/myapp.tar",
+      "docker restore -i /tmp/myapp.tar"
+    ],
+    "answer": 0,
+    "exp": "docker load -i загружает образ сохранённый через docker save, восстанавливая все слои. docker import создаёт образ из tar-архива файловой системы (без истории слоёв). docker pull — только из registry."
+  },
+  {
+    "id": 25,
+    "task": "Показать историю слоёв образа myapp:v1.0 (команды и размеры)",
+    "opts": [
+      "docker history myapp:v1.0",
+      "docker image layers myapp:v1.0",
+      "docker inspect --layers myapp:v1.0",
+      "docker image inspect myapp:v1.0"
+    ],
+    "answer": 0,
+    "exp": "docker history показывает все слои образа: команду создавшую слой (CREATED BY), размер, ID. Полезно для оптимизации Dockerfile. docker inspect показывает метаданные, но не историю слоёв в читаемом виде."
+  },
+  {
+    "id": 26,
+    "task": "Войти в запущенный контейнер myapp с правами root и запустить bash",
+    "opts": [
+      "docker exec -it -u root myapp bash",
+      "docker exec -it myapp sudo bash",
+      "docker attach --user root myapp",
+      "docker exec --root myapp /bin/bash"
+    ],
+    "answer": 0,
+    "exp": "docker exec -u root задаёт пользователя для выполнения команды. -it: интерактивный терминал. docker attach подключается к основному процессу контейнера, не создаёт новый. sudo может не быть установлен в контейнере."
+  },
+  {
+    "id": 27,
+    "task": "Удалить все остановленные контейнеры и неиспользуемые образы одной командой",
+    "opts": [
+      "docker system prune -a",
+      "docker rm $(docker ps -aq) && docker rmi $(docker images -q)",
+      "docker container prune && docker image prune",
+      "docker system prune"
+    ],
+    "answer": 0,
+    "exp": "docker system prune -a удаляет: остановленные контейнеры, неиспользуемые сети, dangling образы И все образа без контейнеров (-a). Без -a удаляет только dangling (без тега) образы. Также удаляет build cache."
+  },
+  {
+    "id": 28,
+    "task": "Собрать multi-stage образ из Dockerfile остановившись на stage с именем 'builder'",
+    "opts": [
+      "docker build --target builder -t myapp:builder .",
+      "docker build --stage builder -t myapp:builder .",
+      "docker build -s builder -t myapp:builder .",
+      "docker build --from builder -t myapp:builder ."
+    ],
+    "answer": 0,
+    "exp": "--target <stage_name> указывает финальный stage при сборке multi-stage Dockerfile. Stage именуется: FROM golang:1.21 AS builder. Позволяет собрать промежуточный артефакт для тестирования."
+  },
+  {
+    "id": 29,
+    "task": "Скопировать файл /app/config.json из контейнера myapp на хост в текущую директорию",
+    "opts": [
+      "docker cp myapp:/app/config.json .",
+      "docker copy myapp:/app/config.json .",
+      "docker exec myapp cat /app/config.json > config.json",
+      "docker export myapp | tar -x app/config.json"
+    ],
+    "answer": 0,
+    "exp": "docker cp <container>:<path> <host_path> копирует файлы из контейнера на хост. Работает и в обратную сторону: docker cp ./file container:/path. Контейнер может быть остановлен."
+  },
+  {
+    "id": 30,
+    "task": "Проверить статус healthcheck для контейнера myapp",
+    "opts": [
+      "docker inspect --format='{{json .State.Health}}' myapp",
+      "docker health myapp",
+      "docker status myapp",
+      "docker ps --health myapp"
+    ],
+    "answer": 0,
+    "exp": "docker inspect с форматом json выводит объект Health: Status (healthy/unhealthy/starting), FailingStreak, Log с последними результатами проверок. docker ps тоже показывает статус в колонке STATUS, но без истории."
+  },
+  {
+    "id": 31,
+    "task": "Получить логи из предыдущего (упавшего) экземпляра контейнера app в pod api-pod",
+    "opts": [
+      "kubectl logs api-pod -c app --previous",
+      "kubectl logs api-pod -c app --last",
+      "kubectl logs api-pod -c app --crashed",
+      "kubectl logs --prev api-pod -c app"
+    ],
+    "answer": 0,
+    "exp": "--previous (или -p) выводит логи предыдущего (завершённого) экземпляра контейнера. Незаменимо при CrashLoopBackOff — текущий контейнер может ещё не накопить логи. -c указывает контейнер в multi-container pod."
+  },
+  {
+    "id": 32,
+    "task": "Запустить временный pod с образом busybox для интерактивной отладки сети и удалить его после выхода",
+    "opts": [
+      "kubectl run debug --image=busybox --rm -it --restart=Never -- sh",
+      "kubectl run debug --image=busybox -it --delete-on-exit -- sh",
+      "kubectl create pod debug --image=busybox --interactive",
+      "kubectl exec -it --image=busybox -- sh"
+    ],
+    "answer": 0,
+    "exp": "--rm удаляет pod после завершения. -it: интерактивный терминал. --restart=Never: запустить как Job, не как Deployment (иначе pod будет перезапускаться). -- sh: команда для запуска."
+  },
+  {
+    "id": 33,
+    "task": "Применить манифест deployment.yaml и сразу проверить статус rollout",
+    "opts": [
+      "kubectl apply -f deployment.yaml && kubectl rollout status deployment/myapp",
+      "kubectl apply -f deployment.yaml && kubectl get deployment myapp",
+      "kubectl deploy -f deployment.yaml --watch",
+      "kubectl apply -f deployment.yaml --rollout-watch"
+    ],
+    "answer": 0,
+    "exp": "kubectl rollout status блокирует выполнение до завершения rollout и выводит прогресс. Возвращает код 0 при успехе, ненулевой при ошибке. Полезно в CI/CD пайплайнах."
+  },
+  {
+    "id": 34,
+    "task": "Принудительно удалить pod застрявший в статусе Terminating",
+    "opts": [
+      "kubectl delete pod stuck-pod --force --grace-period=0",
+      "kubectl delete pod stuck-pod --timeout=0",
+      "kubectl kill pod stuck-pod",
+      "kubectl delete pod stuck-pod --now"
+    ],
+    "answer": 0,
+    "exp": "--force --grace-period=0 немедленно удаляет объект из etcd без ожидания завершения процессов. Используйте только когда pod завис и не реагирует на обычное удаление. --now эквивалентно --grace-period=1 (не 0)."
+  },
+  {
+    "id": 35,
+    "task": "Показать использование CPU и памяти всеми pods в namespace production",
+    "opts": [
+      "kubectl top pods -n production",
+      "kubectl get pods -n production --resources",
+      "kubectl describe pods -n production | grep -i cpu",
+      "kubectl stats pods -n production"
+    ],
+    "answer": 0,
+    "exp": "kubectl top pods требует установленного metrics-server в кластере. -n задаёт namespace. Показывает реальное потребление CPU (millicores) и памяти (Mi). kubectl describe показывает лимиты/запросы, не реальное потребление."
+  },
+  {
+    "id": 36,
+    "task": "Скопировать файл /var/log/app.log из pod api-pod (namespace production) на локальную машину",
+    "opts": [
+      "kubectl cp production/api-pod:/var/log/app.log ./app.log",
+      "kubectl copy api-pod:/var/log/app.log ./app.log -n production",
+      "kubectl exec api-pod -n production -- cat /var/log/app.log > app.log",
+      "kubectl get file api-pod:/var/log/app.log -n production"
+    ],
+    "answer": 0,
+    "exp": "kubectl cp <namespace>/<pod>:<path> <local_path> копирует файл из pod. Формат: namespace/pod:path или pod:path с -n namespace. Требует tar в контейнере. Вариант с exec + cat может не передать бинарные файлы корректно."
+  },
+  {
+    "id": 37,
+    "task": "Отредактировать deployment myapp в namespace production напрямую в редакторе",
+    "opts": [
+      "kubectl edit deployment myapp -n production",
+      "kubectl modify deployment myapp -n production",
+      "kubectl update deployment myapp -n production",
+      "kubectl patch deployment myapp -n production"
+    ],
+    "answer": 0,
+    "exp": "kubectl edit открывает ресурс в $EDITOR (по умолчанию vi). После сохранения изменения применяются немедленно. kubectl patch применяет изменения из командной строки или файла без интерактивного редактора."
+  },
+  {
+    "id": 38,
+    "task": "Показать все события (events) в namespace production отсортированные по времени",
+    "opts": [
+      "kubectl get events -n production --sort-by='.lastTimestamp'",
+      "kubectl describe events -n production",
+      "kubectl get events -n production --watch",
+      "kubectl logs events -n production"
+    ],
+    "answer": 0,
+    "exp": "--sort-by='.lastTimestamp' сортирует события по времени последнего появления. Events содержат причины: FailedScheduling, OOMKilled, ImagePullBackOff и т.д. --watch следит за новыми событиями в реальном времени."
+  },
+  {
+    "id": 39,
+    "task": "Пробросить порт 8080 с pod api-pod на localhost:9090",
+    "opts": [
+      "kubectl port-forward pod/api-pod 9090:8080",
+      "kubectl port-forward api-pod 8080:9090",
+      "kubectl forward pod/api-pod 9090:8080",
+      "kubectl tunnel api-pod --local=9090 --remote=8080"
+    ],
+    "answer": 0,
+    "exp": "kubectl port-forward <resource> <local_port>:<remote_port>. Порядок: сначала локальный порт, потом порт в pod. Работает и для service/deployment. Создаёт туннель через API server — не для production нагрузки."
+  },
+  {
+    "id": 40,
+    "task": "Откатить deployment myapp в namespace production к предыдущей ревизии",
+    "opts": [
+      "kubectl rollout undo deployment/myapp -n production",
+      "kubectl rollback deployment/myapp -n production",
+      "kubectl rollout revert deployment/myapp -n production",
+      "kubectl apply -f previous-deployment.yaml -n production"
+    ],
+    "answer": 0,
+    "exp": "kubectl rollout undo откатывает к предыдущей ревизии. --to-revision=N откатывает к конкретной ревизии. История ревизий: kubectl rollout history deployment/myapp. Количество хранимых ревизий задаётся revisionHistoryLimit."
+  }
+]

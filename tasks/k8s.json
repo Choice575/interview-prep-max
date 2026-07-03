@@ -1,0 +1,142 @@
+[
+  {
+    "id": 1,
+    "title": "Отсутствует readinessProbe",
+    "code": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 3\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      containers:\n      - name: api\n        image: myapp:latest\n        ports:\n        - containerPort: 8080",
+    "bug": "Нет readinessProbe! K8s считает под готовым сразу после старта контейнера. Если приложение загружается 30 секунд — часть запросов упадёт на непрогретый инстанс.",
+    "fix": "readinessProbe:\n  httpGet:\n    path: /health\n    port: 8080\n  initialDelaySeconds: 10\n  periodSeconds: 5",
+    "opts": [
+      "Нет readinessProbe — трафик идёт на непрогретый под",
+      "replicas: 3 слишком много",
+      "matchLabels не совпадает с labels",
+      "containerPort должен быть 80"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 2,
+    "title": "Нет livenessProbe — подвисший под не перезапустится",
+    "code": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: worker\nspec:\n  containers:\n  - name: worker\n    image: myworker:v1\n    resources:\n      requests:\n        memory: \"128Mi\"\n        cpu: \"100m\"",
+    "bug": "Без livenessProbe K8s не узнает что приложение зависло (deadlock, бесконечный цикл). Под будет висеть вечно, не обрабатывая запросы.",
+    "fix": "livenessProbe:\n  httpGet:\n    path: /healthz\n    port: 8080\n  initialDelaySeconds: 15\n  periodSeconds: 10\n  failureThreshold: 3",
+    "opts": [
+      "Нет livenessProbe — зависший под не перезапустится",
+      "resources.requests.memory должен быть в Gi",
+      "kind: Pod не поддерживает resources",
+      "Не указан namespace"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 3,
+    "title": "ConfigMap: строка вместо файла",
+    "code": "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: app-config\ndata:\n  config.yaml: |\n    server:\n      port: 8080\n      host: 0.0.0.0\n  DB_PASSWORD: supersecret",
+    "bug": "Пароль БД в открытом виде в ConfigMap! ConfigMap — не для секретов. Любой с доступом к namespace видит пароль.",
+    "fix": "Использовать Secret вместо ConfigMap:\napiVersion: v1\nkind: Secret\nmetadata:\n  name: db-credentials\ntype: Opaque\nstringData:\n  DB_PASSWORD: supersecret",
+    "opts": [
+      "Пароль в открытом виде в ConfigMap — нужно использовать Secret",
+      "config.yaml должен быть в binaryData",
+      "Неверный apiVersion",
+      "ConfigMap не поддерживает многострочные значения"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 4,
+    "title": "Service без selector",
+    "code": "apiVersion: v1\nkind: Service\nmetadata:\n  name: api-svc\nspec:\n  ports:\n  - port: 80\n    targetPort: 8080\n  type: ClusterIP",
+    "bug": "Service без selector не знает на какие поды отправлять трафик. Endpoints останутся пустыми. Запросы будут виснуть/падать.",
+    "fix": "spec:\n  selector:\n    app: api\n  ports:\n  - port: 80\n    targetPort: 8080\n  type: ClusterIP",
+    "opts": [
+      "Нет selector — Service не знает куда маршрутизировать трафик",
+      "ClusterIP не поддерживает targetPort",
+      "port и targetPort не могут различаться",
+      "Service должен быть типа NodePort"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 5,
+    "title": "resources без limits",
+    "code": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: app\nspec:\n  containers:\n  - name: app\n    image: myapp:v1\n    resources:\n      requests:\n        memory: \"128Mi\"\n        cpu: \"100m\"",
+    "bug": "Указаны requests, но нет limits. K8s позволяет контейнеру съесть всю память ноды. При утечке памяти — OOMKiller убьёт процесс. QoS класс — Burstable (не Guaranteed).",
+    "fix": "resources:\n  requests:\n    memory: \"128Mi\"\n    cpu: \"100m\"\n  limits:\n    memory: \"256Mi\"\n    cpu: \"500m\"",
+    "opts": [
+      "Нет limits — контейнер может занять всю память ноды",
+      "requests должны быть равны limits",
+      "cpu запрос задан в милли-ядрах — неверный формат",
+      "Не указан imagePullPolicy"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 6,
+    "title": "latest-тег и imagePullPolicy: Always пропущен",
+    "code": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: frontend\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: frontend\n  template:\n    spec:\n      containers:\n      - name: frontend\n        image: myapp:latest",
+    "bug": "latest + imagePullPolicy по умолчанию (IfNotPresent) = нода кэширует старый latest. Новый образ не подтягивается. Поды на разных нодах могут запустить РАЗНЫЕ версии.",
+    "fix": "Добавить imagePullPolicy: Always\nИли использовать версионированные теги: myapp:v1.2.3",
+    "opts": [
+      "latest без imagePullPolicy: Always — нода кэширует старый образ",
+      "replicas: 2 недостаточно",
+      "Deployment требует strategy",
+      "Неверный apiVersion"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 7,
+    "title": "Отсутствует securityContext",
+    "code": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: secure-app\nspec:\n  containers:\n  - name: app\n    image: myapp:v1\n    ports:\n    - containerPort: 8080",
+    "bug": "Контейнер запускается от root (по умолчанию). Нет ограничений: можно менять системные файлы, устанавливать пакеты. При взломе — полный контроль над контейнером.",
+    "fix": "securityContext:\n  runAsNonRoot: true\n  runAsUser: 1000\n  allowPrivilegeEscalation: false\n  capabilities:\n    drop:\n    - ALL",
+    "opts": [
+      "Нет securityContext — контейнер запускается от root с полными правами",
+      "kind: Pod не поддерживает containerPort",
+      "image должен быть в приватном реестре",
+      "Нельзя запускать контейнер не от root"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 8,
+    "title": "Deployment без strategy",
+    "code": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 3\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      containers:\n      - name: api\n        image: myapp:v1",
+    "bug": "По умолчанию strategy: RollingUpdate с maxSurge: 25% и maxUnavailable: 25%. Для 3 реплик — 1 под может быть недоступен (33% трафика под риском). Для production лучше явно указать параметры.",
+    "fix": "strategy:\n  type: RollingUpdate\n  rollingUpdate:\n    maxSurge: 1\n    maxUnavailable: 0\n// Гарантирует что все 3 пода всегда доступны",
+    "opts": [
+      "strategy по умолчанию RollingUpdate — нужно явно задать maxUnavailable: 0 для production",
+      "RollingUpdate не работает с 3 репликами",
+      "Deployment требует minReadySeconds",
+      "matchLabels должен быть словарём"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 9,
+    "title": "Service тип ClusterIP для внешнего доступа",
+    "code": "apiVersion: v1\nkind: Service\nmetadata:\n  name: web-svc\nspec:\n  selector:\n    app: web\n  ports:\n  - port: 80\n    targetPort: 3000\n  type: ClusterIP",
+    "bug": "ClusterIP доступен ТОЛЬКО внутри кластера. Для доступа извне нужен NodePort (порт на каждой ноде) или LoadBalancer (внешний IP облачного балансировщика).",
+    "fix": "type: LoadBalancer\n// или\ntype: NodePort\nnodePort: 30080",
+    "opts": [
+      "ClusterIP недоступен извне кластера — нужен LoadBalancer или NodePort",
+      "targetPort 3000 не может отличаться от port 80",
+      "selector не должен совпадать с labels",
+      "Service не поддерживает порты"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 10,
+    "title": "Pod без restartPolicy для критичной задачи",
+    "code": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: cron-task\nspec:\n  containers:\n  - name: worker\n    image: myworker:v1\n    command: [\"python\", \"-\", \"process_batch.py\"]\n  restartPolicy: Never",
+    "bug": "restartPolicy: Never означает что упавший под НЕ перезапустится. Для воркера/батча это может быть ок, но если под упадёт из-за OOM — задача потеряна навсегда. Для долгоживущих сервисов нужен OnFailure или Always.",
+    "fix": "Для сервисов:\nrestartPolicy: Always\nДля задач с ретраями:\nrestartPolicy: OnFailure\n// Или использовать Job/CronJob вместо Pod",
+    "opts": [
+      "restartPolicy: Never для сервиса — при падении под не перезапустится",
+      "Pod не поддерживает restartPolicy",
+      "command должен быть массивом строк",
+      "Неверно — для Pod правильный restartPolicy: Never"
+    ],
+    "answer": 0
+  }
+]

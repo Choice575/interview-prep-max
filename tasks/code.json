@@ -1,0 +1,227 @@
+[
+  {
+    "id": 1,
+    "tool": "Terraform",
+    "title": "Чувствительный output без защиты",
+    "code": "output \"db_password\" {\n  value = aws_db_instance.main.password\n}",
+    "bug": "Пароль БД выводится в plaintext в terraform output и terraform.tfstate без маскировки",
+    "fix": "Добавить sensitive = true:\noutput \"db_password\" {\n  value     = aws_db_instance.main.password\n  sensitive = true\n}",
+    "opts": [
+      "Не указан sensitive = true для секретного output",
+      "Неверный синтаксис output блока",
+      "Нужно добавить description",
+      "Пароль нельзя выводить через output"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 2,
+    "tool": "Terraform",
+    "title": "for_each со списком вместо set",
+    "code": "variable \"buckets\" {\n  type    = list(string)\n  default = [\"logs\", \"backups\", \"artifacts\"]\n}\n\nresource \"aws_s3_bucket\" \"this\" {\n  for_each = var.buckets\n  bucket   = each.key\n}",
+    "bug": "for_each требует map или set(string), но передаётся list(string). Terraform выдаст ошибку.",
+    "fix": "Использовать toset(): for_each = toset(var.buckets)\nили изменить тип переменной на set(string)",
+    "opts": [
+      "for_each не поддерживает list — нужен toset(var.buckets) или set(string)",
+      "each.key нужно заменить на each.value",
+      "variable нужно объявить внутри resource",
+      "Нужно добавить count вместо for_each"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 3,
+    "tool": "Terraform",
+    "title": "ACM сертификат без create_before_destroy",
+    "code": "resource \"aws_acm_certificate\" \"cert\" {\n  domain_name       = \"example.com\"\n  validation_method = \"DNS\"\n}\n\nresource \"aws_lb_listener\" \"https\" {\n  certificate_arn = aws_acm_certificate.cert.arn\n}",
+    "bug": "При обновлении сертификата Terraform сначала удалит старый, затем создаст новый — downtime HTTPS.",
+    "fix": "Добавить lifecycle:\nlifecycle {\n  create_before_destroy = true\n}",
+    "opts": [
+      "Нет lifecycle { create_before_destroy = true } — будет downtime при обновлении сертификата",
+      "Нет validation_record ресурса",
+      "certificate_arn нельзя использовать напрямую",
+      "Нужно добавить depends_on"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 4,
+    "tool": "Terraform",
+    "title": "CloudFront без alias provider",
+    "code": "provider \"aws\" {\n  region = \"eu-west-1\"\n}\n\nresource \"aws_cloudfront_distribution\" \"cdn\" {\n  # ...\n}\n\nresource \"aws_acm_certificate\" \"cert\" {\n  domain_name       = \"example.com\"\n  validation_method = \"DNS\"\n}",
+    "bug": "ACM сертификат для CloudFront ОБЯЗАН быть в регионе us-east-1. При eu-west-1 CloudFront не сможет использовать сертификат.",
+    "fix": "Добавить provider с alias:\nprovider \"aws\" {\n  alias  = \"us_east_1\"\n  region = \"us-east-1\"\n}\nresource \"aws_acm_certificate\" \"cert\" {\n  provider = aws.us_east_1\n  ...\n}",
+    "opts": [
+      "ACM для CloudFront должен быть в us-east-1, нужен provider alias",
+      "CloudFront не поддерживает ACM",
+      "Нужно указать aliases в CloudFront distribution",
+      "region должен быть us-west-2"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 5,
+    "tool": "Terraform",
+    "title": "Credentials в backend конфиге",
+    "code": "terraform {\n  backend \"s3\" {\n    bucket     = \"my-tfstate\"\n    key        = \"prod/terraform.tfstate\"\n    region     = \"us-east-1\"\n    access_key = \"AKIAIOSFODNN7EXAMPLE\"\n    secret_key = \"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\"\n  }\n}",
+    "bug": "AWS credentials захардкожены в .tf файле. Попадут в git историю и будут скомпрометированы.",
+    "fix": "Использовать переменные окружения AWS_ACCESS_KEY_ID и AWS_SECRET_ACCESS_KEY, или IAM роль, или ~/.aws/credentials.",
+    "opts": [
+      "AWS credentials захардкожены в коде — попадут в git",
+      "Неверный формат backend блока",
+      "region должен быть в provider, не backend",
+      "Нужно добавить encrypt = true"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 6,
+    "tool": "Terraform",
+    "title": "count вызывает destroy при добавлении в середину",
+    "code": "variable \"servers\" {\n  default = [\"web-a\", \"web-b\", \"web-c\"]\n}\n\nresource \"aws_instance\" \"web\" {\n  count = length(var.servers)\n  ami   = \"ami-12345678\"\n  tags  = { Name = var.servers[count.index] }\n}",
+    "bug": "Если добавить элемент в начало списка: все последующие ресурсы получат другой индекс и будут пересозданы.",
+    "fix": "Использовать for_each с toset:\nfor_each = toset(var.servers)\ntags = { Name = each.key }",
+    "opts": [
+      "count привязан к индексу — добавление в середину вызовет destroy/recreate всех следующих элементов",
+      "Нужно добавить больше инстансов",
+      "ami нужно вынести в переменную",
+      "Нет lifecycle блока"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 7,
+    "tool": "Terraform",
+    "title": "ignore_changes = all блокирует обновления",
+    "code": "resource \"aws_launch_template\" \"app\" {\n  name_prefix = \"app-\"\n  image_id    = var.ami_id\n\n  lifecycle {\n    ignore_changes = all\n  }\n}",
+    "bug": "ignore_changes = all означает что Terraform никогда не обновит этот ресурс, даже если поменять AMI. Это нарушает принцип IaC.",
+    "fix": "Игнорировать только конкретные атрибуты:\nignore_changes = [tags[\"LastModified\"]]",
+    "opts": [
+      "ignore_changes = all запрещает ВСЕ обновления ресурса, даже легитимные изменения в коде",
+      "Нет create_before_destroy",
+      "image_id нельзя изменять",
+      "Нужно добавить version = \"\""
+    ],
+    "answer": 0
+  },
+  {
+    "id": 8,
+    "tool": "Ansible",
+    "title": "Несовпадение имени handler",
+    "code": "tasks:\n  - name: Copy nginx config\n    template:\n      src: nginx.conf.j2\n      dest: /etc/nginx/nginx.conf\n    notify: Restart Nginx\n\nhandlers:\n  - name: restart nginx\n    service:\n      name: nginx\n      state: restarted",
+    "bug": "notify: \"Restart Nginx\" не совпадает с name: \"restart nginx\" (разный регистр). Handler не запустится.",
+    "fix": "Привести к единому регистру:\nnotify: restart nginx\nили\nname: Restart Nginx",
+    "opts": [
+      "Имя в notify (\"Restart Nginx\") не совпадает с именем handler (\"restart nginx\") — регистр важен",
+      "Нужно добавить become: yes в handler",
+      "state должен быть started не restarted",
+      "handlers нужно вынести в отдельный файл"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 9,
+    "tool": "Ansible",
+    "title": "Отсутствует become для привилегированной задачи",
+    "code": "- name: Install nginx\n  apt:\n    name: nginx\n    state: present\n\n- name: Create nginx config\n  template:\n    src: nginx.conf.j2\n    dest: /etc/nginx/nginx.conf",
+    "bug": "apt и запись в /etc/nginx/ требуют root. Без become: yes задачи упадут с Permission denied.",
+    "fix": "Добавить в play или задачи:\nbecome: yes",
+    "opts": [
+      "Нет become: yes — задачи требуют root-привилегий для apt и записи в /etc/",
+      "Нужно добавить become_user: root",
+      "apt не поддерживается без sudo",
+      "Нужно использовать shell вместо apt"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 10,
+    "tool": "Ansible",
+    "title": "copy вместо template для Jinja2 файла",
+    "code": "- name: Deploy application config\n  copy:\n    src: app.conf.j2\n    dest: /etc/app/app.conf\n    owner: app\n    mode: \"0644\"",
+    "bug": "Модуль copy копирует файл как есть, без обработки Jinja2 шаблонов. Переменные {{ var }} останутся необработанными.",
+    "fix": "Использовать модуль template:\n- name: Deploy application config\n  template:\n    src: app.conf.j2\n    dest: /etc/app/app.conf",
+    "opts": [
+      "Нужен модуль template для обработки Jinja2 (.j2), copy копирует файл без рендеринга",
+      "src файл не существует",
+      "Нужно добавить validate параметр",
+      "mode должен быть 0600 для конфига"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 11,
+    "tool": "Ansible",
+    "title": "state: started не перезапускает сервис",
+    "code": "- name: Update nginx config\n  template:\n    src: nginx.conf.j2\n    dest: /etc/nginx/nginx.conf\n  notify: Restart nginx\n\nhandlers:\n  - name: Restart nginx\n    service:\n      name: nginx\n      state: started",
+    "bug": "state: started запустит nginx только если он не запущен. Если nginx уже работает — ничего не произойдёт. Конфиг не применится.",
+    "fix": "Изменить на state: restarted или state: reloaded (применяет конфиг без downtime):\nstate: reloaded",
+    "opts": [
+      "state: started не перезапустит уже работающий nginx — нужен state: restarted или state: reloaded",
+      "Нужно убрать notify и сделать restart в tasks",
+      "handler вызовется только при changed",
+      "Нужно добавить force: yes"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 12,
+    "tool": "Ansible",
+    "title": "Неверный синтаксис when с двойными скобками",
+    "code": "- name: Configure production settings\n  template:\n    src: prod.conf.j2\n    dest: /etc/app/app.conf\n  when: \"{{ env }} == 'production'\"",
+    "bug": "Двойные фигурные скобки в when — deprecated синтаксис. Jinja2 рендерит {{ env }} в строку, сравнение работает непредсказуемо.",
+    "fix": "Убрать двойные скобки:\nwhen: env == \"production\"\nили:\nwhen: env is defined and env == \"production\"",
+    "opts": [
+      "Неверный синтаксис when: двойные скобки deprecated, правильно: when: env == \"production\"",
+      "Нужно использовать register вместо when",
+      "env нужно определить как факт",
+      "Нужны одинарные кавычки вокруг всего выражения"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 13,
+    "tool": "Ansible",
+    "title": "yum на Debian системе",
+    "code": "- name: Install required packages\n  yum:\n    name:\n      - curl\n      - wget\n      - git\n    state: present",
+    "bug": "Модуль yum работает только на RHEL/CentOS/Fedora. На Ubuntu/Debian он упадёт с ошибкой.",
+    "fix": "Использовать apt для Debian/Ubuntu:\n  apt:\n    name: [curl, wget, git]\n    state: present\n\nИли универсальный:\n  package:\n    name: ...\n    state: present",
+    "opts": [
+      "yum работает только на RHEL/CentOS, для Ubuntu/Debian нужен apt или универсальный модуль package",
+      "Нужно добавить update_cache: yes",
+      "state: present нужно заменить на latest",
+      "Модули yum и apt взаимозаменяемы"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 14,
+    "tool": "Ansible",
+    "title": "set_fact в handler",
+    "code": "handlers:\n  - name: Restart app\n    service:\n      name: myapp\n      state: restarted\n\n  - name: Record restart time\n    set_fact:\n      last_restart: \"{{ ansible_date_time.iso8601 }}\"",
+    "bug": "set_fact в handler недоступен в задачах того же play — handlers выполняются в конце play изолированно.",
+    "fix": "Переместить set_fact в tasks или post_tasks. Handlers должны только выполнять действия (restart, reload).",
+    "opts": [
+      "set_fact в handler недоступен в задачах того же play — handlers изолированы в конце play",
+      "Нужно добавить listen к handler",
+      "ansible_date_time не доступен в handlers",
+      "Нужно использовать vars вместо set_fact"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 15,
+    "tool": "Terraform",
+    "title": "Hardcoded ARN вместо implicit reference",
+    "code": "resource \"aws_iam_role\" \"lambda_role\" {\n  name               = \"lambda-role\"\n  assume_role_policy = data.aws_iam_policy_document.assume_role.json\n}\n\nresource \"aws_lambda_function\" \"processor\" {\n  filename      = \"lambda.zip\"\n  function_name = \"processor\"\n  role          = \"arn:aws:iam::123456789:role/lambda-role\"\n  runtime       = \"python3.11\"\n}",
+    "bug": "role использует hardcoded ARN. Terraform не знает о зависимости — может создать lambda до IAM роли. ARN не обновится при изменении.",
+    "fix": "Использовать implicit reference:\nrole = aws_iam_role.lambda_role.arn",
+    "opts": [
+      "Hardcoded ARN — нет implicit dependency. Нужно role = aws_iam_role.lambda_role.arn для правильного порядка создания",
+      "ARN формат неверный",
+      "Нужно добавить depends_on явно",
+      "runtime не поддерживается"
+    ],
+    "answer": 0
+  }
+]

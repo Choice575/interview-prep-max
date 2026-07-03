@@ -1,0 +1,152 @@
+[
+  {
+    "id": 1,
+    "title": "become: yes пропущен",
+    "task": "Установить пакет nginx от root",
+    "code": "- name: Install nginx\n  apt:\n    name: nginx\n    state: present",
+    "bug": "apt требует прав root, но become: yes не указан. Плейбук упадёт с ошибкой прав доступа на непривилегированном пользователе.",
+    "fix": "Добавить become: yes:\n- name: Install nginx\n  become: yes\n  apt:\n    name: nginx\n    state: present",
+    "opts": [
+      "Не указан become: yes для повышения прав",
+      "Неверное имя пакета",
+      "Нужен модуль yum вместо apt",
+      "state: present недопустим для apt"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 2,
+    "title": "Неверный синтаксис переменной Jinja2",
+    "task": "Скопировать конфиг с именем хоста",
+    "code": "- name: Deploy config\n  template:\n    src: app.conf.j2\n    dest: \"/etc/app/{{ hostname }}.conf\"",
+    "bug": "Переменная hostname не существует. Правильное имя: ansible_hostname или inventory_hostname. Плейбук упадёт с ошибкой undefined variable.",
+    "fix": "Использовать ansible_hostname:\ndest: \"/etc/app/{{ ansible_hostname }}.conf\"",
+    "opts": [
+      "Переменная {{ hostname }} не существует — нужно ansible_hostname",
+      "Неверный модуль — нужен copy вместо template",
+      "Путь dest должен быть абсолютным",
+      "Синтаксис Jinja2 не поддерживается в Ansible"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 3,
+    "title": "notify вызывает handler с другим именем",
+    "task": "Перезапустить nginx при изменении конфига",
+    "code": "- name: Copy nginx config\n  copy:\n    src: nginx.conf\n    dest: /etc/nginx/nginx.conf\n  notify: restart nginx\n\nhandlers:\n  - name: Restart Nginx\n    service:\n      name: nginx\n      state: restarted",
+    "bug": "Имена handler чувствительны к регистру! notify: 'restart nginx' ≠ name: 'Restart Nginx'. Handler не выполнится.",
+    "fix": "Сделать имена одинаковыми:\nnotify: Restart Nginx\n// или\nhandlers:\n  - name: restart nginx // (lowercase)",
+    "opts": [
+      "Имена чувствительны к регистру: notify 'restart nginx' ≠ name 'Restart Nginx'",
+      "Handler должен быть определён до notify",
+      "Модуль service не поддерживает state: restarted",
+      "copy не поддерживает notify"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 4,
+    "title": "Пароль в открытом виде в плейбуке",
+    "task": "Создать пользователя БД с паролем",
+    "code": "- name: Create database user\n  mysql_user:\n    name: appuser\n    password: SuperSecret123!\n    priv: \"appdb.*:ALL\"\n    state: present",
+    "bug": "Пароль хранится в открытом виде в плейбуке. Попадёт в Git-историю — катастрофа безопасности.",
+    "fix": "Использовать Ansible Vault:\npassword: \"{{ vault_db_password }}\"\nЗашифровать переменную: ansible-vault encrypt_string 'SuperSecret123!' --name 'vault_db_password'",
+    "opts": [
+      "Пароль в открытом виде — нужно использовать Ansible Vault",
+      "Модуль mysql_user не существует",
+      "privileges пишется слитно: 'appdb.*:ALL'",
+      "state: present не создаёт пользователя"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 5,
+    "title": "with_items устарело — нужен loop",
+    "task": "Установить несколько пакетов",
+    "code": "- name: Install packages\n  apt:\n    name: \"{{ item }}\"\n    state: present\n  with_items:\n    - curl\n    - wget\n    - git",
+    "bug": "with_items устарело с версии 2.5. Нужно использовать loop. Работает, но генерирует предупреждения и будет удалено в будущем.",
+    "fix": "Заменить with_items на loop:\nloop:\n  - curl\n  - wget\n  - git\nТакже можно передать список напрямую: name: ['curl','wget','git']",
+    "opts": [
+      "with_items устарело — заменить на loop",
+      "apt не поддерживает список пакетов",
+      "Нужен модуль package вместо apt",
+      "state: present недопустим для нескольких пакетов"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 6,
+    "title": "Отсутствует проверка идемпотентности",
+    "task": "Добавить строку в /etc/hosts без дублирования",
+    "code": "- name: Add host entry\n  lineinfile:\n    path: /etc/hosts\n    line: \"10.0.0.5 app.internal\"\n    create: yes",
+    "bug": "lineinfile без regexp добавит строку при КАЖДОМ запуске. Файл замусорится дубликатами. Идемпотентность нарушена.",
+    "fix": "Добавить regexp для поиска существующей строки:\nlineinfile:\n  path: /etc/hosts\n  regexp: '^10\\.0\\.0\\.5\\s+app\\.internal'\n  line: \"10.0.0.5 app.internal\"\nТак Ansible сначала проверит наличие строки и добавит только если её нет.",
+    "opts": [
+      "Без regexp строка добавляется при каждом запуске — дубликаты",
+      "create: yes создаст файл, но не добавит строку",
+      "Модуль lineinfile не работает с /etc/hosts",
+      "Нужно использовать модуль blockinfile"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 7,
+    "title": "delegate_to вне правильного контекста",
+    "task": "Дождаться запуска приложения на удалённом хосте",
+    "code": "- name: Deploy app\n  copy:\n    src: app.jar\n    dest: /opt/app/app.jar\n\n- name: Wait for app to start\n  uri:\n    url: http://localhost:8080/health\n    status_code: 200\n  register: health\n  until: health.status == 200\n  retries: 30\n  delay: 2\n  delegate_to: localhost",
+    "bug": "delegate_to: localhost запустит проверку на локальной машине, а не на удалённом хосте. health вернёт статус localhost, а не целевого сервера.",
+    "fix": "Убрать delegate_to: localhost. uri должен выполняться на управляемом хосте для проверки его же сервиса. Если нужно проверить с локальной машины — указать полный URL целевого хоста.",
+    "opts": [
+      "delegate_to: localhost проверяет локальную машину вместо целевого хоста",
+      "uri не поддерживает retries и until",
+      "register не работает с uri",
+      "Нужно использовать модуль wait_for вместо uri"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 8,
+    "title": "Неэкранированные спецсимволы в YAML",
+    "task": "Выполнить shell-команду с пайпом",
+    "code": "- name: Check disk usage\n  shell:\n    cmd: df -h | grep /dev/sda1\n  register: disk_usage",
+    "bug": "Символ | (pipe) в YAML имеет специальное значение — это блочный литерал. Строка интерпретируется неверно, возможна ошибка парсинга.",
+    "fix": "Заключить команду в кавычки:\ncmd: \"df -h | grep /dev/sda1\"\nИли использовать многострочный синтаксис с |:\ncmd: |\n  df -h | grep /dev/sda1",
+    "opts": [
+      "Символ | конфликтует с YAML-синтаксисом — заключить команду в кавычки",
+      "shell не поддерживает аргумент cmd",
+      "Нужно использовать модуль command вместо shell",
+      "grep не работает внутри Ansible"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 9,
+    "title": "when без обязательной переменной",
+    "task": "Выполнить задачу только если определена переменная",
+    "code": "- name: Upload to S3\n  aws_s3:\n    bucket: my-bucket\n    object: /data/backup.tar.gz\n    src: /tmp/backup.tar.gz\n    mode: put\n  when: upload_to_s3",
+    "bug": "Если переменная upload_to_s3 не определена — Ansible упадёт с ошибкой, а не пропустит задачу. when ожидает именно boolean, а undefined variable вызывает ошибку.",
+    "fix": "Использовать фильтр default:\nwhen: upload_to_s3 | default(false) | bool\nИли проверить определённость:\nwhen: upload_to_s3 is defined and upload_to_s3",
+    "opts": [
+      "Неопределённая переменная в when вызывает ошибку — нужен default(false)",
+      "aws_s3 не поддерживает mode: put",
+      "when работает только с зарегистрированными переменными",
+      "Модуль aws_s3 требует регион"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 10,
+    "title": "facts не собираются — переменные недоступны",
+    "task": "Использовать IP-адрес хоста в конфиге",
+    "code": "- name: Configure app\n  hosts: webservers\n  gather_facts: no\n  tasks:\n    - name: Write config\n      template:\n        src: app.conf.j2\n        dest: /etc/app/config.conf",
+    "bug": "gather_facts: no отключает сбор фактов. Переменные ansible_default_ipv4, ansible_hostname и другие недоступны в шаблоне. template упадёт если они используются.",
+    "fix": "Убрать gather_facts: no или явно указать gather_facts: yes (по умолчанию). Или передать нужные переменные через vars/vars_files.",
+    "opts": [
+      "gather_facts: no отключает сбор системных переменных для шаблона",
+      "template не работает без gather_facts",
+      "hosts: webservers недопустимый синтаксис",
+      "Нужно использовать модуль copy вместо template"
+    ],
+    "answer": 0
+  }
+]

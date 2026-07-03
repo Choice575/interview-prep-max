@@ -1,0 +1,2202 @@
+[
+  {
+    "id": 1,
+    "title": "Nginx отдаёт 502 Bad Gateway",
+    "context": "Приложение недоступно. Nginx запущен, но возвращает 502 Bad Gateway.",
+    "nodes": {
+      "start": {
+        "obs": "Nginx запущен, но возвращает 502. С чего начнёте?",
+        "choices": [
+          {
+            "text": "Проверить логи nginx: tail -f /var/log/nginx/error.log",
+            "next": "nginx_logs",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "Перезапустить nginx: systemctl restart nginx",
+            "next": "restart_nginx",
+            "pts": 0,
+            "ok": false
+          },
+          {
+            "text": "Перезагрузить сервер",
+            "next": "reboot",
+            "pts": -10,
+            "ok": false
+          },
+          {
+            "text": "Запустить htop",
+            "next": "wrong_check",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "nginx_logs": {
+        "obs": "Лог: connect() failed (111: Connection refused) while connecting to upstream. Следующий шаг?",
+        "choices": [
+          {
+            "text": "Проверить запущен ли backend: ss -tlnp | grep 8080",
+            "next": "check_backend",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "Исправить конфиг nginx",
+            "next": "wrong_nginx_conf",
+            "pts": 5,
+            "ok": false
+          },
+          {
+            "text": "Проверить firewall",
+            "next": "check_fw_early",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "Перезапустить backend сервис",
+            "next": "restart_backend_blind",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "check_backend": {
+        "obs": "ss -tlnp показывает: порт 8080 не слушается. Backend не запущен. Что дальше?",
+        "choices": [
+          {
+            "text": "journalctl -u myapp -n 50 — посмотреть почему упал",
+            "next": "journalctl_check",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "systemctl start myapp без диагностики",
+            "next": "start_blind",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "Проверить /var/log/syslog",
+            "next": "syslog_check",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "Откатить последний деплой",
+            "next": "rollback_early",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "journalctl_check": {
+        "obs": "Журнал: java.lang.OutOfMemoryError: Java heap space. Backend падает из-за нехватки памяти. Что делать?",
+        "choices": [
+          {
+            "text": "Увеличить heap: добавить -Xmx2g в JAVA_OPTS и перезапустить",
+            "next": "fix_oom",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "Добавить swap",
+            "next": "add_swap",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "Перезагрузить сервер",
+            "next": "reboot",
+            "pts": 0,
+            "ok": false
+          },
+          {
+            "text": "Удалить логи приложения",
+            "next": "delete_logs",
+            "pts": 0,
+            "ok": false
+          }
+        ]
+      },
+      "fix_oom": {
+        "obs": "РЕШЕНО: Найдена корневая причина (OOM), heap увеличен. Nginx теперь отдаёт 200 OK.",
+        "choices": []
+      },
+      "restart_nginx": {
+        "obs": "Nginx перезапустился, но 502 не исчез — upstream всё ещё недоступен.",
+        "choices": [
+          {
+            "text": "Проверить логи nginx",
+            "next": "nginx_logs",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "start_blind": {
+        "obs": "Сервис стартовал, но через минуту снова упал. Без диагностики не исправить.",
+        "choices": [
+          {
+            "text": "journalctl -u myapp -n 50",
+            "next": "journalctl_check",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "reboot": {
+        "obs": "Перезагрузка не поможет исправить баг в коде. Проблема вернётся.",
+        "choices": []
+      },
+      "wrong_check": {
+        "obs": "htop показывает ресурсы, но не объясняет 502. Нужны логи.",
+        "choices": [
+          {
+            "text": "Проверить логи nginx",
+            "next": "nginx_logs",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "wrong_nginx_conf": {
+        "obs": "Конфиг nginx корректен — upstream просто не запущен.",
+        "choices": [
+          {
+            "text": "ss -tlnp | grep 8080",
+            "next": "check_backend",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "check_fw_early": {
+        "obs": "Firewall разрешает порт 8080, но сервис не слушает.",
+        "choices": [
+          {
+            "text": "ss -tlnp | grep 8080",
+            "next": "check_backend",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "restart_backend_blind": {
+        "obs": "Сервис не запускается. Нужно посмотреть почему.",
+        "choices": [
+          {
+            "text": "journalctl -u myapp -n 50",
+            "next": "journalctl_check",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "syslog_check": {
+        "obs": "В syslog нет детальных ошибок приложения. Нужен journalctl.",
+        "choices": [
+          {
+            "text": "journalctl -u myapp -n 50",
+            "next": "journalctl_check",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "rollback_early": {
+        "obs": "Откат — крайняя мера. Сначала нужно понять причину.",
+        "choices": [
+          {
+            "text": "journalctl -u myapp -n 50",
+            "next": "journalctl_check",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "add_swap": {
+        "obs": "Swap замедлит систему и не решит утечку памяти.",
+        "choices": [
+          {
+            "text": "Увеличить heap: -Xmx2g",
+            "next": "fix_oom",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "delete_logs": {
+        "obs": "Удаление логов не поможет — проблема в heap size.",
+        "choices": []
+      }
+    }
+  },
+  {
+    "id": 2,
+    "title": "Диск заполнен на 100%",
+    "context": "Все сервисы деградировали. df -h показывает /var 100%.",
+    "nodes": {
+      "start": {
+        "obs": "/var заполнен на 100%. Сервисы не могут писать логи. Первый шаг?",
+        "choices": [
+          {
+            "text": "du -sh /var/* | sort -rh | head -10",
+            "next": "find_dir",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "rm -rf /var/log/*",
+            "next": "rm_all_logs",
+            "pts": -15,
+            "ok": false
+          },
+          {
+            "text": "Перезагрузить сервер",
+            "next": "reboot_bad",
+            "pts": 0,
+            "ok": false
+          },
+          {
+            "text": "Добавить новый диск",
+            "next": "add_disk",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "find_dir": {
+        "obs": "du показывает: /var/log 25G, /var/lib 2G. Диагностируем /var/log.",
+        "choices": [
+          {
+            "text": "du -sh /var/log/* | sort -rh | head -10",
+            "next": "find_file",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "ls -lh /var/log",
+            "next": "ls_log",
+            "pts": 15,
+            "ok": false
+          },
+          {
+            "text": "journalctl --vacuum-size=1G",
+            "next": "vacuum_journal",
+            "pts": 20,
+            "ok": false
+          },
+          {
+            "text": "logrotate -f /etc/logrotate.conf",
+            "next": "logrotate_blind",
+            "pts": 10,
+            "ok": false
+          }
+        ]
+      },
+      "find_file": {
+        "obs": "Найдено: /var/log/app/debug.log 22G. Сервис активно пишет. Как освободить место без убийства процесса?",
+        "choices": [
+          {
+            "text": "> /var/log/app/debug.log (truncate открытого файла)",
+            "next": "truncate_file",
+            "pts": 30,
+            "ok": true
+          },
+          {
+            "text": "rm /var/log/app/debug.log",
+            "next": "rm_open_file",
+            "pts": 5,
+            "ok": false
+          },
+          {
+            "text": "kill $(lsof /var/log/app/debug.log | awk NR>1{print $2})",
+            "next": "kill_process",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "mv /var/log/app/debug.log /tmp/",
+            "next": "mv_file",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "truncate_file": {
+        "obs": "РЕШЕНО: Файл обнулён, 22GB освободились немедленно. Процесс продолжил запись. Настроить logrotate!",
+        "choices": []
+      },
+      "rm_all_logs": {
+        "obs": "ОПАСНО: Вы удалили системные и security логи. Невозможно расследовать инциденты.",
+        "choices": []
+      },
+      "reboot_bad": {
+        "obs": "После перезагрузки диск снова заполнится — причина не устранена.",
+        "choices": [
+          {
+            "text": "du -sh /var/*",
+            "next": "find_dir",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "add_disk": {
+        "obs": "Добавление диска займёт время. Сейчас нужно срочно освободить место.",
+        "choices": [
+          {
+            "text": "du -sh /var/*",
+            "next": "find_dir",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "ls_log": {
+        "obs": "ls -lh не даёт размер директорий. Используй du.",
+        "choices": [
+          {
+            "text": "du -sh /var/log/*",
+            "next": "find_file",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "vacuum_journal": {
+        "obs": "Журнал уменьшился, но 22G лог остался нетронутым.",
+        "choices": [
+          {
+            "text": "du -sh /var/log/*",
+            "next": "find_file",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "logrotate_blind": {
+        "obs": "logrotate создаёт новый файл, но старый (22G) занимает место пока открыт процессом.",
+        "choices": [
+          {
+            "text": "> /var/log/app/debug.log",
+            "next": "truncate_file",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "rm_open_file": {
+        "obs": "rm удалит имя файла, но блоки не освободятся пока процесс держит дескриптор!",
+        "choices": [
+          {
+            "text": "> /var/log/app/debug.log",
+            "next": "truncate_file",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "kill_process": {
+        "obs": "Убийство процесса освободит блоки, но сервис упадёт. Лучше truncate.",
+        "choices": []
+      },
+      "mv_file": {
+        "obs": "mv в той же ФС не освобождает блоки немедленно.",
+        "choices": [
+          {
+            "text": "> /var/log/app/debug.log",
+            "next": "truncate_file",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 3,
+    "title": "Сервис не запускается после обновления конфига",
+    "context": "После обновления конфига systemd сервис в статусе failed.",
+    "nodes": {
+      "start": {
+        "obs": "Сервис в статусе failed. Первый шаг?",
+        "choices": [
+          {
+            "text": "journalctl -u myservice -n 50 --no-pager",
+            "next": "journal_check",
+            "pts": 30,
+            "ok": true
+          },
+          {
+            "text": "systemctl restart myservice",
+            "next": "restart_failed",
+            "pts": 5,
+            "ok": false
+          },
+          {
+            "text": "systemctl daemon-reload && restart",
+            "next": "daemon_reload",
+            "pts": 15,
+            "ok": false
+          },
+          {
+            "text": "Откатить конфиг",
+            "next": "rollback_first",
+            "pts": 10,
+            "ok": false
+          }
+        ]
+      },
+      "journal_check": {
+        "obs": "Журнал: Permission denied: /etc/myservice/config.yaml. Следующий шаг?",
+        "choices": [
+          {
+            "text": "ls -la /etc/myservice/config.yaml — проверить права",
+            "next": "check_perms",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "chmod 777 /etc/myservice/config.yaml",
+            "next": "chmod_777",
+            "pts": -5,
+            "ok": false
+          },
+          {
+            "text": "chown root:root /etc/myservice/config.yaml",
+            "next": "chown_root",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "Запустить сервис от root",
+            "next": "run_root",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "check_perms": {
+        "obs": "ls -la: -rw------- root root config.yaml. Сервис запускается от пользователя myapp. Что сделать?",
+        "choices": [
+          {
+            "text": "chown myapp:myapp /etc/myservice/config.yaml",
+            "next": "fix_chown",
+            "pts": 30,
+            "ok": true
+          },
+          {
+            "text": "chmod 644 /etc/myservice/config.yaml",
+            "next": "chmod_644",
+            "pts": 20,
+            "ok": false
+          },
+          {
+            "text": "chmod 777 /etc/myservice/config.yaml",
+            "next": "chmod_777",
+            "pts": -5,
+            "ok": false
+          },
+          {
+            "text": "Добавить myapp в группу root",
+            "next": "add_to_root",
+            "pts": -10,
+            "ok": false
+          }
+        ]
+      },
+      "fix_chown": {
+        "obs": "РЕШЕНО: chown myapp:myapp дал права. systemctl start myservice — сервис запущен!",
+        "choices": []
+      },
+      "chmod_644": {
+        "obs": "chmod 644 (rw-r--r--) тоже решит проблему, но менее безопасно чем изменение владельца.",
+        "choices": []
+      },
+      "restart_failed": {
+        "obs": "Перезапуск не поможет — причина не устранена. Нужна диагностика.",
+        "choices": [
+          {
+            "text": "journalctl -u myservice -n 50",
+            "next": "journal_check",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "daemon_reload": {
+        "obs": "daemon-reload нужен при изменении unit файлов. Проблема в правах конфига.",
+        "choices": [
+          {
+            "text": "journalctl -u myservice -n 50",
+            "next": "journal_check",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "rollback_first": {
+        "obs": "Откат без диагностики — можно откатить правильные изменения.",
+        "choices": [
+          {
+            "text": "journalctl -u myservice -n 50",
+            "next": "journal_check",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "chmod_777": {
+        "obs": "777 — грубое нарушение безопасности. Для конфигов с паролями это критично.",
+        "choices": []
+      },
+      "chown_root": {
+        "obs": "root уже владелец. Проблема в том, что сервис запускается не от root.",
+        "choices": [
+          {
+            "text": "ls -la /etc/myservice/",
+            "next": "check_perms",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "run_root": {
+        "obs": "Запуск от root — нарушение принципа минимальных привилегий.",
+        "choices": [
+          {
+            "text": "ls -la /etc/myservice/",
+            "next": "check_perms",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "add_to_root": {
+        "obs": "Добавление в группу root — избыточные привилегии.",
+        "choices": []
+      }
+    }
+  },
+  {
+    "id": 4,
+    "title": "Terraform state lock завис",
+    "context": "terraform apply зависло. Коллега говорит его apply упал 15 минут назад.",
+    "nodes": {
+      "start": {
+        "obs": "terraform apply ждёт lock. Что делать?",
+        "choices": [
+          {
+            "text": "Проверить, нет ли активного apply у коллеги",
+            "next": "check_active",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "Немедленно terraform force-unlock",
+            "next": "force_unlock_blind",
+            "pts": 5,
+            "ok": false
+          },
+          {
+            "text": "Удалить запись в DynamoDB вручную",
+            "next": "delete_dynamo",
+            "pts": 0,
+            "ok": false
+          },
+          {
+            "text": "Удалить .terraform.tfstate.lock.info",
+            "next": "delete_lockfile",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "check_active": {
+        "obs": "Коллега подтвердил — его apply упал, процесса нет. Как получить LOCK_ID?",
+        "choices": [
+          {
+            "text": "Из сообщения об ошибке в терминале (там есть Lock ID)",
+            "next": "get_lock_id",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "Посмотреть в DynamoDB таблице",
+            "next": "dynamo_check",
+            "pts": 20,
+            "ok": false
+          },
+          {
+            "text": "terraform plan чтобы увидеть ID",
+            "next": "plan_lock",
+            "pts": 5,
+            "ok": false
+          },
+          {
+            "text": "Угадать ID",
+            "next": "guess_id",
+            "pts": -10,
+            "ok": false
+          }
+        ]
+      },
+      "get_lock_id": {
+        "obs": "У вас есть Lock ID из сообщения об ошибке. Что дальше?",
+        "choices": [
+          {
+            "text": "terraform force-unlock LOCK_ID",
+            "next": "success_unlock",
+            "pts": 30,
+            "ok": true
+          },
+          {
+            "text": "terraform force-unlock -force LOCK_ID",
+            "next": "success_unlock",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "Удалить .terraform директорию",
+            "next": "wrong_delete",
+            "pts": -5,
+            "ok": false
+          },
+          {
+            "text": "Переключить backend на local",
+            "next": "wrong_backend",
+            "pts": -5,
+            "ok": false
+          }
+        ]
+      },
+      "success_unlock": {
+        "obs": "РЕШЕНО: Lock снят. Теперь можно безопасно запустить terraform apply.",
+        "choices": []
+      },
+      "force_unlock_blind": {
+        "obs": "Нужно убедиться что никто не использует lock прямо сейчас.",
+        "choices": [
+          {
+            "text": "Подтвердить у коллеги что apply упал",
+            "next": "check_active",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "delete_dynamo": {
+        "obs": "Удалять DynamoDB запись напрямую — опасно. Используйте terraform force-unlock.",
+        "choices": []
+      },
+      "delete_lockfile": {
+        "obs": "При DynamoDB backend нет lockfile на диске. Lock в DynamoDB.",
+        "choices": [
+          {
+            "text": "Получить Lock ID из сообщения",
+            "next": "get_lock_id",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "dynamo_check": {
+        "obs": "DynamoDB покажет запись с Lock ID. Работает, но медленнее.",
+        "choices": [
+          {
+            "text": "terraform force-unlock LOCK_ID",
+            "next": "success_unlock",
+            "pts": 25,
+            "ok": true
+          }
+        ]
+      },
+      "plan_lock": {
+        "obs": "terraform plan тоже заблокирован тем же lock.",
+        "choices": [
+          {
+            "text": "Lock ID из сообщения об ошибке",
+            "next": "get_lock_id",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "guess_id": {
+        "obs": "Lock ID — UUID, угадать невозможно.",
+        "choices": []
+      },
+      "wrong_delete": {
+        "obs": "Удаление .terraform не снимает lock.",
+        "choices": []
+      },
+      "wrong_backend": {
+        "obs": "Смена backend потребует migrate-state и не решит проблему.",
+        "choices": []
+      }
+    }
+  },
+  {
+    "id": 5,
+    "title": "Высокая нагрузка CPU (GC thrashing)",
+    "context": "Сервер тормозит. Load average 12.0 при 4 ядрах. Пользователи жалуются.",
+    "nodes": {
+      "start": {
+        "obs": "Load average 12.0 на 4-ядерном сервере. Первый шаг?",
+        "choices": [
+          {
+            "text": "top или htop — найти процессы с высоким CPU",
+            "next": "top_check",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "Перезагрузить сервер",
+            "next": "reboot_server",
+            "pts": -5,
+            "ok": false
+          },
+          {
+            "text": "kill -9 -1 (убить все процессы)",
+            "next": "kill_all",
+            "pts": -20,
+            "ok": false
+          },
+          {
+            "text": "Проверить I/O: iotop",
+            "next": "iotop_check",
+            "pts": 15,
+            "ok": false
+          }
+        ]
+      },
+      "top_check": {
+        "obs": "top: java PID 1234 использует 380% CPU (4 ядра). Следующий шаг?",
+        "choices": [
+          {
+            "text": "jstack 1234 — получить thread dump для анализа",
+            "next": "jstack_check",
+            "pts": 30,
+            "ok": true
+          },
+          {
+            "text": "kill -9 1234",
+            "next": "kill_java",
+            "pts": 5,
+            "ok": false
+          },
+          {
+            "text": "Проверить логи java",
+            "next": "java_logs",
+            "pts": 15,
+            "ok": false
+          },
+          {
+            "text": "Перезапустить java сервис",
+            "next": "restart_java",
+            "pts": 10,
+            "ok": false
+          }
+        ]
+      },
+      "jstack_check": {
+        "obs": "jstack: сотни потоков в состоянии GC waiting. Это GC thrashing. Что делать?",
+        "choices": [
+          {
+            "text": "Увеличить heap (-Xmx), собрать heap dump для анализа утечки",
+            "next": "gc_fix",
+            "pts": 30,
+            "ok": true
+          },
+          {
+            "text": "Перезапустить JVM",
+            "next": "restart_java",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "Добавить swap",
+            "next": "add_swap2",
+            "pts": 5,
+            "ok": false
+          },
+          {
+            "text": "Обновить JVM",
+            "next": "update_jvm",
+            "pts": 0,
+            "ok": false
+          }
+        ]
+      },
+      "gc_fix": {
+        "obs": "РЕШЕНО: GC thrashing диагностирован. Heap dump собран, утечка будет найдена. Xmx увеличен.",
+        "choices": []
+      },
+      "reboot_server": {
+        "obs": "Перезагрузка не устранит причину. Через час нагрузка вернётся.",
+        "choices": [
+          {
+            "text": "top/htop",
+            "next": "top_check",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "kill_all": {
+        "obs": "kill -9 -1 убьёт ВСЕ процессы включая systemd. Это катастрофа.",
+        "choices": []
+      },
+      "iotop_check": {
+        "obs": "iotop показывает нормальный I/O. Проблема в CPU. top покажет что именно.",
+        "choices": [
+          {
+            "text": "top/htop",
+            "next": "top_check",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "kill_java": {
+        "obs": "Сервис убит, нагрузка спала. Но при рестарте повторится.",
+        "choices": [
+          {
+            "text": "jstack при следующем инциденте",
+            "next": "jstack_check",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "java_logs": {
+        "obs": "Логи: GC overhead limit exceeded. Подтверждает GC проблему.",
+        "choices": [
+          {
+            "text": "jstack для thread dump",
+            "next": "jstack_check",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "restart_java": {
+        "obs": "Рестарт временно помог, но без анализа причины проблема повторится.",
+        "choices": [
+          {
+            "text": "jstack при следующем инциденте",
+            "next": "jstack_check",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "add_swap2": {
+        "obs": "Swap не поможет при CPU GC thrashing. Нужно исправить heap size.",
+        "choices": []
+      },
+      "update_jvm": {
+        "obs": "Обновление JVM займёт время и вряд ли поможет при утечке памяти.",
+        "choices": []
+      }
+    }
+  },
+  {
+    "id": 6,
+    "title": "Ansible UNREACHABLE после ротации SSH ключей",
+    "context": "После ротации SSH ключей все хосты UNREACHABLE в Ansible.",
+    "nodes": {
+      "start": {
+        "obs": "Все хосты UNREACHABLE. Первый шаг?",
+        "choices": [
+          {
+            "text": "ssh -i new_key.pem user@host — проверить вручную",
+            "next": "ssh_test",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "ansible all -m ping -vvv",
+            "next": "ansible_verbose",
+            "pts": 20,
+            "ok": false
+          },
+          {
+            "text": "Откатить ключи",
+            "next": "rollback_keys",
+            "pts": 5,
+            "ok": false
+          },
+          {
+            "text": "Проверить inventory файл",
+            "next": "check_inventory",
+            "pts": 15,
+            "ok": false
+          }
+        ]
+      },
+      "ssh_test": {
+        "obs": "SSH: WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED. Что произошло?",
+        "choices": [
+          {
+            "text": "Ключ хоста изменился, known_hosts устарел. ssh-keyscan для обновления.",
+            "next": "fix_known_hosts",
+            "pts": 30,
+            "ok": true
+          },
+          {
+            "text": "ssh-keygen -R hostname — удалить старый ключ",
+            "next": "remove_known_hosts",
+            "pts": 25,
+            "ok": false
+          },
+          {
+            "text": "Отключить StrictHostKeyChecking в ansible.cfg",
+            "next": "disable_strict",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "Пересоздать все ВМ",
+            "next": "recreate_vms",
+            "pts": -10,
+            "ok": false
+          }
+        ]
+      },
+      "fix_known_hosts": {
+        "obs": "ssh-keyscan -H hostname >> ~/.ssh/known_hosts обновил ключи. Ansible работает?",
+        "choices": [
+          {
+            "text": "ansible all -m ping — проверить",
+            "next": "ansible_success",
+            "pts": 20,
+            "ok": true
+          },
+          {
+            "text": "Добавить ssh-keyscan в pipeline перед Ansible",
+            "next": "ansible_success",
+            "pts": 25,
+            "ok": true
+          }
+        ]
+      },
+      "ansible_success": {
+        "obs": "РЕШЕНО: known_hosts обновлён, Ansible подключается ко всем хостам. Автоматизируйте обновление ключей в pipeline.",
+        "choices": []
+      },
+      "ansible_verbose": {
+        "obs": "-vvv показывает Host key verification failed. Причина найдена.",
+        "choices": [
+          {
+            "text": "Обновить known_hosts через ssh-keyscan",
+            "next": "fix_known_hosts",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "rollback_keys": {
+        "obs": "Откат — крайняя мера. Сначала диагностика.",
+        "choices": [
+          {
+            "text": "ssh вручную для проверки",
+            "next": "ssh_test",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "check_inventory": {
+        "obs": "Inventory корректен. Проблема в SSH подключении.",
+        "choices": [
+          {
+            "text": "ssh вручную для проверки",
+            "next": "ssh_test",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "remove_known_hosts": {
+        "obs": "ssh-keygen -R удалит старый ключ, но SSH запросит подтверждение нового. ssh-keyscan лучше.",
+        "choices": [
+          {
+            "text": "ansible all -m ping",
+            "next": "ansible_success",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "disable_strict": {
+        "obs": "host_key_checking = False — быстро, но небезопасно (MITM уязвимость).",
+        "choices": [
+          {
+            "text": "ansible all -m ping",
+            "next": "ansible_success",
+            "pts": 10,
+            "ok": true
+          }
+        ]
+      },
+      "recreate_vms": {
+        "obs": "Пересоздание ВМ займёт часы и не нужно. Просто обновите known_hosts.",
+        "choices": []
+      }
+    }
+  },
+  {
+    "id": 7,
+    "title": "Kubernetes Pod в CrashLoopBackOff",
+    "context": "Pod сервиса api-backend постоянно перезапускается. kubectl get pods показывает статус CrashLoopBackOff. Приложение недоступно.",
+    "nodes": {
+      "start": {
+        "obs": "Pod api-backend в статусе CrashLoopBackOff. Restarts: 8. С чего начнёте диагностику?",
+        "choices": [
+          {
+            "text": "kubectl describe pod api-backend — посмотреть события и состояние",
+            "next": "describe_pod",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "kubectl delete pod api-backend — пересоздать pod",
+            "next": "delete_pod",
+            "pts": 0,
+            "ok": false
+          },
+          {
+            "text": "kubectl rollout restart deployment/api-backend",
+            "next": "rollout_restart",
+            "pts": 5,
+            "ok": false
+          },
+          {
+            "text": "kubectl get events --sort-by=.lastTimestamp",
+            "next": "get_events",
+            "pts": 15,
+            "ok": false
+          }
+        ]
+      },
+      "describe_pod": {
+        "obs": "kubectl describe pod: Last State: OOMKilled, Exit Code: 137. Limits: memory: 128Mi. Pod убивается ядром из-за нехватки памяти. Что дальше?",
+        "choices": [
+          {
+            "text": "kubectl logs api-backend --previous — посмотреть логи упавшего контейнера",
+            "next": "check_logs",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "Сразу увеличить memory limit в deployment",
+            "next": "fix_limits_blind",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "kubectl top pod api-backend — проверить текущее потребление",
+            "next": "top_pod",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "Добавить livenessProbe с увеличенным timeout",
+            "next": "wrong_probe",
+            "pts": 0,
+            "ok": false
+          }
+        ]
+      },
+      "check_logs": {
+        "obs": "Логи предыдущего контейнера: 'FATAL: OutOfMemoryError - heap space exhausted. Used: 125MB/128MB'. Приложению нужно больше памяти. Что делать?",
+        "choices": [
+          {
+            "text": "kubectl edit deployment api-backend — установить resources.limits.memory: 512Mi и requests.memory: 256Mi",
+            "next": "fix_resources",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "kubectl patch deployment api-backend --patch '{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"api\",\"resources\":{\"limits\":{\"memory\":\"512Mi\"}}}]}}}}'",
+            "next": "fix_resources",
+            "pts": 20,
+            "ok": true
+          },
+          {
+            "text": "Перезапустить node на котором запущен pod",
+            "next": "restart_node",
+            "pts": -5,
+            "ok": false
+          },
+          {
+            "text": "Удалить ограничения памяти совсем",
+            "next": "remove_limits",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "fix_resources": {
+        "obs": "РЕШЕНО: Memory limit увеличен до 512Mi. Pod запустился и работает. kubectl get pods показывает Running. Рекомендуется настроить VPA для автоматической оптимизации лимитов.",
+        "choices": []
+      },
+      "delete_pod": {
+        "obs": "Pod пересоздан, но снова в CrashLoopBackOff. Deployment автоматически создаёт новый pod с теми же настройками. Нужна диагностика.",
+        "choices": [
+          {
+            "text": "kubectl describe pod api-backend",
+            "next": "describe_pod",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "rollout_restart": {
+        "obs": "Rollout restart пересоздаёт все pods, но причина не устранена. CrashLoopBackOff вернулся.",
+        "choices": [
+          {
+            "text": "kubectl describe pod api-backend",
+            "next": "describe_pod",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "get_events": {
+        "obs": "События: 'OOMKilled' и 'Back-off restarting failed container'. Подтверждает проблему с памятью, но нужны детали.",
+        "choices": [
+          {
+            "text": "kubectl describe pod api-backend",
+            "next": "describe_pod",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "fix_limits_blind": {
+        "obs": "Увеличение лимита без просмотра логов — неплохо, но нужно знать сколько памяти реально нужно приложению.",
+        "choices": [
+          {
+            "text": "kubectl logs api-backend --previous",
+            "next": "check_logs",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "top_pod": {
+        "obs": "kubectl top не работает для CrashLoopBackOff pod — контейнер не запущен. Нужны логи предыдущего запуска.",
+        "choices": [
+          {
+            "text": "kubectl logs api-backend --previous",
+            "next": "check_logs",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "wrong_probe": {
+        "obs": "livenessProbe не поможет при OOMKilled — это системное завершение процесса ядром Linux из-за нехватки памяти.",
+        "choices": []
+      },
+      "restart_node": {
+        "obs": "Перезапуск node не решит проблему недостаточного memory limit. Pod снова получит OOMKilled.",
+        "choices": []
+      },
+      "remove_limits": {
+        "obs": "Отсутствие лимитов опасно — pod может потребить всю память node и вызвать OOMKill других pods.",
+        "choices": [
+          {
+            "text": "kubectl edit deployment — установить разумные лимиты 512Mi",
+            "next": "fix_resources",
+            "pts": 10,
+            "ok": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 8,
+    "title": "GitLab CI Runner не подхватывает задачи",
+    "context": "Pipeline запущен, задачи в статусе 'pending' уже 30 минут. Раньше всё работало. Runner зарегистрирован в GitLab UI.",
+    "nodes": {
+      "start": {
+        "obs": "Jobs висят в pending. Runner виден в GitLab как зарегистрированный. С чего начнёте?",
+        "choices": [
+          {
+            "text": "gitlab-runner status — проверить статус демона runner",
+            "next": "check_status",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "Отменить pipeline и запустить заново",
+            "next": "retry_pipeline",
+            "pts": 0,
+            "ok": false
+          },
+          {
+            "text": "Проверить в GitLab UI статус runner (Settings → CI/CD → Runners)",
+            "next": "check_gitlab_ui",
+            "pts": 15,
+            "ok": false
+          },
+          {
+            "text": "Перезагрузить сервер с runner",
+            "next": "reboot_runner",
+            "pts": -5,
+            "ok": false
+          }
+        ]
+      },
+      "check_status": {
+        "obs": "gitlab-runner status: 'Runtime platform: linux/amd64. gitlab-runner: Service is not running.' Runner демон не запущен! Что дальше?",
+        "choices": [
+          {
+            "text": "sudo systemctl start gitlab-runner && systemctl enable gitlab-runner",
+            "next": "start_runner",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "gitlab-runner run — запустить в foreground для диагностики",
+            "next": "run_foreground",
+            "pts": 20,
+            "ok": false
+          },
+          {
+            "text": "Проверить почему упал: journalctl -u gitlab-runner -n 50",
+            "next": "check_journal",
+            "pts": 20,
+            "ok": false
+          },
+          {
+            "text": "Переустановить gitlab-runner",
+            "next": "reinstall_runner",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "start_runner": {
+        "obs": "gitlab-runner стартовал, но задачи всё ещё pending. Проверяем журнал: 'ERROR: Checking for jobs... forbidden  runner=abc123'. Что это значит?",
+        "choices": [
+          {
+            "text": "Токен регистрации мог устареть. gitlab-runner verify && gitlab-runner register",
+            "next": "reregister_runner",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "Проверить сетевой доступ к GitLab: curl https://gitlab.example.com",
+            "next": "check_network",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "Удалить и заново создать runner в GitLab UI",
+            "next": "delete_runner",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "Добавить тег pipeline к runner",
+            "next": "wrong_tags",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "reregister_runner": {
+        "obs": "РЕШЕНО: Токен runner'а был отозван при ротации. После перерегистрации с новым токеном (gitlab-runner register) задачи начали выполняться. Настройте мониторинг статуса runner.",
+        "choices": []
+      },
+      "retry_pipeline": {
+        "obs": "Повтор pipeline не поможет — runner не запущен или не может принять задачи.",
+        "choices": [
+          {
+            "text": "gitlab-runner status",
+            "next": "check_status",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "check_gitlab_ui": {
+        "obs": "В GitLab UI runner показан как 'green' (был активен менее 2 часов назад), но статус может быть устаревшим.",
+        "choices": [
+          {
+            "text": "gitlab-runner status на сервере",
+            "next": "check_status",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "reboot_runner": {
+        "obs": "После перезагрузки runner не запустился автоматически — служба не включена в автозапуск.",
+        "choices": [
+          {
+            "text": "gitlab-runner status",
+            "next": "check_status",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "run_foreground": {
+        "obs": "gitlab-runner run показывает ошибки: токен отклонён GitLab. Нужна перерегистрация.",
+        "choices": [
+          {
+            "text": "gitlab-runner register с новым токеном",
+            "next": "reregister_runner",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "check_journal": {
+        "obs": "journalctl показывает: 'FATAL: Service exited with error code. forbidden token'. Токен отозван.",
+        "choices": [
+          {
+            "text": "gitlab-runner register с новым токеном",
+            "next": "reregister_runner",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "reinstall_runner": {
+        "obs": "Переустановка не поможет если проблема в токене — данные конфигурации сохранятся.",
+        "choices": [
+          {
+            "text": "gitlab-runner verify",
+            "next": "reregister_runner",
+            "pts": 10,
+            "ok": true
+          }
+        ]
+      },
+      "check_network": {
+        "obs": "Сеть работает, GitLab доступен. Проблема в авторизации runner (токен).",
+        "choices": [
+          {
+            "text": "gitlab-runner register с новым токеном",
+            "next": "reregister_runner",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "delete_runner": {
+        "obs": "Удаление и пересоздание runner — рабочий вариант, но нужно обновить токен в конфигурации.",
+        "choices": [
+          {
+            "text": "gitlab-runner register с новым токеном",
+            "next": "reregister_runner",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "wrong_tags": {
+        "obs": "Теги pipeline и runner должны совпадать, но здесь проблема в аутентификации, не в тегах.",
+        "choices": []
+      }
+    }
+  },
+  {
+    "id": 9,
+    "title": "Redis неожиданно удаляет ключи",
+    "context": "Приложение периодически получает nil вместо данных из Redis. Ключи существуют, но исчезают через несколько часов. TTL не установлен.",
+    "nodes": {
+      "start": {
+        "obs": "Ключи Redis исчезают без TTL. Приложение получает nil. С чего начнёте диагностику?",
+        "choices": [
+          {
+            "text": "redis-cli INFO memory — проверить использование памяти и политику вытеснения",
+            "next": "check_memory",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "redis-cli MONITOR — смотреть все команды в реальном времени",
+            "next": "monitor_redis",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "Перезапустить Redis",
+            "next": "restart_redis",
+            "pts": -5,
+            "ok": false
+          },
+          {
+            "text": "Проверить логи Redis: tail -f /var/log/redis/redis.log",
+            "next": "check_logs",
+            "pts": 15,
+            "ok": false
+          }
+        ]
+      },
+      "check_memory": {
+        "obs": "redis-cli INFO memory: used_memory_human:1.98G, maxmemory:2G, maxmemory_policy:allkeys-lru. Redis использует почти всю доступную память и вытесняет ключи по LRU! Что делать?",
+        "choices": [
+          {
+            "text": "Оценить реальный размер данных и увеличить maxmemory: redis-cli CONFIG SET maxmemory 4gb",
+            "next": "increase_maxmemory",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "Изменить политику на noeviction чтобы Redis не удалял ключи",
+            "next": "set_noeviction",
+            "pts": 15,
+            "ok": false
+          },
+          {
+            "text": "Изменить политику на volatile-lru (удалять только ключи с TTL)",
+            "next": "set_volatile_lru",
+            "pts": 20,
+            "ok": false
+          },
+          {
+            "text": "Очистить весь кэш: redis-cli FLUSHALL",
+            "next": "flush_all",
+            "pts": -15,
+            "ok": false
+          }
+        ]
+      },
+      "increase_maxmemory": {
+        "obs": "maxmemory увеличен до 4GB. Но нужно также зафиксировать в конфиге. Что ещё важно сделать?",
+        "choices": [
+          {
+            "text": "Обновить /etc/redis/redis.conf (maxmemory 4gb) и проверить политику вытеснения для данного use-case",
+            "next": "fix_config",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "Перезапустить Redis для применения",
+            "next": "wrong_restart",
+            "pts": 5,
+            "ok": false
+          },
+          {
+            "text": "Ничего — CONFIG SET уже применил изменение",
+            "next": "no_config",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "fix_config": {
+        "obs": "РЕШЕНО: maxmemory увеличен и зафиксирован в конфиге. Политика allkeys-lru подходит для кэша, но если данные не должны теряться — используйте noeviction с мониторингом памяти и шардированием.",
+        "choices": []
+      },
+      "monitor_redis": {
+        "obs": "MONITOR показывает команды, но не объясняет почему исчезают ключи без явного DEL. Нужна информация о памяти.",
+        "choices": [
+          {
+            "text": "redis-cli INFO memory",
+            "next": "check_memory",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "restart_redis": {
+        "obs": "Перезапуск Redis без persistence (RDB/AOF) приведёт к потере ВСЕХ данных. Категорически опасно.",
+        "choices": []
+      },
+      "check_logs": {
+        "obs": "Логи Redis: '# Accepted client connection'. Мало информации. INFO memory даст больше.",
+        "choices": [
+          {
+            "text": "redis-cli INFO memory",
+            "next": "check_memory",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "set_noeviction": {
+        "obs": "noeviction остановит вытеснение, но при заполнении памяти Redis начнёт возвращать OOM ошибки на записи — приложение сломается.",
+        "choices": [
+          {
+            "text": "Увеличить maxmemory: redis-cli CONFIG SET maxmemory 4gb",
+            "next": "increase_maxmemory",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "set_volatile_lru": {
+        "obs": "volatile-lru удаляет только ключи с TTL. Если ключи без TTL, вытеснения не будет — но при заполнении памяти Redis вернёт OOM.",
+        "choices": [
+          {
+            "text": "Увеличить maxmemory: redis-cli CONFIG SET maxmemory 4gb",
+            "next": "increase_maxmemory",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "flush_all": {
+        "obs": "FLUSHALL удалил все данные из Redis. Приложение получит nil на все запросы до прогрева кэша. Катастрофа без решения первопричины.",
+        "choices": []
+      },
+      "wrong_restart": {
+        "obs": "CONFIG SET применяется немедленно без перезапуска. Перезапуск сбросит значение если конфиг-файл не обновлён.",
+        "choices": [
+          {
+            "text": "Обновить /etc/redis/redis.conf",
+            "next": "fix_config",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "no_config": {
+        "obs": "CONFIG SET применяется только в памяти. После перезапуска Redis значение вернётся к старому из конфиг-файла.",
+        "choices": [
+          {
+            "text": "Обновить /etc/redis/redis.conf",
+            "next": "fix_config",
+            "pts": 10,
+            "ok": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 10,
+    "title": "Docker контейнер без доступа к сети",
+    "context": "Запущенный Docker контейнер не может обращаться к внешним адресам. curl из контейнера зависает. На хосте интернет работает.",
+    "nodes": {
+      "start": {
+        "obs": "Контейнер не имеет доступа к внешней сети. Хост работает нормально. Первый шаг диагностики?",
+        "choices": [
+          {
+            "text": "docker exec <container> ping 8.8.8.8 — проверить сетевую связность из контейнера",
+            "next": "ping_test",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "docker restart <container> — перезапустить контейнер",
+            "next": "restart_container",
+            "pts": 0,
+            "ok": false
+          },
+          {
+            "text": "docker network inspect bridge — проверить сетевые настройки Docker",
+            "next": "inspect_network",
+            "pts": 15,
+            "ok": false
+          },
+          {
+            "text": "Проверить файрвол хоста: iptables -L",
+            "next": "check_iptables_blind",
+            "pts": 10,
+            "ok": false
+          }
+        ]
+      },
+      "ping_test": {
+        "obs": "ping 8.8.8.8 из контейнера: connect: Network is unreachable. Проблема на уровне маршрутизации. Что проверить на хосте?",
+        "choices": [
+          {
+            "text": "sysctl net.ipv4.ip_forward — проверить включён ли IP forwarding",
+            "next": "check_ip_forward",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "iptables -t nat -L POSTROUTING — проверить NAT правила",
+            "next": "check_nat",
+            "pts": 20,
+            "ok": false
+          },
+          {
+            "text": "ip route show — проверить таблицу маршрутизации хоста",
+            "next": "check_routes",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "docker network disconnect bridge <container> && docker network connect bridge <container>",
+            "next": "reconnect_network",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "check_ip_forward": {
+        "obs": "sysctl net.ipv4.ip_forward = 0. IP forwarding отключён — пакеты от контейнеров не маршрутизируются на хосте! Что делать?",
+        "choices": [
+          {
+            "text": "sysctl -w net.ipv4.ip_forward=1 && echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf",
+            "next": "fix_ip_forward",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "sysctl -w net.ipv4.ip_forward=1 (только временно)",
+            "next": "temp_fix",
+            "pts": 15,
+            "ok": false
+          },
+          {
+            "text": "systemctl restart docker — Docker должен включить forwarding сам",
+            "next": "restart_docker",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "Добавить --network=host к контейнеру",
+            "next": "host_network",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "fix_ip_forward": {
+        "obs": "РЕШЕНО: IP forwarding включён постоянно. Контейнеры теперь имеют доступ к внешней сети. Также убедитесь что правило iptables MASQUERADE для Docker существует: iptables -t nat -L POSTROUTING.",
+        "choices": []
+      },
+      "restart_container": {
+        "obs": "Контейнер перезапустился, но сеть не работает — проблема на уровне хоста.",
+        "choices": [
+          {
+            "text": "docker exec <container> ping 8.8.8.8",
+            "next": "ping_test",
+            "pts": 20,
+            "ok": true
+          }
+        ]
+      },
+      "inspect_network": {
+        "obs": "docker network inspect показывает bridge сеть настроена корректно. Проблема за пределами Docker networking.",
+        "choices": [
+          {
+            "text": "docker exec <container> ping 8.8.8.8",
+            "next": "ping_test",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "check_iptables_blind": {
+        "obs": "iptables -L показывает правила FILTER цепочки, но для NAT нужна таблица nat. Сначала проверим forwarding.",
+        "choices": [
+          {
+            "text": "sysctl net.ipv4.ip_forward",
+            "next": "check_ip_forward",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "check_nat": {
+        "obs": "iptables -t nat -L: правило MASQUERADE для 172.17.0.0/16 существует. Проблема не в NAT, а в IP forwarding.",
+        "choices": [
+          {
+            "text": "sysctl net.ipv4.ip_forward",
+            "next": "check_ip_forward",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "check_routes": {
+        "obs": "Маршрутизация хоста корректна. Проблема в том что пакеты от контейнеров не форвардируются.",
+        "choices": [
+          {
+            "text": "sysctl net.ipv4.ip_forward",
+            "next": "check_ip_forward",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "reconnect_network": {
+        "obs": "Переподключение к сети не помогло — проблема в настройках хоста.",
+        "choices": [
+          {
+            "text": "sysctl net.ipv4.ip_forward",
+            "next": "check_ip_forward",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "temp_fix": {
+        "obs": "sysctl -w применяет изменение только до перезагрузки. После reboot проблема вернётся если не добавить в /etc/sysctl.conf.",
+        "choices": [
+          {
+            "text": "echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf",
+            "next": "fix_ip_forward",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "restart_docker": {
+        "obs": "Docker при рестарте должен восстанавливать iptables правила, но ip_forward=0 блокирует форвардинг на уровне ядра.",
+        "choices": [
+          {
+            "text": "sysctl -w net.ipv4.ip_forward=1",
+            "next": "fix_ip_forward",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "host_network": {
+        "obs": "--network=host обходит изоляцию Docker сети. Это небезопасно и не решает корневую проблему для остальных контейнеров.",
+        "choices": []
+      }
+    }
+  },
+  {
+    "id": 11,
+    "title": "Kubernetes ImagePullBackOff",
+    "context": "После деплоя новой версии pod не может стартовать. kubectl get pods показывает статус ImagePullBackOff. Образ существует в приватном registry.",
+    "nodes": {
+      "start": {
+        "obs": "Pod в статусе ImagePullBackOff. Образ в приватном registry. Первый шаг?",
+        "choices": [
+          {
+            "text": "kubectl describe pod <pod-name> — посмотреть детальную причину ошибки",
+            "next": "describe_pod",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "kubectl get pod <pod-name> -o yaml — получить полный манифест",
+            "next": "get_yaml",
+            "pts": 15,
+            "ok": false
+          },
+          {
+            "text": "docker pull registry.example.com/app:v2.0 — проверить доступность образа",
+            "next": "docker_pull",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "kubectl rollout undo deployment/app — откатить к предыдущей версии",
+            "next": "rollout_undo",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "describe_pod": {
+        "obs": "kubectl describe pod: Events: Failed to pull image: 'registry.example.com/app:v2.0': rpc error: unauthorized: authentication required. Kubernetes не может авторизоваться в registry. Что дальше?",
+        "choices": [
+          {
+            "text": "kubectl get secret — проверить наличие docker-registry secret в namespace",
+            "next": "check_secret",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "Проверить imagePullPolicy в deployment манифесте",
+            "next": "check_pull_policy",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "Создать secret для registry: kubectl create secret docker-registry regcred",
+            "next": "create_secret",
+            "pts": 20,
+            "ok": false
+          },
+          {
+            "text": "Перевести registry в публичный режим",
+            "next": "rollout_undo",
+            "pts": -5,
+            "ok": false
+          }
+        ]
+      },
+      "check_secret": {
+        "obs": "kubectl get secret: в namespace 'production' нет secret типа kubernetes.io/dockerconfigjson. Credentials не созданы. Что делать?",
+        "choices": [
+          {
+            "text": "kubectl create secret docker-registry regcred --docker-server=registry.example.com --docker-username=user --docker-password=pass -n production",
+            "next": "create_secret",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "kubectl create secret generic regcred --from-file=.dockerconfigjson=/root/.docker/config.json",
+            "next": "create_secret_file",
+            "pts": 20,
+            "ok": false
+          },
+          {
+            "text": "Добавить imagePullPolicy: Never в deployment",
+            "next": "wrong_policy",
+            "pts": -10,
+            "ok": false
+          },
+          {
+            "text": "Скопировать secret из другого namespace: kubectl get secret regcred -n default -o yaml | kubectl apply -n production -f -",
+            "next": "copy_secret",
+            "pts": 15,
+            "ok": false
+          }
+        ]
+      },
+      "create_secret": {
+        "obs": "Secret создан. Но pod всё ещё ImagePullBackOff. Нужно привязать secret к deployment. Что делать?",
+        "choices": [
+          {
+            "text": "kubectl patch deployment app -p '{\"spec\":{\"template\":{\"spec\":{\"imagePullSecrets\":[{\"name\":\"regcred\"}]}}}}'",
+            "next": "fix_deployment",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "kubectl edit deployment app — добавить imagePullSecrets: [{name: regcred}]",
+            "next": "fix_deployment",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "kubectl rollout restart deployment/app",
+            "next": "restart_without_secret",
+            "pts": 5,
+            "ok": false
+          },
+          {
+            "text": "kubectl annotate deployment app kubernetes.io/imagePullSecret=regcred",
+            "next": "wrong_annotation",
+            "pts": 0,
+            "ok": false
+          }
+        ]
+      },
+      "fix_deployment": {
+        "obs": "РЕШЕНО: imagePullSecrets добавлен в deployment. Kubernetes успешно получил credentials и скачал образ. Pod запущен. Убедитесь что secret создан во всех нужных namespaces.",
+        "choices": []
+      },
+      "get_yaml": {
+        "obs": "YAML манифест показывает image: registry.example.com/app:v2.0, но нет imagePullSecrets. Это подсказка, но нужно подтвердить ошибку.",
+        "choices": [
+          {
+            "text": "kubectl describe pod — посмотреть Events с деталями ошибки",
+            "next": "describe_pod",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "docker_pull": {
+        "obs": "docker pull с хоста работает — образ существует и доступен при наличии credentials. Проблема в Kubernetes credentials.",
+        "choices": [
+          {
+            "text": "kubectl describe pod <pod-name>",
+            "next": "describe_pod",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "rollout_undo": {
+        "obs": "Откат к предыдущей версии поможет восстановить работу, но не решит проблему с credentials для новой версии.",
+        "choices": [
+          {
+            "text": "kubectl describe pod — диагностировать проблему с credentials",
+            "next": "describe_pod",
+            "pts": 10,
+            "ok": true
+          }
+        ]
+      },
+      "check_pull_policy": {
+        "obs": "imagePullPolicy: Always — это корректно для production. Проблема в авторизации, не в политике pull.",
+        "choices": [
+          {
+            "text": "kubectl get secret в namespace production",
+            "next": "check_secret",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "create_secret_file": {
+        "obs": "Создание secret из config.json тоже работает, но нужно привязать его к deployment через imagePullSecrets.",
+        "choices": [
+          {
+            "text": "Добавить imagePullSecrets в deployment",
+            "next": "fix_deployment",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "copy_secret": {
+        "obs": "Копирование secret из другого namespace — рабочий вариант, но нужно также добавить imagePullSecrets в deployment.",
+        "choices": [
+          {
+            "text": "Добавить imagePullSecrets в deployment",
+            "next": "fix_deployment",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "wrong_policy": {
+        "obs": "imagePullPolicy: Never заставит Kubernetes искать образ локально — на worker node образа нет. Pod не запустится.",
+        "choices": []
+      },
+      "restart_without_secret": {
+        "obs": "Rollout restart без imagePullSecrets снова получит ошибку авторизации.",
+        "choices": [
+          {
+            "text": "kubectl edit deployment — добавить imagePullSecrets",
+            "next": "fix_deployment",
+            "pts": 10,
+            "ok": true
+          }
+        ]
+      },
+      "wrong_annotation": {
+        "obs": "imagePullSecrets — это поле spec, не annotation. Аннотация не повлияет на pull credentials.",
+        "choices": []
+      }
+    }
+  },
+  {
+    "id": 12,
+    "title": "Высокий iowait на сервере",
+    "context": "Сервер тормозит. top показывает iowait 75%. Load average 8.0 при 4 ядрах. Диск в порядке по SMART. Приложения деградируют.",
+    "nodes": {
+      "start": {
+        "obs": "iowait 75%, сервер тормозит. SMART в норме. С чего начнёте?",
+        "choices": [
+          {
+            "text": "iostat -x 1 5 — подробная статистика по устройствам (await, %util, r/s, w/s)",
+            "next": "iostat_check",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "iotop -o — найти процессы с высоким I/O",
+            "next": "iotop_check",
+            "pts": 20,
+            "ok": false
+          },
+          {
+            "text": "df -h — проверить заполненность дисков",
+            "next": "df_check",
+            "pts": 5,
+            "ok": false
+          },
+          {
+            "text": "Перезагрузить сервер",
+            "next": "reboot_server",
+            "pts": -10,
+            "ok": false
+          }
+        ]
+      },
+      "iostat_check": {
+        "obs": "iostat -x: sda %util=98%, await=450ms, w/s=850. Диск перегружен записью. Какой процесс виновен?",
+        "choices": [
+          {
+            "text": "iotop -o -b -n 3 — показать процессы с активным I/O",
+            "next": "iotop_check",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "lsof | grep sda — найти открытые файлы на устройстве",
+            "next": "lsof_device",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "vmstat 1 5 — посмотреть на уровне системы",
+            "next": "vmstat_check",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "Добавить SSD диск для ускорения",
+            "next": "add_ssd",
+            "pts": 0,
+            "ok": false
+          }
+        ]
+      },
+      "iotop_check": {
+        "obs": "iotop: PID 4521 'postgresql' — 820MB/s DISK WRITE. Postgres генерирует огромный I/O. Почему?",
+        "choices": [
+          {
+            "text": "lsof -p 4521 — посмотреть какие файлы открыты у процесса",
+            "next": "lsof_process",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "kill -9 4521 — убить postgres",
+            "next": "kill_postgres",
+            "pts": -15,
+            "ok": false
+          },
+          {
+            "text": "Проверить pg_stat_activity: SELECT * FROM pg_stat_activity WHERE state='active'",
+            "next": "pg_stat",
+            "pts": 20,
+            "ok": false
+          },
+          {
+            "text": "Перезапустить PostgreSQL",
+            "next": "restart_pg",
+            "pts": 5,
+            "ok": false
+          }
+        ]
+      },
+      "lsof_process": {
+        "obs": "lsof -p 4521: активно пишет в /var/lib/postgresql/pg_wal/*.wal. WAL файлы генерируются с огромной скоростью — запущен массовый импорт данных без checkpoint throttling. Что делать?",
+        "choices": [
+          {
+            "text": "Найти и остановить импорт. ALTER SYSTEM SET checkpoint_completion_target='0.9'; SELECT pg_reload_conf();",
+            "next": "fix_postgres",
+            "pts": 25,
+            "ok": true
+          },
+          {
+            "text": "Изменить synchronous_commit = off для снижения I/O (с риском потери данных)",
+            "next": "sync_off",
+            "pts": 10,
+            "ok": false
+          },
+          {
+            "text": "ionice -c 3 -p 4521 — снизить приоритет I/O процесса",
+            "next": "ionice_fix",
+            "pts": 15,
+            "ok": false
+          },
+          {
+            "text": "Увеличить vm.dirty_ratio для буферизации записи",
+            "next": "dirty_ratio",
+            "pts": 10,
+            "ok": false
+          }
+        ]
+      },
+      "fix_postgres": {
+        "obs": "РЕШЕНО: Массовый импорт остановлен, WAL generation снизился. checkpoint_completion_target=0.9 распределяет checkpoint I/O равномернее. iowait упал до 5%. Рекомендуется: pg_bulkload для импорта, мониторинг WAL generation.",
+        "choices": []
+      },
+      "df_check": {
+        "obs": "df -h: диски не заполнены. iowait не связан с нехваткой места. Нужна детальная I/O статистика.",
+        "choices": [
+          {
+            "text": "iostat -x 1 5",
+            "next": "iostat_check",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "reboot_server": {
+        "obs": "Перезагрузка прервёт все операции и может повредить данные PostgreSQL. Причина не устранена.",
+        "choices": []
+      },
+      "lsof_device": {
+        "obs": "lsof | grep sda показывает много процессов, но не ранжирует по I/O активности. iotop нагляднее.",
+        "choices": [
+          {
+            "text": "iotop -o — найти процессы с активным I/O",
+            "next": "iotop_check",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "vmstat_check": {
+        "obs": "vmstat подтверждает высокий wa (iowait) и активную запись. Нужно найти конкретный процесс.",
+        "choices": [
+          {
+            "text": "iotop -o",
+            "next": "iotop_check",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "add_ssd": {
+        "obs": "Добавление SSD — долгосрочное решение. Сейчас нужно найти и устранить причину аномального I/O.",
+        "choices": [
+          {
+            "text": "iotop -o — найти виновный процесс",
+            "next": "iotop_check",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "kill_postgres": {
+        "obs": "Убийство PostgreSQL kill -9 вызовет crash recovery при следующем запуске и прервёт все транзакции. Катастрофа.",
+        "choices": []
+      },
+      "pg_stat": {
+        "obs": "pg_stat_activity показывает активный COPY FROM запрос — массовый импорт. Источник I/O найден.",
+        "choices": [
+          {
+            "text": "Остановить импорт и настроить checkpoint_completion_target",
+            "next": "fix_postgres",
+            "pts": 15,
+            "ok": true
+          }
+        ]
+      },
+      "restart_pg": {
+        "obs": "Перезапуск PostgreSQL прервёт все активные транзакции и вызовет crash recovery с дополнительным I/O.",
+        "choices": [
+          {
+            "text": "lsof -p <pid> — сначала понять что происходит",
+            "next": "lsof_process",
+            "pts": 10,
+            "ok": true
+          }
+        ]
+      },
+      "sync_off": {
+        "obs": "synchronous_commit=off снижает I/O но при сбое можно потерять последние транзакции. Не подходит для production данных.",
+        "choices": []
+      },
+      "ionice_fix": {
+        "obs": "ionice снижает приоритет, но не устраняет причину аномального WAL generation. Другие процессы будут тормозить.",
+        "choices": [
+          {
+            "text": "Найти и остановить импорт",
+            "next": "fix_postgres",
+            "pts": 10,
+            "ok": true
+          }
+        ]
+      },
+      "dirty_ratio": {
+        "obs": "vm.dirty_ratio увеличивает буферизацию записи, но при PostgreSQL с fsync это не даёт эффекта — Postgres управляет fsync сам.",
+        "choices": []
+      }
+    }
+  }
+]

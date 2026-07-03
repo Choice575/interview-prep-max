@@ -1,0 +1,262 @@
+[
+  {
+    "id": 1,
+    "task": "Найти все строки в лог-файле содержащие IPv4-адрес. Какая команда правильная?",
+    "context": "grep <REGEX> /var/log/app.log",
+    "opts": [
+      "grep -E '[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}' /var/log/app.log",
+      "grep -E '[0-9]+.[0-9]+.[0-9]+.[0-9]+' /var/log/app.log",
+      "grep '\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}' /var/log/app.log",
+      "grep -E '^[0-9]{3}.[0-9]{3}.[0-9]{3}.[0-9]{3}$' /var/log/app.log"
+    ],
+    "answer": 0,
+    "exp": "[0-9]{1,3} — от 1 до 3 цифр. \\. — экранированная точка (не любой символ). -E включает расширенные регулярные выражения. \\d не поддерживается в POSIX grep без флага -P."
+  },
+  {
+    "id": 2,
+    "task": "Извлечь только email-адреса из файла (вывести только совпадения, не целые строки). Что правильно?",
+    "context": "grep <REGEX> emails.txt",
+    "opts": [
+      "grep -oE '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}' emails.txt",
+      "grep -E '@[a-zA-Z0-9.-]+' emails.txt",
+      "grep -o '.*@.*' emails.txt",
+      "grep -E '[a-z]+@[a-z]+.[a-z]+' emails.txt"
+    ],
+    "answer": 0,
+    "exp": "-o выводит только совпадающую часть строки. -E включает расширенный синтаксис. Паттерн [a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,} покрывает стандартный формат email."
+  },
+  {
+    "id": 3,
+    "task": "Заменить все числа (одно и более цифр) на символ X в файле data.txt (inplace). Что правильно?",
+    "context": "sed <ARGS> data.txt",
+    "opts": [
+      "sed -i 's/[0-9]\\+/X/g' data.txt",
+      "sed -i 's/[0-9]/X/g' data.txt",
+      "sed -i 's/\\d+/X/g' data.txt",
+      "sed -i 's/[0-9]{1,}/X/g' data.txt"
+    ],
+    "answer": 0,
+    "exp": "В базовом BRE sed + нужно экранировать: [0-9]\\+. Вариант без \\+ заменит каждую цифру отдельно. \\d и {1,} — синтаксис ERE, нужен флаг -E. g в конце для замены всех вхождений."
+  },
+  {
+    "id": 4,
+    "task": "Удалить все пустые строки из файла config.txt и сохранить результат. Что правильно?",
+    "context": "sed <ARGS> config.txt",
+    "opts": [
+      "sed -i '/^$/d' config.txt",
+      "sed -i 's/^$//g' config.txt",
+      "grep -v '^$' config.txt > config.txt",
+      "sed -i '/^\\s*$/d' config.txt"
+    ],
+    "answer": 0,
+    "exp": "/^$/d удаляет строки, соответствующие шаблону (^ начало, $ конец — пустая строка). s/^$// заменяет на пустое, но строка остаётся. grep > config.txt перезапишет файл нулём байт. /^\\s*$/d удаляет и строки из пробелов (тоже верно, но не минимальный вариант)."
+  },
+  {
+    "id": 5,
+    "task": "Найти строки начинающиеся с ERROR или WARN в лог-файле. Что правильно?",
+    "context": "grep <ARGS> /var/log/app.log",
+    "opts": [
+      "grep -E '^(ERROR|WARN)' /var/log/app.log",
+      "grep '^ERROR|^WARN' /var/log/app.log",
+      "grep -E 'ERROR|WARN' /var/log/app.log",
+      "grep -E '(ERROR|WARN)' /var/log/app.log"
+    ],
+    "answer": 0,
+    "exp": "-E включает расширенные выражения. ^ привязывает к началу строки. (ERROR|WARN) — группа с альтернативой. Без ^: найдёт строки где ERROR/WARN встречается в любом месте. Без -E: | воспринимается буквально."
+  },
+  {
+    "id": 6,
+    "task": "Извлечь только HTTP-коды ответов (3 цифры) из access.log (только совпадения). Что правильно?",
+    "context": "grep <ARGS> /var/log/nginx/access.log",
+    "opts": [
+      "grep -oE '\" [0-9]{3} ' /var/log/nginx/access.log",
+      "grep -oE '[0-9]{3}' /var/log/nginx/access.log",
+      "grep -E ' [1-5][0-9]{2} ' /var/log/nginx/access.log",
+      "grep -oP '(?<= )[1-5][0-9]{2}(?= )' /var/log/nginx/access.log"
+    ],
+    "answer": 0,
+    "exp": "В nginx access.log формат: \"GET / HTTP/1.1\" 200 1234. Паттерн '\" [0-9]{3} ' точно совпадает с полем статуса. -o выводит только совпадение. Вариант без контекста даст ложные срабатывания на числа в URL."
+  },
+  {
+    "id": 7,
+    "task": "Заменить старый URL http://old-server.com на https://new-server.com во всех .conf файлах директории. Что правильно?",
+    "context": "sed <ARGS> /etc/app/*.conf",
+    "opts": [
+      "sed -i 's|http://old-server\\.com|https://new-server.com|g' /etc/app/*.conf",
+      "sed -i 's/http://old-server.com/https://new-server.com/g' /etc/app/*.conf",
+      "sed -i 's/http:\\/\\/old-server.com/https:\\/\\/new-server.com/g' /etc/app/*.conf",
+      "sed -i 's/old-server/new-server/g' /etc/app/*.conf"
+    ],
+    "answer": 0,
+    "exp": "Использование | как разделителя позволяет избежать экранирования /. \\. экранирует точку (иначе совпадёт с любым символом). Вариант с // в разделителях сломает sed синтаксис."
+  },
+  {
+    "id": 8,
+    "task": "Найти строки с временем в формате HH:MM:SS в лог-файле. Что правильно?",
+    "context": "grep <ARGS> /var/log/syslog",
+    "opts": [
+      "grep -E '[0-2][0-9]:[0-5][0-9]:[0-5][0-9]' /var/log/syslog",
+      "grep -E '[0-9]{2}:[0-9]{2}:[0-9]{2}' /var/log/syslog",
+      "grep '[0-9][0-9]:[0-9][0-9]:[0-9][0-9]' /var/log/syslog",
+      "grep -E '\\d{2}:\\d{2}:\\d{2}' /var/log/syslog"
+    ],
+    "answer": 0,
+    "exp": "[0-2][0-9] ограничивает часы до 09-29 (точнее: [01][0-9]|2[0-3]). [0-5][0-9] — минуты и секунды 00-59. Вариант [0-9]{2} менее строгий (даст 99:99:99). \\d не работает в POSIX grep без -P."
+  },
+  {
+    "id": 9,
+    "task": "Извлечь только имя хоста из FQDN (например из 'server01.prod.example.com' получить 'server01'). Что правильно?",
+    "context": "echo 'server01.prod.example.com' | sed <ARGS>",
+    "opts": [
+      "echo 'server01.prod.example.com' | sed 's/\\..*$//'",
+      "echo 'server01.prod.example.com' | sed 's/\\..*//'",
+      "echo 'server01.prod.example.com' | sed 's/[.].*//'",
+      "echo 'server01.prod.example.com' | cut -d. -f1"
+    ],
+    "answer": 0,
+    "exp": "s/\\..*$// удаляет первую точку и всё после неё до конца строки. $ явно указывает конец. Вариант без $ тоже работает так как .* жадный. cut -d. -f1 тоже верно, но не sed-решение."
+  },
+  {
+    "id": 10,
+    "task": "Удалить строки начинающиеся с # (комментарии) из файла /etc/app.conf. Что правильно?",
+    "context": "grep <ARGS> /etc/app.conf",
+    "opts": [
+      "grep -v '^#' /etc/app.conf",
+      "grep '^[^#]' /etc/app.conf",
+      "sed -i '/^#/d' /etc/app.conf",
+      "grep -v '#' /etc/app.conf"
+    ],
+    "answer": 0,
+    "exp": "grep -v инвертирует совпадения: выводит строки НЕ начинающиеся с #. ^# привязывает к началу строки. Вариант grep -v '#' удалит и строки где # встречается в середине (inline комментарии). sed -i тоже работает но модифицирует файл."
+  },
+  {
+    "id": 11,
+    "task": "Найти MAC-адреса в формате XX:XX:XX:XX:XX:XX (hex) в файле. Что правильно?",
+    "context": "grep <ARGS> /var/log/dhcp.log",
+    "opts": [
+      "grep -iE '([0-9a-f]{2}:){5}[0-9a-f]{2}' /var/log/dhcp.log",
+      "grep -E '[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}' /var/log/dhcp.log",
+      "grep -E '[0-9A-F]{2}(:[0-9A-F]{2}){5}' /var/log/dhcp.log",
+      "grep -E '[a-f0-9]{12}' /var/log/dhcp.log"
+    ],
+    "answer": 0,
+    "exp": "([0-9a-f]{2}:){5}[0-9a-f]{2} — компактная запись: 5 пар hex+двоеточие и последняя пара без двоеточия. -i делает регистронезависимым (покрывает и заглавные). Последний вариант не учитывает разделители."
+  },
+  {
+    "id": 12,
+    "task": "Вывести строки из CSV-файла, где второе поле (число) больше 100. Что правильно?",
+    "context": "awk <ARGS> /var/data/stats.csv",
+    "opts": [
+      "awk -F',' '$2 > 100' /var/data/stats.csv",
+      "awk -F',' '$2 > \"100\"' /var/data/stats.csv",
+      "awk '$2 > 100' /var/data/stats.csv",
+      "awk -F',' 'NR>1 && $2+0 > 100' /var/data/stats.csv"
+    ],
+    "answer": 0,
+    "exp": "awk -F',' задаёт разделитель запятую. $2 — второе поле. $2 > 100 — числовое сравнение. Сравнение со строкой > \"100\" даёт лексикографический порядок. Без -F',' поля разделяются пробелами."
+  },
+  {
+    "id": 13,
+    "task": "Извлечь значение после знака = из строк вида 'key=value' (только значение). Что правильно?",
+    "context": "grep <ARGS> /etc/app/config.env",
+    "opts": [
+      "grep -oP '(?<==).*' /etc/app/config.env",
+      "grep -oE '=[^=]*$' /etc/app/config.env",
+      "grep -oE '[^=]+$' /etc/app/config.env",
+      "sed -n 's/.*=//p' /etc/app/config.env"
+    ],
+    "answer": 0,
+    "exp": "grep -oP '(?<==).*' использует lookbehind (?<=) для совпадения после = без включения самого =. -P включает Perl-совместимые regex. Вариант с [^=]+$ тоже работает, но менее точен при нескольких = в строке."
+  },
+  {
+    "id": 14,
+    "task": "Найти дублирующиеся строки в отсортированном файле. Что правильно?",
+    "context": "sort /var/log/access.log | <КОМАНДА>",
+    "opts": [
+      "sort /var/log/access.log | uniq -d",
+      "sort /var/log/access.log | uniq -c",
+      "sort /var/log/access.log | sort -u",
+      "sort /var/log/access.log | uniq --duplicates"
+    ],
+    "answer": 0,
+    "exp": "uniq -d выводит только дублирующиеся строки (только одну копию каждой). uniq -c считает вхождения. sort -u оставляет уникальные. --duplicates не является валидным флагом uniq."
+  },
+  {
+    "id": 15,
+    "task": "Удалить пробелы в конце каждой строки (trailing whitespace) в файле script.py inplace. Что правильно?",
+    "context": "sed <ARGS> script.py",
+    "opts": [
+      "sed -i 's/[[:space:]]*$//' script.py",
+      "sed -i 's/ *$//' script.py",
+      "sed -i 's/\\s+$//' script.py",
+      "sed -i 's/[ \\t]*$//' script.py"
+    ],
+    "answer": 0,
+    "exp": "[[:space:]] — POSIX класс, включает пробел, таб, и другие пробельные символы. * означает ноль и более. $ — конец строки. s/ *$// удалит только пробелы (не табы). \\s+ требует -E, и + не совпадёт с нулём пробелов."
+  },
+  {
+    "id": 16,
+    "task": "Найти файлы с именем содержащим одну или более цифр в директории /opt. Что правильно?",
+    "context": "find /opt <ARGS>",
+    "opts": [
+      "find /opt -regextype posix-extended -regex '.*/.*[0-9]+.*'",
+      "find /opt -name '*[0-9]*'",
+      "find /opt -regex '[0-9]+'",
+      "find /opt -iname '\\d+'"
+    ],
+    "answer": 0,
+    "exp": "find -regex совпадает с полным путём файла, поэтому нужно .*/.*[0-9]+.*. -regextype posix-extended включает ERE. -name '*[0-9]*' тоже работает (glob), но это не regex. \\d не поддерживается в POSIX regex."
+  },
+  {
+    "id": 17,
+    "task": "Извлечь registry/path из Docker image reference вида 'registry.example.com/team/app:v1.2' (без тега). Что правильно?",
+    "context": "echo 'registry.example.com/team/app:v1.2' | sed <ARGS>",
+    "opts": [
+      "echo 'registry.example.com/team/app:v1.2' | sed 's/:[^:]*$//'",
+      "echo 'registry.example.com/team/app:v1.2' | sed 's/:.*//'",
+      "echo 'registry.example.com/team/app:v1.2' | cut -d: -f1",
+      "echo 'registry.example.com/team/app:v1.2' | sed 's/\\(.*\\):.*/\\1/'"
+    ],
+    "answer": 0,
+    "exp": "s/:[^:]*$// удаляет последнее двоеточие и всё после него до конца строки. [^:]* — любые символы кроме :. Это корректно обрабатывает случаи с несколькими : в пути (digest SHA256 и т.п.)."
+  },
+  {
+    "id": 18,
+    "task": "Найти IPv6 адреса в стандартном полном формате (8 групп по 4 hex-цифры) в файле. Что правильно?",
+    "context": "grep <ARGS> /var/log/firewall.log",
+    "opts": [
+      "grep -iE '([0-9a-f]{4}:){7}[0-9a-f]{4}' /var/log/firewall.log",
+      "grep -E '[0-9a-f:]{39}' /var/log/firewall.log",
+      "grep -E '([0-9a-f]+:){7}[0-9a-f]+' /var/log/firewall.log",
+      "grep -iE '^([0-9a-f]{1,4}:){7}[0-9a-f]{1,4}$' /var/log/firewall.log"
+    ],
+    "answer": 0,
+    "exp": "([0-9a-f]{4}:){7}[0-9a-f]{4} — ровно 8 групп по 4 hex-символа. -i для регистронезависимости. Вариант с {1,4} тоже корректен для IPv6, но {4} строже. Без ^ и $ не требует полного совпадения строки."
+  },
+  {
+    "id": 19,
+    "task": "Заменить версию в строке 'version: 1.2.3' на 'version: 2.0.0' используя захваченную группу. Что правильно?",
+    "context": "sed <ARGS> version.yaml",
+    "opts": [
+      "sed -i 's/\\(version: \\)[0-9.]*/\\12.0.0/' version.yaml",
+      "sed -i 's/version: [0-9.]*/version: 2.0.0/' version.yaml",
+      "sed -i -E 's/(version: )[0-9.]*/\\12.0.0/' version.yaml",
+      "sed -i 's/version: \\(.*\\)/version: 2.0.0/' version.yaml"
+    ],
+    "answer": 0,
+    "exp": "\\(version: \\) — захватывающая группа в BRE синтаксисе. \\1 — обратная ссылка на группу 1. В ERE (-E) скобки без экранирования: (version: ). Оба варианта верны. Вариант без группы (второй) тоже работает, но дублирует текст."
+  },
+  {
+    "id": 20,
+    "task": "Проверить что строки в файле соответствуют формату даты YYYY-MM-DD (вывести только совпадающие). Что правильно?",
+    "context": "grep <ARGS> dates.txt",
+    "opts": [
+      "grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' dates.txt",
+      "grep -E '[0-9]{4}-[0-9]{2}-[0-9]{2}' dates.txt",
+      "grep -E '^\\d{4}-\\d{2}-\\d{2}$' dates.txt",
+      "grep -E '^[12][0-9]{3}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$' dates.txt"
+    ],
+    "answer": 0,
+    "exp": "^ и $ привязывают к полной строке. [0-9]{4} — ровно 4 цифры. [0-9]{2} — ровно 2 цифры. -E включает ERE. Без ^ и $ найдёт дату внутри любой строки. \\d требует -P. Четвёртый вариант строже (валидный месяц/день), но избыточен для задачи."
+  }
+]

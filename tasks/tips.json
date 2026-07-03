@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Terraform — for_each vs count",
+    "body": "for_each привязывает ресурс к строковому ключу — стабильно при изменении набора. count привязывает к индексу — добавление в середину списка вызывает destroy/recreate всего что после. count = var.enabled ? 1 : 0 — классика для условного ресурса."
+  },
+  {
+    "title": "Terraform — state lock",
+    "body": "State lock защищает от одновременного apply. При зависшем lock: terraform force-unlock ID. Для S3 backend нужна DynamoDB таблица. НИКОГДА не удаляй tfstate вручную."
+  },
+  {
+    "title": "Terraform — remote backend",
+    "body": "Local backend: tfstate рядом с кодом — опасно для команды. Remote (S3+DynamoDB): shared state, locking, versioning. Правило: если больше одного человека или prod — только remote."
+  },
+  {
+    "title": "Linux — load average",
+    "body": "LA = running + uninterruptible (D) процессы. LA > N_CPU = очередь. Если LA высокий а CPU свободен — искать D-state процессы: ps aux | grep \" D \". Могут висеть на NFS, диске, сети."
+  },
+  {
+    "title": "Linux — освобождение места без остановки сервиса",
+    "body": "НИКОГДА не используй rm для открытого файла — место не освободится пока процесс держит дескриптор! Используй: > filename или truncate -s 0 filename. lsof | grep deleted — найти призрачные файлы."
+  },
+  {
+    "title": "Linux — zombie процессы",
+    "body": "Zombie (Z-state) — процесс завершился, но родитель не вызвал wait(). kill -9 на zombie не работает. Решение: kill -CHLD PARENT_PID или убить родителя (зомби усыновит init и очистится)."
+  },
+  {
+    "title": "Сети — диагностика потерь",
+    "body": "mtr = ping + traceroute в реальном времени. Потери на промежуточных хопах часто означают rate limiting ICMP, а не реальные потери. Проверяй потери именно на конечном хосте. iperf3 для измерения реальной пропускной способности."
+  },
+  {
+    "title": "Сети — TCP keepalive",
+    "body": "Stateful firewall/NAT сбрасывает idle сессии. Настрой: net.ipv4.tcp_keepalive_time=60. Или application-level heartbeat. Симптом: сессии рвутся через N минут простоя (обычно 4-10 мин)."
+  },
+  {
+    "title": "Ansible — приоритет переменных",
+    "body": "Порядок от низшего к высшему: role defaults → group_vars → host_vars → play vars → set_fact → extra-vars (-e). extra-vars всегда побеждает. Для дебага: ansible -m debug -a \"var=myvar\" host."
+  },
+  {
+    "title": "Ansible — handler troubleshooting",
+    "body": "Handler не запускается? Проверь: 1) имена case-sensitive (notify: \"Restart Nginx\" ≠ name: \"restart nginx\"); 2) задача должна вернуть changed; 3) --check mode не выполняет handlers; 4) используй --diff чтобы увидеть изменения."
+  },
+  {
+    "title": "Интервью — сценарные вопросы",
+    "body": "Структура ответа: 1) Диагноз (что проверяю первым?), 2) Изоляция (где именно проблема?), 3) Решение (как исправить?), 4) Верификация (как убедиться что работает?), 5) Предотвращение (как избежать в будущем?). Думай вслух!"
+  },
+  {
+    "title": "Интервью — trade-off вопросы",
+    "body": "При вопросах \"когда X вместо Y?\" всегда давай обе стороны: преимущества X, когда X не подходит, и в каком контексте выбирать. Покажи что понимаешь компромиссы, а не просто знаешь определения."
+  }
+]

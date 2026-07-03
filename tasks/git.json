@@ -1,0 +1,242 @@
+[
+  {
+    "id": 1,
+    "task": "Перебазировать ветку feature поверх main (перенести коммиты без merge-коммита)",
+    "opts": [
+      "git rebase main",
+      "git merge main",
+      "git cherry-pick main..feature",
+      "git rebase --onto feature main"
+    ],
+    "answer": 0,
+    "exp": "git rebase main переносит коммиты текущей ветки поверх main, создавая линейную историю без merge-коммита."
+  },
+  {
+    "id": 2,
+    "task": "Интерактивно отредактировать последние 4 коммита (переименовать, squash, fixup)",
+    "opts": [
+      "git rebase -i HEAD~4",
+      "git rebase -i HEAD^4",
+      "git log -i HEAD~4",
+      "git commit --amend -i HEAD~4"
+    ],
+    "answer": 0,
+    "exp": "git rebase -i HEAD~4 открывает редактор с последними 4 коммитами. HEAD~4 — предок на 4 шага назад. Можно указать squash, fixup, reword, drop для каждого коммита."
+  },
+  {
+    "id": 3,
+    "task": "Перенести конкретный коммит abc1234 из другой ветки в текущую",
+    "opts": [
+      "git cherry-pick abc1234",
+      "git rebase abc1234",
+      "git merge abc1234",
+      "git apply abc1234"
+    ],
+    "answer": 0,
+    "exp": "git cherry-pick <hash> применяет изменения конкретного коммита в текущую ветку, создавая новый коммит с теми же изменениями."
+  },
+  {
+    "id": 4,
+    "task": "Перенести диапазон коммитов от abc1234 (не включительно) до def5678 (включительно) в текущую ветку",
+    "opts": [
+      "git cherry-pick abc1234..def5678",
+      "git cherry-pick abc1234^..def5678",
+      "git rebase abc1234 def5678",
+      "git cherry-pick abc1234:def5678"
+    ],
+    "answer": 0,
+    "exp": "git cherry-pick A..B переносит коммиты после A до B включительно (A не включается). Чтобы включить A, используйте git cherry-pick A^..B."
+  },
+  {
+    "id": 5,
+    "task": "Начать бисекцию для поиска коммита, сломавшего тест (текущее состояние — плохое)",
+    "opts": [
+      "git bisect start && git bisect bad",
+      "git bisect run bad",
+      "git bisect begin --bad HEAD",
+      "git debug --bisect bad HEAD"
+    ],
+    "answer": 0,
+    "exp": "git bisect start инициирует сессию бисекции. git bisect bad помечает текущий коммит как сломанный. Затем нужно указать последний известный рабочий коммит: git bisect good <hash>."
+  },
+  {
+    "id": 6,
+    "task": "В процессе git bisect вы проверили коммит — он рабочий. Что ввести?",
+    "opts": [
+      "git bisect good",
+      "git bisect ok",
+      "git bisect pass",
+      "git bisect skip"
+    ],
+    "answer": 0,
+    "exp": "git bisect good помечает текущий коммит как рабочий, git bisect bad — как сломанный. После достаточного количества меток Git укажет первый проблемный коммит. skip используется если коммит нельзя проверить."
+  },
+  {
+    "id": 7,
+    "task": "Вы сделали git reset --hard и потеряли коммиты. Как найти их хэши?",
+    "opts": [
+      "git reflog",
+      "git log --all",
+      "git stash list",
+      "git fsck --lost-found"
+    ],
+    "answer": 0,
+    "exp": "git reflog показывает историю всех перемещений HEAD, включая удалённые коммиты. Можно найти хэш и восстановить ветку: git checkout -b recovered <hash>."
+  },
+  {
+    "id": 8,
+    "task": "Временно сохранить текущие изменения с описанием 'WIP: fix auth bug'",
+    "opts": [
+      "git stash push -m 'WIP: fix auth bug'",
+      "git stash save 'WIP: fix auth bug'",
+      "git stash -m 'WIP: fix auth bug'",
+      "git stash --message 'WIP: fix auth bug'"
+    ],
+    "answer": 0,
+    "exp": "git stash push -m 'message' — современный синтаксис. git stash save 'message' — устаревший, но тоже работает. -m задаёт описание для stash@{0}."
+  },
+  {
+    "id": 9,
+    "task": "Применить последний stash и удалить его из списка stash'ей",
+    "opts": [
+      "git stash pop",
+      "git stash apply",
+      "git stash drop && git stash apply",
+      "git stash restore"
+    ],
+    "answer": 0,
+    "exp": "git stash pop применяет stash и удаляет его из стека. git stash apply применяет, но оставляет в списке. После apply нужно вручную вызвать git stash drop."
+  },
+  {
+    "id": 10,
+    "task": "Создать новую рабочую директорию ../hotfix из текущего репозитория для ветки hotfix/critical",
+    "opts": [
+      "git worktree add ../hotfix hotfix/critical",
+      "git clone . ../hotfix && cd ../hotfix && git checkout hotfix/critical",
+      "git checkout --worktree ../hotfix hotfix/critical",
+      "git branch --worktree hotfix/critical ../hotfix"
+    ],
+    "answer": 0,
+    "exp": "git worktree add <path> <branch> создаёт дополнительную рабочую директорию с указанной веткой. Это позволяет работать над несколькими ветками одновременно без clone."
+  },
+  {
+    "id": 11,
+    "task": "Инициализировать и обновить все субмодули рекурсивно после clone",
+    "opts": [
+      "git submodule update --init --recursive",
+      "git submodule init && git submodule update",
+      "git submodule sync --recursive",
+      "git clone --submodules --recursive"
+    ],
+    "answer": 0,
+    "exp": "git submodule update --init --recursive инициализирует незарегистрированные субмодули и обновляет их, включая вложенные субмодули (--recursive)."
+  },
+  {
+    "id": 12,
+    "task": "Узнать кто и в каком коммите изменил строку 42 файла src/auth.py",
+    "opts": [
+      "git blame -L 42,42 src/auth.py",
+      "git log -L 42,42:src/auth.py",
+      "git show HEAD:src/auth.py | sed -n '42p'",
+      "git diff HEAD~1 src/auth.py | grep -n 42"
+    ],
+    "answer": 0,
+    "exp": "git blame -L 42,42 file показывает автора, хэш коммита и дату для строки 42. git log -L тоже работает, но показывает историю изменений строки."
+  },
+  {
+    "id": 13,
+    "task": "Показать граф веток в консоли с сокращёнными хэшами и сообщениями коммитов",
+    "opts": [
+      "git log --graph --oneline --all",
+      "git log --tree --short --branches",
+      "git branch --graph --verbose",
+      "git show --graph --all --oneline"
+    ],
+    "answer": 0,
+    "exp": "git log --graph рисует ASCII-граф. --oneline: хэш + сообщение в одну строку. --all: все ветки. Для красивого вывода добавляют --decorate --color."
+  },
+  {
+    "id": 14,
+    "task": "Показать разницу между текущим состоянием и состоянием 3 коммита назад",
+    "opts": [
+      "git diff HEAD~3",
+      "git diff HEAD^3",
+      "git diff -3",
+      "git show HEAD~3"
+    ],
+    "answer": 0,
+    "exp": "git diff HEAD~3 показывает разницу между рабочей директорией и предком на 3 коммита назад. HEAD~3 — относительная ссылка. HEAD^3 — третий родитель merge-коммита (другое значение)."
+  },
+  {
+    "id": 15,
+    "task": "Отменить последний коммит, сохранив все изменения в рабочей директории (для переделки)",
+    "opts": [
+      "git reset --soft HEAD~1",
+      "git reset --hard HEAD~1",
+      "git revert HEAD",
+      "git commit --amend"
+    ],
+    "answer": 0,
+    "exp": "git reset --soft HEAD~1 отменяет коммит, изменения остаются в индексе (staged). --mixed оставит в рабочей директории. --hard удалит изменения полностью. revert создаёт новый отменяющий коммит."
+  },
+  {
+    "id": 16,
+    "task": "Отменить уже запушенный коммит abc1234, сохранив историю (безопасно для shared ветки)",
+    "opts": [
+      "git revert abc1234",
+      "git reset --hard abc1234~1 && git push --force",
+      "git checkout abc1234~1 -- . && git commit",
+      "git cherry-pick -R abc1234"
+    ],
+    "answer": 0,
+    "exp": "git revert создаёт новый коммит, который отменяет изменения указанного коммита. Это безопасно для публичных веток — история не переписывается. Force push после reset опасен в командной работе."
+  },
+  {
+    "id": 17,
+    "task": "Создать аннотированный тег v2.0.0 с сообщением 'Release 2.0.0'",
+    "opts": [
+      "git tag -a v2.0.0 -m 'Release 2.0.0'",
+      "git tag v2.0.0 -m 'Release 2.0.0'",
+      "git tag --annotate v2.0.0 'Release 2.0.0'",
+      "git tag -s v2.0.0 -m 'Release 2.0.0'"
+    ],
+    "answer": 0,
+    "exp": "git tag -a создаёт аннотированный тег с метаданными (автор, дата, сообщение). Без -a создаётся lightweight тег. -s создаёт подписанный тег (GPG). Аннотированные теги предпочтительны для релизов."
+  },
+  {
+    "id": 18,
+    "task": "Удалить все неотслеживаемые файлы и директории из рабочей директории",
+    "opts": [
+      "git clean -fd",
+      "git clean -f",
+      "git rm -rf .",
+      "git checkout -- ."
+    ],
+    "answer": 0,
+    "exp": "git clean -fd: -f force (обязателен для выполнения), -d удаляет untracked директории. Без -f Git откажется. git checkout -- . только сбрасывает tracked файлы, не трогает untracked."
+  },
+  {
+    "id": 19,
+    "task": "Временно сохранить изменения включая неотслеживаемые (новые) файлы",
+    "opts": [
+      "git stash -u",
+      "git stash",
+      "git stash --all",
+      "git stash push --include-untracked=yes"
+    ],
+    "answer": 0,
+    "exp": "git stash -u (--include-untracked) сохраняет и неотслеживаемые файлы. Обычный git stash сохраняет только tracked changes. --all включает игнорируемые файлы (из .gitignore)."
+  },
+  {
+    "id": 20,
+    "task": "Найти самый первый коммит, в котором появился файл config/database.yml",
+    "opts": [
+      "git log --diff-filter=A -- config/database.yml",
+      "git log --follow -- config/database.yml | tail -1",
+      "git log --first-parent -- config/database.yml",
+      "git blame config/database.yml | tail -1"
+    ],
+    "answer": 0,
+    "exp": "git log --diff-filter=A показывает только коммиты, в которых файл был добавлен (Added). -- config/database.yml ограничивает историю этим файлом. Самый нижний результат — первый коммит."
+  }
+]
