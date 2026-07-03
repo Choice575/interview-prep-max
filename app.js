@@ -137,7 +137,7 @@ function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.ra
 
 // ═══ TAGS ═══
 const TAG_MAP={Terraform:'tf',Linux:'lx','Сети':'net',Ansible:'ans',Docker:'docker',Kubernetes:'k8s','CI/CD':'cicd',Git:'git',Regex:'rx'};
-function ttag(t){return '<span class="tag tag-'+(TAG_MAP[t]||'tf')+'">'+t+'</span>';}
+function ttag(t){return '<span class="tag tag-'+(TAG_MAP[t]||'tf')+'">'+esc(t)+'</span>';}
 function ltag(l){const m={Junior:'jr',Middle:'md',Senior:'sr'};return '<span class="tag tag-'+(m[l]||'jr')+'">'+l+'</span>';}
 function ctag(c){if(!c||c==='definition') return '';const lbl={scenario:'Сценарий',tradeoff:'Trade-off',output:'Анализ вывода'};const cls={scenario:'sc',tradeoff:'tr',output:'out'};return '<span class="tag tag-'+(cls[c]||'sc')+'">'+(lbl[c]||c)+'</span>';}
 
@@ -281,7 +281,7 @@ function renderHome(){
   const hist=lsGet('history',[]);
   const hc=document.getElementById('home-history');
   if(!hist.length){hc.innerHTML='<p style="color:var(--text3);font-size:13px">История пуста. Начните экзамен!</p>';return;}
-  hc.innerHTML=hist.slice(0,5).map(h=>'<div class="history-item"><span style="color:var(--text3);font-size:11px">'+h.date+'</span><span>'+(h.topic||'')+'</span><span style="color:'+(h.correct?'var(--green)':'var(--red)')+'">'+(h.correct?'✅ Верно':'❌ Неверно')+'</span></div>').join('');
+  hc.innerHTML=hist.slice(0,5).map(h=>'<div class="history-item"><span style="color:var(--text3);font-size:11px">'+esc(h.date)+'</span><span>'+esc(h.topic||'')+'</span><span style="color:'+(h.correct?'var(--green)':'var(--red)')+'">'+(h.correct?'✅ Верно':'❌ Неверно')+'</span></div>').join('');
 }
 function renderMasteryCards(){
   const qprog=getQProg(),allQ=getAllQ();
@@ -472,7 +472,7 @@ function openCustomModal(){
   document.getElementById('custom-modal').classList.add('open');
   // Заполняем список тем динамически
   const sel = document.getElementById('cq-topic');
-  sel.innerHTML = getAllTopics().map(t => '<option>'+t+'</option>').join('');
+  sel.innerHTML = getAllTopics().map(t => '<option>'+esc(t)+'</option>').join('');
 }
 function closeCustomModal(){document.getElementById('custom-modal').classList.remove('open');}
 function saveCustomQ(){
@@ -685,7 +685,7 @@ async function initApp(){
 function buildTopicFilters(){
   const topics = getAllTopics();
   const topicChips = document.getElementById('topic-chips');
-  if(topicChips){topicChips.innerHTML='<span class="chip active" onclick="setTopic(\'all\',this)">Все</span>'+topics.map(t=>'<span class="chip" onclick="setTopic(\''+t+'\',this)">'+t+'</span>').join('');}
+  if(topicChips){topicChips.innerHTML='<span class="chip active" onclick="setTopic(\'all\',this)">Все</span>'+topics.map(t=>'<span class="chip" onclick="setTopic(\''+esc(t)+'\',this)">'+esc(t)+'</span>').join('');}
   // Обновляем фильтр «Все N» в режиме
   const allChip=document.querySelector('#mode-chips .chip:first-child');
   if(allChip) allChip.textContent='Все '+getAllQ().length;
@@ -706,9 +706,9 @@ document.addEventListener('keydown',function(e){
 
 // ═══ PWA ═══
 if ('serviceWorker' in navigator) {
-  // Сначала удаляем старые Service Workers (миграция с v8)
+  // Сначала удаляем все старые Service Workers (миграция с v8)
   navigator.serviceWorker.getRegistrations().then(regs => {
-    regs.forEach(reg => { if (reg.scope.includes('interview-prep-max')) reg.unregister(); });
+    regs.forEach(reg => reg.unregister());
   }).then(() => {
     navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW v9:', reg.scope)).catch(err => console.log('SW error:', err));
   });
