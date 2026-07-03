@@ -580,7 +580,12 @@ document.addEventListener('keydown',function(e){
 
 // ═══ PWA ═══
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(reg=>{console.log('SW registered:',reg.scope);}).catch(err=>{console.log('SW error:',err);});
+  // Сначала удаляем старые Service Workers (миграция с v8)
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(reg => { if (reg.scope.includes('interview-prep-max')) reg.unregister(); });
+  }).then(() => {
+    navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW v9:', reg.scope)).catch(err => console.log('SW error:', err));
+  });
 }
 
 // Запуск
