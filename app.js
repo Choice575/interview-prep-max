@@ -542,8 +542,9 @@ async function initApp(){
     document.getElementById('theme-label').textContent='Тёмная тема';
   }
 
-  // Скрываем загрузчик
+  // Скрываем загрузчик и обновляем заголовок
   document.getElementById('app-loading').style.display='none';
+  document.getElementById('page-title').textContent = 'Главная';
 
   // Рендерим
   renderHome();
