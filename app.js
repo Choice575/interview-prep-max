@@ -33,6 +33,7 @@ const DATA_VARS = {
 
 async function loadAllData() {
   const status = document.getElementById('load-status');
+  const errors = [];
   const promises = Object.entries(DATA_FILES).map(async ([key, url]) => {
     try {
       const resp = await fetch(url);
@@ -42,10 +43,21 @@ async function loadAllData() {
       status.textContent = `Загружено: ${key} (${data.length})`;
     } catch (e) {
       console.error(`Failed to load ${url}:`, e);
-      status.textContent = `Ошибка загрузки ${key}: ${e.message}`;
+      errors.push(`${key}: ${e.message}`);
+      status.textContent = `Ошибка загрузки ${key}`;
     }
   });
   await Promise.all(promises);
+  if (errors.length > 0) {
+    document.getElementById('app-loading').innerHTML =
+      '<div style="font-size:48px;margin-bottom:16px">⚠️</div>'+
+      '<div style="font-size:18px;font-weight:700;margin-bottom:8px;color:var(--red)">Не удалось загрузить данные</div>'+
+      '<div style="font-size:12px;color:var(--text2);max-width:400px;margin:0 auto">'+
+      errors.map(e => '<div>• '+esc(e)+'</div>').join('')+
+      '</div>'+
+      '<div style="margin-top:16px"><button class="btn btn-primary" onclick="location.reload()">🔄 Попробовать снова</button></div>';
+    throw new Error('Data loading failed: '+errors.join(', '));
+  }
   status.textContent = 'Инициализация...';
 }
 
@@ -300,7 +312,7 @@ function renderAnalytics(){
     {v:avgTime+'с',l:'Среднее время ответа',c:'var(--primary-h)'}
   ].map(s=>'<div class="stat-card"><div class="stat-val" style="color:'+s.c+'">'+s.v+'</div><div class="stat-label">'+s.l+'</div></div>').join('');
   const hist=lsGet('history',[]);
-  document.getElementById('history-list').innerHTML=hist.length?hist.map(h=>'<div class="history-item"><span style="color:var(--text3);font-size:11px">'+h.date+'</span><span class="tag '+(TAG_MAP[h.topic]?'tag-'+(TAG_MAP[h.topic]):'tag-tf')+'">'+(h.topic||'')+'</span><span style="color:'+(h.correct?'var(--green)':'var(--red)')+'">'+(h.correct?'✅':'❌')+'</span></div>').join(''):'<p style="color:var(--text3);font-size:13px;padding:10px">Нет данных</p>';
+  document.getElementById('history-list').innerHTML=hist.length?hist.map(h=>'<div class="history-item"><span style="color:var(--text3);font-size:11px">'+esc(h.date)+'</span><span class="tag '+(TAG_MAP[h.topic]?'tag-'+(TAG_MAP[h.topic]):'tag-tf')+'">'+esc(h.topic||'')+'</span><span style="color:'+(h.correct?'var(--green)':'var(--red)')+'">'+(h.correct?'✅':'❌')+'</span></div>').join(''):'<p style="color:var(--text3);font-size:13px;padding:10px">Нет данных</p>';
   let ok=0,err=0;const tot=allQ.length;
   allQ.forEach(q=>{const p=qprog[q.id];if(p){if(p.correct>p.wrong)ok++;else if(p.wrong>0)err++;}});
   document.getElementById('analytics-seg-bar').innerHTML='<div class="seg-ok" style="width:'+(ok/tot*100)+'%"></div><div class="seg-err" style="width:'+(err/tot*100)+'%"></div><div class="seg-none" style="width:'+((tot-ok-err)/tot*100)+'%"></div>';
@@ -340,6 +352,119 @@ function renderWeakSpots(){
   if(!weak.length){el.innerHTML='<p style="font-size:12px;color:var(--text3)">Ответьте хотя бы на 2 вопроса, чтобы увидеть слабые места.</p>';return;}
   el.innerHTML=weak.map(w=>'<div class="weak-item"><span class="weak-pct">'+w.pct+'%</span><span class="weak-txt" title="'+esc(w.q.q)+'">'+esc(w.q.q.slice(0,60))+(w.q.q.length>60?'…':'')+'</span><span style="font-size:10px;color:var(--text3)">'+w.wrong+'/'+w.total+'</span></div>').join('');
 }
+
+// ═══ SUBNET ═══
+let subnetDone={};
+function calcSubnet(ip,prefix){
+  const p=ip.split('.').map(Number);const ipN=(p[0]<<24|p[1]<<16|p[2]<<8|p[3])>>>0;
+  const mask=prefix===0?0:(0xFFFFFFFF<<(32-prefix))>>>0;const net=(ipN&mask)>>>0;const bc=(net|(~mask>>>0))>>>0;
+  const first=(net+1)>>>0,last=(bc-1)>>>0;const hosts=prefix>=31?(prefix===31?2:1):Math.pow(2,32-prefix)-2;
+  function n2ip(n){return [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');}
+  return{network:n2ip(net),broadcast:n2ip(bc),first:n2ip(first),last:n2ip(last),hosts:hosts,mask:n2ip(mask)};
+}
+function renderSubnet(){
+  subnetDone=lsGet('subnet_prog',{});const cont=document.getElementById('subnet-container');
+  const fieldLabels={network:'Адрес сети',broadcast:'Broadcast',first:'Первый хост',last:'Последний хост',mask:'Маска подсети'};
+  cont.innerHTML=SUBNET_PROBLEMS.map((prob,idx)=>{const ans=calcSubnet(prob.ip,prob.prefix);const done=subnetDone[idx];
+    return '<div class="subnet-problem" id="sp-'+idx+'"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div class="subnet-ip">'+prob.ip+'/'+prob.prefix+'</div><span style="font-size:12px;color:var(--text3)">'+prob.desc+'</span><span id="sp-badge-'+idx+'" style="margin-left:auto">'+(done?'<span style="color:var(--green);font-weight:700">✅ Верно!</span>':'')+'</span></div><div class="subnet-inputs">'+
+    ['network','broadcast','first','last','mask'].map(f=>'<div class="subnet-input-group"><label>'+fieldLabels[f]+'</label><input class="subnet-input'+(done?' ok':'')+'" id="si-'+idx+'-'+f+'" placeholder="x.x.x.x" value="'+(done?ans[f]:'')+'" '+(done?'readonly':'')+' ></div>').join('')+
+    '<div class="subnet-input-group"><label>Кол-во хостов</label><input class="subnet-input'+(done?' ok':'')+'" id="si-'+idx+'-hosts" placeholder="число" value="'+(done?ans.hosts:'')+'" '+(done?'readonly':'')+' ></div></div>'+
+    '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="checkSubnet('+idx+')" '+(done?'disabled':'')+'>Проверить</button><button class="btn btn-outline btn-sm" onclick="showSubnetAns('+idx+')">Показать ответ</button></div>'+
+    '<div class="subnet-result" id="sr-'+idx+'"></div></div>';
+  }).join('');updateSubnetProg();
+}
+function checkSubnet(idx){
+  const prob=SUBNET_PROBLEMS[idx];const ans=calcSubnet(prob.ip,prob.prefix);const fields=['network','broadcast','first','last','mask'];let allOk=true;
+  fields.forEach(f=>{const el=document.getElementById('si-'+idx+'-'+f);if(!el) return;const ok=el.value.trim()===ans[f];el.classList.toggle('ok',ok);el.classList.toggle('err',!ok);if(!ok)allOk=false;});
+  const he=document.getElementById('si-'+idx+'-hosts');if(he){const ok=parseInt(he.value)===ans.hosts;he.classList.toggle('ok',ok);he.classList.toggle('err',!ok);if(!ok)allOk=false;}
+  if(allOk){subnetDone[idx]=1;lsSet('subnet_prog',subnetDone);document.getElementById('sp-badge-'+idx).innerHTML='<span style="color:var(--green);font-weight:700">✅ Верно!</span>';updateSubnetProg();}
+}
+function showSubnetAns(idx){
+  const el=document.getElementById('sr-'+idx);if(!el)return;
+  if(el.style.display==='block'){el.style.display='none';return;}
+  const prob=SUBNET_PROBLEMS[idx];const ans=calcSubnet(prob.ip,prob.prefix);
+  const p=prob.ip.split('.').map(Number);const ipN=(p[0]<<24|p[1]<<16|p[2]<<8|p[3])>>>0;
+  const mask=prob.prefix===0?0:(0xFFFFFFFF<<(32-prob.prefix))>>>0;const bits=32-prob.prefix;
+  const hosts=prob.prefix>=31?(prob.prefix===31?2:1):Math.pow(2,bits)-2;
+  el.innerHTML='<div style="margin-bottom:10px"><b>📐 Пошаговый расчёт '+prob.ip+'/'+prob.prefix+'</b></div><div style="font-size:12px;line-height:2;color:var(--text2)"><b>1. Маска:</b> /'+prob.prefix+' → '+prob.prefix+' бит = 1, остальные '+bits+' = 0<br>&nbsp;&nbsp;&nbsp;Двоичная: '+mask.toString(2).padStart(32,'0').replace(/(.{8})/g,'$1 ')+'<br>&nbsp;&nbsp;&nbsp;Десятичная: <b style="color:var(--primary-h)">'+ans.mask+'</b><br><b>2. IP:</b> '+ipN.toString(2).padStart(32,'0').replace(/(.{8})/g,'$1 ')+'<br><b>3. Сеть:</b> <b style="color:var(--green)">'+ans.network+'</b><br><b>4. Broadcast:</b> <b style="color:var(--red)">'+ans.broadcast+'</b><br><b>5-6. Хосты:</b> '+ans.first+' – '+ans.last+'<br><b>7. Всего:</b> 2<sup>'+bits+'</sup>-2 = <b style="color:var(--yellow)">'+hosts+'</b></div>';
+  el.style.display='block';
+}
+function updateSubnetProg(){const done=Object.keys(subnetDone).length;document.getElementById('subnet-progress-fill').style.width=(done/SUBNET_PROBLEMS.length*100)+'%';document.getElementById('subnet-score-display').textContent=done+' / '+SUBNET_PROBLEMS.length;}
+
+// ═══ TROUBLESHOOTING ═══
+let tsState={scenarioId:null,currentNode:'start',totalPoints:0,steps:[]};let tsScores={};
+function renderTsList(){
+  tsScores=lsGet('ts_scores',{});document.getElementById('ts-list').style.display='block';document.getElementById('ts-game').classList.remove('active');document.getElementById('ts-end').style.display='none';
+  document.getElementById('ts-cards').innerHTML=TS_SCENARIOS.map(s=>{const sc=tsScores[s.id]||0;const done=!!tsScores[s.id];
+    return '<div class="ts-sc-card'+(done?' done':'')+'" onclick="tsStart('+s.id+')"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px"><span style="font-size:13px;font-weight:700">'+s.title+'</span>'+(done?'<span class="ts-score-badge">'+sc+' очков</span>':'')+'</div><div style="font-size:12px;color:var(--text2);line-height:1.5">'+s.context+'</div></div>';
+  }).join('');
+}
+function tsStart(id){const scen=TS_SCENARIOS.find(s=>s.id===id);if(!scen) return;tsState={scenarioId:id,currentNode:'start',totalPoints:0,steps:[]};document.getElementById('ts-list').style.display='none';document.getElementById('ts-game').classList.add('active');document.getElementById('ts-game-title').textContent=scen.title;document.getElementById('ts-context-text').textContent=scen.context;document.getElementById('ts-end').style.display='none';document.getElementById('ts-step-log').innerHTML='';tsRenderNode(scen,'start');}
+function tsRenderNode(scen,nodeId){const node=scen.nodes[nodeId];if(!node) return;document.getElementById('ts-observation').textContent=node.obs;document.getElementById('ts-game-score').textContent='Очки: '+tsState.totalPoints;const ch=document.getElementById('ts-choices');if(!node.choices||!node.choices.length){ch.innerHTML='';tsEndScenario(scen);return;}ch.innerHTML=node.choices.map((c,i)=>'<div class="ts-choice" onclick="tsChoose('+i+')"><span>'+esc(c.text)+'</span></div>').join('');}
+function tsChoose(i){const scen=TS_SCENARIOS.find(s=>s.id===tsState.scenarioId);const node=scen.nodes[tsState.currentNode];const choice=node.choices[i];document.querySelectorAll('.ts-choice').forEach((el,j)=>{el.classList.add(j===i?(choice.ok?'ch-ok':'ch-bad'):'disabled');el.onclick=null;});tsState.totalPoints=Math.max(0,tsState.totalPoints+(choice.pts||0));document.getElementById('ts-step-log').innerHTML+='<div class="ts-log-item">'+(choice.ok?'✅':'❌')+' '+esc(choice.text)+' ('+(choice.pts>=0?'+':'')+choice.pts+' очков)</div>';document.getElementById('ts-game-score').textContent='Очки: '+tsState.totalPoints;setTimeout(()=>{tsState.currentNode=choice.next;tsRenderNode(scen,choice.next);},900);}
+function tsEndScenario(scen){document.getElementById('ts-end').style.display='block';const pts=Math.min(100,Math.max(0,tsState.totalPoints));document.getElementById('ts-end-score').textContent=pts;tsScores[scen.id]=pts;lsSet('ts_scores',tsScores);}
+function tsBack(){renderTsList();}function tsRestart(){tsStart(tsState.scenarioId);}
+
+// ═══ COMMAND BUILDER ═══
+let cmdDone={};
+function renderCmd(){cmdDone=lsGet('cmd_prog',{});const L=['A','B','C','D'];document.getElementById('cmd-container').innerHTML=CMD_TASKS.map((t,idx)=>{const done=cmdDone[t.id];return '<div class="cmd-card" id="cmd-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:11px;font-weight:700;color:var(--text3)">Задача '+(idx+1)+'/40</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅ Верно':'❌ Ошибка')+'</span>':'')+'</div><div class="cmd-task-text">'+esc(t.task)+'</div><div class="cmd-opts">'+t.opts.map((o,i)=>'<div class="cmd-opt'+(done!==undefined?' disabled':'')+'" id="co-'+t.id+'-'+i+'" onclick="pickCmd('+t.id+','+i+')"><span style="font-weight:700;color:var(--text3)">'+L[i]+'.</span><code>'+esc(o)+'</code></div>').join('')+'</div><div class="cmd-exp" id="cexp-'+t.id+'">'+esc(t.exp)+'</div></div>';}).join('');Object.entries(cmdDone).forEach(([id,chosen])=>applyCmdState(parseInt(id),chosen));updateCmdProg();}
+function applyCmdState(id,chosen){const t=CMD_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#cmd-'+id+' .cmd-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong');});document.getElementById('cexp-'+id).style.display='block';}
+function pickCmd(tid,chosen){if(cmdDone[tid]!==undefined) return;cmdDone[tid]=chosen;lsSet('cmd_prog',cmdDone);applyCmdState(tid,chosen);updateCmdProg();}
+function updateCmdProg(){const done=Object.keys(cmdDone).length;const ok=Object.entries(cmdDone).filter(([id,c])=>CMD_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('cmd-progress-fill').style.width=(done/CMD_TASKS.length*100)+'%';document.getElementById('cmd-score-display').textContent=ok+' / '+CMD_TASKS.length+' правильно';}
+
+// ═══ CODE REVIEWER ═══
+let codeDone={};
+function renderCode(){codeDone=lsGet('code_prog',{});const L=['A','B','C','D'];document.getElementById('code-container').innerHTML=CODE_TASKS.map((t,idx)=>{const done=codeDone[t.id];const tool=t.tool==='Terraform'?'tag-tf':'tag-ans';const hlCode=t.tool==='Terraform'?highlightHCL(t.code):highlightYAML(t.code);const hlFix=t.tool==='Terraform'?highlightHCL(t.fix):highlightYAML(t.fix);return '<div class="code-card" id="code-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="tag '+tool+'">'+t.tool+'</span><span style="font-size:14px;font-weight:700">'+esc(t.title)+'</span><span style="margin-left:auto;font-size:11px;color:var(--text3)">'+(idx+1)+'/15</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅':'❌')+'</span>':'')+'</div><div class="code-question">🔍 Найдите ошибку в этом коде:</div><div class="code-block">'+hlCode+'</div><div class="code-opts">'+t.opts.map((o,i)=>'<div class="code-opt'+(done!==undefined?' disabled':'')+'" id="codeopt-'+t.id+'-'+i+'" onclick="pickCode('+t.id+','+i+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[i]+'.</span><span>'+esc(o)+'</span></div>').join('')+'</div><div class="code-fix" id="cfix-'+t.id+'">✅ Исправление:\n'+hlFix+'</div></div>';}).join('');Object.entries(codeDone).forEach(([id,chosen])=>applyCodeState(parseInt(id),chosen));updateCodeProg();}
+function applyCodeState(id,chosen){const t=CODE_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#code-'+id+' .code-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong');});document.getElementById('cfix-'+id).style.display='block';}
+function pickCode(tid,chosen){if(codeDone[tid]!==undefined) return;codeDone[tid]=chosen;lsSet('code_prog',codeDone);applyCodeState(tid,chosen);updateCodeProg();}
+function updateCodeProg(){const done=Object.keys(codeDone).length;const ok=Object.entries(codeDone).filter(([id,c])=>CODE_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('code-progress-fill').style.width=(done/CODE_TASKS.length*100)+'%';document.getElementById('code-score-display').textContent=ok+' / '+CODE_TASKS.length+' правильно';}
+
+// ═══ ANSIBLE TRAINER ═══
+let ansDone={};
+function renderAnsible(){ansDone=lsGet('ans_prog',{});const L=['A','B','C','D'];document.getElementById('ans-container').innerHTML=ANSIBLE_PB_TASKS.map(t=>{const done=ansDone[t.id];return '<div class="code-card" id="ans-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="tag tag-ans">Ansible</span><span style="font-size:14px;font-weight:700">'+esc(t.title)+'</span><span style="margin-left:auto;font-size:11px;color:var(--text3)">'+(ANSIBLE_PB_TASKS.indexOf(t)+1)+'/10</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅':'❌')+'</span>':'')+'</div><div class="code-question">📋 Задача: '+esc(t.task)+'</div><div class="code-block">'+highlightYAML(t.code)+'</div><div class="code-question" style="color:var(--red)">🔍 Найдите ошибку:</div><div class="code-opts">'+t.opts.map((o,i)=>'<div class="code-opt'+(done!==undefined?' disabled':'')+'" id="ansopt-'+t.id+'-'+i+'" onclick="pickAns('+t.id+','+i+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[i]+'.</span><span>'+esc(o)+'</span></div>').join('')+'</div><div class="code-fix" id="afix-'+t.id+'">✅ Исправление:\n'+highlightYAML(t.fix)+'</div></div>';}).join('');Object.entries(ansDone).forEach(([id,chosen])=>applyAnsState(parseInt(id),chosen));updateAnsProg();}
+function applyAnsState(id,chosen){const t=ANSIBLE_PB_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#ans-'+id+' .code-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong');});document.getElementById('afix-'+id).style.display='block';}
+function pickAns(tid,chosen){if(ansDone[tid]!==undefined) return;ansDone[tid]=chosen;lsSet('ans_prog',ansDone);applyAnsState(tid,chosen);updateAnsProg();}
+function updateAnsProg(){const done=Object.keys(ansDone).length;const ok=Object.entries(ansDone).filter(([id,c])=>ANSIBLE_PB_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('ans-pb').style.width=(done/ANSIBLE_PB_TASKS.length*100)+'%';document.getElementById('ans-score-lbl').textContent=ok+' / '+ANSIBLE_PB_TASKS.length+' правильно';}
+
+// ═══ DOCKERFILE TRAINER ═══
+let dfDone={};
+function renderDockerfile(){dfDone=lsGet('df_prog',{});const L=['A','B','C','D'];document.getElementById('df-container').innerHTML=DOCKERFILE_TASKS.map(t=>{const done=dfDone[t.id];return '<div class="code-card" id="df-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="tag tag-docker">Docker</span><span style="font-size:14px;font-weight:700">'+esc(t.title)+'</span><span style="margin-left:auto;font-size:11px;color:var(--text3)">'+(DOCKERFILE_TASKS.indexOf(t)+1)+'/10</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅':'❌')+'</span>':'')+'</div><div class="code-block">'+highlightDockerfile(t.code)+'</div><div class="code-question" style="color:var(--red)">🔍 В чём проблема?</div><div class="code-opts">'+t.opts.map((o,i)=>'<div class="code-opt'+(done!==undefined?' disabled':'')+'" id="dfopt-'+t.id+'-'+i+'" onclick="pickDf('+t.id+','+i+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[i]+'.</span><span>'+esc(o)+'</span></div>').join('')+'</div><div class="code-fix" id="dfix-'+t.id+'">✅ Правильный вариант:\n'+esc(t.fix)+'</div></div>';}).join('');Object.entries(dfDone).forEach(([id,chosen])=>applyDfState(parseInt(id),chosen));updateDfProg();}
+function applyDfState(id,chosen){const t=DOCKERFILE_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#df-'+id+' .code-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong');});document.getElementById('dfix-'+id).style.display='block';}
+function pickDf(tid,chosen){if(dfDone[tid]!==undefined) return;dfDone[tid]=chosen;lsSet('df_prog',dfDone);applyDfState(tid,chosen);updateDfProg();}
+function updateDfProg(){const done=Object.keys(dfDone).length;const ok=Object.entries(dfDone).filter(([id,c])=>DOCKERFILE_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('df-pb').style.width=(done/DOCKERFILE_TASKS.length*100)+'%';document.getElementById('df-score-lbl').textContent=ok+' / '+DOCKERFILE_TASKS.length+' правильно';}
+
+// ═══ K8S TRAINER ═══
+let k8sDone={};
+function renderK8s(){k8sDone=lsGet('k8s_prog',{});const L=['A','B','C','D'];document.getElementById('k8s-container').innerHTML=K8S_TASKS.map(t=>{const done=k8sDone[t.id];return '<div class="code-card" id="k8sc-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="tag tag-k8s">K8s</span><span style="font-size:14px;font-weight:700">'+esc(t.title)+'</span><span style="margin-left:auto;font-size:11px;color:var(--text3)">'+(K8S_TASKS.indexOf(t)+1)+'/10</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅':'❌')+'</span>':'')+'</div><div class="code-block">'+highlightYAML(t.code)+'</div><div class="code-question" style="color:var(--red)">🔍 В чём проблема?</div><div class="code-opts">'+t.opts.map((o,i)=>'<div class="code-opt'+(done!==undefined?' disabled':'')+'" id="k8sopt-'+t.id+'-'+i+'" onclick="pickK8s('+t.id+','+i+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[i]+'.</span><span>'+esc(o)+'</span></div>').join('')+'</div><div class="code-fix" id="k8sfix-'+t.id+'">✅ Исправление:\n'+highlightYAML(t.fix)+'</div></div>';}).join('');Object.entries(k8sDone).forEach(([id,chosen])=>applyK8sState(parseInt(id),chosen));updateK8sProg();}
+function applyK8sState(id,chosen){const t=K8S_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#k8sc-'+id+' .code-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong');});document.getElementById('k8sfix-'+id).style.display='block';}
+function pickK8s(tid,chosen){if(k8sDone[tid]!==undefined) return;k8sDone[tid]=chosen;lsSet('k8s_prog',k8sDone);applyK8sState(tid,chosen);updateK8sProg();}
+function updateK8sProg(){const done=Object.keys(k8sDone).length;const ok=Object.entries(k8sDone).filter(([id,c])=>K8S_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('k8s-pb').style.width=(done/K8S_TASKS.length*100)+'%';document.getElementById('k8s-score-lbl').textContent=ok+' / '+K8S_TASKS.length+' правильно';}
+
+// ═══ PORTS TRAINER ═══
+let ptDone={},ptCurrent={};
+function renderPorts(){ptDone=lsGet('pt_prog',{});ptCurrent={};renderPortQ();}
+function renderPortQ(){const undone=PORTS_TASKS.filter(p=>!ptDone[p.id]);if(!undone.length){document.getElementById('pt-container').innerHTML='<div class="empty-state"><div class="icon">🏆</div><p>Все порты выучены!</p><button class="btn btn-primary" onclick="lsSet(\'pt_prog\',{});renderPorts();">🔄 Начать заново</button></div>';updatePtProg();return;}const q=undone[Math.floor(Math.random()*undone.length)];ptCurrent=q;document.getElementById('pt-container').innerHTML='<div class="card" style="text-align:center;max-width:450px;margin:0 auto"><div style="font-size:11px;color:var(--text3);margin-bottom:8px">Укажите TCP-порт</div><div style="font-size:28px;font-weight:800;margin-bottom:20px;color:var(--primary-h)">'+esc(q.service)+'</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:14px"><input class="form-input" id="pt-inp" type="number" placeholder="Порт" style="width:120px;text-align:center;font-size:18px;font-family:JetBrains Mono,monospace" onkeydown="if(event.key===\'Enter\')checkPort()"><button class="btn btn-primary" onclick="checkPort()">✓</button></div><div id="pt-feedback" style="display:none;margin-top:10px"></div><div style="margin-top:14px"><button class="btn btn-outline btn-sm" onclick="skipPort()">Пропустить</button></div></div>';setTimeout(()=>document.getElementById('pt-inp')?.focus(),100);updatePtProg();}
+function checkPort(){const inp=document.getElementById('pt-inp');const fb=document.getElementById('pt-feedback');const val=parseInt(inp.value);const correct=ptCurrent.port;if(val===correct){ptDone[ptCurrent.id]=1;lsSet('pt_prog',ptDone);fb.style.display='block';fb.innerHTML='<span style="color:var(--green);font-weight:700">✅ Верно! '+correct+'</span>';updatePtProg();setTimeout(renderPortQ,800);}else{fb.style.display='block';fb.innerHTML='<span style="color:var(--red);font-weight:700">❌ '+ptCurrent.service+' → порт <b>'+correct+'</b>, не '+val+'</span>';inp.value='';inp.focus();}}
+function skipPort(){const fb=document.getElementById('pt-feedback');fb.style.display='block';fb.innerHTML='<span style="color:var(--yellow)">💡 '+ptCurrent.service+' → порт <b>'+ptCurrent.port+'</b></span>';setTimeout(renderPortQ,1200);}
+function updatePtProg(){const done=Object.keys(ptDone).length;document.getElementById('pt-pb').style.width=(done/PORTS_TASKS.length*100)+'%';document.getElementById('pt-score-lbl').textContent=done+' / '+PORTS_TASKS.length+' портов';}
+
+// ═══ GIT TRAINER ═══
+let gitDone={};
+function renderGit(){gitDone=lsGet('git_prog',{});const L=['A','B','C','D'];document.getElementById('git-container').innerHTML=GIT_TASKS.map(t=>{const done=gitDone[t.id];return '<div class="git-card" id="gt-'+t.id+'"><div class="git-num">Задача #'+t.id+'</div><div class="git-task">'+esc(t.task)+'</div><div class="git-opts">'+t.opts.map((o,i)=>'<div class="git-opt'+(done!==undefined?' disabled':'')+'" id="go-'+t.id+'-'+i+'" onclick="pickGit('+t.id+','+i+')"><span style="font-weight:600;margin-right:8px;color:var(--text3)">'+L[i]+')</span>'+esc(o)+'</div>').join('')+'</div><div class="git-exp" id="gexp-'+t.id+'">💡 '+esc(t.exp)+'</div></div>';}).join('');Object.entries(gitDone).forEach(([id,c])=>applyGitState(parseInt(id),c));updateGitProg();}
+function applyGitState(id,chosen){const t=GIT_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#gt-'+id+' .git-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong-pick');});document.getElementById('gexp-'+id).style.display='block';}
+function pickGit(tid,chosen){if(gitDone[tid]!==undefined) return;gitDone[tid]=chosen;lsSet('git_prog',gitDone);applyGitState(tid,chosen);updateGitProg();}
+function updateGitProg(){const done=Object.keys(gitDone).length;const ok=Object.entries(gitDone).filter(([id,c])=>GIT_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('git-pb').style.width=(done/GIT_TASKS.length*100)+'%';document.getElementById('git-score-lbl').textContent=ok+' / '+GIT_TASKS.length+' правильно';}
+
+// ═══ REGEX TRAINER ═══
+let rxDone={};
+function renderRegex(){rxDone=lsGet('regex_prog',{});const L=['A','B','C','D'];document.getElementById('rx-container').innerHTML=REGEX_TASKS.map(t=>{const done=rxDone[t.id];return '<div class="rx-card" id="rx-'+t.id+'"><div class="rx-num">Задача #'+t.id+'</div><div class="rx-task">'+esc(t.task)+'</div>'+(t.context?'<div class="rx-ctx">$ '+esc(t.context)+'</div>':'')+'<div class="rx-opts">'+t.opts.map((o,i)=>'<div class="rx-opt'+(done!==undefined?' disabled':'')+'" id="ro-'+t.id+'-'+i+'" onclick="pickRx('+t.id+','+i+')"><span style="font-weight:600;margin-right:8px;color:var(--text3)">'+L[i]+')</span>'+esc(o)+'</div>').join('')+'</div><div class="rx-exp" id="rexp-'+t.id+'">💡 '+esc(t.exp)+'</div></div>';}).join('');Object.entries(rxDone).forEach(([id,c])=>applyRxState(parseInt(id),c));updateRxProg();}
+function applyRxState(id,chosen){const t=REGEX_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#rx-'+id+' .rx-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong-pick');});document.getElementById('rexp-'+id).style.display='block';}
+function pickRx(tid,chosen){if(rxDone[tid]!==undefined) return;rxDone[tid]=chosen;lsSet('regex_prog',rxDone);applyRxState(tid,chosen);updateRxProg();}
+function updateRxProg(){const done=Object.keys(rxDone).length;const ok=Object.entries(rxDone).filter(([id,c])=>REGEX_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('rx-pb').style.width=(done/REGEX_TASKS.length*100)+'%';document.getElementById('rx-score-lbl').textContent=ok+' / '+REGEX_TASKS.length+' правильно';}
+
+// ═══ TIPS ═══
+function renderTips(){document.getElementById('tips-container').innerHTML=TIPS.map((t,i)=>'<div class="tip-card"><div class="tip-header" onclick="toggleTip('+i+')"><span>💡 '+esc(t.title)+'</span><span id="ta-'+i+'">▼</span></div><div class="tip-body" id="tb-'+i+'">'+esc(t.body)+'</div></div>').join('');}
+function toggleTip(i){const b=document.getElementById('tb-'+i);const a=document.getElementById('ta-'+i);b.classList.toggle('open');a.textContent=b.classList.contains('open')?'▲':'▼';}
 
 
 // ═══ CUSTOM Q ═══
