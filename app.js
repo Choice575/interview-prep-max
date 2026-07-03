@@ -481,7 +481,7 @@ function renderAnalytics(){
   allQ.forEach(q=>{const p=qprog[q.id];if(p){if(p.correct>p.wrong)ok++;else if(p.wrong>0)err++;}});
   document.getElementById('analytics-seg-bar').innerHTML='<div class="seg-ok" style="width:'+(ok/tot*100)+'%"></div><div class="seg-err" style="width:'+(err/tot*100)+'%"></div><div class="seg-none" style="width:'+((tot-ok-err)/tot*100)+'%"></div>';
   document.getElementById('analytics-seg-label').textContent='✅ Изучено: '+ok+' | ❌ Ошибки: '+err+' | ⭕ Не отвечено: '+(tot-ok-err)+' из '+tot;
-  drawRadar();renderTimeChart();renderCategoryStats();renderWeakSpots();
+  drawRadar();renderTimeChart();renderCategoryStats();renderWeakSpots();renderGradeReadiness();
 }
 function drawRadar(){
   const canvas=document.getElementById('radarCanvas');if(!canvas) return;const ctx=canvas.getContext('2d');
@@ -515,6 +515,27 @@ function renderWeakSpots(){
   const weak=allQ.map(q=>{const p=qprog[q.id];if(!p||p.wrong===0) return null;const total=p.correct+p.wrong;if(total<2) return null;return {q,wrong:p.wrong,total,pct:Math.round(p.wrong/total*100)};}).filter(Boolean).sort((a,b)=>b.pct-a.pct).slice(0,5);
   if(!weak.length){el.innerHTML='<p style="font-size:12px;color:var(--text3)">Ответьте хотя бы на 2 вопроса, чтобы увидеть слабые места.</p>';return;}
   el.innerHTML=weak.map(w=>'<div class="weak-item"><span class="weak-pct">'+w.pct+'%</span><span class="weak-txt" title="'+esc(w.q.q)+'">'+esc(w.q.q.slice(0,60))+(w.q.q.length>60?'…':'')+'</span><span style="font-size:10px;color:var(--text3)">'+w.wrong+'/'+w.total+'</span></div>').join('');
+}
+
+// ═══ GRADE READINESS ═══
+function renderGradeReadiness(){
+  const el=document.getElementById('weak-spots-list');if(!el) return;
+  const qprog=getQProg(),allQ=getAllQ();
+  const grades={Junior:{qs:[],ok:0},Middle:{qs:[],ok:0},Senior:{qs:[],ok:0}};
+  allQ.forEach(q=>{const lvl=q.level||'Junior';if(grades[lvl]){grades[lvl].qs.push(q);const p=qprog[q.id];if(p&&p.correct>p.wrong)grades[lvl].ok++;}});
+  // Добавляем карточку после weak-spots
+  const card=document.getElementById('grade-readiness-card');
+  const container=document.getElementById('analytics-three');
+  if(!container||card) return;
+  const div=document.createElement('div');div.className='card';div.id='grade-readiness-card';
+  div.innerHTML='<div class="card-title">🎯 Готовность по грейдам</div>'+
+    Object.entries(grades).map(([g,d])=>{
+      const pct=d.qs.length?Math.round(d.ok/d.qs.length*100):0;
+      const barClr=pct>=70?'var(--green)':pct>=40?'var(--yellow)':'var(--red)';
+      return '<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">'+g+'</span><span style="color:var(--text2)">'+d.ok+'/'+d.qs.length+' ('+pct+'%)</span></div><div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+barClr+';border-radius:3px"></div></div></div>';
+    }).join('')+
+    '<div style="font-size:11px;color:var(--text3);margin-top:8px">Оценка: ≥70% Junior → готов к Middle, ≥70% Middle → готов к Senior</div>';
+  container.appendChild(div);
 }
 
 // ═══ SUBNET ═══
@@ -870,6 +891,24 @@ document.addEventListener('keydown',function(e){
     if(e.key===' '&&currentView==='flashcard'){e.preventDefault();const fc=document.querySelector('.flashcard');if(fc) fc.click();}
   }
 });
+
+// ═══ OFFLINE READINESS CHECK ═══
+async function checkOfflineReady(){
+  const files=['./','./index.html','./styles.css','./app.js','./sw.js','./interview-prep-max.webmanifest'];
+  const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','tips'];
+  tasks.forEach(t=>files.push('./tasks/'+t+'.json'));
+  let ok=0,fail=0;
+  const results=[];
+  for(const f of files){
+    try{
+      const r=await fetch(f,{cache:'only-if-cached'});
+      if(r.ok){ok++;results.push('✅ '+f);}
+      else{fail++;results.push('⚠️ '+f+' (status '+r.status+')');}
+    }catch(e){fail++;results.push('❌ '+f+' — не в кэше');}
+  }
+  const pct=Math.round(ok/files.length*100);
+  alert('📶 Оффлайн-готовность: '+pct+'%\n\n'+results.join('\n')+'\n\n'+(pct===100?'🎉 Полный оффлайн работает!':'💡 Откройте все разделы при интернете для кэширования.'));
+}
 
 // ═══ PWA ═══
 if ('serviceWorker' in navigator) {
