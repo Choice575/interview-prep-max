@@ -166,9 +166,15 @@ function filterQs(){
   if(s) qs=qs.filter(q=>q.q.toLowerCase().includes(s)||(q.options||[]).some(o=>o.toLowerCase().includes(s)));
   const mistakes=getMistakes();const qprog=getQProg();
   if(currentMode==='mistakes') qs=qs.filter(q=>mistakes[q.id]);
-  if(currentMode==='smart'){
+  if(currentMode==='smart'||currentMode==='srs'){
     const now=Date.now();
-    qs=qs.filter(q=>{const p=qprog[q.id];if(!p) return true;const r=p.correct/(p.correct+p.wrong);const age=(now-(p.lastSeen||0))/3600000;return r<0.7||age>24;});
+    if(currentMode==='srs'){
+      // Только вопросы, которые пора повторить
+      qs=qs.filter(q=>{const p=qprog[q.id];return !p||!p.nextReviewAt||p.nextReviewAt<=now;});
+    } else {
+      // Умный: ошибки + давно не видел + низкий процент
+      qs=qs.filter(q=>{const p=qprog[q.id];if(!p) return true;const r=p.correct/(p.correct+p.wrong);const age=(now-(p.lastSeen||0))/3600000;return r<0.7||age>24;});
+    }
   }
   if(['mix10','mix20','mix30'].includes(currentMode)){
     const n={mix10:10,mix20:20,mix30:30}[currentMode];
@@ -192,6 +198,7 @@ function renderQuestions(){
   sb.innerHTML='<div class="seg-ok" style="width:'+(ok/total*100)+'%"></div><div class="seg-err" style="width:'+(err/total*100)+'%"></div><div class="seg-none" style="width:'+((total-ok-err)/total*100)+'%"></div>';
   pi.innerHTML='<span style="font-size:12px;color:var(--text2)">Показано: <b>'+total+'</b> | ✅ '+ok+' | ❌ '+err+' | ⭕ '+(total-ok-err)+'</span>';
   if(currentView==='flashcard'){renderFlashcards(qs);sc.style.display='none';return;}
+  if(currentView==='freeform'){renderFreeform();sc.style.display='none';return;}
   if(currentView==='single'){singleIdx=0;renderSingle();sc.style.display='block';return;}
   sc.style.display='none';
   cont.innerHTML=qs.map(q=>renderQCard(q,false)).join('');
@@ -238,6 +245,22 @@ function pick(qid,chosen,correct){
   const respTime=questionStartTime[qid]?Math.round((Date.now()-questionStartTime[qid])/1000):0;
   qprog[qid].times.push(respTime);
   if(qprog[qid].times.length>20)qprog[qid].times.shift();
+  // Spaced Repetition (SM-2)
+  if(!qprog[qid].ease) qprog[qid].ease = 2.5;
+  if(!qprog[qid].interval) qprog[qid].interval = 0;
+  if(!qprog[qid].repetitions) qprog[qid].repetitions = 0;
+  if(ok){
+    qprog[qid].repetitions++;
+    if(qprog[qid].interval === 0) qprog[qid].interval = 1;
+    else if(qprog[qid].interval === 1) qprog[qid].interval = 3;
+    else qprog[qid].interval = Math.round(qprog[qid].interval * qprog[qid].ease);
+    qprog[qid].ease = Math.min(3.0, qprog[qid].ease + 0.1);
+  } else {
+    qprog[qid].repetitions = 0;
+    qprog[qid].interval = 1;
+    qprog[qid].ease = Math.max(1.3, qprog[qid].ease - 0.2);
+  }
+  qprog[qid].nextReviewAt = Date.now() + qprog[qid].interval * 86400000;
   lsSet('qprog',qprog);
   const mistakes=getMistakes();if(!ok)mistakes[qid]=1;else delete mistakes[qid];lsSet('mistakes',mistakes);
   const stats=lsGet('stats',{total:0,correct:0});stats.total++;if(ok)stats.correct++;lsSet('stats',stats);
@@ -268,6 +291,147 @@ function renderFlashcards(qs){
   ).join('');
 }
 function flipCard(id){document.getElementById('fc-'+id)?.classList.toggle('flipped');}
+
+// ═══ FREEFORM MODE (ответ без вариантов) ═══
+let freeformIdx=0, freeformQs=[], freeformAnswers={};
+function renderFreeform(){
+  freeformQs=filterQs();freeformIdx=0;freeformAnswers={};
+  if(!freeformQs.length){document.getElementById('questions-container').innerHTML='<div class="empty-state"><div class="icon">🔍</div><p>Нет вопросов</p></div>';return;}
+  renderFreeformQ();
+}
+function renderFreeformQ(){
+  if(freeformIdx>=freeformQs.length){
+    renderFreeformResults();return;
+  }
+  const q=freeformQs[freeformIdx];questionStartTime[q.id]=Date.now();
+  document.getElementById('questions-container').innerHTML=
+    '<div class="card" style="max-width:700px;margin:0 auto">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'+
+    '<div style="display:flex;gap:6px">'+ttag(q.topic)+ltag(q.level)+'</div>'+
+    '<span style="font-size:13px;color:var(--text2)">'+(freeformIdx+1)+' / '+freeformQs.length+'</span>'+
+    '</div>'+
+    '<div class="q-text" style="font-size:16px;margin-bottom:16px">'+esc(q.q)+'</div>'+
+    '<textarea class="form-input" id="ff-inp" rows="4" placeholder="Ваш ответ..." style="width:100%;margin-bottom:12px;font-size:14px" onkeydown="if(event.ctrlKey&&event.key===\'Enter\')freeformReveal()"></textarea>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<button class="btn btn-primary" onclick="freeformReveal()">Показать ответ</button>'+
+    '<button class="btn btn-outline btn-sm" onclick="freeformSkip()">Пропустить</button>'+
+    '</div>'+
+    '<div id="ff-answer" style="display:none;margin-top:14px;padding:14px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--primary)">'+
+    '<div style="font-weight:700;color:var(--primary-h);margin-bottom:8px">✅ Правильный ответ:</div>'+
+    '<div style="font-size:14px;line-height:1.6;color:var(--text)">'+esc((q.options||[])[q.answer]||'')+'</div>'+
+    (q.explanation?'<div style="margin-top:10px;font-size:13px;color:var(--text2);line-height:1.6">💡 '+esc(q.explanation)+'</div>':'')+
+    '<div style="margin-top:14px;display:flex;gap:8px">'+
+    '<span style="font-size:12px;color:var(--text2)">Оцените себя:</span>'+
+    '<button class="btn btn-sm" style="background:var(--green-dim);color:var(--green)" onclick="freeformRate(\'good\')">✅ Знал</button>'+
+    '<button class="btn btn-sm" style="background:var(--yellow-dim);color:var(--yellow)" onclick="freeformRate(\'partial\')">🤔 Частично</button>'+
+    '<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red)" onclick="freeformRate(\'bad\')">❌ Не знал</button>'+
+    '</div></div></div>';
+  setTimeout(()=>document.getElementById('ff-inp')?.focus(),100);
+}
+function freeformReveal(){
+  document.getElementById('ff-answer').style.display='block';
+  document.getElementById('ff-inp').disabled=true;
+}
+function freeformRate(rating){
+  const q=freeformQs[freeformIdx];
+  freeformAnswers[q.id]=rating;
+  // Записываем в статистику
+  const qprog=getQProg();if(!qprog[q.id])qprog[q.id]={correct:0,wrong:0,times:[]};
+  if(rating==='good') qprog[q.id].correct++;
+  else if(rating==='bad') qprog[q.id].wrong++;
+  else {qprog[q.id].correct++;qprog[q.id].wrong++;} // частично = 0.5/0.5
+  qprog[q.id].lastSeen=Date.now();
+  const respTime=questionStartTime[q.id]?Math.round((Date.now()-questionStartTime[q.id])/1000):0;
+  if(!qprog[q.id].times)qprog[q.id].times=[];
+  qprog[q.id].times.push(respTime);
+  if(!qprog[q.id].ease) qprog[q.id].ease=2.5;
+  if(!qprog[q.id].interval) qprog[q.id].interval=0;
+  if(!qprog[q.id].repetitions) qprog[q.id].repetitions=0;
+  if(rating==='good'){qprog[q.id].repetitions++;qprog[q.id].interval=qprog[q.id].interval===0?1:Math.round(qprog[q.id].interval*qprog[q.id].ease);qprog[q.id].ease=Math.min(3,qprog[q.id].ease+0.1);}
+  else {qprog[q.id].repetitions=0;qprog[q.id].interval=1;qprog[q.id].ease=Math.max(1.3,qprog[q.id].ease-0.2);}
+  qprog[q.id].nextReviewAt=Date.now()+qprog[q.id].interval*86400000;
+  lsSet('qprog',qprog);
+  const stats=lsGet('stats',{total:0,correct:0});stats.total++;if(rating==='good')stats.correct++;lsSet('stats',stats);
+  freeformIdx++;renderFreeformQ();
+}
+function freeformSkip(){freeformIdx++;renderFreeformQ();}
+function renderFreeformResults(){
+  const total=freeformQs.length;const good=Object.values(freeformAnswers).filter(r=>r==='good').length;
+  const partial=Object.values(freeformAnswers).filter(r=>r==='partial').length;
+  const bad=Object.values(freeformAnswers).filter(r=>r==='bad').length;
+  const score=Math.round((good+partial*0.5)/total*100);
+  document.getElementById('questions-container').innerHTML=
+    '<div style="text-align:center;padding:40px 20px">'+
+    '<div style="font-size:60px;margin-bottom:10px">'+(score>=80?'🏆':score>=50?'🎯':'📚')+'</div>'+
+    '<div style="font-size:28px;font-weight:800;margin-bottom:8px">Сессия завершена</div>'+
+    '<div style="font-size:48px;font-weight:800;color:var(--primary-h);margin-bottom:6px">'+score+'%</div>'+
+    '<div style="font-size:14px;color:var(--text2);margin-bottom:16px">✅ '+good+' зная | 🤔 '+partial+' частично | ❌ '+bad+' не зная</div>'+
+    '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'+
+    '<button class="btn btn-primary" onclick="currentView=\'freeform\';renderFreeform()">🔄 Ещё раз</button>'+
+    '<button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
+}
+
+// ═══ MOCK INTERVIEW ═══
+let mockState={questions:[],idx:0,answers:[],timeLeft:1800,timer:null,active:false};
+function startMockInterview(){
+  const allQ=getAllQ();if(allQ.length<15){alert('Нужно минимум 15 вопросов');return;}
+  mockState.questions=shuffle(allQ).slice(0,15);
+  mockState.idx=0;mockState.answers=[];mockState.timeLeft=1800;mockState.active=true;
+  nav('exam');
+  document.getElementById('exam-controls').style.display='none';
+  document.getElementById('progress-info').style.display='none';
+  document.getElementById('seg-bar').style.display='none';
+  document.getElementById('single-controls').style.display='none';
+  renderMockQ();mockState.timer=setInterval(mockTick,1000);
+}
+function mockTick(){
+  mockState.timeLeft--;
+  const el=document.getElementById('mock-timer');
+  if(el){const m=Math.floor(mockState.timeLeft/60),s=('0'+mockState.timeLeft%60).slice(-2);el.textContent=m+':'+s;if(mockState.timeLeft<=120)el.style.color='var(--red)';}
+  if(mockState.timeLeft<=0)endMockInterview();
+}
+function renderMockQ(){
+  if(mockState.idx>=mockState.questions.length){endMockInterview();return;}
+  const q=mockState.questions[mockState.idx];
+  document.getElementById('questions-container').innerHTML=
+    '<div style="background:var(--bg2);border:2px solid var(--primary);border-radius:14px;padding:24px;max-width:700px;margin:0 auto">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'+
+    '<div style="display:flex;gap:6px">'+ttag(q.topic)+ltag(q.level)+'</div>'+
+    '<div style="font-size:18px;font-weight:800" id="mock-timer">'+Math.floor(mockState.timeLeft/60)+':'+('0'+mockState.timeLeft%60).slice(-2)+'</div>'+
+    '<div style="font-size:13px;color:var(--text2)">Вопрос '+(mockState.idx+1)+'/15</div></div>'+
+    '<div class="q-text" style="font-size:16px;margin-bottom:20px">'+esc(q.q)+'</div>'+
+    '<textarea class="form-input" id="mock-inp" rows="5" placeholder="Ваш ответ..." style="width:100%;font-size:14px;margin-bottom:12px"></textarea>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<button class="btn btn-primary" onclick="mockNext()">Следующий →</button>'+
+    '<button class="btn btn-outline btn-sm" onclick="mockSkip()">Пропустить</button>'+
+    '<button class="btn btn-outline btn-sm" onclick="endMockInterview()" style="color:var(--red)">Завершить</button>'+
+    '</div></div>';
+  setTimeout(()=>document.getElementById('mock-inp')?.focus(),100);
+}
+function mockNext(){mockState.answers.push({q:mockState.questions[mockState.idx],answer:document.getElementById('mock-inp')?.value||'(пусто)'});mockState.idx++;renderMockQ();}
+function mockSkip(){mockState.answers.push({q:mockState.questions[mockState.idx],answer:'(пропущено)'});mockState.idx++;renderMockQ();}
+function endMockInterview(){
+  clearInterval(mockState.timer);mockState.active=false;
+  document.getElementById('exam-controls').style.display='';
+  document.getElementById('progress-info').style.display='';
+  document.getElementById('seg-bar').style.display='';
+  if(mockState.idx<mockState.questions.length) mockState.answers.push({q:mockState.questions[mockState.idx],answer:document.getElementById('mock-inp')?.value||'(не закончено)'});
+  // Анализ по темам
+  const byTopic={};mockState.answers.forEach(a=>{const t=a.q.topic;if(!byTopic[t])byTopic[t]=[];byTopic[t].push(a);});
+  const totalQ=mockState.answers.length;
+  document.getElementById('questions-container').innerHTML=
+    '<div style="text-align:center;padding:30px 20px;max-width:800px;margin:0 auto">'+
+    '<div style="font-size:48px;margin-bottom:8px">🎤</div>'+
+    '<div style="font-size:24px;font-weight:800;margin-bottom:4px">Mock Interview завершён</div>'+
+    '<div style="font-size:14px;color:var(--text2);margin-bottom:20px">Ответов: '+totalQ+' | Время: '+Math.floor((1800-mockState.timeLeft)/60)+' мин</div>'+
+    '<div class="card" style="text-align:left;margin-bottom:14px"><div class="card-title">📊 Разбор по темам</div>'+
+    Object.entries(byTopic).map(([t,as])=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;font-size:13px"><span>'+esc(t)+'</span><span style="color:var(--text2)">'+as.length+' вопр.</span></div>').join('')+'</div>'+
+    '<div class="card" style="text-align:left"><div class="card-title">📝 Ваши ответы и правильные</div>'+
+    mockState.answers.map(a=>'<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)"><div style="font-weight:600;margin-bottom:4px">'+esc(a.q.q)+'</div><div style="font-size:12px;color:var(--text2);margin-bottom:4px">Ваш ответ: <span style="color:var(--yellow)">'+esc(a.answer.substring(0,200))+'</span></div><div style="font-size:12px;color:var(--green)">✅ Правильный: '+esc((a.q.options||[])[a.q.answer]||'')+'</div></div>').join('')+'</div>'+
+    '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">'+
+    '<button class="btn btn-primary" onclick="startMockInterview()">🔄 Ещё интервью</button>'+
+    '<button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
+}
 
 // ═══ HOME ═══
 function updateStreakDisplay(){const sd=document.getElementById('streak-display');if(sd)sd.textContent='🔥 '+streak;}
@@ -678,7 +842,10 @@ async function initApp(){
   // Блиц-кнопка
   setTimeout(()=>{
     const qa=document.querySelector('.quick-actions');
-    if(qa){const btn=document.createElement('button');btn.className='btn btn-outline';btn.style.cssText='background:var(--primary-dim);color:var(--primary-h);border-color:var(--primary)';btn.textContent='⚡ Блиц-собеседование (5 мин)';btn.onclick=startBlitz;qa.appendChild(btn);}
+    if(qa){const btn=document.createElement('button');btn.className='btn btn-outline';btn.style.cssText='background:var(--primary-dim);color:var(--primary-h);border-color:var(--primary)';btn.textContent='⚡ Блиц (5 мин)';btn.onclick=startBlitz;qa.appendChild(btn);
+      const mockBtn=document.createElement('button');mockBtn.className='btn btn-outline';
+      mockBtn.style.cssText='background:var(--primary-dim);color:var(--primary-h);border-color:var(--primary)';
+      mockBtn.textContent='🎤 Mock Interview (30 мин)';mockBtn.onclick=startMockInterview;qa.appendChild(mockBtn);}
   },200);
 }
 
