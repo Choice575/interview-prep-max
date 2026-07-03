@@ -67,21 +67,134 @@
     <div style="font-size:13px;color:var(--text2)" id="load-status">Инициализация</div>
   </div>
 
-  <!-- Все страницы рендерятся динамически через app.js -->
-  <div class="page active" id="page-home"></div>
-  <div class="page" id="page-exam"></div>
-  <div class="page" id="page-analytics"></div>
-  <div class="page" id="page-subnet"></div>
-  <div class="page" id="page-ts"></div>
-  <div class="page" id="page-cmd"></div>
-  <div class="page" id="page-code"></div>
-  <div class="page" id="page-ansible"></div>
-  <div class="page" id="page-dockerfile"></div>
-  <div class="page" id="page-k8s"></div>
-  <div class="page" id="page-ports"></div>
-  <div class="page" id="page-git"></div>
-  <div class="page" id="page-regex"></div>
-  <div class="page" id="page-tips"></div>
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div id="home-streak-banner" class="streak-banner" style="display:none">
+      <div class="streak-num" id="home-streak-num">0</div>
+      <div><div style="font-weight:700">Серия правильных ответов 🔥</div><div style="font-size:12px;color:var(--text2)" id="home-best-streak">Лучшая серия: 0</div></div>
+    </div>
+    <div class="home-grid" id="mastery-cards"></div>
+    <div class="sep"></div>
+    <h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text2)">Быстрый старт</h3>
+    <div class="quick-actions">
+      <button class="btn btn-primary" onclick="startMode('mix20')">⚡ Микс 20 вопросов</button>
+      <button class="btn btn-outline" onclick="startMode('mix10')">🎯 Микс 10</button>
+      <button class="btn btn-outline" onclick="startMode('smart')">🧠 Умный режим</button>
+      <button class="btn btn-outline" onclick="startMode('mistakes')">❌ Работа над ошибками</button>
+      <button class="btn btn-outline" onclick="nav('subnet')">🌐 Тренажёр подсетей</button>
+      <button class="btn btn-outline" onclick="nav('ts')">🔧 Troubleshooting</button>
+    </div>
+    <div class="sep"></div>
+    <h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text2)">Последние ответы</h3>
+    <div id="home-history"></div>
+  </div>
+
+  <!-- EXAM -->
+  <div class="page" id="page-exam">
+    <div class="exam-controls" id="exam-controls">
+      <div><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:5px">РЕЖИМ</div><div class="filter-row" id="mode-chips"><span class="chip active" onclick="setMode('all',this)">Все</span><span class="chip" onclick="setMode('mix10',this)">Микс 10</span><span class="chip" onclick="setMode('mix20',this)">Микс 20</span><span class="chip" onclick="setMode('mix30',this)">Микс 30</span><span class="chip" onclick="setMode('mistakes',this)">Ошибки</span><span class="chip" onclick="setMode('smart',this)">Умный SR</span></div></div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:5px">ПРОСМОТР</div><div class="filter-row" id="view-chips"><span class="chip active" onclick="setView('standard',this)">Список</span><span class="chip" onclick="setView('single',this)">По одному</span><span class="chip" onclick="setView('flashcard',this)">Карточки</span></div></div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:5px">ТЕМА</div><div class="filter-row" id="topic-chips"></div></div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:5px">УРОВЕНЬ</div><div class="filter-row" id="level-chips"><span class="chip active" onclick="setLevel('all',this)">Все</span><span class="chip" onclick="setLevel('Junior',this)">Junior</span><span class="chip" onclick="setLevel('Middle',this)">Middle</span><span class="chip" onclick="setLevel('Senior',this)">Senior</span></div></div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:5px">КАТЕГОРИЯ</div><div class="filter-row" id="cat-chips"><span class="chip active" onclick="setCategory('all',this)">Все</span><span class="chip" onclick="setCategory('definition',this)">Определение</span><span class="chip" onclick="setCategory('scenario',this)">Сценарий</span><span class="chip" onclick="setCategory('tradeoff',this)">Trade-off</span></div></div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:5px">ТАЙМЕР</div><div class="filter-row" id="timer-chips"><span class="chip active" onclick="setTimer(0,this)">Выкл</span><span class="chip" onclick="setTimer(30,this)">30с</span><span class="chip" onclick="setTimer(60,this)">60с</span><span class="chip" onclick="setTimer(90,this)">90с</span></div></div>
+      <div><input class="form-input" id="exam-search" placeholder="Поиск..." style="width:200px" oninput="renderQuestions()"></div>
+      <div><label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="study-mode-cb" onchange="renderQuestions()"> Режим учёбы</label><button class="btn btn-outline btn-sm" onclick="clearMistakes()">🗑 Ошибки</button></div>
+    </div>
+    <div id="progress-info" style="margin-bottom:10px"></div>
+    <div class="prog-bar" id="seg-bar" style="display:none"></div>
+    <div class="hk-hint"><span class="hk-key">1</span>-<span class="hk-key">4</span> выбор | <span class="hk-key">→</span> след | <span class="hk-key">Пробел</span> флип | <span class="hk-key">R</span> сброс | <span class="hk-key">?</span> шпаргалки</div>
+    <div id="questions-container"></div>
+    <div id="single-controls" style="display:none;text-align:center;margin-top:18px"><div style="margin-bottom:10px" id="single-timer-display"></div><div style="display:flex;gap:10px;justify-content:center"><button class="btn btn-outline" onclick="singlePrev()">← Предыдущий</button><span id="single-counter" style="align-self:center;font-size:13px;color:var(--text2)"></span><button class="btn btn-primary" onclick="singleNext()">Следующий →</button></div></div>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div class="page" id="page-analytics">
+    <div class="analytics-grid" id="stat-cards"></div>
+    <div class="analytics-two"><div class="card"><div class="card-title">Охват по темам</div><canvas id="radarCanvas" width="300" height="300"></canvas></div><div class="card"><div class="card-title">История ответов</div><div id="history-list" style="max-height:240px;overflow-y:auto"></div></div></div>
+    <div class="card"><div class="card-title">Прогресс по вопросам</div><div class="prog-bar" id="analytics-seg-bar" style="height:12px"></div><div style="font-size:12px;color:var(--text2);margin-top:7px" id="analytics-seg-label"></div></div>
+    <div class="analytics-three"><div class="card"><div class="card-title">📅 Активность за 14 дней</div><div class="activity-bars" id="act-bars"></div><div style="font-size:11px;color:var(--text3);margin-top:4px;text-align:center" id="act-total"></div></div><div class="card"><div class="card-title">🏷 Прогресс по категориям</div><div id="cat-stat-rows"></div></div><div class="card"><div class="card-title">⚠️ Топ-5 слабых мест</div><div id="weak-spots-list"></div></div></div>
+  </div>
+
+  <!-- SUBNET -->
+  <div class="page" id="page-subnet">
+    <p style="color:var(--text2);font-size:13px;margin-bottom:12px">Вычислите параметры подсети. Введите ответы и нажмите «Проверить».</p>
+    <div class="trainer-progress"><div class="trainer-pb"><div class="trainer-pb-fill" id="subnet-progress-fill" style="width:0%"></div></div><div class="trainer-score" id="subnet-score-display">0 / 10</div></div>
+    <div id="subnet-container"></div>
+  </div>
+
+  <!-- TS -->
+  <div class="page" id="page-ts">
+    <div id="ts-list"><p style="color:var(--text2);font-size:13px;margin-bottom:14px">Выберите сценарий.</p><div class="ts-sc-list" id="ts-cards"></div></div>
+    <div class="ts-game" id="ts-game">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px"><button class="btn btn-outline btn-sm" onclick="tsBack()">← Все</button><h2 style="font-size:15px;font-weight:700" id="ts-game-title"></h2><div style="margin-left:auto;font-size:13px;font-weight:700;color:var(--primary-h)" id="ts-game-score">Очки: 0</div></div>
+      <div class="ts-context-box"><div style="font-size:12px;color:var(--text3);margin-bottom:4px">📋 Контекст</div><div id="ts-context-text" style="font-size:14px;line-height:1.6"></div></div>
+      <div class="ts-obs" id="ts-observation"></div><div class="ts-choices" id="ts-choices"></div><div class="ts-log" id="ts-step-log"></div>
+      <div id="ts-end" style="display:none"><div class="ts-end-box"><div style="font-size:13px;font-weight:600;color:var(--primary-h);margin-bottom:8px">Сценарий завершён</div><div style="font-size:34px;font-weight:800" id="ts-end-score"></div><div style="font-size:12px;color:var(--text2);margin-top:3px">очков из 100</div><div style="margin-top:14px;display:flex;gap:10px;justify-content:center"><button class="btn btn-primary" onclick="tsRestart()">🔄 Заново</button><button class="btn btn-outline" onclick="tsBack()">← К списку</button></div></div></div>
+    </div>
+  </div>
+
+  <!-- CMD -->
+  <div class="page" id="page-cmd">
+    <p style="color:var(--text2);font-size:13px;margin-bottom:12px">Выберите правильную команду.</p>
+    <div class="trainer-progress"><div class="trainer-pb"><div class="trainer-pb-fill" id="cmd-progress-fill" style="width:0%"></div></div><div class="trainer-score" id="cmd-score-display">0 / 40</div></div>
+    <div id="cmd-container"></div>
+  </div>
+
+  <!-- CODE -->
+  <div class="page" id="page-code">
+    <p style="color:var(--text2);font-size:13px;margin-bottom:12px">Найдите ошибку в сниппете.</p>
+    <div class="trainer-progress"><div class="trainer-pb"><div class="trainer-pb-fill" id="code-progress-fill" style="width:0%"></div></div><div class="trainer-score" id="code-score-display">0 / 15</div></div>
+    <div id="code-container"></div>
+  </div>
+
+  <!-- ANSIBLE -->
+  <div class="page" id="page-ansible">
+    <p style="color:var(--text2);font-size:13px;margin-bottom:12px">Найдите ошибку в Ansible-плейбуке.</p>
+    <div class="trainer-progress"><div class="trainer-pb"><div class="trainer-pb-fill" id="ans-pb" style="width:0%"></div></div><div class="trainer-score" id="ans-score-lbl">0 / 10</div></div>
+    <div id="ans-container"></div>
+  </div>
+
+  <!-- DOCKERFILE -->
+  <div class="page" id="page-dockerfile">
+    <p style="color:var(--text2);font-size:13px;margin-bottom:12px">Найдите ошибку в Dockerfile.</p>
+    <div class="trainer-progress"><div class="trainer-pb"><div class="trainer-pb-fill" id="df-pb" style="width:0%"></div></div><div class="trainer-score" id="df-score-lbl">0 / 10</div></div>
+    <div id="df-container"></div>
+  </div>
+
+  <!-- K8S -->
+  <div class="page" id="page-k8s">
+    <p style="color:var(--text2);font-size:13px;margin-bottom:12px">Найдите ошибку в K8s-манифесте.</p>
+    <div class="trainer-progress"><div class="trainer-pb"><div class="trainer-pb-fill" id="k8s-pb" style="width:0%"></div></div><div class="trainer-score" id="k8s-score-lbl">0 / 10</div></div>
+    <div id="k8s-container"></div>
+  </div>
+
+  <!-- PORTS -->
+  <div class="page" id="page-ports">
+    <p style="color:var(--text2);font-size:13px;margin-bottom:12px">Укажите TCP-порт.</p>
+    <div class="trainer-progress"><div class="trainer-pb"><div class="trainer-pb-fill" id="pt-pb" style="width:0%"></div></div><div class="trainer-score" id="pt-score-lbl">0 / 20</div></div>
+    <div id="pt-container"></div>
+  </div>
+
+  <!-- GIT -->
+  <div class="page" id="page-git">
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Выберите правильную Git-команду.</p>
+    <div class="trainer-progress"><div class="trainer-pb"><div class="trainer-pb-fill" id="git-pb" style="width:0%"></div></div><div class="trainer-score" id="git-score-lbl">0 / 20</div></div>
+    <div id="git-container"></div>
+  </div>
+
+  <!-- REGEX -->
+  <div class="page" id="page-regex">
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Выберите правильное регулярное выражение.</p>
+    <div class="trainer-progress"><div class="trainer-pb"><div class="trainer-pb-fill" id="rx-pb" style="width:0%"></div></div><div class="trainer-score" id="rx-score-lbl">0 / 20</div></div>
+    <div id="rx-container"></div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="page" id="page-tips">
+    <p style="color:var(--text2);font-size:13px;margin-bottom:16px">Ключевые знания для собеседований.</p>
+    <div id="tips-container"></div>
+  </div>
 </div>
 
 <!-- CUSTOM MODAL -->
