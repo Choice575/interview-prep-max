@@ -94,6 +94,7 @@ const PAGE_TITLES={home:'Главная',exam:'Экзамен',analytics:'Ана
   ansible:'Ansible Playbook',dockerfile:'Dockerfile',k8s:'K8s YAML',ports:'Порты TCP',labs:'Debugging',
   git:'Git-тренажёр',regex:'Regex-тренажёр',tips:'Советы'};
 function nav(page){
+  stopActiveSessions();
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
   const pg=document.getElementById('page-'+page);
@@ -122,6 +123,12 @@ function startMode(m){nav('exam');currentMode=m;document.querySelectorAll('#mode
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebar-overlay').classList.toggle('open');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');}
 document.getElementById('sidebar-overlay').onclick=closeSidebar;
+
+function stopActiveSessions(){
+  if(blitzState.timer){clearInterval(blitzState.timer);blitzState.timer=null;blitzState.active=false;}
+  if(mockState.timer){clearInterval(mockState.timer);mockState.timer=null;mockState.active=false;}
+  if(cmdMuscleActive){cmdMuscleActive=false;renderCmd();}
+}
 
 // ═══ THEME ═══
 function toggleTheme(){
@@ -233,7 +240,7 @@ function pick(qid,chosen,correct){
   if(!card||card.querySelector('.q-opt.correct-opt')) return;
   const q=getAllQ().find(x=>x.id===qid);
   const opts=card.querySelectorAll('.q-opt');
-  opts.forEach((o,i)=>{o.classList.add('disabled');if(i===correct)o.classList.add('correct-opt');else if(i===chosen)o.classList.add('wrong-opt');});
+  opts.forEach(o=>{o.classList.add('disabled');const oi=parseInt(o.getAttribute('data-orig-idx'));if(oi===correct)o.classList.add('correct-opt');else if(oi===chosen)o.classList.add('wrong-opt');});
   const ok=chosen===correct;
   card.classList.add(ok?'correct':'wrong');
   streak=ok?streak+1:0;
@@ -785,7 +792,13 @@ function blitzPick(qid,chosen,correct){
   const qprog=getQProg();if(!qprog[qid])qprog[qid]={correct:0,wrong:0,times:[]};if(!qprog[qid].times)qprog[qid].times=[];
   qprog[qid][ok?'correct':'wrong']++;qprog[qid].lastSeen=Date.now();
   const respTime=questionStartTime[qid]?Math.round((Date.now()-questionStartTime[qid])/1000):0;
-  qprog[qid].times.push(respTime);lsSet('qprog',qprog);
+  qprog[qid].times.push(respTime);
+  // SRS update
+  if(!qprog[qid].ease) qprog[qid].ease=2.5;if(!qprog[qid].interval) qprog[qid].interval=0;if(!qprog[qid].repetitions) qprog[qid].repetitions=0;
+  if(ok){qprog[qid].repetitions++;qprog[qid].interval=qprog[qid].interval===0?1:qprog[qid].interval===1?3:Math.round(qprog[qid].interval*qprog[qid].ease);qprog[qid].ease=Math.min(3,qprog[qid].ease+0.1);}
+  else{qprog[qid].repetitions=0;qprog[qid].interval=1;qprog[qid].ease=Math.max(1.3,qprog[qid].ease-0.2);}
+  qprog[qid].nextReviewAt=Date.now()+qprog[qid].interval*86400000;
+  lsSet('qprog',qprog);
   const stats=lsGet('stats',{total:0,correct:0});stats.total++;if(ok)stats.correct++;lsSet('stats',stats);
 }
 function blitzNext(){blitzState.idx++;blitzState.active=true;if(blitzState.idx>=blitzState.questions.length){endBlitz();return;}renderBlitzQ();}
@@ -899,8 +912,10 @@ async function initApp(){
 function buildTopicFilters(){
   const topics = getAllTopics();
   const topicChips = document.getElementById('topic-chips');
-  if(topicChips){topicChips.innerHTML='<span class="chip active" onclick="setTopic(\'all\',this)">Все</span>'+topics.map(t=>'<span class="chip" onclick="setTopic(\''+esc(t)+'\',this)">'+esc(t)+'</span>').join('');}
-  // Обновляем фильтр «Все N» в режиме
+  if(topicChips){
+    topicChips.innerHTML='<span class="chip active" data-topic="all">Все</span>';
+    topics.forEach(t=>{const chip=document.createElement('span');chip.className='chip';chip.textContent=t;chip.setAttribute('data-topic',t);chip.onclick=function(){setTopic(t,this);};topicChips.appendChild(chip);});
+  }
   const allChip=document.querySelector('#mode-chips .chip:first-child');
   if(allChip) allChip.textContent='Все '+getAllQ().length;
 }
@@ -920,20 +935,18 @@ document.addEventListener('keydown',function(e){
 
 // ═══ OFFLINE READINESS CHECK ═══
 async function checkOfflineReady(){
-  const files=['./','./index.html','./styles.css','./app.js','./sw.js','./interview-prep-max.webmanifest'];
-  const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','tips'];
+  const files=['./','./index.html','./styles.css','./app.js','./interview-prep-max.webmanifest'];
+  const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','labs','tips'];
   tasks.forEach(t=>files.push('./tasks/'+t+'.json'));
-  let ok=0,fail=0;
-  const results=[];
+  let ok=0,fail=0;const results=[];
   for(const f of files){
     try{
-      const r=await fetch(f,{cache:'only-if-cached'});
+      const r=await fetch(f,{cache:'only-if-cached',mode:'same-origin'});
       if(r.ok){ok++;results.push('✅ '+f);}
-      else{fail++;results.push('⚠️ '+f+' (status '+r.status+')');}
-    }catch(e){fail++;results.push('❌ '+f+' — не в кэше');}
+      else{fail++;results.push('⚠️ '+f);}
+    }catch(e){fail++;results.push('❌ '+f);}
   }
-  const pct=Math.round(ok/files.length*100);
-  alert('📶 Оффлайн-готовность: '+pct+'%\n\n'+results.join('\n')+'\n\n'+(pct===100?'🎉 Полный оффлайн работает!':'💡 Откройте все разделы при интернете для кэширования.'));
+  alert('📶 Оффлайн: '+Math.round(ok/files.length*100)+'% ('+ok+'/'+files.length+')\n\n'+results.slice(0,10).join('\n')+'\n...\n'+(ok===files.length?'🎉 Полный оффлайн!':'💡 Откройте разделы при интернете.'));
 }
 
 // ═══ PWA ═══

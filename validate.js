@@ -139,6 +139,7 @@ const trainers = [
   { file: 'dockerfile.json', name: 'Dockerfile', idField: 'id', answerField: 'answer' },
   { file: 'k8s.json', name: 'K8s YAML', idField: 'id', answerField: 'answer' },
   { file: 'ports.json', name: 'Порты', idField: 'id', answerField: null },
+  { file: 'labs.json', name: 'Labs/Debugging', idField: 'id', answerField: 'answer' },
 ];
 
 trainers.forEach(t => {
