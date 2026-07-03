@@ -7,7 +7,7 @@ const APP_VERSION = '9.0.0';
 // ═══ DATA LOADING ═══
 var BASE_QUESTIONS = [], SUBNET_PROBLEMS = [], TS_SCENARIOS = [], CMD_TASKS = [],
     CODE_TASKS = [], GIT_TASKS = [], REGEX_TASKS = [], ANSIBLE_PB_TASKS = [],
-    DOCKERFILE_TASKS = [], K8S_TASKS = [], PORTS_TASKS = [], TIPS = [];
+    DOCKERFILE_TASKS = [], K8S_TASKS = [], PORTS_TASKS = [], LABS_TASKS = [], TIPS = [];
 
 const DATA_FILES = {
   base_questions: 'tasks/base_questions.json',
@@ -21,6 +21,7 @@ const DATA_FILES = {
   dockerfile: 'tasks/dockerfile.json',
   k8s: 'tasks/k8s.json',
   ports: 'tasks/ports.json',
+  labs: 'tasks/labs.json',
   tips: 'tasks/tips.json'
 };
 
@@ -28,7 +29,7 @@ const DATA_VARS = {
   base_questions: 'BASE_QUESTIONS', subnet: 'SUBNET_PROBLEMS', ts: 'TS_SCENARIOS',
   cmd: 'CMD_TASKS', code: 'CODE_TASKS', git: 'GIT_TASKS', regex: 'REGEX_TASKS',
   ansible_pb: 'ANSIBLE_PB_TASKS', dockerfile: 'DOCKERFILE_TASKS', k8s: 'K8S_TASKS',
-  ports: 'PORTS_TASKS', tips: 'TIPS'
+  ports: 'PORTS_TASKS', labs: 'LABS_TASKS', tips: 'TIPS'
 };
 
 async function loadAllData() {
@@ -67,7 +68,7 @@ const LS = {
   qprog:'ipmax_qprog',streak_best:'ipmax_streak_best',custom:'ipmax_custom',theme:'ipmax_theme',
   ts_scores:'ipmax_ts_scores',cmd_prog:'ipmax_cmd_prog',code_prog:'ipmax_code_prog',subnet_prog:'ipmax_subnet_prog',
   git_prog:'ipmax_git_prog',regex_prog:'ipmax_regex_prog',ans_prog:'ipmax_ans_prog',df_prog:'ipmax_df_prog',
-  k8s_prog:'ipmax_k8s_prog',pt_prog:'ipmax_pt_prog',daily:'ipmax_daily'
+  k8s_prog:'ipmax_k8s_prog',pt_prog:'ipmax_pt_prog',labs_prog:'ipmax_labs_prog',daily:'ipmax_daily'
 };
 function lsGet(k,def){try{const v=localStorage.getItem(LS[k]);return v?JSON.parse(v):def;}catch(e){console.warn('lsGet error:',e);return def;}}
 function lsSet(k,v){try{localStorage.setItem(LS[k],JSON.stringify(v));}catch(e){console.warn('lsSet error:',e);}}
@@ -90,7 +91,7 @@ let questionStartTime={};
 const PAGE_TITLES={home:'Главная',exam:'Экзамен',analytics:'Аналитика',
   subnet:'Тренажёр подсетей',ts:'Troubleshooting-симулятор',
   cmd:'Command Builder',code:'Code Reviewer',
-  ansible:'Ansible Playbook',dockerfile:'Dockerfile',k8s:'K8s YAML',ports:'Порты TCP',
+  ansible:'Ansible Playbook',dockerfile:'Dockerfile',k8s:'K8s YAML',ports:'Порты TCP',labs:'Debugging',
   git:'Git-тренажёр',regex:'Regex-тренажёр',tips:'Советы'};
 function nav(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -106,6 +107,7 @@ function nav(page){
   if(page==='subnet') renderSubnet();
   if(page==='ts') renderTsList();
   if(page==='cmd') renderCmd();
+  if(page==='labs') renderLabs();
   if(page==='code') renderCode();
   if(page==='ansible') renderAnsible();
   if(page==='dockerfile') renderDockerfile();
@@ -590,9 +592,32 @@ function tsChoose(i){const scen=TS_SCENARIOS.find(s=>s.id===tsState.scenarioId);
 function tsEndScenario(scen){document.getElementById('ts-end').style.display='block';const pts=Math.min(100,Math.max(0,tsState.totalPoints));document.getElementById('ts-end-score').textContent=pts;tsScores[scen.id]=pts;lsSet('ts_scores',tsScores);}
 function tsBack(){renderTsList();}function tsRestart(){tsStart(tsState.scenarioId);}
 
+// ═══ LABS / DEBUGGING ═══
+let labsDone={};
+function renderLabs(){
+  labsDone=lsGet('labs_prog',{});const L=['A','B','C','D'];const icons={yaml:'📄',log:'📋',incident:'🚨'};
+  document.getElementById('labs-container').innerHTML=LABS_TASKS.map(t=>{const done=labsDone[t.id];
+    return '<div class="code-card" id="lab-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">'+
+    '<span style="font-size:16px">'+(icons[t.type]||'🔬')+'</span><span style="font-size:14px;font-weight:700">'+esc(t.title)+'</span>'+
+    '<span style="margin-left:auto;font-size:11px;color:var(--text3)">'+(LABS_TASKS.indexOf(t)+1)+'/15</span>'+
+    (done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅':'❌')+'</span>':'')+
+    '</div><div style="font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5">📋 '+esc(t.scenario)+'</div>'+
+    (t.code?'<div class="code-block">'+esc(t.code)+'</div>':'')+
+    '<div class="code-question" style="color:var(--yellow)">'+esc(t.question)+'</div>'+
+    '<div class="code-opts">'+t.opts.map((o,i)=>'<div class="code-opt'+(done!==undefined?' disabled':'')+'" id="labopt-'+t.id+'-'+i+'" onclick="pickLab('+t.id+','+i+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[i]+'.</span><span>'+esc(o)+'</span></div>').join('')+'</div>'+
+    '<div class="code-fix" id="labfix-'+t.id+'">🔧 '+esc(t.bug)+'\n\n✅ '+esc(t.fix)+'</div></div>';
+  }).join('');Object.entries(labsDone).forEach(([id,chosen])=>applyLabState(parseInt(id),chosen));updateLabsProg();
+}
+function applyLabState(id,chosen){const t=LABS_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#lab-'+id+' .code-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong');});document.getElementById('labfix-'+id).style.display='block';}
+function pickLab(tid,chosen){if(labsDone[tid]!==undefined) return;labsDone[tid]=chosen;lsSet('labs_prog',labsDone);applyLabState(tid,chosen);updateLabsProg();}
+function updateLabsProg(){const done=Object.keys(labsDone).length;const ok=Object.entries(labsDone).filter(([id,c])=>LABS_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('labs-pb').style.width=(done/LABS_TASKS.length*100)+'%';document.getElementById('labs-score-lbl').textContent=ok+' / '+LABS_TASKS.length+' правильно';}
+
 // ═══ COMMAND BUILDER ═══
-let cmdDone={};
-function renderCmd(){cmdDone=lsGet('cmd_prog',{});const L=['A','B','C','D'];document.getElementById('cmd-container').innerHTML=CMD_TASKS.map((t,idx)=>{const done=cmdDone[t.id];return '<div class="cmd-card" id="cmd-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:11px;font-weight:700;color:var(--text3)">Задача '+(idx+1)+'/40</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅ Верно':'❌ Ошибка')+'</span>':'')+'</div><div class="cmd-task-text">'+esc(t.task)+'</div><div class="cmd-opts">'+t.opts.map((o,i)=>'<div class="cmd-opt'+(done!==undefined?' disabled':'')+'" id="co-'+t.id+'-'+i+'" onclick="pickCmd('+t.id+','+i+')"><span style="font-weight:700;color:var(--text3)">'+L[i]+'.</span><code>'+esc(o)+'</code></div>').join('')+'</div><div class="cmd-exp" id="cexp-'+t.id+'">'+esc(t.exp)+'</div></div>';}).join('');Object.entries(cmdDone).forEach(([id,chosen])=>applyCmdState(parseInt(id),chosen));updateCmdProg();}
+let cmdDone={}, cmdMuscleIdx=0, cmdMuscleQs=[];
+function renderCmd(){cmdDone=lsGet('cmd_prog',{});const L=['A','B','C','D'];document.getElementById('cmd-container').innerHTML='<div style="margin-bottom:12px"><button class="btn btn-outline btn-sm" onclick="startCmdMuscle()">💪 Muscle Memory (ввод команд)</button></div>'+CMD_TASKS.map((t,idx)=>{const done=cmdDone[t.id];return '<div class="cmd-card" id="cmd-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:11px;font-weight:700;color:var(--text3)">Задача '+(idx+1)+'/40</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅ Верно':'❌ Ошибка')+'</span>':'')+'</div><div class="cmd-task-text">'+esc(t.task)+'</div><div class="cmd-opts">'+t.opts.map((o,i)=>'<div class="cmd-opt'+(done!==undefined?' disabled':'')+'" id="co-'+t.id+'-'+i+'" onclick="pickCmd('+t.id+','+i+')"><span style="font-weight:700;color:var(--text3)">'+L[i]+'.</span><code>'+esc(o)+'</code></div>').join('')+'</div><div class="cmd-exp" id="cexp-'+t.id+'">'+esc(t.exp)+'</div></div>';}).join('');Object.entries(cmdDone).forEach(([id,chosen])=>applyCmdState(parseInt(id),chosen));updateCmdProg();}
+function startCmdMuscle(){cmdMuscleQs=shuffle(CMD_TASKS).slice(0,10);cmdMuscleIdx=0;document.getElementById('cmd-container').innerHTML='<div id="muscle-area"></div>';renderMuscleQ();}
+function renderMuscleQ(){if(cmdMuscleIdx>=cmdMuscleQs.length){renderCmd();return;}const t=cmdMuscleQs[cmdMuscleIdx];document.getElementById('muscle-area').innerHTML='<div class="card" style="max-width:600px;margin:0 auto;text-align:center"><div style="font-size:12px;color:var(--text3);margin-bottom:8px">'+(cmdMuscleIdx+1)+' / 10</div><div class="cmd-task-text" style="font-size:15px;margin-bottom:14px">'+esc(t.task)+'</div><input class="form-input" id="muscle-inp" style="width:100%;font-family:JetBrains Mono,monospace;font-size:14px;text-align:center;margin-bottom:10px" placeholder="Введите команду..." onkeydown="if(event.key===\'Enter\')checkMuscle()"><button class="btn btn-primary" onclick="checkMuscle()">Проверить</button><div id="muscle-fb" style="display:none;margin-top:12px"></div><div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="cmdMuscleIdx++;renderMuscleQ()">Пропустить</button></div></div>';setTimeout(()=>document.getElementById('muscle-inp')?.focus(),100);}
+function checkMuscle(){const inp=document.getElementById('muscle-inp');const fb=document.getElementById('muscle-fb');const t=cmdMuscleQs[cmdMuscleIdx];const correct=t.opts[t.answer];const userCmd=inp.value.trim();const correctParts=correct.replace(/\s+/g,' ').trim().split(' ');const userParts=userCmd.replace(/\s+/g,' ').trim().split(' ');const ok=userCmd===correct||(userParts.length>=correctParts.length*0.6&&correctParts.every(p=>userCmd.includes(p)));fb.style.display='block';if(ok){fb.innerHTML='<span style="color:var(--green);font-weight:700">✅ Верно!</span>';if(!cmdDone[t.id]){cmdDone[t.id]=t.answer;lsSet('cmd_prog',cmdDone);}}else{fb.innerHTML='<span style="color:var(--red);font-weight:700">❌ Правильно:</span><br><code style="color:var(--green)">'+esc(correct)+'</code><br><div style="font-size:12px;color:var(--text2);margin-top:4px">💡 '+esc(t.exp)+'</div>';}inp.disabled=true;setTimeout(()=>{cmdMuscleIdx++;renderMuscleQ();},ok?800:2000);}
 function applyCmdState(id,chosen){const t=CMD_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#cmd-'+id+' .cmd-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong');});document.getElementById('cexp-'+id).style.display='block';}
 function pickCmd(tid,chosen){if(cmdDone[tid]!==undefined) return;cmdDone[tid]=chosen;lsSet('cmd_prog',cmdDone);applyCmdState(tid,chosen);updateCmdProg();}
 function updateCmdProg(){const done=Object.keys(cmdDone).length;const ok=Object.entries(cmdDone).filter(([id,c])=>CMD_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('cmd-progress-fill').style.width=(done/CMD_TASKS.length*100)+'%';document.getElementById('cmd-score-display').textContent=ok+' / '+CMD_TASKS.length+' правильно';}
@@ -784,7 +809,7 @@ function exportProgress(){
     qprog:lsGet('qprog',{}),streak_best:lsGet('streak_best',0),custom:lsGet('custom',[]),
     ts_scores:lsGet('ts_scores',{}),cmd_prog:lsGet('cmd_prog',{}),code_prog:lsGet('code_prog',{}),
     subnet_prog:lsGet('subnet_prog',{}),git_prog:lsGet('git_prog',{}),regex_prog:lsGet('regex_prog',{}),
-    ans_prog:lsGet('ans_prog',{}),df_prog:lsGet('df_prog',{}),k8s_prog:lsGet('k8s_prog',{}),pt_prog:lsGet('pt_prog',{}),
+    ans_prog:lsGet('ans_prog',{}),df_prog:lsGet('df_prog',{}),k8s_prog:lsGet('k8s_prog',{}),pt_prog:lsGet('pt_prog',{}),labs_prog:lsGet('labs_prog',{}),
     daily:lsGet('daily',{})
   };
   const text=JSON.stringify(data,null,2);
@@ -829,6 +854,7 @@ function importProgressData(data){
   if(data.df_prog) lsSet('df_prog',data.df_prog);
   if(data.k8s_prog) lsSet('k8s_prog',data.k8s_prog);
   if(data.pt_prog) lsSet('pt_prog',data.pt_prog);
+  if(data.labs_prog) lsSet('labs_prog',data.labs_prog);
   if(data.daily) lsSet('daily',data.daily);
   streak=lsGet('streak_best',0);
   alert('✅ Прогресс импортирован v'+(data.version||'?')+'!');

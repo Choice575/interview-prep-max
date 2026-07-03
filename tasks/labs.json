@@ -1,0 +1,257 @@
+[
+  {
+    "id": 1,
+    "type": "yaml",
+    "title": "Почини Docker Compose — неверный отступ",
+    "scenario": "docker-compose up падает с ошибкой: 'services.web.ports must be a list'",
+    "code": "version: '3'\nservices:\n  web:\n    image: nginx:alpine\n    ports:\n      - \"80:80\"\n  db:\n  image: postgres:15\n    environment:\n      POSTGRES_PASSWORD: secret",
+    "bug": "У сервиса db неправильный отступ: image должен быть с отступом 4 пробела под db, а не на уровне db.",
+    "fix": "db:\n    image: postgres:15",
+    "question": "В чём ошибка в docker-compose.yml?",
+    "opts": [
+      "Неверный отступ у image: db — должно быть на 2 пробела правее",
+      "Неверная версия '3'",
+      "ports должен быть строкой",
+      "Не указан networks"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 2,
+    "type": "log",
+    "title": "Диагноз по логу: nginx 502",
+    "scenario": "Пользователи жалуются на 502 ошибку. Вы зашли на сервер и выполнили tail -20 /var/log/nginx/error.log. Что случилось?",
+    "code": "2024/07/15 14:23:01 [error] 1234#1234: *56 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.1.5, server: api.example.com, request: \"GET /users HTTP/1.1\", upstream: \"http://127.0.0.1:3000/users\"",
+    "bug": "Nginx не может соединиться с бэкендом на порту 3000 — бэкенд не слушает порт (упал или не запущен).",
+    "fix": "Проверить бэкенд: systemctl status myapp. Если упал — journalctl -u myapp -n 50, исправить причину падения, запустить.",
+    "question": "Что показывает этот лог?",
+    "opts": [
+      "Бэкенд на порту 3000 не отвечает — упал или не запущен",
+      "Неправильный конфиг nginx",
+      "Проблема с DNS",
+      "Закончилось место на диске"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 3,
+    "type": "incident",
+    "title": "Pod CrashLoopBackOff — диагностика",
+    "scenario": "Вы задеплоили новую версию приложения. kubectl get pods показывает: myapp-7d4f8b9c-xyz 0/1 CrashLoopBackOff. Ваши действия?",
+    "code": "$ kubectl describe pod myapp-7d4f8b9c-xyz\n...\nState: Waiting (CrashLoopBackOff)\nLast State: Terminated (Error: exit code 1)\n...\n$ kubectl logs myapp-7d4f8b9c-xyz --previous\nError: Cannot find module '/app/dist/server.js'",
+    "bug": "Приложение падает потому что не может найти /app/dist/server.js — либо не сработал билд, либо путь изменился в новой версии.",
+    "fix": "Проверить Dockerfile: скопированы ли файлы билда. Или проверить package.json: правильный ли main/start скрипт.",
+    "question": "Почему под падает?",
+    "opts": [
+      "Приложение не находит файл /app/dist/server.js — проблема в сборке образа",
+      "Закончились ресурсы на ноде",
+      "Проблема с сетью в кластере",
+      "Неправильный imagePullPolicy"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 4,
+    "type": "yaml",
+    "title": "Почини Terraform — неверный тип переменной",
+    "scenario": "terraform plan выдаёт ошибку: 'Invalid value for input variable'. Вы смотрите в конфиг.",
+    "code": "variable \"instance_count\" {\n  type    = number\n  default = \"3\"\n}\n\nresource \"aws_instance\" \"web\" {\n  count = var.instance_count\n  ami   = \"ami-0c55b159cbfafe1f0\"\n  instance_type = \"t3.micro\"\n}",
+    "bug": "default = \"3\" — строка, а type = number. Terraform не может преобразовать строку в число для значения по умолчанию.",
+    "fix": "default = 3 (без кавычек)",
+    "question": "В чём ошибка?",
+    "opts": [
+      "default = \"3\" — строка вместо числа для type = number",
+      "count не поддерживает переменные",
+      "ami должен быть в кавычках",
+      "Не указан provider"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 5,
+    "type": "log",
+    "title": "Диагноз по логу: OOM Killer",
+    "scenario": "Сервис неожиданно перезапустился. Вы смотрите dmesg. Что произошло?",
+    "code": "$ dmesg | tail -5\n[12345.678] Out of memory: Killed process 9876 (java) total-vm:4194304kB, anon-rss:2048000kB, file-rss:0kB, shmem-rss:0kB\n[12345.789] oom_reaper: reaped process 9876 (java), now anon-rss:0kB, file-rss:0kB, shmem-rss:0kB",
+    "bug": "OOM Killer убил Java-процесс потому что он использовал ~2GB RAM и на сервере закончилась память.",
+    "fix": "Увеличить RAM сервера ИЛИ ограничить heap для Java: -Xmx1g ИЛИ настроить memory limits в Docker/K8s.",
+    "question": "Что случилось с процессом java?",
+    "opts": [
+      "OOM Killer убил процесс из-за нехватки памяти (~2GB использовано)",
+      "Процесс упал из-за segmentation fault",
+      "Процесс был убит сигналом SIGTERM",
+      "Диск заполнен"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 6,
+    "type": "incident",
+    "title": "Terraform state lock — что делать?",
+    "scenario": "Вы запускаете terraform apply в CI/CD, но получаете ошибку. Команда упала на середине.",
+    "code": "$ terraform apply -auto-approve\nError: Error acquiring the state lock\n...\nLock Info:\n  ID: a1b2c3d4-xxxx\n  Operation: OperationTypeApply\n  Who: @jenkins\n  Created: 2024-07-15 10:00:00\n\nTerraform acquires a state lock to protect the state from being written by multiple users at the same time.",
+    "bug": "Предыдущий terraform apply не завершился (упал Jenkins), и блокировка осталась. CI/CD не может взять новую блокировку.",
+    "fix": "terraform force-unlock a1b2c3d4-xxxx (ТОЛЬКО убедившись что apply действительно не выполняется).",
+    "question": "Как исправить ошибку?",
+    "opts": [
+      "terraform force-unlock ID (предварительно проверив что apply не активен)",
+      "Удалить tfstate файл",
+      "Перезапустить Jenkins",
+      "Добавить -lock=false"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 7,
+    "type": "log",
+    "title": "Диагноз по логу: DNS resolution failed",
+    "scenario": "Микросервис не может подключиться к БД. Вы смотрите логи приложения.",
+    "code": "$ tail -10 /var/log/myapp/app.log\n2024-07-15 15:00:01 ERROR - Failed to connect to database: getaddrinfo ENOTFOUND db.internal\n2024-07-15 15:00:01 ERROR - Retrying in 5s...\n2024-07-15 15:00:06 ERROR - Failed to connect to database: getaddrinfo ENOTFOUND db.internal",
+    "bug": "DNS не может разрешить имя db.internal. Возможные причины: DNS-сервер недоступен, запись не существует, сетевые проблемы.",
+    "fix": "1) nslookup db.internal — проверить DNS. 2) Проверить /etc/resolv.conf. 3) Проверить CoreDNS/kube-dns в K8s.",
+    "question": "В чём причина ошибки?",
+    "opts": [
+      "DNS не может разрешить db.internal — проблема с DNS-сервером или записью",
+      "Неправильный пароль БД",
+      "БД не принимает соединения",
+      "Закончились соединения в пуле"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 8,
+    "type": "yaml",
+    "title": "Почини K8s манифест — missing readinessProbe",
+    "scenario": "После деплоя часть запросов получает 503. Rolling update идёт, но новые поды не готовы принимать трафик.",
+    "code": "apiVersion: apps/v1\nkind: Deployment\nspec:\n  replicas: 3\n  template:\n    spec:\n      containers:\n      - name: api\n        image: myapp:v2\n        ports:\n        - containerPort: 8080\n        resources:\n          requests:\n            cpu: 100m\n            memory: 128Mi",
+    "bug": "Нет readinessProbe! K8s считает под готовым сразу после старта, но приложение загружается 20 секунд. Часть запросов уходит на непрогретые поды.",
+    "fix": "Добавить readinessProbe с httpGet на /health, initialDelaySeconds: 10, periodSeconds: 5.",
+    "question": "Почему 503 на новых подах?",
+    "opts": [
+      "Нет readinessProbe — трафик идёт на непрогретые поды",
+      "replicas: 3 слишком мало",
+      "resources: requests не хватает",
+      "containerPort должен быть 80"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 9,
+    "type": "incident",
+    "title": "502 после деплоя — быстрая диагностика",
+    "scenario": "Только что задеплоили новую версию. Nginx возвращает 502. Времени мало, нужно быстро понять что сломалось.",
+    "code": "Хронология:\n1. Деплой прошёл успешно (по логам CI)\n2. Health-check эндпоинт /health возвращает 200\n3. Но при запросе /api/users — nginx 502\n\nЧто проверяете ПЕРВЫМ?",
+    "bug": "Health-check работает (200), но бизнес-запросы падают (502). Проблема не в доступности приложения, а в логике: возможно баг в новой версии, который крашит обработчик /api/users.",
+    "fix": "1) Проверить логи приложения на наличие exceptions. 2) Откатить деплой (если критично). 3) Исправить баг.",
+    "question": "Первый шаг диагностики?",
+    "opts": [
+      "Проверить логи приложения (journalctl/docker logs) на наличие ошибок в /api/users",
+      "Перезапустить nginx",
+      "Перезагрузить сервер",
+      "Увеличить таймаут nginx"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 10,
+    "type": "log",
+    "title": "Диагноз по логу: disk full — inodes",
+    "scenario": "Приложение не может писать временные файлы. df -h показывает 45% использования. Но ошибка остаётся.",
+    "code": "$ df -h\nFilesystem  Size  Used Avail Use% Mounted on\n/dev/sda1   100G   45G   55G  45% /\n\n$ df -i\nFilesystem  Inodes IUsed IFree IUse% Mounted on\n/dev/sda1   655360 655360     0  100% /\n\n$ touch /tmp/test\ntouch: cannot touch '/tmp/test': No space left on device",
+    "bug": "Место на диске есть (45%), но ЗАКОНЧИЛИСЬ INODE'ы (100%). Каждый файл требует inode, и они исчерпаны — новые файлы создать невозможно.",
+    "fix": "Найти директорию с миллионами мелких файлов: for d in /*; do echo \"$(find $d -type f | wc -l) $d\"; done | sort -rn. Удалить ненужные (обычно сессии PHP, кэш).",
+    "question": "Почему нельзя создать файл при 45% свободного места?",
+    "opts": [
+      "Закончились inode'ы (100%) — максимум файлов достигнут",
+      "Диск на самом деле полон",
+      "Нет прав на запись в /tmp",
+      "Файловая система повреждена"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 11,
+    "type": "incident",
+    "title": "SSL-сертификат истёк — экстренное решение",
+    "scenario": "3 часа ночи, мониторинг: сайт недоступен. Браузер показывает NET::ERR_CERT_DATE_INVALID.",
+    "code": "$ openssl s_client -connect site.ru:443 -servername site.ru | openssl x509 -noout -dates\nnotBefore=Apr 15 00:00:00 2024 GMT\nnotAfter=Jul 14 23:59:59 2024 GMT\n\nСегодня 15 июля. Сертификат истёк вчера.",
+    "bug": "Сертификат Let's Encrypt истёк. Автообновление (certbot) не сработало.",
+    "fix": "1) Экстренно: certbot renew --force-renewal. 2) Проверить таймер: systemctl status certbot.timer. 3) Настроить мониторинг срока сертификата.",
+    "question": "Первое действие в 3 часа ночи?",
+    "opts": [
+      "certbot renew --force-renewal для срочного обновления",
+      "Купить новый сертификат у регистратора",
+      "Отключить HTTPS временно",
+      "Перезагрузить nginx"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 12,
+    "type": "yaml",
+    "title": "Почини Ansible — missing become",
+    "scenario": "Ansible падает при установке пакета: 'Permission denied'. Плейбук запускается от обычного пользователя.",
+    "code": "- name: Install nginx\n  hosts: webservers\n  tasks:\n    - name: Install package\n      apt:\n        name: nginx\n        state: present\n        update_cache: yes",
+    "bug": "apt требует прав root. Нет become: yes — Ansible пытается установить пакет от обычного пользователя.",
+    "fix": "- name: Install nginx\n  hosts: webservers\n  become: yes\n  tasks: ...",
+    "question": "Почему Permission denied?",
+    "opts": [
+      "Нет become: yes — apt требует root",
+      "Неверное имя пакета (нужно nginx-full)",
+      "state: present не работает с apt",
+      "Нужен модуль package вместо apt"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 13,
+    "type": "log",
+    "title": "Диагноз по логу: PostgreSQL too many clients",
+    "scenario": "Приложение падает с ошибкой БД. Вы проверяете логи PostgreSQL.",
+    "code": "$ tail -5 /var/log/postgresql/postgresql-15-main.log\n2024-07-15 16:30:01 FATAL: remaining connection slots are reserved for non-replication superuser connections\n2024-07-15 16:30:01 FATAL: sorry, too many clients already\n\n$ psql -c \"SELECT count(*) FROM pg_stat_activity;\"\n count\n-------\n   100",
+    "bug": "Достигнут лимит подключений (max_connections=100). Приложение не закрывает соединения или создаёт слишком много.",
+    "fix": "1) Найти долгие idle-транзакции: SELECT * FROM pg_stat_activity WHERE state='idle in transaction'. 2) Настроить pgBouncer. 3) Добавить таймаут idle_in_transaction_session_timeout.",
+    "question": "В чём причина ошибки 'too many clients'?",
+    "opts": [
+      "Достигнут лимит max_connections=100 — нужно pgBouncer или таймаут idle-транзакций",
+      "Закончилось место на диске PostgreSQL",
+      "Неверный пароль пользователя БД",
+      "PostgreSQL не запущен"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 14,
+    "type": "incident",
+    "title": "Redis out of memory — что делать?",
+    "scenario": "Redis перестал отвечать на запросы. Приложение пишет: 'OOM command not allowed when used memory > maxmemory'.",
+    "code": "$ redis-cli INFO memory\nused_memory_human: 2.50G\nmaxmemory_human: 2.00G\nmaxmemory_policy: noeviction\n\n$ redis-cli SET cache:key \"value\"\n(error) OOM command not allowed when used memory > 'maxmemory'",
+    "bug": "Redis использовал больше памяти чем maxmemory (2GB), и политика noeviction запрещает новые записи.",
+    "fix": "1) Срочно: redis-cli CONFIG SET maxmemory-policy allkeys-lru (начнёт вытеснять старые ключи). 2) Увеличить maxmemory. 3) Найти большие ключи: redis-cli --bigkeys.",
+    "question": "Как срочно восстановить работу Redis?",
+    "opts": [
+      "CONFIG SET maxmemory-policy allkeys-lru — разрешить вытеснение",
+      "Перезапустить Redis",
+      "Увеличить RAM на сервере",
+      "Очистить все ключи: FLUSHALL"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 15,
+    "type": "log",
+    "title": "Диагноз по логу: Docker daemon not running",
+    "scenario": "docker ps выдаёт ошибку. Контейнеры не запускаются после перезагрузки сервера.",
+    "code": "$ docker ps\nCannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?\n\n$ systemctl status docker\n● docker.service - Docker Application Container Engine\n   Loaded: loaded (/lib/systemd/system/docker.service; disabled)\n   Active: inactive (dead)",
+    "bug": "Docker daemon не запущен и не включён в автозагрузку (disabled). После перезагрузки сервера Docker не стартует.",
+    "fix": "systemctl enable --now docker (включить автозагрузку и запустить сейчас)",
+    "question": "Почему Docker не работает?",
+    "opts": [
+      "Docker daemon не включён в автозагрузку (disabled) и не запущен",
+      "Закончилось место на диске",
+      "Сломан файл docker.sock",
+      "Нужно переустановить Docker"
+    ],
+    "answer": 0
+  }
+]

@@ -5,7 +5,7 @@ const ASSETS = [
   './tasks/base_questions.json', './tasks/ts.json', './tasks/subnet.json',
   './tasks/cmd.json', './tasks/code.json', './tasks/git.json', './tasks/regex.json',
   './tasks/ansible_pb.json', './tasks/dockerfile.json', './tasks/k8s.json', './tasks/ports.json',
-  './tasks/tips.json'
+  './tasks/labs.json', './tasks/tips.json'
 ];
 
 self.addEventListener('install', event => {

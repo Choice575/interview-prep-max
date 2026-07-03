@@ -30,6 +30,7 @@
     <div class="sb-item" onclick="nav('subnet')" data-page="subnet"><span class="icon">🌐</span>Подсети</div>
     <div class="sb-item" onclick="nav('ts')" data-page="ts"><span class="icon">🔧</span>Диагностика</div>
     <div class="sb-item" onclick="nav('cmd')" data-page="cmd"><span class="icon">💻</span>Команды</div>
+    <div class="sb-item" onclick="nav('labs')" data-page="labs"><span class="icon">🔬</span>Debugging</div>
     <div class="sb-item" onclick="nav('code')" data-page="code"><span class="icon">🐛</span>Код</div>
     <div class="sb-item" onclick="nav('ansible')" data-page="ansible"><span class="icon">📦</span>Ansible</div>
     <div class="sb-item" onclick="nav('dockerfile')" data-page="dockerfile"><span class="icon">🐳</span>Dockerfile</div>
@@ -140,6 +141,13 @@
     <p style="color:var(--text2);font-size:13px;margin-bottom:12px">Выберите правильную команду.</p>
     <div class="trainer-progress"><div class="trainer-pb"><div class="trainer-pb-fill" id="cmd-progress-fill" style="width:0%"></div></div><div class="trainer-score" id="cmd-score-display">0 / 40</div></div>
     <div id="cmd-container"></div>
+  </div>
+
+  <!-- LABS / DEBUGGING -->
+  <div class="page" id="page-labs">
+    <p style="color:var(--text2);font-size:13px;margin-bottom:12px">Диагностируйте проблему: логи, YAML, инциденты. 15 сценариев.</p>
+    <div class="trainer-progress"><div class="trainer-pb"><div class="trainer-pb-fill" id="labs-pb" style="width:0%"></div></div><div class="trainer-score" id="labs-score-lbl">0 / 15 правильно</div></div>
+    <div id="labs-container"></div>
   </div>
 
   <!-- CODE -->
