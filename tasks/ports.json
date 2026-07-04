@@ -1,102 +1,52 @@
 [
-  {
-    "service": "SSH",
-    "port": 22,
-    "id": 1
-  },
-  {
-    "service": "HTTP",
-    "port": 80,
-    "id": 2
-  },
-  {
-    "service": "HTTPS",
-    "port": 443,
-    "id": 3
-  },
-  {
-    "service": "DNS (TCP/UDP)",
-    "port": 53,
-    "id": 4
-  },
-  {
-    "service": "MySQL",
-    "port": 3306,
-    "id": 5
-  },
-  {
-    "service": "PostgreSQL",
-    "port": 5432,
-    "id": 6
-  },
-  {
-    "service": "Redis",
-    "port": 6379,
-    "id": 7
-  },
-  {
-    "service": "MongoDB",
-    "port": 27017,
-    "id": 8
-  },
-  {
-    "service": "Docker API",
-    "port": 2375,
-    "id": 9
-  },
-  {
-    "service": "Kubernetes API",
-    "port": 6443,
-    "id": 10
-  },
-  {
-    "service": "Nginx (default)",
-    "port": 80,
-    "id": 11
-  },
-  {
-    "service": "Grafana",
-    "port": 3000,
-    "id": 12
-  },
-  {
-    "service": "Prometheus",
-    "port": 9090,
-    "id": 13
-  },
-  {
-    "service": "Jenkins",
-    "port": 8080,
-    "id": 14
-  },
-  {
-    "service": "GitLab",
-    "port": 443,
-    "id": 15
-  },
-  {
-    "service": "SMTP",
-    "port": 25,
-    "id": 16
-  },
-  {
-    "service": "RabbitMQ",
-    "port": 5672,
-    "id": 17
-  },
-  {
-    "service": "Elasticsearch",
-    "port": 9200,
-    "id": 18
-  },
-  {
-    "service": "etcd",
-    "port": 2379,
-    "id": 19
-  },
-  {
-    "service": "Node Exporter",
-    "port": 9100,
-    "id": 20
-  }
+  { "service": "SSH", "port": 22, "proto": "TCP", "id": 1 },
+  { "service": "HTTP", "port": 80, "proto": "TCP", "id": 2 },
+  { "service": "HTTPS", "port": 443, "proto": "TCP", "id": 3 },
+  { "service": "DNS", "port": 53, "proto": "TCP/UDP", "id": 4 },
+  { "service": "MySQL", "port": 3306, "proto": "TCP", "id": 5 },
+  { "service": "PostgreSQL", "port": 5432, "proto": "TCP", "id": 6 },
+  { "service": "Redis", "port": 6379, "proto": "TCP", "id": 7 },
+  { "service": "MongoDB", "port": 27017, "proto": "TCP", "id": 8 },
+  { "service": "Docker API", "port": 2375, "proto": "TCP", "id": 9 },
+  { "service": "Docker TLS", "port": 2376, "proto": "TCP", "id": 10 },
+  { "service": "Kubernetes API", "port": 6443, "proto": "TCP", "id": 11 },
+  { "service": "Grafana", "port": 3000, "proto": "TCP", "id": 12 },
+  { "service": "Prometheus", "port": 9090, "proto": "TCP", "id": 13 },
+  { "service": "AlertManager", "port": 9093, "proto": "TCP", "id": 14 },
+  { "service": "Jenkins", "port": 8080, "proto": "TCP", "id": 15 },
+  { "service": "GitLab", "port": 443, "proto": "TCP", "id": 16 },
+  { "service": "SMTP", "port": 25, "proto": "TCP", "id": 17 },
+  { "service": "SMTPS", "port": 465, "proto": "TCP", "id": 18 },
+  { "service": "IMAP", "port": 143, "proto": "TCP", "id": 19 },
+  { "service": "IMAPS", "port": 993, "proto": "TCP", "id": 20 },
+  { "service": "RabbitMQ", "port": 5672, "proto": "TCP", "id": 21 },
+  { "service": "RabbitMQ MGMT", "port": 15672, "proto": "TCP", "id": 22 },
+  { "service": "Elasticsearch", "port": 9200, "proto": "TCP", "id": 23 },
+  { "service": "Kibana", "port": 5601, "proto": "TCP", "id": 24 },
+  { "service": "Logstash", "port": 5044, "proto": "TCP", "id": 25 },
+  { "service": "etcd (client)", "port": 2379, "proto": "TCP", "id": 26 },
+  { "service": "etcd (peer)", "port": 2380, "proto": "TCP", "id": 27 },
+  { "service": "Node Exporter", "port": 9100, "proto": "TCP", "id": 28 },
+  { "service": "Consul", "port": 8500, "proto": "TCP", "id": 29 },
+  { "service": "Vault", "port": 8200, "proto": "TCP", "id": 30 },
+  { "service": "NTP", "port": 123, "proto": "UDP", "id": 31 },
+  { "service": "SNMP", "port": 161, "proto": "UDP", "id": 32 },
+  { "service": "LDAP", "port": 389, "proto": "TCP", "id": 33 },
+  { "service": "LDAPS", "port": 636, "proto": "TCP", "id": 34 },
+  { "service": "Syslog", "port": 514, "proto": "UDP", "id": 35 },
+  { "service": "RDP", "port": 3389, "proto": "TCP", "id": 36 },
+  { "service": "Memcached", "port": 11211, "proto": "TCP", "id": 37 },
+  { "service": "Zookeeper", "port": 2181, "proto": "TCP", "id": 38 },
+  { "service": "Kafka", "port": 9092, "proto": "TCP", "id": 39 },
+  { "service": "Cassandra", "port": 9042, "proto": "TCP", "id": 40 },
+  { "service": "CockroachDB", "port": 26257, "proto": "TCP", "id": 41 },
+  { "service": "MinIO", "port": 9000, "proto": "TCP", "id": 42 },
+  { "service": "Harbor", "port": 443, "proto": "TCP", "id": 43 },
+  { "service": "ArgoCD", "port": 443, "proto": "TCP", "id": 44 },
+  { "service": "Cilium Hubble", "port": 4244, "proto": "TCP", "id": 45 },
+  { "service": "Istio Ingress", "port": 15443, "proto": "TCP", "id": 46 },
+  { "service": "Boundary", "port": 9200, "proto": "TCP", "id": 47 },
+  { "service": "ClickHouse HTTP", "port": 8123, "proto": "TCP", "id": 48 },
+  { "service": "ClickHouse Native", "port": 9000, "proto": "TCP", "id": 49 },
+  { "service": "Loki", "port": 3100, "proto": "TCP", "id": 50 }
 ]

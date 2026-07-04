@@ -9498,5 +9498,859 @@
     "answer": 1,
     "explanation": "Container Registry — аналог Docker Hub, но приватный. Интеграция с Managed K8s, сканирование уязвимостей, управление доступами через IAM.",
     "id": 10045
+  },
+  {
+    "topic": "CI/CD",
+    "level": "Junior",
+    "q": "Что такое CI (Continuous Integration)?",
+    "options": [
+      "Практика частой интеграции кода с автосборкой и тестированием",
+      "Ручное тестирование раз в неделю",
+      "Система хранения Docker-образов",
+      "Инструмент для документации"
+    ],
+    "answer": 0,
+    "explanation": "CI — частая интеграция изменений в main. Каждый коммит триггерит сборку и тесты.",
+    "id": 10001
+  },
+  {
+    "topic": "CI/CD",
+    "level": "Junior",
+    "q": "Что такое GitLab Runner?",
+    "options": [
+      "Агент, выполняющий задачи CI/CD из .gitlab-ci.yml",
+      "Веб-интерфейс GitLab",
+      "Плагин VS Code",
+      "Хранилище образов"
+    ],
+    "answer": 0,
+    "explanation": "GitLab Runner — агент для запуска job. Исполнители: shell, docker, kubernetes, ssh.",
+    "id": 10002
+  },
+  {
+    "topic": "CI/CD",
+    "level": "Junior",
+    "q": "Где описывается пайплайн GitHub Actions?",
+    "options": [
+      ".github/workflows/*.yml",
+      "Jenkinsfile",
+      "Dockerfile",
+      "package.json"
+    ],
+    "answer": 0,
+    "explanation": "Workflow-файлы в .github/workflows/. Триггеры: push, pull_request, schedule.",
+    "id": 10003
+  },
+  {
+    "topic": "CI/CD",
+    "level": "Junior",
+    "q": "Что такое артефакт в CI/CD?",
+    "options": [
+      "Файлы созданные на одном этапе и передаваемые дальше",
+      "Лог сборки",
+      "Базовый образ ОС",
+      "Конфиг сервера"
+    ],
+    "answer": 0,
+    "explanation": "Артефакты — бинарники, отчёты тестов, Docker-образы. GitLab CI хранит в MinIO.",
+    "id": 10004
+  },
+  {
+    "topic": "CI/CD",
+    "level": "Middle",
+    "q": "GitLab CI vs GitHub Actions?",
+    "options": [
+      "GitLab: один .gitlab-ci.yml; GitHub: множество workflow-файлов",
+      "GitLab CI без Docker",
+      "GitHub Actions без параллелизма",
+      "Идентичны"
+    ],
+    "answer": 0,
+    "explanation": "GitLab CI: stages+jobs в одном файле. GitHub Actions: отдельные файлы-воркфлоу.",
+    "id": 10005
+  },
+  {
+    "topic": "CI/CD",
+    "level": "Middle",
+    "q": "Как кэшировать в GitHub Actions?",
+    "options": [
+      "actions/cache@v4 с ключом по хешу lock-файла",
+      "Хранить в образе",
+      "Git LFS",
+      "Недоступно"
+    ],
+    "answer": 0,
+    "explanation": "actions/cache@v4 кэширует node_modules, pip-пакеты. Ключ: hashFiles().",
+    "id": 10006
+  },
+  {
+    "topic": "CI/CD",
+    "level": "Middle",
+    "q": "Что такое Matrix Build?",
+    "options": [
+      "Запуск job с разными комбинациями ОС/версий",
+      "Сборка multi-arch образа",
+      "Параллельный запуск разных job",
+      "Матрица RBAC"
+    ],
+    "answer": 0,
+    "explanation": "Strategy matrix: os x version — декартово произведение комбинаций.",
+    "id": 10007
+  },
+  {
+    "topic": "CI/CD",
+    "level": "Senior",
+    "q": "Как работает GitOps с ArgoCD?",
+    "options": [
+      "ArgoCD синхронизирует кластер с Git-репозиторием",
+      "Ручной kubectl apply",
+      "rsync на сервер",
+      "Замена Docker Registry"
+    ],
+    "answer": 0,
+    "explanation": "ArgoCD: Git — источник истины. Auto-sync, prune, Helm, Kustomize.",
+    "id": 10008
+  },
+  {
+    "topic": "CI/CD",
+    "level": "Senior",
+    "q": "Как настроить Canary через Argo Rollouts?",
+    "options": [
+      "Argo Rollouts с шагами канареечного анализа метрик",
+      "Ручное переключение трафика",
+      "Отдельный кластер",
+      "Cronjob"
+    ],
+    "answer": 0,
+    "explanation": "Argo Rollouts: Blue/Green, Canary с анализом Prometheus/Datadog.",
+    "id": 10009
+  },
+  {
+    "topic": "CI/CD",
+    "level": "Senior",
+    "q": "Multi-account CI/CD в AWS через OIDC?",
+    "options": [
+      "OIDC-федерация: временный токен AWS STS без хранения ключей",
+      "Хранить Access Key",
+      "Отдельный IAM-пользователь",
+      "VPN"
+    ],
+    "answer": 0,
+    "explanation": "IAM Role доверяет token.actions.githubusercontent.com. STS-токен временный.",
+    "id": 10010
+  },
+  {
+    "topic": "CI/CD",
+    "level": "Middle",
+    "q": "Что такое Self-Hosted Runner?",
+    "options": [
+      "Собственный сервер для GitHub Actions job",
+      "Плагин для локального запуска",
+      "Резервный раннер",
+      "Библиотека тестирования"
+    ],
+    "answer": 0,
+    "explanation": "Self-Hosted Runner: доступ к внутренним серверам, GPU. Минус: обслуживание.",
+    "id": 10011
+  },
+  {
+    "topic": "CI/CD",
+    "level": "Middle",
+    "q": "Как работает approval в GitLab CI?",
+    "options": [
+      "when: manual с Protected Environments ограничивает круг утверждающих",
+      "Автодеплой без ограничений",
+      "Email всем",
+      "Через Jira"
+    ],
+    "answer": 0,
+    "explanation": "when: manual — кнопка Play. Protected Environments — кто может деплоить.",
+    "id": 10012
+  },
+  {
+    "topic": "Kubernetes",
+    "level": "Junior",
+    "q": "Что такое Namespace?",
+    "options": [
+      "Виртуальный кластер для изоляции ресурсов",
+      "Docker-контейнер",
+      "Физический сервер",
+      "Сетевой протокол"
+    ],
+    "answer": 0,
+    "explanation": "Namespace разделяет кластер. ResourceQuota и NetworkPolicy для изоляции.",
+    "id": 11001
+  },
+  {
+    "topic": "Kubernetes",
+    "level": "Junior",
+    "q": "Что такое ServiceAccount?",
+    "options": [
+      "Учётная запись подов для доступа к K8s API",
+      "Аккаунт админа",
+      "Облачный сервисный аккаунт",
+      "SSH-ключ"
+    ],
+    "answer": 0,
+    "explanation": "ServiceAccount — идентификатор для подов. Монтируется автоматически.",
+    "id": 11002
+  },
+  {
+    "topic": "Kubernetes",
+    "level": "Junior",
+    "q": "Для чего ConfigMap?",
+    "options": [
+      "Хранение несекретных конфигураций",
+      "Шифрование секретов",
+      "Сетевые политики",
+      "Мониторинг"
+    ],
+    "answer": 0,
+    "explanation": "ConfigMap отделяет конфигурацию от образа. Монтируется как файлы или env.",
+    "id": 11003
+  },
+  {
+    "topic": "Kubernetes",
+    "level": "Middle",
+    "q": "StatefulSet vs Deployment?",
+    "options": [
+      "StatefulSet сохраняет идентичность подов и persistent storage",
+      "Deployment без реплик",
+      "StatefulSet только stateless",
+      "Алиасы"
+    ],
+    "answer": 0,
+    "explanation": "StatefulSet: стабильные имена, сетевые ID, PVC-шаблоны. Для БД, Kafka.",
+    "id": 11004
+  },
+  {
+    "topic": "Kubernetes",
+    "level": "Middle",
+    "q": "Что делает Ingress Controller?",
+    "options": [
+      "Управляет внешним HTTP/HTTPS-доступом к сервисам",
+      "Мониторит CPU",
+      "Управляет сертификатами",
+      "Распределяет поды"
+    ],
+    "answer": 0,
+    "explanation": "Ingress Controller (nginx, traefik): маршрутизация по host/path, TLS.",
+    "id": 11005
+  },
+  {
+    "topic": "Kubernetes",
+    "level": "Middle",
+    "q": "Как работает NetworkPolicy?",
+    "options": [
+      "Правила in/egress трафика между подами",
+      "Управление DNS",
+      "Фаервол на ноде",
+      "Распределение IP"
+    ],
+    "answer": 0,
+    "explanation": "L3/L4 firewall для подов. Требует CNI (Calico, Cilium).",
+    "id": 11006
+  },
+  {
+    "topic": "Kubernetes",
+    "level": "Senior",
+    "q": "Multi-cluster Istio?",
+    "options": [
+      "Общий корневой CA, DNS-прокси для обнаружения сервисов",
+      "Один Istiod",
+      "Только Ingress",
+      "VPN"
+    ],
+    "answer": 0,
+    "explanation": "Multi-cluster: общий root CA, east-west gateway для non-flat сети.",
+    "id": 11007
+  },
+  {
+    "topic": "Kubernetes",
+    "level": "Senior",
+    "q": "Что такое Admission Webhooks?",
+    "options": [
+      "Webhook для модификации/валидации объектов до сохранения в etcd",
+      "Автомасштабирование",
+      "Сбор логов",
+      "Балансировка"
+    ],
+    "answer": 0,
+    "explanation": "MutatingWebhook изменяет объект. ValidatingWebhook отклоняет.",
+    "id": 11008
+  },
+  {
+    "topic": "Kubernetes",
+    "level": "Senior",
+    "q": "Как работает VPA?",
+    "options": [
+      "Анализирует потребление и корректирует requests/limits",
+      "Добавляет ноды",
+      "Заменяет HPA",
+      "Только уменьшает"
+    ],
+    "answer": 0,
+    "explanation": "VPA: режимы Off/Initial/Auto. Не совместим с HPA по CPU/Memory.",
+    "id": 11009
+  },
+  {
+    "topic": "Kubernetes",
+    "level": "Middle",
+    "q": "Что такое Helm?",
+    "options": [
+      "Пакетный менеджер — шаблоны и версионирование релизов",
+      "Система логирования",
+      "Утилита дампов",
+      "Плагин авторизации"
+    ],
+    "answer": 0,
+    "explanation": "Helm: Chart с шаблонами и values.yaml. helm install/upgrade/rollback.",
+    "id": 11010
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Junior",
+    "q": "Что такое мониторинг в DevOps?",
+    "options": [
+      "Непрерывный сбор, анализ и оповещение о состоянии систем",
+      "Ручная проверка серверов",
+      "Система резервного копирования",
+      "Инструмент деплоя"
+    ],
+    "answer": 0,
+    "explanation": "Мониторинг: метрики (CPU, память), логи (ELK/Loki), трейсинг, алертинг, визуализация (Grafana).",
+    "id": 12001
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Junior",
+    "q": "Для чего используется Prometheus?",
+    "options": [
+      "Сбор и хранение временных рядов метрик с PromQL и алертингом",
+      "Потоковая обработка логов",
+      "Резервное копирование БД",
+      "Управление контейнерами"
+    ],
+    "answer": 0,
+    "explanation": "Prometheus: pull-модель, TSDB, PromQL, AlertManager. Federation и remote write.",
+    "id": 12002
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Junior",
+    "q": "Что такое Grafana?",
+    "options": [
+      "Платформа визуализации метрик, логов и трейсов",
+      "База данных временных рядов",
+      "Система сбора логов",
+      "Прокси для Kubernetes"
+    ],
+    "answer": 0,
+    "explanation": "Grafana — дашборды и алертинг. Источники: Prometheus, InfluxDB, Loki, Elasticsearch.",
+    "id": 12003
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Middle",
+    "q": "Чем отличаются метрики USE и RED?",
+    "options": [
+      "USE — для ресурсов (Utilization, Saturation, Errors); RED — для сервисов (Rate, Errors, Duration)",
+      "USE для логов, RED для метрик",
+      "Оба метода идентичны",
+      "USE — Google, RED — AWS"
+    ],
+    "answer": 0,
+    "explanation": "USE (Brendan Gregg): инфраструктура. RED (Tom Wilkie): микросервисы. Google SRE: Four Golden Signals.",
+    "id": 12004
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Middle",
+    "q": "Как работает AlertManager?",
+    "options": [
+      "Принимает алерты, группирует, дедуплицирует, маршрутизирует в Slack/PagerDuty",
+      "Хранит историю алертов",
+      "Генерирует метрики",
+      "Заменяет Grafana"
+    ],
+    "answer": 0,
+    "explanation": "AlertManager: grouping, inhibition, silencing. Маршрутизация через routes.",
+    "id": 12005
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Senior",
+    "q": "Как организовать долгосрочное хранение метрик?",
+    "options": [
+      "Thanos/VictoriaMetrics с объектным хранилищем, дедупликацией и downsampling",
+      "Локальный диск Prometheus",
+      "Экспорт в Excel",
+      "Только Grafana Cloud"
+    ],
+    "answer": 0,
+    "explanation": "Thanos: sidecar загружает блоки в S3, Querier объединяет данные. Downsampling, dedup.",
+    "id": 12006
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Senior",
+    "q": "Как работает распределённый трейсинг с OpenTelemetry?",
+    "options": [
+      "OTel SDK инструментирует код, Collector экспортирует спаны с W3C Trace Context",
+      "Только логи приложения",
+      "tcpdump на серверах",
+      "В пределах одного пода"
+    ],
+    "answer": 0,
+    "explanation": "OpenTelemetry: SDK (traceId/spanId), Collector (OTLP), экспорт в Jaeger/Tempo.",
+    "id": 12007
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Middle",
+    "q": "Что такое Loki?",
+    "options": [
+      "Система агрегации логов от Grafana — индексирует метаданные, дешевле ELK",
+      "Форк Prometheus",
+      "Инструмент трейсинга",
+      "БД для Secrets"
+    ],
+    "answer": 0,
+    "explanation": "Loki: horizontally-scalable логи. Индексирует метки, текст в S3. LogQL. Promtail/Alloy.",
+    "id": 12008
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Middle",
+    "q": "Какие метрики мониторить у K8s-кластера?",
+    "options": [
+      "Node CPU/Memory, Pod restarts, etcd leader changes, API latency, scheduler queue",
+      "Только uptime мастер-нод",
+      "Количество образов",
+      "Скорость интернета"
+    ],
+    "answer": 0,
+    "explanation": "Критические: control plane (API latency, etcd fsync), узлы (Node condition), поды (OOMKill).",
+    "id": 12009
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Senior",
+    "q": "Что такое SLO/SLI/SLA?",
+    "options": [
+      "SLI — индикатор (p99), SLO — цель (99.9%), SLA — договор; error budget = 1-SLO",
+      "Одно и то же",
+      "SLO для логов, SLI для метрик",
+      "Только Google Cloud"
+    ],
+    "answer": 0,
+    "explanation": "SLI — метрика. SLO — цель за период. Error Budget — допустимый уровень ошибок.",
+    "id": 12010
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Middle",
+    "q": "Как работает Blackbox Exporter?",
+    "options": [
+      "Проверяет доступность: HTTP-статус, TCP, DNS, SSL-сертификаты",
+      "Собирает CPU метрики",
+      "Экспортирует Docker-логи",
+      "Мониторит ноды"
+    ],
+    "answer": 0,
+    "explanation": "Blackbox Exporter: probing HTTP, HTTPS (SSL expiry), TCP, DNS, ICMP.",
+    "id": 12011
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Middle",
+    "q": "Что такое ELK-стек?",
+    "options": [
+      "Elasticsearch + Logstash + Kibana для централизованного логирования",
+      "Система мониторинга метрик",
+      "Платформа CI/CD",
+      "Инструмент управления конфигурациями"
+    ],
+    "answer": 0,
+    "explanation": "ELK: Filebeat/Logstash собирают, Elasticsearch хранит, Kibana визуализирует. OpenSearch — форк.",
+    "id": 12012
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Middle",
+    "q": "Что такое instrumentation?",
+    "options": [
+      "Встраивание кода для сбора метрик/трейсов — экспорт в Prometheus/Jaeger",
+      "Настройка серверов",
+      "Установка агентов",
+      "Конфигурация сети"
+    ],
+    "answer": 0,
+    "explanation": "Instrumentation: Prometheus client libraries, OpenTelemetry SDK. Автоинструментация через агенты.",
+    "id": 12013
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Senior",
+    "q": "Как построить observability-платформу на OpenSource?",
+    "options": [
+      "Prometheus + Loki + Tempo + Grafana с OpenTelemetry Collector",
+      "Только ELK",
+      "Только Prometheus",
+      "Купить Datadog"
+    ],
+    "answer": 0,
+    "explanation": "Grafana LGTM-стек: Loki, Grafana, Tempo, Mimir. OpenTelemetry Collector — универсальный.",
+    "id": 12014
+  },
+  {
+    "topic": "Cloud",
+    "level": "Junior",
+    "q": "Что такое IaaS, PaaS, SaaS?",
+    "options": [
+      "IaaS — инфраструктура (VM), PaaS — платформа (managed DB), SaaS — готовое ПО",
+      "Три облачных провайдера",
+      "Три уровня безопасности",
+      "Три модели оплаты"
+    ],
+    "answer": 0,
+    "explanation": "IaaS: VM, сети. PaaS: managed K8s, DBaaS. SaaS: готовые приложения.",
+    "id": 13001
+  },
+  {
+    "topic": "Cloud",
+    "level": "Junior",
+    "q": "Что такое Object Storage (S3)?",
+    "options": [
+      "Масштабируемое хранилище неструктурированных данных с HTTP API",
+      "Файловая система VM",
+      "SQL-база данных",
+      "Блочное хранилище"
+    ],
+    "answer": 0,
+    "explanation": "Object Storage: бэкапы, статика, логи. REST API, версионирование, lifecycle.",
+    "id": 13002
+  },
+  {
+    "topic": "Cloud",
+    "level": "Junior",
+    "q": "Какие сервисы у Yandex Cloud?",
+    "options": [
+      "Compute Cloud, Managed K8s, Managed PostgreSQL, Object Storage, Cloud Functions, YDB",
+      "Только виртуальные серверы",
+      "Только хранение файлов",
+      "Исключительно AI"
+    ],
+    "answer": 0,
+    "explanation": "Yandex Cloud: VM, Managed K8s, DBaaS (PostgreSQL, MySQL, Redis), S3, serverless, YDB.",
+    "id": 13003
+  },
+  {
+    "topic": "Cloud",
+    "level": "Junior",
+    "q": "Какие сервисы у VK Cloud?",
+    "options": [
+      "VM, Managed K8s, DBaaS, S3-хранилище, CDN, мониторинг",
+      "Только соцсети",
+      "Видеоконференции",
+      "Почтовый сервис"
+    ],
+    "answer": 0,
+    "explanation": "VK Cloud: виртуальные машины, Cloud Containers, DBaaS, S3, CDN.",
+    "id": 13004
+  },
+  {
+    "topic": "Cloud",
+    "level": "Middle",
+    "q": "Как настроить отказоустойчивость в Yandex Cloud?",
+    "options": [
+      "Ресурсы в нескольких зонах доступности, Managed K8s с мульти-зональными узлами, Load Balancer",
+      "Один мощный сервер",
+      "Зарубежные облака",
+      "rsync вручную"
+    ],
+    "answer": 0,
+    "explanation": "Yandex Cloud: три зоны (ru-central1-a/b/d). Распределённые узлы K8s, Managed DB.",
+    "id": 13005
+  },
+  {
+    "topic": "Cloud",
+    "level": "Middle",
+    "q": "Terraform с Yandex Cloud как использовать?",
+    "options": [
+      "Провайдер yandex-cloud/yandex с IAM-токеном или ключом сервисного аккаунта",
+      "Не поддерживается",
+      "Только Web-интерфейс",
+      "Проприетарный CLI"
+    ],
+    "answer": 0,
+    "explanation": "Terraform провайдер: Compute, VPC, Managed K8s, DB. State в Object Storage.",
+    "id": 13006
+  },
+  {
+    "topic": "Cloud",
+    "level": "Middle",
+    "q": "Что такое Selectel?",
+    "options": [
+      "Российский IaaS/PaaS: bare metal, облачная платформа, managed K8s, S3, CDN",
+      "Регистратор доменов",
+      "Хранилище паролей",
+      "Стриминг-платформа"
+    ],
+    "answer": 0,
+    "explanation": "Selectel: выделенные серверы, облако, Managed Kubernetes, DBaaS, S3, CDN. ЦОДы в РФ.",
+    "id": 13007
+  },
+  {
+    "topic": "Cloud",
+    "level": "Middle",
+    "q": "Что такое SberCloud / Platform V?",
+    "options": [
+      "Enterprise-платформа Сбера: managed K8s, DBaaS, AI (GigaChat), в реестре ПО",
+      "Облачное хранилище фото",
+      "Соцсеть",
+      "Платёжная система"
+    ],
+    "answer": 0,
+    "explanation": "SberCloud: вычислительные ресурсы, Managed K8s, DBaaS, AI-сервисы, безопасность.",
+    "id": 13008
+  },
+  {
+    "topic": "Cloud",
+    "level": "Senior",
+    "q": "Как мигрировать с AWS на российские облака?",
+    "options": [
+      "Адаптация Terraform, перенос данных через S3 API, перестройка CI/CD",
+      "Скопировать AMI",
+      "FTP вручную",
+      "Невозможно"
+    ],
+    "answer": 0,
+    "explanation": "Шаги: 1) Аудит. 2) Terraform. 3) S3 API. 4) БД pg_dump. 5) CI/CD. 6) Мониторинг.",
+    "id": 13009
+  },
+  {
+    "topic": "Cloud",
+    "level": "Senior",
+    "q": "Как организовать гибрид (on-prem + облако РФ) для 152-ФЗ?",
+    "options": [
+      "ПДн on-premise или аттестованном облаке, stateless в облаке, VPN, сертифицированная криптография",
+      "Всё в зарубежное облако",
+      "Игнорировать закон",
+      "Хранить в Excel"
+    ],
+    "answer": 0,
+    "explanation": "152-ФЗ: ПДн в аттестованных ЦОДах. Канал VPN/Direct Connect. Криптосредства ФСБ/ФСТЭК.",
+    "id": 13010
+  },
+  {
+    "topic": "Cloud",
+    "level": "Middle",
+    "q": "Что такое Cloud.ru?",
+    "options": [
+      "Enterprise-платформа для госсектора: аттестация ФСТЭК, managed K8s, DBaaS, AI",
+      "Хранилище фото",
+      "Маркетплейс услуг",
+      "Система управления БД"
+    ],
+    "answer": 0,
+    "explanation": "Cloud.ru: сертифицирована 152-ФЗ УЗ-1, PCI DSS. VM, Managed K8s, DBaaS, AI Cloud.",
+    "id": 13011
+  },
+  {
+    "topic": "Cloud",
+    "level": "Senior",
+    "q": "Как организовать DR с российскими облаками?",
+    "options": [
+      "Георезервирование между ЦОДами или cross-cloud (Yandex+VK) с DNS Failover",
+      "USB-диск с бэкапом",
+      "Один ЦОД с RAID",
+      "DR не нужен"
+    ],
+    "answer": 0,
+    "explanation": "DR: Geo-репликация БД, Object Storage cross-region, Terraform, DNS Failover.",
+    "id": 13012
+  },
+  {
+    "topic": "Cloud",
+    "level": "Junior",
+    "q": "Что такое Serverless?",
+    "options": [
+      "Модель: разработчик пишет функции, облако управляет серверами, оплата за выполнение",
+      "Работа без серверов",
+      "Только локальные компьютеры",
+      "Тип виртуализации"
+    ],
+    "answer": 0,
+    "explanation": "Serverless (FaaS): Yandex Cloud Functions, AWS Lambda. Автомасштабирование, cold start.",
+    "id": 13013
+  },
+  {
+    "topic": "Security",
+    "level": "Junior",
+    "q": "Что такое DevSecOps?",
+    "options": [
+      "Интеграция безопасности на всех этапах CI/CD — shift left security",
+      "Отдельный отдел безопасности",
+      "Автообновление паролей",
+      "Инструмент пентеста"
+    ],
+    "answer": 0,
+    "explanation": "DevSecOps: SAST, DAST, SCA, секреты (Vault), политики как код (OPA/Checkov).",
+    "id": 14001
+  },
+  {
+    "topic": "Security",
+    "level": "Junior",
+    "q": "Чем SAST отличается от DAST?",
+    "options": [
+      "SAST анализирует исходный код (белый ящик), DAST тестирует приложение (чёрный ящик)",
+      "SAST для Python, DAST для Java",
+      "Оба тестируют порты",
+      "SAST устарел"
+    ],
+    "answer": 0,
+    "explanation": "SAST: поиск инъекций, XSS. DAST: OWASP Top-10. IAST — гибридный подход.",
+    "id": 14002
+  },
+  {
+    "topic": "Security",
+    "level": "Junior",
+    "q": "Как защитить секреты в CI/CD?",
+    "options": [
+      "Встроенные секреты CI (GitHub Secrets), маскировка в логах, ротация, аудит",
+      "Хранить в коде",
+      "Отправлять в Slack",
+      "Одинаковый пароль везде"
+    ],
+    "answer": 0,
+    "explanation": "Никогда не хардкодить. Vault/секреты CI. ::add-mask:: для GitHub Actions.",
+    "id": 14003
+  },
+  {
+    "topic": "Security",
+    "level": "Middle",
+    "q": "Как сканировать уязвимости в Docker-образах?",
+    "options": [
+      "Trivy/Grype анализируют слои образа, сравнивают с CVE-базами",
+      "Ручной просмотр Dockerfile",
+      "Антивирус в контейнере",
+      "Только базовый образ"
+    ],
+    "answer": 0,
+    "explanation": "Trivy: пакеты ОС, библиотеки (pip/npm). trivy image --severity HIGH,CRITICAL.",
+    "id": 14004
+  },
+  {
+    "topic": "Security",
+    "level": "Middle",
+    "q": "Что такое OPA/Gatekeeper в Kubernetes?",
+    "options": [
+      "Движок политик — валидирует ресурсы (запрет привилегированных подов, проверка labels)",
+      "Мониторинг безопасности",
+      "Прокси для шифрования",
+      "Бэкап-система"
+    ],
+    "answer": 0,
+    "explanation": "OPA (Rego-язык) + Gatekeeper = ValidatingWebhook. Kyverno — упрощённая альтернатива.",
+    "id": 14005
+  },
+  {
+    "topic": "Security",
+    "level": "Middle",
+    "q": "Как работает Vault в Kubernetes?",
+    "options": [
+      "Agent Injector добавляет sidecar для получения секретов и записи в shared volume",
+      "Заменяет etcd",
+      "Только с AWS",
+      "Облачное хранилище"
+    ],
+    "answer": 0,
+    "explanation": "Vault: аутентификация через JWT SA-токен. Agent Injector (mutating webhook). Dynamic secrets.",
+    "id": 14006
+  },
+  {
+    "topic": "Security",
+    "level": "Senior",
+    "q": "Как построить Software Supply Chain Security (SLSA)?",
+    "options": [
+      "SLSA Level 1-4: изолированные сборки, подписанные артефакты (Sigstore), attestation",
+      "Проверенные образы из Docker Hub",
+      "Отключить интернет",
+      "Проверять после деплоя"
+    ],
+    "answer": 0,
+    "explanation": "SLSA: L1-L4. Sigstore (Cosign), SLSA Generator, Tekton Chains. Reproducible builds.",
+    "id": 14007
+  },
+  {
+    "topic": "Security",
+    "level": "Senior",
+    "q": "Как проверять IaC на безопасность?",
+    "options": [
+      "Checkov/tfsec анализируют Terraform/K8s-манифесты на misconfigurations",
+      "Ручной аудит после",
+      "Сканирование только образов",
+      "Проверка стиля кода"
+    ],
+    "answer": 0,
+    "explanation": "Checkov/tfsec: S3 без шифрования, SG с 0.0.0.0/0, Pod без securityContext.",
+    "id": 14008
+  },
+  {
+    "topic": "Security",
+    "level": "Middle",
+    "q": "Что такое secret detection в Git?",
+    "options": [
+      "Gitleaks/TruffleHog сканируют коммиты на ключи/токены до пуша",
+      "Поиск багов",
+      "Проверка стиля коммитов",
+      "Автодеплой"
+    ],
+    "answer": 0,
+    "explanation": "Gitleaks, TruffleHog — pre-commit hook или CI. GitHub Advanced Security.",
+    "id": 14009
+  },
+  {
+    "topic": "Security",
+    "level": "Middle",
+    "q": "Что такое Network Policy для безопасности?",
+    "options": [
+      "K8s NetworkPolicy — microsegmentation: поды изолированы, доступ открывается явно",
+      "Фаервол на уровне облака",
+      "VPN между кластерами",
+      "DNS-фильтрация"
+    ],
+    "answer": 0,
+    "explanation": "Zero-trust networking: ingress/egress правила с podSelector, namespaceSelector.",
+    "id": 14010
+  },
+  {
+    "topic": "Security",
+    "level": "Senior",
+    "q": "Как реализовать Zero Trust в облаке?",
+    "options": [
+      "Identity-based доступ, mTLS между сервисами, JWT с коротким TTL, аудит запросов",
+      "Фаервол по периметру",
+      "VPN для всех",
+      "Парольная защита"
+    ],
+    "answer": 0,
+    "explanation": "Zero Trust: SPIFFE/SPIRE, mTLS (Istio), короткоживущие токены, continuous verification.",
+    "id": 14011
+  },
+  {
+    "topic": "Security",
+    "level": "Junior",
+    "q": "Что такое HTTPS и TLS?",
+    "options": [
+      "Протоколы шифрования трафика: TLS-рукопожатие, сертификаты X.509",
+      "Виды брандмауэров",
+      "Протоколы маршрутизации",
+      "Форматы хранения паролей"
+    ],
+    "answer": 0,
+    "explanation": "TLS: шифрование, целостность (HMAC), аутентификация. TLS 1.3 быстрее и безопаснее.",
+    "id": 14012
   }
 ]
