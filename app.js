@@ -468,7 +468,7 @@ function renderMasteryCards(){
     const tqs=allQ.filter(q=>q.topic===t);
     const m=tqs.filter(q=>{const p=qprog[q.id];return p&&p.correct>p.wrong;}).length;
     const pct=tqs.length?Math.round(m/tqs.length*100):0;
-    return '<div class="mastery-card" onclick="nav(\'exam\')">'+'<div style="font-size:20px">'+(icons[i]||'📋')+'</div>'+'<div class="mastery-pct" style="color:'+(colors[i]||'var(--primary)')+'">'+pct+'%</div>'+'<div class="mastery-name">'+t+'</div>'+'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+m+'/'+tqs.length+'</div>'+'<div class="mastery-bar"><div class="mastery-fill" style="width:'+pct+'%;background:'+(colors[i]||'var(--primary)')+'"></div></div></div>';
+    return '<div class="mastery-card" data-topic="'+t+'" onclick="currentTopic=this.getAttribute(\'data-topic\');nav(\'exam\')">'+'<div style="font-size:20px">'+(icons[i]||'📋')+'</div>'+'<div class="mastery-pct" style="color:'+(colors[i]||'var(--primary)')+'">'+pct+'%</div>'+'<div class="mastery-name">'+t+'</div>'+'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+m+'/'+tqs.length+'</div>'+'<div class="mastery-bar"><div class="mastery-fill" style="width:'+pct+'%;background:'+(colors[i]||'var(--primary)')+'"></div></div></div>';
   }).join('');
 }
 

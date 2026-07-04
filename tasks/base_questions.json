@@ -10352,5 +10352,425 @@
     "answer": 0,
     "explanation": "TLS: шифрование, целостность (HMAC), аутентификация. TLS 1.3 быстрее и безопаснее.",
     "id": 14012
+  },
+  {
+    "topic": "Cloud",
+    "level": "Junior",
+    "q": "Что такое виртуальная машина (VM) в облаке?",
+    "options": [
+      "Виртуальный сервер с выделенными vCPU, RAM и диском, работающий на гипервизоре",
+      "Физический сервер в дата-центре",
+      "Контейнер Docker",
+      "Сетевое хранилище"
+    ],
+    "answer": 0,
+    "explanation": "VM — изолированная вычислительная среда с гостевой ОС. В Yandex Cloud создаётся через Compute Cloud, поддерживает vCPU от 2 до 80, RAM до 640 ГБ, GPU.",
+    "id": 14013
+  },
+  {
+    "topic": "Cloud",
+    "level": "Junior",
+    "q": "Что такое VPC (Virtual Private Cloud)?",
+    "options": [
+      "Изолированная частная сеть в облаке с настраиваемыми подсетями, таблицами маршрутизации и security groups",
+      "VPN-сервер",
+      "Физический коммутатор",
+      "Wi-Fi сеть"
+    ],
+    "answer": 0,
+    "explanation": "VPC позволяет создать логически изолированную сеть в облаке. В Yandex Cloud: каждая VM размещается в VPC-подсети, можно настроить NAT, static routes, security groups.",
+    "id": 14014
+  },
+  {
+    "topic": "Cloud",
+    "level": "Middle",
+    "q": "Как работает автомасштабирование в облаке (Auto Scaling)?",
+    "options": [
+      "Группа ВМ автоматически увеличивает/уменьшает количество инстансов на основе метрик (CPU, RPS) и расписания",
+      "Ручное добавление серверов",
+      "Увеличение размера диска",
+      "Изменение конфигурации сети"
+    ],
+    "answer": 0,
+    "explanation": "Auto Scaling в Yandex Cloud: Instance Group с политиками масштабирования (по CPU, кастомным метрикам, расписанию). Интегрируется с Network Load Balancer. Min/max размер группы, cooldown период.",
+    "id": 14015
+  },
+  {
+    "topic": "Cloud",
+    "level": "Middle",
+    "q": "Что такое Cloud Interconnect / Direct Connect?",
+    "options": [
+      "Выделенный физический канал между on-premise инфраструктурой и облачным провайдером",
+      "VPN через интернет",
+      "Wi-Fi мост",
+      "Спутниковый канал"
+    ],
+    "answer": 0,
+    "explanation": "Cloud Interconnect (Yandex Cloud) / Direct Connect (AWS) — выделенный оптоволоконный канал с гарантированной пропускной способностью. Используется для гибридной инфраструктуры, миграции, низкой задержки.",
+    "id": 14016
+  },
+  {
+    "topic": "Cloud",
+    "level": "Middle",
+    "q": "Как организовать хранение Terraform state в Yandex Cloud?",
+    "options": [
+      "Yandex Object Storage для хранения state-файла + YDB для блокировок (DynamoDB-совместимый API)",
+      "Локальный файл на компьютере",
+      "Git-репозиторий",
+      "FTP-сервер"
+    ],
+    "answer": 0,
+    "explanation": "Yandex Cloud: Object Storage (S3-совместимый) для хранения .tfstate с версионированием. YDB (document table) для state locking — аналог DynamoDB в AWS. Настройка backend: s3 с endpoint storage.yandexcloud.net и dynamodb_endpoint.",
+    "id": 14017
+  },
+  {
+    "topic": "Cloud",
+    "level": "Senior",
+    "q": "Как спроектировать мульти-региональную архитектуру в российских облаках?",
+    "options": [
+      "Разместить сервисы в ЦОДах разных регионов (Москва, СПб, Новосибирск), использовать геораспределённый DNS, асинхронную репликацию БД",
+      "Поставить всё в один ЦОД",
+      "Использовать зарубежные облака",
+      "CDN заменяет мульти-региональность"
+    ],
+    "answer": 0,
+    "explanation": "Мульти-региональная архитектура: 1) Разные регионы провайдера (Yandex Cloud: ru-central1, Selectel: Москва/СПб). 2) GeoDNS для маршрутизации пользователей к ближайшему ЦОДу. 3) Async репликация БД с приемлемым RPO. 4) Terraform с разными провайдерами/алиасами. 5) Единый мониторинг через федерацию Prometheus.",
+    "id": 14018
+  },
+  {
+    "topic": "Cloud",
+    "level": "Senior",
+    "q": "Как обеспечить соответствие требованиям ФСТЭК при работе с облаками?",
+    "options": [
+      "Использовать аттестованные ЦОДы, сертифицированные средства защиты (СЗИ), журналирование действий, разграничение доступа",
+      "Достаточно HTTPS",
+      "Только зарубежные сертификаты",
+      "Парольная защита"
+    ],
+    "answer": 0,
+    "explanation": "ФСТЭК: 1) ЦОД должен иметь аттестат соответствия. 2) Использование сертифицированных СЗИ (межсетевые экраны, СОВ, антивирусы). 3) Обязательное журналирование и аудит действий. 4) Разграничение доступа (IAM, RBAC). 5) Регулярное обновление и сканирование уязвимостей.",
+    "id": 14019
+  },
+  {
+    "topic": "Cloud",
+    "level": "Middle",
+    "q": "Что такое S3 Storage Class (класс хранения) в Object Storage?",
+    "options": [
+      "Разные уровни хранения: Standard (частый доступ), Cold (редкий доступ), Ice/Archive (архивное) с разной стоимостью и задержкой",
+      "Типы шифрования",
+      "Уровни репликации",
+      "Форматы файлов"
+    ],
+    "answer": 0,
+    "explanation": "Классы хранения: Standard (высокая доступность, дороже), Cold (для редко используемых данных, дешевле хранение, дороже запросы), Ice/Archive (минимальная стоимость, часы на восстановление). Настраивается через Lifecycle-политики для автоматического перевода объектов.",
+    "id": 14020
+  },
+  {
+    "topic": "Cloud",
+    "level": "Junior",
+    "q": "Что такое Cloud Load Balancer?",
+    "options": [
+      "Сервис распределения входящего трафика между несколькими серверами с проверкой здоровья",
+      "Фаервол",
+      "DNS-сервер",
+      "CDN"
+    ],
+    "answer": 0,
+    "explanation": "Load Balancer: распределяет TCP/HTTP-трафик между целевыми ресурсами. Поддерживает health checks, SSL termination, sticky sessions. В Yandex Cloud: Network Load Balancer (L4) и Application Load Balancer (L7).",
+    "id": 14021
+  },
+  {
+    "topic": "Cloud",
+    "level": "Middle",
+    "q": "Как работает DNS в Yandex Cloud?",
+    "options": [
+      "Cloud DNS управляет DNS-зонами, поддерживает приватные зоны (доступные только внутри VPC) и публичные зоны",
+      "Только через внешних регистраторов",
+      "DNS не поддерживается",
+      "Только через /etc/hosts"
+    ],
+    "answer": 0,
+    "explanation": "Yandex Cloud DNS: публичные зоны (видны из интернета) и приватные (только внутри VPC). Поддерживает A, AAAA, CNAME, MX, TXT, SRV записи. Интеграция с Certificate Manager для автоматического DNS-челленджа Let's Encrypt.",
+    "id": 14022
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Junior",
+    "q": "Что такое алерт (alert) в мониторинге?",
+    "options": [
+      "Уведомление о нарушении заданного условия (порога метрики) отправляемое ответственному",
+      "График в Grafana",
+      "Запись в лог-файле",
+      "Конфигурационный файл"
+    ],
+    "answer": 0,
+    "explanation": "Alert — правило в Prometheus/AlertManager: условие (cpu > 90%), продолжительность (for: 5m), severity (critical/warning), аннотации (summary, description) и маршрут доставки (Slack, Telegram, PagerDuty).",
+    "id": 14023
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Junior",
+    "q": "Какие типы метрик существуют в Prometheus?",
+    "options": [
+      "Counter (счётчик), Gauge (значение), Histogram (распределение), Summary (квантили)",
+      "Только числовые и строковые",
+      "Логи и трейсы",
+      "Boolean и Integer"
+    ],
+    "answer": 0,
+    "explanation": "Prometheus метрики: Counter (только растёт: http_requests_total), Gauge (растёт/падает: memory_usage_bytes), Histogram (распределение по bucket'ам: request_duration_seconds), Summary (квантили на клиенте).",
+    "id": 14024
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Middle",
+    "q": "Что такое Service Mesh Observability с Istio?",
+    "options": [
+      "Автоматический сбор метрик RED (Rate/Errors/Duration) для всех сервисов через sidecar-прокси Envoy без изменения кода",
+      "Ручная инструментация каждого сервиса",
+      "Только логи доступа",
+      "Мониторинг через SNMP"
+    ],
+    "answer": 0,
+    "explanation": "Istio + Prometheus: Envoy sidecar автоматически собирает метрики HTTP/gRPC/TCP трафика (istio_requests_total, istio_request_duration_ms). Kiali визуализирует service mesh граф. Jaeger/Zipkin для распределённого трейсинга.",
+    "id": 14025
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Middle",
+    "q": "Как настроить мониторинг SSL-сертификатов?",
+    "options": [
+      "Blackbox Exporter с модулем tcp_connect и проверкой probe_ssl_early_cert_expiry, алерт когда expire < 30 дней",
+      "Ручная проверка в браузере",
+      "Только через curl",
+      "SSL-мониторинг невозможен"
+    ],
+    "answer": 0,
+    "explanation": "Blackbox Exporter: module: http_2xx с tls_config. PromQL: probe_ssl_early_cert_expiry - time() < 30*24*3600. AlertManager отправляет предупреждение. Можно мониторить и внешние, и внутренние сертификаты.",
+    "id": 14026
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Middle",
+    "q": "Что такое Synthetic Monitoring?",
+    "options": [
+      "Имитация действий пользователя (HTTP-запросы, клики) из разных точек мира для проверки доступности и производительности",
+      "Мониторинг реальных пользователей (RUM)",
+      "Анализ логов",
+      "Проверка конфигурации серверов"
+    ],
+    "answer": 0,
+    "explanation": "Synthetic Monitoring: скрипты, имитирующие пользовательские сценарии (логин → поиск → покупка). Blackbox Exporter для базовых проверок, Grafana k6 для сложных сценариев с порогами производительности.",
+    "id": 14027
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Senior",
+    "q": "Как настроить федерацию Prometheus для multi-cluster мониторинга?",
+    "options": [
+      "Prometheus на каждом кластере + центральный Prometheus забирает агрегированные метрики через /federate эндпоинт",
+      "Запустить один Prometheus для всех",
+      "Использовать только Grafana Cloud",
+      "Ручной экспорт метрик"
+    ],
+    "answer": 0,
+    "explanation": "Федерация Prometheus: каждый кластер имеет локальный Prometheus. Центральный Prometheus собирает агрегированные метрики (sum, avg) через /federate?match[]={job=~'.+'}. Thanos/Cortex/Mimir обеспечивают глобальный вид с дедупликацией.",
+    "id": 14028
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Senior",
+    "q": "Как реализовать мониторинг на основе четырех золотых сигналов Google SRE?",
+    "options": [
+      "Latency (задержка), Traffic (трафик/RPS), Errors (ошибки), Saturation (насыщение) — измеряются Prometheus и визуализируются в Grafana",
+      "Только мониторинг CPU",
+      "Проверка uptime",
+      "Только логи"
+    ],
+    "answer": 0,
+    "explanation": "Four Golden Signals: 1) Latency (p50/p90/p99 через Histogram). 2) Traffic (RPS через Counter). 3) Errors (rate 5xx / total). 4) Saturation (очереди, usage %). RED-метод — частный случай для микросервисов.",
+    "id": 14029
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Junior",
+    "q": "Что такое uptime (время безотказной работы)?",
+    "options": [
+      "Процент времени, в течение которого сервис был доступен (обычно 99.9% = 8.7ч простоя в год)",
+      "Скорость ответа сервера",
+      "Количество запросов",
+      "Размер базы данных"
+    ],
+    "answer": 0,
+    "explanation": "Uptime = (total_time - downtime) / total_time × 100%. 99% = 3.65 дня/год, 99.9% = 8.7ч/год, 99.99% = 52мин/год, 99.999% = 5мин/год. Измеряется через Prometheus Blackbox Exporter или внешние сервисы.",
+    "id": 14030
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Middle",
+    "q": "Что такое log aggregation и зачем она нужна?",
+    "options": [
+      "Централизованный сбор логов со всех серверов/контейнеров в единое хранилище с поиском и визуализацией",
+      "Хранение логов на каждом сервере отдельно",
+      "Отправка логов по email",
+      "Архивирование в ZIP"
+    ],
+    "answer": 0,
+    "explanation": "Log aggregation (ELK/Loki): 1) Сбор: Filebeat/Promtail на каждом хосте. 2) Обработка: Logstash/Alloy парсинг и обогащение. 3) Хранение: Elasticsearch/ Loki (S3). 4) Поиск и визуализация: Kibana/Grafana. Позволяет быстро находить ошибки в распределённых системах.",
+    "id": 14031
+  },
+  {
+    "topic": "Monitoring",
+    "level": "Junior",
+    "q": "Что такое дашборд (dashboard) в мониторинге?",
+    "options": [
+      "Визуальное представление ключевых метрик системы на одном экране для быстрой оценки состояния",
+      "Текстовый лог ошибок",
+      "Список серверов",
+      "Таблица в Excel"
+    ],
+    "answer": 0,
+    "explanation": "Dashboard в Grafana: панели (graph, stat, table, heatmap), переменные (фильтры по хостам/окружениям), аннотации (деплои, инциденты). Хороший дашборд: USE-метрики серверов + RED-метрики приложений + бизнес-метрики.",
+    "id": 14032
+  },
+  {
+    "topic": "Security",
+    "level": "Junior",
+    "q": "Что такое OWASP Top 10?",
+    "options": [
+      "Список десяти наиболее критичных уязвимостей веб-приложений (Injection, XSS, Broken Auth, etc.)",
+      "Топ-10 антивирусов",
+      "Список самых популярных веб-серверов",
+      "Рейтинг облачных провайдеров"
+    ],
+    "answer": 0,
+    "explanation": "OWASP Top 10 (2021): A1 Broken Access Control, A2 Cryptographic Failures, A3 Injection, A4 Insecure Design, A5 Security Misconfiguration, A6 Vulnerable Components, A7 Auth Failures, A8 Software/Data Integrity, A9 Logging/Monitoring Failures, A10 SSRF.",
+    "id": 14033
+  },
+  {
+    "topic": "Security",
+    "level": "Junior",
+    "q": "Что такое принцип наименьших привилегий (Least Privilege)?",
+    "options": [
+      "Предоставление пользователям и сервисам только минимально необходимых прав для выполнения их задач",
+      "Выдача максимальных прав всем",
+      "Отсутствие всяких прав",
+      "Парольная защита"
+    ],
+    "answer": 0,
+    "explanation": "Least Privilege: каждый пользователь/сервис/контейнер имеет только необходимые права. В K8s: RBAC с минимальными Role. В AWS: IAM с конкретными Action/Resource. В Docker: запуск не от root, no-new-privileges.",
+    "id": 14034
+  },
+  {
+    "topic": "Security",
+    "level": "Middle",
+    "q": "Как работает Mutual TLS (mTLS) в сервисной сети?",
+    "options": [
+      "Двусторонняя аутентификация: и клиент, и сервер предъявляют сертификаты, подписанные общим CA (Istio, Consul Connect)",
+      "Только серверный TLS",
+      "Только клиентские сертификаты",
+      "HTTP без шифрования"
+    ],
+    "answer": 0,
+    "explanation": "mTLS обеспечивает: 1) Аутентификацию обеих сторон. 2) Шифрование трафика. 3) Целостность данных. Istio автоматически управляет сертификатами через Istiod (CA). Citadel генерирует SPIFFE-совместимые сертификаты для каждого workload.",
+    "id": 14035
+  },
+  {
+    "topic": "Security",
+    "level": "Middle",
+    "q": "Что такое CVE и CVSS?",
+    "options": [
+      "CVE — идентификатор уязвимости, CVSS — числовая оценка её критичности (0-10)",
+      "Типы баз данных",
+      "Виды сетевых протоколов",
+      "Форматы файлов"
+    ],
+    "answer": 0,
+    "explanation": "CVE (Common Vulnerabilities and Exposures): уникальный ID (CVE-2024-XXXXX). CVSS (Common Vulnerability Scoring System): оценка 0-10 (None/Low/Medium/High/Critical). Учитывает вектор атаки, сложность, привилегии, влияние. Используется Trivy, Nessus.",
+    "id": 14036
+  },
+  {
+    "topic": "Security",
+    "level": "Middle",
+    "q": "Как реализовать управление секретами с динамическими учётными данными БД?",
+    "options": [
+      "HashiCorp Vault генерирует временные учётные данные PostgreSQL/MySQL с автоматическим TTL и отзывом",
+      "Хардкодить пароль в конфиге",
+      "Использовать один пароль навсегда",
+      "Хранить в .env файле"
+    ],
+    "answer": 0,
+    "explanation": "Vault Database Secrets Engine: 1) Создаёт временного пользователя БД через root-учётку. 2) Выдаёт credentials с TTL (например 1 час). 3) Автоматически удаляет пользователя по истечении срока. 4) Приложение получает новые креды через Vault API.",
+    "id": 14037
+  },
+  {
+    "topic": "Security",
+    "level": "Senior",
+    "q": "Как организовать Security Incident Response в cloud-native среде?",
+    "options": [
+      "Процесс: обнаружение (алерты), сдерживание (изоляция pod/VM), расследование (логи/трейсы), восстановление (restore из бэкапа), post-mortem анализ",
+      "Паника и перезагрузка серверов",
+      "Игнорирование инцидента",
+      "Увольнение виновного"
+    ],
+    "answer": 0,
+    "explanation": "Incident Response: 1) Detection: Prometheus алерты, Falco (runtime security). 2) Containment: NetworkPolicy изоляция, taint ноды. 3) Forensics: снапшот диска, логи из Loki, трейсы Jaeger. 4) Recovery: GitOps откат, restore БД. 5) Post-mortem: blameless анализ, action items.",
+    "id": 14038
+  },
+  {
+    "topic": "Security",
+    "level": "Senior",
+    "q": "Что такое Policy as Code и как реализовать в Kubernetes?",
+    "options": [
+      "Описание политик безопасности в виде кода (OPA/Rego, Kyverno YAML) с автоматической валидацией в CI/CD и runtime",
+      "Ручная проверка конфигураций",
+      "Word-документ с правилами",
+      "Excel-таблица с чеклистом"
+    ],
+    "answer": 0,
+    "explanation": "Policy as Code: 1) OPA Gatekeeper: Rego-политики как CRD (ConstraintTemplate). 2) Kyverno: нативные K8s-политики (validate, mutate, generate). 3) Checkov/tfsec проверяют Terraform. 4) Интеграция в CI/CD: pre-commit hooks, GitHub Actions.",
+    "id": 14039
+  },
+  {
+    "topic": "Security",
+    "level": "Junior",
+    "q": "Что такое Penetration Testing (пентест)?",
+    "options": [
+      "Санкционированная имитация атаки на систему для выявления уязвимостей",
+      "Автоматическое сканирование портов",
+      "Проверка скорости интернета",
+      "Написание unit-тестов"
+    ],
+    "answer": 0,
+    "explanation": "Пентест: этичный хакинг с разрешения владельца. Методологии: OWASP Testing Guide, PTES, OSSTMM. Инструменты: Burp Suite, Metasploit, Nmap, sqlmap, hydra. Виды: black-box (без доступа), white-box (с полным доступом), grey-box.",
+    "id": 14040
+  },
+  {
+    "topic": "Security",
+    "level": "Middle",
+    "q": "Что такое Container Runtime Security (Falco)?",
+    "options": [
+      "Falco отслеживает системные вызовы (syscalls) контейнеров в реальном времени и алертит о подозрительной активности",
+      "Сканер уязвимостей образов",
+      "Фаервол для контейнеров",
+      "Система логирования"
+    ],
+    "answer": 0,
+    "explanation": "Falco (CNCF): eBPF-агент мониторит syscalls на хосте. Правила (rules): запуск shell в контейнере, запись в /etc, неожиданные сетевые соединения, чтение секретных файлов. Интегрируется с AlertManager, Slack, Syslog.",
+    "id": 14041
+  },
+  {
+    "topic": "Security",
+    "level": "Junior",
+    "q": "Что такое DDoS-атака и как защититься?",
+    "options": [
+      "Массированные запросы с множества источников для перегрузки сервиса; защита: CDN, WAF, rate limiting, Anycast",
+      "Взлом пароля",
+      "Кража данных",
+      "Фишинг"
+    ],
+    "answer": 0,
+    "explanation": "DDoS защита: 1) Облачные WAF/CDN (Cloudflare, Qrator). 2) Rate limiting на уровне приложения. 3) Anycast-сеть для распределения атаки. 4) Автомасштабирование ресурсов. 5) Blackhole/null routing для экстренных случаев.",
+    "id": 14042
   }
 ]
