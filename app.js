@@ -86,6 +86,7 @@ let timerSecs=0,timerInterval=null;
 let activeQuestions=[],singleIdx=0;
 let streak=0;
 let questionStartTime={};
+let cmdMuscleActive=false;
 
 // ═══ NAV ═══
 const PAGE_TITLES={home:'Главная',exam:'Экзамен',analytics:'Аналитика',
