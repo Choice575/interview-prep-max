@@ -1,6 +1,6 @@
 /**
- * Interview Prep Max v9 — Application Logic
- * APP_VERSION: 9.0.0
+ * Interview Prep Max v10 — Application Logic
+ * APP_VERSION: 10.0.0
  */
 const APP_VERSION = '10.0.0';
 
