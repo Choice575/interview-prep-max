@@ -2,7 +2,7 @@
  * Interview Prep Max v9 — Application Logic
  * APP_VERSION: 9.0.0
  */
-const APP_VERSION = '9.0.0';
+const APP_VERSION = '10.0.0';
 
 // ═══ DATA LOADING ═══
 var BASE_QUESTIONS = [], SUBNET_PROBLEMS = [], TS_SCENARIOS = [], CMD_TASKS = [],
@@ -705,9 +705,10 @@ function saveCustomQ(){
   const opts=[a,b,c,d].filter(Boolean);
   if(ansIdx >= opts.length){alert('Правильный ответ ('+ansIdx+') указывает на несуществующий вариант. Вариантов: '+opts.length);return;}
   const customs=getCustomQ();
-  // Используем max(id)+1 вместо фиксированного 10000
-  const maxId = customs.reduce((max, q) => Math.max(max, q.id||0), 0);
-  const newId = Math.max(maxId + 1, 10001);
+  // ID по всей базе (не только custom), уводим custom в диапазон 900000+
+  const allQ=getAllQ();
+  const maxId = allQ.reduce((max, q) => Math.max(max, q.id||0), 900000);
+  const newId = maxId + 1;
   customs.push({
     id: newId,
     topic: document.getElementById('cq-topic').value,
@@ -804,7 +805,7 @@ function blitzPick(qid,chosen,correct){
 }
 function blitzNext(){blitzState.idx++;blitzState.active=true;if(blitzState.idx>=blitzState.questions.length){endBlitz();return;}renderBlitzQ();}
 function endBlitz(){
-  clearInterval(blitzState.timer);blitzState.active=false;
+  clearInterval(blitzState.timer);blitzState.timer=null;blitzState.active=false;
   document.getElementById('exam-controls').style.display='';
   document.getElementById('progress-info').style.display='';
   document.getElementById('seg-bar').style.display='';
@@ -914,7 +915,9 @@ function buildTopicFilters(){
   const topics = getAllTopics();
   const topicChips = document.getElementById('topic-chips');
   if(topicChips){
-    topicChips.innerHTML='<span class="chip active" data-topic="all">Все</span>';
+    topicChips.innerHTML='';
+    const allChip=document.createElement('span');allChip.className='chip active';allChip.textContent='Все';allChip.onclick=function(){setTopic('all',this);};
+    topicChips.appendChild(allChip);
     topics.forEach(t=>{const chip=document.createElement('span');chip.className='chip';chip.textContent=t;chip.setAttribute('data-topic',t);chip.onclick=function(){setTopic(t,this);};topicChips.appendChild(chip);});
   }
   const allChip=document.querySelector('#mode-chips .chip:first-child');
@@ -952,12 +955,7 @@ async function checkOfflineReady(){
 
 // ═══ PWA ═══
 if ('serviceWorker' in navigator) {
-  // Сначала удаляем все старые Service Workers (миграция с v8)
-  navigator.serviceWorker.getRegistrations().then(regs => {
-    regs.forEach(reg => reg.unregister());
-  }).then(() => {
-    navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW v9:', reg.scope)).catch(err => console.log('SW error:', err));
-  });
+  navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW v10:', reg.scope)).catch(err => console.log('SW error:', err));
 }
 
 // Запуск

@@ -1,5 +1,5 @@
-// Service Worker v9 — Interview Prep Max
-const CACHE_NAME = 'ipmax-v9';
+// Service Worker v10 — Interview Prep Max
+const CACHE_NAME = 'ipmax-v10';
 const ASSETS = [
   './', './index.html', './styles.css', './app.js', './interview-prep-max.webmanifest',
   './tasks/base_questions.json', './tasks/ts.json', './tasks/subnet.json',
