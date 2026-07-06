@@ -9511,7 +9511,7 @@
     ],
     "answer": 0,
     "explanation": "CI — частая интеграция изменений в main. Каждый коммит триггерит сборку и тесты.",
-    "id": 10001
+    "id": 14043
   },
   {
     "topic": "CI/CD",
@@ -9525,7 +9525,7 @@
     ],
     "answer": 0,
     "explanation": "GitLab Runner — агент для запуска job. Исполнители: shell, docker, kubernetes, ssh.",
-    "id": 10002
+    "id": 14044
   },
   {
     "topic": "CI/CD",
@@ -9539,7 +9539,7 @@
     ],
     "answer": 0,
     "explanation": "Workflow-файлы в .github/workflows/. Триггеры: push, pull_request, schedule.",
-    "id": 10003
+    "id": 14045
   },
   {
     "topic": "CI/CD",
@@ -9553,7 +9553,7 @@
     ],
     "answer": 0,
     "explanation": "Артефакты — бинарники, отчёты тестов, Docker-образы. GitLab CI хранит в MinIO.",
-    "id": 10004
+    "id": 14046
   },
   {
     "topic": "CI/CD",
@@ -9567,7 +9567,7 @@
     ],
     "answer": 0,
     "explanation": "GitLab CI: stages+jobs в одном файле. GitHub Actions: отдельные файлы-воркфлоу.",
-    "id": 10005
+    "id": 14047
   },
   {
     "topic": "CI/CD",
@@ -9581,7 +9581,7 @@
     ],
     "answer": 0,
     "explanation": "actions/cache@v4 кэширует node_modules, pip-пакеты. Ключ: hashFiles().",
-    "id": 10006
+    "id": 14048
   },
   {
     "topic": "CI/CD",
@@ -9595,7 +9595,7 @@
     ],
     "answer": 0,
     "explanation": "Strategy matrix: os x version — декартово произведение комбинаций.",
-    "id": 10007
+    "id": 14049
   },
   {
     "topic": "CI/CD",
@@ -9609,7 +9609,7 @@
     ],
     "answer": 0,
     "explanation": "ArgoCD: Git — источник истины. Auto-sync, prune, Helm, Kustomize.",
-    "id": 10008
+    "id": 14050
   },
   {
     "topic": "CI/CD",
@@ -9623,7 +9623,7 @@
     ],
     "answer": 0,
     "explanation": "Argo Rollouts: Blue/Green, Canary с анализом Prometheus/Datadog.",
-    "id": 10009
+    "id": 14051
   },
   {
     "topic": "CI/CD",
@@ -9637,7 +9637,7 @@
     ],
     "answer": 0,
     "explanation": "IAM Role доверяет token.actions.githubusercontent.com. STS-токен временный.",
-    "id": 10010
+    "id": 14052
   },
   {
     "topic": "CI/CD",
@@ -9651,7 +9651,7 @@
     ],
     "answer": 0,
     "explanation": "Self-Hosted Runner: доступ к внутренним серверам, GPU. Минус: обслуживание.",
-    "id": 10011
+    "id": 14053
   },
   {
     "topic": "CI/CD",
@@ -9665,7 +9665,7 @@
     ],
     "answer": 0,
     "explanation": "when: manual — кнопка Play. Protected Environments — кто может деплоить.",
-    "id": 10012
+    "id": 14054
   },
   {
     "topic": "Kubernetes",

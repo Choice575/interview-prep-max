@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 
 const TASKS_DIR = path.join(__dirname, 'tasks');
-const KNOWN_TOPICS = ['Terraform', 'Linux', 'Сети', 'Ansible', 'Docker', 'Kubernetes', 'CI/CD', 'Git', 'Regex'];
+const KNOWN_TOPICS = ['Terraform', 'Linux', 'Сети', 'Ansible', 'Docker', 'Kubernetes', 'CI/CD', 'Git', 'Regex', 'Monitoring', 'Cloud', 'Security'];
 const KNOWN_LEVELS = ['Junior', 'Middle', 'Senior'];
 const KNOWN_CATEGORIES = ['definition', 'scenario', 'tradeoff', 'output'];
 const APP_VERSION = '9.0.0';
