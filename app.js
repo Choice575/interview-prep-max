@@ -951,7 +951,7 @@ function renderBlitzQ(){
     '<div style="font-size:13px;color:var(--text2)">Вопрос '+(blitzState.idx+1)+'/20</div></div>'+
     '<div class="q-text" style="font-size:16px;margin-bottom:20px">'+esc(q.q)+'</div>'+
     '<div class="q-options">'+
-    order.map((origIdx,visPos)=>'<div class="q-opt" id="blitz-opt-'+visPos+'" data-orig-idx="'+origIdx+'" data-answer="'+q.answer+'" onclick="blitzPick('+q.id+','+origIdx+','+q.answer+')"><span class="opt-letter">'+L[visPos]+'</span><span>'+esc(opts[origIdx])+'</span></div>').join('')+
+    order.map((origIdx,visPos)=>'<button type="button" class="q-opt" id="blitz-opt-'+visPos+'" data-orig-idx="'+origIdx+'" data-answer="'+q.answer+'" onclick="blitzPick('+q.id+','+origIdx+','+q.answer+')"><span class="opt-letter">'+L[visPos]+'</span><span>'+esc(opts[origIdx])+'</span></button>').join('')+
     '</div>'+
     '<div id="blitz-exp-'+q.id+'" style="display:none" class="q-explanation"></div>'+
     '<div style="text-align:center;margin-top:14px;display:none" id="blitz-next-btn"><button class="btn btn-primary" onclick="blitzNext()">Следующий →</button></div></div>';
