@@ -1,0 +1,435 @@
+{
+  "version": "4.0.0",
+  "title": "DevOps Plan v4 Middle+/Senior: Weeks 1-4 Study Map",
+  "profile": "devops",
+  "language": "ru",
+  "weeklyRhythm": {
+    "monday": "Новая тема и базовая практика",
+    "tuesday": "Углубление и работа с выводом команд",
+    "wednesday": "Production-слой и типовые ошибки",
+    "thursday": "Мини-инцидент или сквозной проект",
+    "friday": "Итоговая задача, тест, Senior Challenge"
+  },
+  "trainerIds": [
+    "exam",
+    "cmd",
+    "labs",
+    "subnet",
+    "ts",
+    "git",
+    "ports",
+    "tips"
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "title": "Linux: навигация, файлы, права, базовый bash",
+      "targetLevel": "Junior+ -> Middle base",
+      "mainTopics": ["Linux"],
+      "goal": "Уверенно работать в файловой системе Linux, понимать права, владельцев, группы и типовые ошибки доступа.",
+      "productionLayer": "Ошибки доступа, права директорий против прав файлов, безопасные изменения прав, диагностика Permission denied.",
+      "artifact": "Мини-скрипт или чек-лист проверки доступа к конфигу сервиса.",
+      "seniorChallenge": {
+        "title": "Сервис не читает конфиг после изменения прав",
+        "task": "По выводу ls -la и тексту ошибки определить минимальное безопасное исправление без chmod 777.",
+        "expectedSkills": [
+          "понимать r/w/x для файла и директории",
+          "отличать владельца от группы",
+          "выбирать минимальные права",
+          "объяснять риск chmod 777"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 1",
+        "trainers": ["exam", "cmd", "labs"],
+        "questionFilters": {
+          "topic": ["Linux"],
+          "level": ["Junior", "Middle"],
+          "category": ["definition", "scenario", "output"]
+        },
+        "newCasesNeeded": [
+          "Permission denied на конфиге",
+          "директория без execute-бита",
+          "опасный chmod 777",
+          "не тот владелец файла"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Навигация и структура Linux",
+          "level": "Junior+",
+          "objective": "Понимать, где находишься, как переходить по путям и как отличать абсолютные и относительные пути.",
+          "practice": [
+            "pwd",
+            "ls -la",
+            "cd /",
+            "cd ~",
+            "mkdir -p ~/projects/devops/week1"
+          ],
+          "pitfalls": [
+            "путать / и ~",
+            "путать абсолютный и относительный путь",
+            "не понимать скрытые файлы в ls -la"
+          ],
+          "miniTest": [
+            "Чем путь / отличается от ~?",
+            "Что показывает pwd?",
+            "Что означает точка в имени .bashrc?",
+            "Зачем нужен флаг -a в ls -la?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Файлы, директории, копирование, перемещение",
+          "level": "Junior+",
+          "objective": "Создавать, копировать, перемещать и удалять файлы без потери данных.",
+          "practice": [
+            "touch",
+            "mkdir -p",
+            "cp",
+            "mv",
+            "rm -i"
+          ],
+          "pitfalls": [
+            "использовать rm без понимания последствий",
+            "путать cp файла и директории",
+            "забывать -p у mkdir для вложенных путей"
+          ],
+          "miniTest": [
+            "Что делает mkdir -p?",
+            "Чем mv отличается от cp?",
+            "Почему rm опаснее mv?",
+            "Что произойдет, если копировать файл в существующую директорию?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Права доступа: r, w, x",
+          "level": "Middle base",
+          "objective": "Понимать права файла и директории, читать chmod в символьном и числовом виде.",
+          "practice": [
+            "ls -l",
+            "chmod u+x file",
+            "chmod 644 file",
+            "chmod 755 dir"
+          ],
+          "pitfalls": [
+            "думать, что execute на директории означает запуск",
+            "путать 6 и 5 в chmod",
+            "использовать chmod 777 как универсальное решение"
+          ],
+          "miniTest": [
+            "Что значит r для файла?",
+            "Что значит x для директории?",
+            "Почему 755 не то же самое, что 777?",
+            "Какие права нужны, чтобы прочитать файл внутри директории?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Владельцы, группы, chown, диагностика Permission denied",
+          "level": "Middle base",
+          "objective": "Определять, кто имеет доступ к файлу, и исправлять владельца или группу без лишнего расширения прав.",
+          "practice": [
+            "id",
+            "groups",
+            "ls -la",
+            "chown",
+            "chgrp"
+          ],
+          "pitfalls": [
+            "исправлять владельца там, где достаточно группы",
+            "давать всем права вместо минимального исправления",
+            "не проверять путь целиком"
+          ],
+          "miniTest": [
+            "Как понять, к каким группам относится пользователь?",
+            "Что безопаснее: chown или chmod 777? Почему?",
+            "Почему файл может быть доступен, но путь к нему нет?",
+            "Что проверять при Permission denied?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели: Linux-доступ и безопасные права",
+          "level": "Middle base",
+          "objective": "Собрать знания недели в практическом разборе ошибки доступа.",
+          "practice": [
+            "разобрать ls -la",
+            "найти причину Permission denied",
+            "предложить минимальный chmod/chown",
+            "написать короткий чек-лист диагностики"
+          ],
+          "weeklyTest": {
+            "theory": [
+              "Объясни r/w/x для файла и директории.",
+              "Почему chmod 777 считается плохой практикой?",
+              "Чем владелец отличается от группы?"
+            ],
+            "debug": "Дан вывод ls -la и ошибка Permission denied. Найди причину.",
+            "practice": "Составь безопасный порядок проверки доступа к конфигу сервиса."
+          }
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "title": "Сети: TCP/IP, DNS, HTTP, curl, CIDR",
+      "targetLevel": "Junior+ -> Middle base",
+      "mainTopics": ["Сети"],
+      "goal": "Диагностировать доступность сервиса по слоям: DNS, TCP, TLS, HTTP, приложение.",
+      "productionLayer": "Timeout, connection refused, HTTP 502/503, DNS failure, ICMP-блокировка, базовая CIDR-математика.",
+      "artifact": "Дерево диагностики: сайт не открывается или API возвращает ошибку.",
+      "seniorChallenge": {
+        "title": "Сайт недоступен у части пользователей",
+        "task": "Составить порядок проверок и объяснить, какие симптомы указывают на DNS, сеть, TLS или backend.",
+        "expectedSkills": [
+          "диагностика по слоям",
+          "curl -v",
+          "понимание HTTP-кодов",
+          "базовый CIDR",
+          "понимание, что ping не доказывает доступность HTTP"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 2",
+        "trainers": ["exam", "subnet", "ports", "ts", "labs"],
+        "questionFilters": {
+          "topic": ["Сети"],
+          "level": ["Junior", "Middle"],
+          "category": ["definition", "scenario", "output", "tradeoff"]
+        },
+        "newCasesNeeded": [
+          "DNS ENOTFOUND",
+          "connection refused",
+          "timeout",
+          "502 от reverse proxy",
+          "503 от backend",
+          "CIDR /26 расчет"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "IP, порты, TCP/UDP",
+          "level": "Junior+",
+          "objective": "Понимать, что такое IP, порт, TCP-соединение и почему сервис может быть недоступен.",
+          "practice": ["ip addr", "ss -tuln", "ping -c 1 -w 1", "nc -vz"],
+          "pitfalls": ["считать ping полной проверкой сервиса", "путать порт и IP", "не отличать timeout от refused"],
+          "miniTest": ["Что проверяет ping?", "Что означает порт 443?", "Чем connection refused отличается от timeout?", "Что показывает ss -tuln?"]
+        },
+        {
+          "day": 2,
+          "title": "DNS и разрешение имён",
+          "level": "Middle base",
+          "objective": "Понимать путь от имени домена до IP-адреса и диагностировать DNS-ошибки.",
+          "practice": ["dig", "nslookup", "getent hosts", "cat /etc/resolv.conf"],
+          "pitfalls": ["путать DNS с HTTP", "не проверять resolv.conf", "делать вывод по одному DNS-серверу"],
+          "miniTest": ["Что делает DNS?", "Что означает ENOTFOUND?", "Зачем проверять /etc/resolv.conf?", "Почему IP может открываться, а домен нет?"]
+        },
+        {
+          "day": 3,
+          "title": "HTTP, curl, методы, заголовки",
+          "level": "Middle base",
+          "objective": "Проверять HTTP-сервис через curl и понимать код ответа, заголовки и тело.",
+          "practice": ["curl -I", "curl -v", "curl -s", "curl -X POST", "curl -H", "curl -d"],
+          "pitfalls": ["думать, что -d выводит JSON", "путать HEAD и GET", "смотреть только тело ответа без кода"],
+          "miniTest": ["Чем HEAD отличается от GET?", "Что делает curl -I?", "Что делает -d?", "Что означает HTTP 503?"]
+        },
+        {
+          "day": 4,
+          "title": "CIDR и подсети",
+          "level": "Middle base",
+          "objective": "Считать количество адресов и понимать маску сети на базовом уровне.",
+          "practice": ["ipcalc или ручной расчет", "задачи /24, /26, /20", "таблица степеней двойки"],
+          "pitfalls": ["считать маска - 12 вместо 32 - маска", "забывать network и broadcast", "путать адреса и usable hosts"],
+          "miniTest": ["Сколько бит под хосты в /26?", "Сколько usable hosts в /26?", "Почему вычитаем 2 адреса?", "Что значит 32 - маска?"]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели: диагностика недоступного сервиса",
+          "level": "Middle base",
+          "objective": "Собрать сетевые проверки в понятный порядок диагностики.",
+          "practice": ["проверить DNS", "проверить TCP-порт", "проверить HTTP-код", "разобрать curl -v", "составить дерево диагностики"],
+          "weeklyTest": {
+            "theory": ["Чем timeout отличается от connection refused?", "Что проверяет DNS?", "Почему ping не доказывает, что сайт работает?"],
+            "debug": "Дан вывод curl -v с 502/timeout/DNS error. Определи слой проблемы.",
+            "practice": "Составь порядок проверки: пользователь жалуется, что сайт не открывается."
+          }
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "title": "Процессы, systemd, journalctl, SSH",
+      "targetLevel": "Middle base",
+      "mainTopics": ["Linux", "Security"],
+      "goal": "Управлять процессами, понимать сигналы, читать логи systemd и безопасно работать по SSH.",
+      "productionLayer": "Restart loop, failed unit, SIGTERM/SIGKILL/SIGTSTP, journalctl, SSH hardening.",
+      "artifact": "Скрипт process_check.sh и runbook диагностики упавшего systemd-сервиса.",
+      "seniorChallenge": {
+        "title": "Backend падает каждые 30 секунд",
+        "task": "По systemctl status и journalctl определить причину, предложить срочное восстановление и постоянное исправление.",
+        "expectedSkills": [
+          "читать состояние unit-файла",
+          "отличать процесс от job",
+          "понимать сигналы",
+          "использовать journalctl",
+          "не перезапускать вслепую"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 3",
+        "trainers": ["exam", "cmd", "labs", "ts"],
+        "questionFilters": {
+          "topic": ["Linux", "Security"],
+          "level": ["Junior", "Middle"],
+          "category": ["scenario", "output"]
+        },
+        "newCasesNeeded": [
+          "Ctrl+Z и SIGTSTP",
+          "systemd restart loop",
+          "journalctl показывает ошибку конфигурации",
+          "SSH permission denied publickey"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Процессы: ps, pstree, kill",
+          "level": "Middle base",
+          "objective": "Находить процессы, понимать PID/PPID и корректно завершать процесс.",
+          "practice": ["ps aux", "pstree", "pgrep", "kill -TERM", "kill -KILL"],
+          "pitfalls": ["использовать kill -9 сразу", "путать PID и порт", "не проверять родительский процесс"],
+          "miniTest": ["Что такое PID?", "Чем SIGTERM отличается от SIGKILL?", "Почему kill -9 не должен быть первым действием?", "Что показывает pstree?"]
+        },
+        {
+          "day": 2,
+          "title": "Jobs, fg, bg, Ctrl+Z, nohup",
+          "level": "Middle base",
+          "objective": "Понимать foreground/background jobs и отличие паузы от завершения.",
+          "practice": ["sleep 300 &", "jobs -l", "fg %1", "Ctrl+Z", "bg %1", "nohup"],
+          "pitfalls": ["думать, что Ctrl+Z завершает процесс", "путать job id и PID", "забывать, что nohup не делает сервис production-ready"],
+          "miniTest": ["Что делает Ctrl+Z?", "Чем fg отличается от bg?", "Что показывает jobs -l?", "Когда нужен nohup?"]
+        },
+        {
+          "day": 3,
+          "title": "systemd и journalctl",
+          "level": "Middle base",
+          "objective": "Проверять unit-файл, состояние сервиса и последние логи.",
+          "practice": ["systemctl status", "systemctl is-active", "journalctl -u", "journalctl -n", "journalctl -f"],
+          "pitfalls": ["перезапускать сервис без чтения логов", "путать loaded и active", "не смотреть exit code"],
+          "miniTest": ["Чем loaded отличается от active?", "Что показывает journalctl -u?", "Зачем смотреть последние 50 строк?", "Что такое restart loop?"]
+        },
+        {
+          "day": 4,
+          "title": "SSH и базовая безопасность доступа",
+          "level": "Middle base",
+          "objective": "Понимать SSH-ключи, права на ключи и базовые причины отказа подключения.",
+          "practice": ["ssh -V", "ssh-keygen", "chmod 600 ~/.ssh/id_rsa", "ssh -v", "sshd_config basics"],
+          "pitfalls": ["слишком открытые права ключа", "путать публичный и приватный ключ", "не использовать ssh -v для диагностики"],
+          "miniTest": ["Почему приватный ключ должен быть защищен?", "Что показывает ssh -v?", "Чем публичный ключ отличается от приватного?", "Что значит Permission denied publickey?"]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели: process_check.sh и диагностика сервиса",
+          "level": "Middle base",
+          "objective": "Собрать процессную диагностику в скрипт и runbook.",
+          "practice": ["написать process_check.sh", "проверить процесс", "проверить порт", "проверить systemd status", "вывести последние логи"],
+          "weeklyTest": {
+            "theory": ["Что делает Ctrl+Z?", "Чем SIGTERM отличается от SIGKILL?", "Что проверять при failed systemd unit?"],
+            "debug": "Дан вывод systemctl status и journalctl. Найди причину падения.",
+            "practice": "Напиши структуру скрипта process_check.sh без готового копипаста."
+          }
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "title": "Git, GitHub, GitLab workflow",
+      "targetLevel": "Middle base",
+      "mainTopics": ["Git", "CI/CD"],
+      "goal": "Работать с ветками, коммитами, конфликтами, pull request и безопасным откатом изменений.",
+      "productionLayer": "Protected branches, revert vs reset, rebase conflicts, release tags, безопасный rollback кода.",
+      "artifact": "Репозиторий с ветками, PR-процессом, решенным конфликтом и документированным rollback-сценарием.",
+      "seniorChallenge": {
+        "title": "Плохой коммит попал в main",
+        "task": "Выбрать между revert, reset, force push и rollback release; объяснить последствия для команды.",
+        "expectedSkills": [
+          "понимать историю Git",
+          "безопасно откатывать публичную ветку",
+          "решать конфликты",
+          "работать через PR",
+          "объяснять риск force push"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 4",
+        "trainers": ["exam", "git", "cmd", "labs"],
+        "questionFilters": {
+          "topic": ["Git", "CI/CD"],
+          "level": ["Junior", "Middle"],
+          "category": ["definition", "scenario", "tradeoff", "output"]
+        },
+        "newCasesNeeded": [
+          "merge conflict",
+          "revert плохого коммита",
+          "reset в публичной ветке",
+          "protected branch",
+          "release tag rollback"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Git basics: status, add, commit, log",
+          "level": "Junior+",
+          "objective": "Понимать состояние рабочей директории, индекс и историю коммитов.",
+          "practice": ["git status", "git add", "git commit", "git log --oneline", "git diff"],
+          "pitfalls": ["коммитить без diff", "путать рабочую директорию и индекс", "не писать понятные сообщения коммитов"],
+          "miniTest": ["Что показывает git status?", "Чем git diff отличается от git log?", "Что попадает в commit после git add?", "Почему перед commit полезно смотреть diff?"]
+        },
+        {
+          "day": 2,
+          "title": "Branches, merge, conflicts",
+          "level": "Middle base",
+          "objective": "Создавать ветки, сливать изменения и решать конфликт вручную.",
+          "practice": ["git branch", "git switch -c", "git merge", "conflict markers", "git status after conflict"],
+          "pitfalls": ["удалять conflict markers неосознанно", "коммитить конфликтный файл", "сливать без понимания изменений"],
+          "miniTest": ["Что такое ветка?", "Когда возникает merge conflict?", "Что означают маркеры <<<<<<< ======= >>>>>>>?", "Что нужно сделать после решения конфликта?"]
+        },
+        {
+          "day": 3,
+          "title": "Remote, GitHub/GitLab, pull request",
+          "level": "Middle base",
+          "objective": "Понимать remote, push/pull/fetch и командный workflow через PR/MR.",
+          "practice": ["git remote -v", "git fetch", "git pull", "git push", "pull request workflow"],
+          "pitfalls": ["путать fetch и pull", "push в main без review", "не обновлять ветку перед PR"],
+          "miniTest": ["Чем fetch отличается от pull?", "Зачем нужен pull request?", "Что такое origin?", "Почему main защищают?"]
+        },
+        {
+          "day": 4,
+          "title": "revert, reset, rebase и безопасный откат",
+          "level": "Middle base",
+          "objective": "Выбирать безопасный способ отката и понимать риски переписывания истории.",
+          "practice": ["git revert", "git reset --soft", "git reset --hard concept", "git rebase concept", "git reflog concept"],
+          "pitfalls": ["делать reset --hard в публичной ветке", "force push без согласования", "использовать rebase без понимания истории"],
+          "miniTest": ["Чем revert отличается от reset?", "Почему reset --hard опасен?", "Когда rebase допустим?", "Что делать, если плохой коммит уже в main?"]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели: командный Git workflow и rollback",
+          "level": "Middle base",
+          "objective": "Пройти полный цикл: ветка, изменение, конфликт, PR, безопасный откат.",
+          "practice": ["создать ветку", "сделать коммит", "смоделировать конфликт", "решить конфликт", "выбрать rollback strategy"],
+          "weeklyTest": {
+            "theory": ["Чем revert отличается от reset?", "Зачем protected branches?", "Что такое merge conflict?"],
+            "debug": "Дан граф истории и плохой коммит в main. Выбери безопасное действие.",
+            "practice": "Опиши командный workflow для изменения в production-репозитории."
+          }
+        }
+      ]
+    }
+  ]
+}

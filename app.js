@@ -1,13 +1,14 @@
 /**
- * Interview Prep Max v10 — Application Logic
- * APP_VERSION: 10.0.0
+ * Interview Prep Max v11 — Application Logic
+ * APP_VERSION: 11.0.0
  */
-const APP_VERSION = '10.0.0';
+const APP_VERSION = '11.0.0';
 
 // ═══ DATA LOADING ═══
 var BASE_QUESTIONS = [], SUBNET_PROBLEMS = [], TS_SCENARIOS = [], CMD_TASKS = [],
     CODE_TASKS = [], GIT_TASKS = [], REGEX_TASKS = [], ANSIBLE_PB_TASKS = [],
-    DOCKERFILE_TASKS = [], K8S_TASKS = [], PORTS_TASKS = [], LABS_TASKS = [], TIPS = [];
+    DOCKERFILE_TASKS = [], K8S_TASKS = [], PORTS_TASKS = [], LABS_TASKS = [], TIPS = [],
+    STUDY_MAP = null, STUDY_TESTS = null, SENIOR_CASES = [];
 
 const DATA_FILES = {
   base_questions: 'tasks/base_questions.json',
@@ -22,15 +23,27 @@ const DATA_FILES = {
   k8s: 'tasks/k8s.json',
   ports: 'tasks/ports.json',
   labs: 'tasks/labs.json',
-  tips: 'tasks/tips.json'
+  tips: 'tasks/tips.json',
+  study_map: 'tasks/study_map.json',
+  study_tests: 'tasks/study_tests.json',
+  senior_cases: 'tasks/senior_cases.json'
 };
 
 const DATA_VARS = {
   base_questions: 'BASE_QUESTIONS', subnet: 'SUBNET_PROBLEMS', ts: 'TS_SCENARIOS',
   cmd: 'CMD_TASKS', code: 'CODE_TASKS', git: 'GIT_TASKS', regex: 'REGEX_TASKS',
   ansible_pb: 'ANSIBLE_PB_TASKS', dockerfile: 'DOCKERFILE_TASKS', k8s: 'K8S_TASKS',
-  ports: 'PORTS_TASKS', labs: 'LABS_TASKS', tips: 'TIPS'
+  ports: 'PORTS_TASKS', labs: 'LABS_TASKS', tips: 'TIPS', study_map: 'STUDY_MAP',
+  study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES'
 };
+
+function dataSize(data){
+  if(Array.isArray(data)) return data.length;
+  if(data&&Array.isArray(data.weeks)) return data.weeks.length+' недель';
+  if(data&&Array.isArray(data.miniTests)) return data.miniTests.length+' мини-тестов';
+  if(data&&Array.isArray(data.cases)) return data.cases.length+' кейсов';
+  return 'object';
+}
 
 async function loadAllData() {
   const status = document.getElementById('load-status');
@@ -41,7 +54,7 @@ async function loadAllData() {
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const data = await resp.json();
       window[DATA_VARS[key]] = data;
-      status.textContent = `Загружено: ${key} (${data.length})`;
+      status.textContent = `Загружено: ${key} (${dataSize(data)})`;
     } catch (e) {
       console.error(`Failed to load ${url}:`, e);
       errors.push(`${key}: ${e.message}`);
@@ -68,7 +81,9 @@ const LS = {
   qprog:'ipmax_qprog',streak_best:'ipmax_streak_best',custom:'ipmax_custom',theme:'ipmax_theme',
   ts_scores:'ipmax_ts_scores',cmd_prog:'ipmax_cmd_prog',code_prog:'ipmax_code_prog',subnet_prog:'ipmax_subnet_prog',
   git_prog:'ipmax_git_prog',regex_prog:'ipmax_regex_prog',ans_prog:'ipmax_ans_prog',df_prog:'ipmax_df_prog',
-  k8s_prog:'ipmax_k8s_prog',pt_prog:'ipmax_pt_prog',labs_prog:'ipmax_labs_prog',daily:'ipmax_daily'
+  k8s_prog:'ipmax_k8s_prog',pt_prog:'ipmax_pt_prog',labs_prog:'ipmax_labs_prog',daily:'ipmax_daily',
+  study_progress:'ipmax_study_progress',study_position:'ipmax_study_position',study_answers:'ipmax_study_answers',
+  senior_case_prog:'ipmax_senior_case_prog'
 };
 function lsGet(k,def){try{const v=localStorage.getItem(LS[k]);return v?JSON.parse(v):def;}catch(e){console.warn('lsGet error:',e);return def;}}
 function lsSet(k,v){try{localStorage.setItem(LS[k],JSON.stringify(v));}catch(e){console.warn('lsSet error:',e);}}
@@ -89,7 +104,7 @@ let questionStartTime={};
 let cmdMuscleActive=false;
 
 // ═══ NAV ═══
-const PAGE_TITLES={home:'Главная',exam:'Экзамен',analytics:'Аналитика',
+const PAGE_TITLES={home:'Главная',study:'Учёба',exam:'Экзамен',analytics:'Аналитика',
   subnet:'Тренажёр подсетей',ts:'Troubleshooting-симулятор',
   cmd:'Command Builder',code:'Code Reviewer',
   ansible:'Ansible Playbook',dockerfile:'Dockerfile',k8s:'K8s YAML',ports:'Порты TCP',labs:'Debugging',
@@ -105,6 +120,7 @@ function nav(page){
   document.getElementById('page-title').textContent=PAGE_TITLES[page]||page;
   closeSidebar();
   if(page==='home') renderHome();
+  if(page==='study') renderStudy();
   if(page==='analytics') renderAnalytics();
   if(page==='subnet') renderSubnet();
   if(page==='ts') renderTsList();
@@ -442,6 +458,135 @@ function endMockInterview(){
     '<button class="btn btn-primary" onclick="startMockInterview()">🔄 Ещё интервью</button>'+
     '<button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
 }
+
+// ═══ STUDY TAB ═══
+function getStudyPosition(){return lsGet('study_position',{week:1,day:1});}
+function setStudyPosition(week,day){lsSet('study_position',{week:week,day:day});renderStudy();}
+function getStudyProgress(){return lsGet('study_progress',{});}
+function setStudyDayStatus(week,day,status){const p=getStudyProgress();p['w'+week+'d'+day]=status;lsSet('study_progress',p);renderStudy();}
+function getStudyWeek(week){return (STUDY_MAP?.weeks||[]).find(w=>w.week===week);}
+function getStudyDay(week,day){const w=getStudyWeek(week);return w?(w.days||[]).find(d=>d.day===day):null;}
+function getMiniTest(week,day){return (STUDY_TESTS?.miniTests||[]).find(t=>t.week===week&&t.day===day);}
+function getWeeklyTest(week){return (STUDY_TESTS?.weeklyTests||[]).find(t=>t.week===week);}
+function getSeniorCaseList(){return Array.isArray(SENIOR_CASES)?SENIOR_CASES:(SENIOR_CASES?.cases||[]);}
+function getSeniorCasesForDay(week,day){return getSeniorCaseList().filter(c=>c.week===week&&(!c.day||c.day===day));}
+function statusLabel(s){return {locked:'закрыт',todo:'к изучению',in_progress:'в процессе',review:'повторить',done:'готово'}[s||'todo']||s;}
+function escAttr(s){return esc(s).replace(/'/g,'&#39;');}
+function renderStudy(){
+  if(!STUDY_MAP||!STUDY_TESTS){return;}
+  const pos=getStudyPosition();
+  const week=getStudyWeek(pos.week)||getStudyWeek(1);
+  if(!week){document.getElementById('study-current').innerHTML='<div class="empty-state"><p>Учебный план не найден</p></div>';return;}
+  const day=getStudyDay(week.week,pos.day)||week.days[0];
+  const actualPos={week:week.week,day:day.day};
+  const mini=getMiniTest(actualPos.week,actualPos.day);
+  const weekly=getWeeklyTest(actualPos.week);
+  const cases=getSeniorCasesForDay(actualPos.week,actualPos.day);
+  renderStudyCurrent(week,day);
+  renderStudyDays(week,day.day);
+  renderStudyToday(day);
+  renderStudyMiniTest(mini,weekly,day.day===5);
+  renderStudyProgress(week);
+  renderStudyTrainers(week);
+  renderStudySeniorCase(cases[0]);
+}
+function renderStudyCurrent(week,day){
+  document.getElementById('study-current').innerHTML=
+    '<section class="study-hero"><div class="study-kicker">Неделя '+week.week+' · '+esc(week.targetLevel||'')+'</div>'+
+    '<div class="study-title">'+esc(week.title)+'</div>'+
+    '<div class="study-goal">'+esc(week.goal||'')+'</div>'+
+    '<div class="study-meta"><span class="tag tag-lx">День '+day.day+'</span><span class="tag tag-sc">'+esc(day.title)+'</span><span class="tag tag-tr">Production-слой</span></div></section>';
+}
+function renderStudyDays(week,activeDay){
+  const prog=getStudyProgress();
+  document.getElementById('study-days').innerHTML='<div class="study-days">'+(week.days||[]).map(d=>{
+    const st=prog['w'+week.week+'d'+d.day]||(d.day===1?'todo':'locked');
+    return '<div class="study-day '+(d.day===activeDay?'active ':'')+esc(st)+'" onclick="setStudyPosition('+week.week+','+d.day+')"><div class="study-day-num">День '+d.day+' · '+statusLabel(st)+'</div><div class="study-day-title">'+esc(d.title)+'</div></div>';
+  }).join('')+'</div>';
+}
+function renderStudyToday(day){
+  document.getElementById('study-today').innerHTML=
+    '<section class="study-card"><h3>Сегодня</h3><div class="study-goal">'+esc(day.objective||'')+'</div>'+
+    '<h4>Практика</h4><div class="study-command-list">'+(day.practice||[]).map(c=>'<span class="study-command">'+esc(c)+'</span>').join('')+'</div>'+
+    '<h4>Типовые ошибки</h4><ul class="study-list">'+(day.pitfalls||[]).map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul>'+
+    '<div class="study-actions"><button class="btn btn-outline btn-sm" onclick="setStudyDayStatus(getStudyPosition().week,getStudyPosition().day,\'in_progress\')">Начал</button>'+
+    '<button class="btn btn-primary btn-sm" onclick="setStudyDayStatus(getStudyPosition().week,getStudyPosition().day,\'done\')">Отметить готово</button>'+
+    '<button class="btn btn-outline btn-sm" onclick="setStudyDayStatus(getStudyPosition().week,getStudyPosition().day,\'review\')">На повтор</button></div></section>';
+}
+function renderStudyMiniTest(test,weekly,showWeekly){
+  const el=document.getElementById('study-test');
+  if(!test){el.innerHTML='<section class="study-card"><h3>Мини-тест</h3><p style="color:var(--text2);font-size:13px">Для этого дня тест пока не задан.</p></section>';return;}
+  const saved=lsGet('study_answers',{})[test.id]||{};
+  const qScores=saved.qScores||[];
+  const total=qScores.reduce((s,v)=>s+(v||0),0);
+  el.innerHTML='<section class="study-card"><h3>Мини-тест: '+esc(test.title)+'</h3><div style="font-size:12px;color:var(--text2);margin-bottom:10px">Оценка: '+total+' / 5</div>'+
+    (test.questions||[]).map((q,i)=>'<div class="study-question"><div class="study-question-text">'+(i+1)+'. '+esc(q.q)+'</div>'+
+      '<textarea class="study-answer" id="study-answer-'+test.id+'-'+i+'" placeholder="Ответ своими словами...">'+esc((saved.answers||[])[i]||'')+'</textarea>'+
+      '<div class="study-score-row"><button class="btn btn-outline btn-sm" onclick="toggleStudyRef(\''+escAttr(test.id)+'-'+i+'\')">Показать эталон</button>'+
+      '<button class="btn btn-outline btn-sm" onclick="scoreStudyQuestion(\''+escAttr(test.id)+'\','+i+',0)">0</button>'+
+      '<button class="btn btn-primary btn-sm" onclick="scoreStudyQuestion(\''+escAttr(test.id)+'\','+i+',1)">1</button><span class="study-status '+(qScores[i]?'done':'')+'">'+(qScores[i]?'1':'0')+' балл</span></div>'+
+      '<div class="study-reference" id="study-ref-'+test.id+'-'+i+'">'+esc(q.expected)+'</div></div>').join('')+
+    '<div class="study-actions"><button class="btn btn-primary btn-sm" onclick="saveStudyAnswers(\''+escAttr(test.id)+'\')">Сохранить ответы</button></div></section>'+
+    (showWeekly&&weekly?renderWeeklyTest(weekly):'');
+}
+function renderWeeklyTest(test){
+  const parts=test.parts||{};
+  const theory=(parts.theory?.questions||[]).map(q=>'<li>'+esc(q)+'</li>').join('');
+  const must=(parts.practice?.mustInclude||[]).map(q=>'<li>'+esc(q)+'</li>').join('');
+  return '<section class="study-card"><h3>Пятничный тест: '+esc(test.title)+'</h3>'+
+    '<h4>Практика · '+(parts.practice?.score||0)+' баллов</h4><p class="study-goal">'+esc(parts.practice?.task||'')+'</p><ul class="study-list">'+must+'</ul>'+
+    '<h4>Теория · '+(parts.theory?.score||0)+' баллов</h4><ul class="study-list">'+theory+'</ul>'+
+    '<h4>Debug · '+(parts.debug?.score||0)+' баллов</h4><p class="study-goal">'+esc(parts.debug?.task||'')+'</p>'+
+    '<button class="btn btn-outline btn-sm" onclick="toggleStudyRef(\''+escAttr(test.id)+'-debug\')">Показать ожидаемый ответ</button>'+
+    '<div class="study-reference" id="study-ref-'+test.id+'-debug">'+esc(parts.debug?.expected||'')+'</div>'+
+    '<h4>Senior Challenge · '+(parts.seniorChallenge?.score||0)+' баллов</h4><p class="study-goal">Кейс: '+esc(parts.seniorChallenge?.caseId||'')+'. '+esc(parts.seniorChallenge?.task||'')+'</p></section>';
+}
+function saveStudyAnswers(testId,silent){
+  const test=(STUDY_TESTS?.miniTests||[]).find(t=>t.id===testId);if(!test)return;
+  const store=lsGet('study_answers',{});const cur=store[testId]||{};
+  cur.answers=(test.questions||[]).map((q,i)=>document.getElementById('study-answer-'+testId+'-'+i)?.value||'');
+  cur.completedAt=new Date().toISOString();store[testId]=cur;lsSet('study_answers',store);if(!silent)alert('Ответы сохранены');
+}
+function scoreStudyQuestion(testId,idx,score){
+  saveStudyAnswers(testId,true);
+  const store=lsGet('study_answers',{});if(!store[testId])store[testId]={};
+  const qScores=store[testId].qScores||[];qScores[idx]=score;store[testId].qScores=qScores;store[testId].score=qScores.reduce((s,v)=>s+(v||0),0);store[testId].completedAt=new Date().toISOString();lsSet('study_answers',store);
+  const pos=getStudyPosition();if(store[testId].score>=4)setStudyDayStatus(pos.week,pos.day,'done');else renderStudy();
+}
+function toggleStudyRef(id){const el=document.getElementById('study-ref-'+id);if(el)el.classList.toggle('open');}
+function renderStudyProgress(week){
+  const prog=getStudyProgress();
+  document.getElementById('study-progress').innerHTML='<section class="study-card"><h3>Прогресс недели</h3>'+
+    (week.days||[]).map(d=>{const st=prog['w'+week.week+'d'+d.day]||(d.day===1?'todo':'locked');return '<div class="study-progress-row"><span>День '+d.day+'</span><span class="study-status '+esc(st)+'">'+statusLabel(st)+'</span></div>';}).join('')+'</section>';
+}
+function renderStudyTrainers(week){
+  const trainers=(week.interviewPrepMax?.trainers||[]);
+  const labels={exam:'Экзамен',cmd:'Команды',labs:'Debugging',subnet:'Подсети',ts:'Диагностика',git:'Git',ports:'Порты',tips:'Советы'};
+  document.getElementById('study-trainers').innerHTML='<section class="study-card"><h3>Связанные тренажёры</h3><div class="study-trainer-grid">'+
+    trainers.map(t=>'<button class="btn btn-outline btn-sm" onclick="startStudyTrainer(\''+t+'\','+week.week+')">'+esc(labels[t]||t)+'</button>').join('')+'</div></section>';
+}
+function startStudyTrainer(trainerId,weekNum){
+  const week=getStudyWeek(weekNum);const filters=week?.interviewPrepMax?.questionFilters||{};
+  if(trainerId==='exam'){
+    const topics=filters.topic||[],levels=filters.level||[];
+    currentTopic=topics.length===1?topics[0]:'all';currentLevel=levels.length===1?levels[0]:'all';currentCategory='all';currentMode='all';currentView='standard';
+    nav('exam');
+    return;
+  }
+  nav(trainerId);
+}
+function renderStudySeniorCase(c){
+  const el=document.getElementById('study-senior-case');
+  if(!c){el.innerHTML='<section class="study-card"><h3>Senior Challenge</h3><p style="font-size:13px;color:var(--text2)">Для этого дня отдельный кейс не задан.</p></section>';return;}
+  const prog=lsGet('senior_case_prog',{})[c.id]||{};
+  el.innerHTML='<section class="study-card"><h3>Senior Challenge</h3><div class="study-meta"><span class="tag tag-sr">'+esc(c.level)+'</span><span class="tag tag-tr">'+esc(c.type)+'</span></div>'+
+    '<h4>'+esc(c.title)+'</h4><p class="study-goal">'+esc(c.context)+'</p><h4>Evidence</h4><pre class="study-evidence">'+esc((c.evidence||[]).join('\n'))+'</pre>'+
+    '<h4>Задача</h4><p class="study-goal">'+esc(c.task)+'</p><div class="study-case-actions"><button class="btn btn-outline btn-sm" onclick="toggleStudyRef(\''+escAttr(c.id)+'-actions\')">Показать ожидаемые действия</button>'+
+    '<button class="btn btn-primary btn-sm" onclick="markSeniorCaseDone(\''+escAttr(c.id)+'\')">Отметить кейс готовым</button></div>'+
+    '<div class="study-reference" id="study-ref-'+c.id+'-actions"><b>Ожидаемые действия:</b><ul class="study-list">'+(c.expectedActions||[]).map(a=>'<li>'+esc(a)+'</li>').join('')+'</ul><b>Частые ошибки:</b><ul class="study-list">'+(c.commonMistakes||[]).map(a=>'<li>'+esc(a)+'</li>').join('')+'</ul></div>'+
+    '<div style="font-size:12px;color:var(--text2);margin-top:10px">Статус: '+esc(prog.status||'не пройден')+'</div></section>';
+}
+function markSeniorCaseDone(id){const p=lsGet('senior_case_prog',{});p[id]={status:'done',completedAt:new Date().toISOString()};lsSet('senior_case_prog',p);renderStudy();}
 
 // ═══ HOME ═══
 function updateStreakDisplay(){const sd=document.getElementById('streak-display');if(sd)sd.textContent='🔥 '+streak;}
@@ -825,7 +970,8 @@ function exportProgress(){
     ts_scores:lsGet('ts_scores',{}),cmd_prog:lsGet('cmd_prog',{}),code_prog:lsGet('code_prog',{}),
     subnet_prog:lsGet('subnet_prog',{}),git_prog:lsGet('git_prog',{}),regex_prog:lsGet('regex_prog',{}),
     ans_prog:lsGet('ans_prog',{}),df_prog:lsGet('df_prog',{}),k8s_prog:lsGet('k8s_prog',{}),pt_prog:lsGet('pt_prog',{}),labs_prog:lsGet('labs_prog',{}),
-    daily:lsGet('daily',{})
+    daily:lsGet('daily',{}),study_progress:lsGet('study_progress',{}),study_position:lsGet('study_position',{week:1,day:1}),
+    study_answers:lsGet('study_answers',{}),senior_case_prog:lsGet('senior_case_prog',{})
   };
   const text=JSON.stringify(data,null,2);
   // Файл
@@ -853,6 +999,10 @@ function importProgressData(data){
   if(!data.df_prog) data.df_prog={};
   if(!data.k8s_prog) data.k8s_prog={};
   if(!data.pt_prog) data.pt_prog={};
+  if(!data.study_progress) data.study_progress={};
+  if(!data.study_position) data.study_position={week:1,day:1};
+  if(!data.study_answers) data.study_answers={};
+  if(!data.senior_case_prog) data.senior_case_prog={};
   if(data.mistakes) lsSet('mistakes',data.mistakes);
   if(data.stats) lsSet('stats',data.stats);
   if(data.history) lsSet('history',data.history);
@@ -871,6 +1021,10 @@ function importProgressData(data){
   if(data.pt_prog) lsSet('pt_prog',data.pt_prog);
   if(data.labs_prog) lsSet('labs_prog',data.labs_prog);
   if(data.daily) lsSet('daily',data.daily);
+  if(data.study_progress) lsSet('study_progress',data.study_progress);
+  if(data.study_position) lsSet('study_position',data.study_position);
+  if(data.study_answers) lsSet('study_answers',data.study_answers);
+  if(data.senior_case_prog) lsSet('senior_case_prog',data.senior_case_prog);
   streak=lsGet('streak_best',0);
   alert('✅ Прогресс импортирован v'+(data.version||'?')+'!');
   nav('home');
@@ -940,7 +1094,7 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 async function checkOfflineReady(){
   const files=['./','./index.html','./styles.css','./app.js','./interview-prep-max.webmanifest'];
-  const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','labs','tips'];
+  const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','labs','tips','study_map','study_tests','senior_cases'];
   tasks.forEach(t=>files.push('./tasks/'+t+'.json'));
   let ok=0,fail=0;const results=[];
   for(const f of files){
@@ -955,7 +1109,7 @@ async function checkOfflineReady(){
 
 // ═══ PWA ═══
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW v10:', reg.scope)).catch(err => console.log('SW error:', err));
+  navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW v11:', reg.scope)).catch(err => console.log('SW error:', err));
 }
 
 // Запуск

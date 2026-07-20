@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Interview Prep Max — DevOps v9</title>
-<meta name="description" content="Тренажёр для подготовки к DevOps-собеседованиям: 655+ вопросов">
+<title>Interview Prep Max — DevOps v11</title>
+<meta name="description" content="DevOps-тренажёр и учебная панель Middle+/Senior: вопросы, практические кейсы, SRS и вкладка Учёба">
 <meta name="theme-color" content="#0f1117">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,6 +23,7 @@
   </div>
   <div class="sb-nav">
     <div class="sb-item active" onclick="nav('home')" data-page="home"><span class="icon">🏠</span>Главная</div>
+    <div class="sb-item" onclick="nav('study')" data-page="study"><span class="icon">🎓</span>Учёба</div>
     <div class="sb-item" onclick="nav('exam')" data-page="exam"><span class="icon">📋</span>Экзамен</div>
     <div class="sb-item" onclick="nav('analytics')" data-page="analytics"><span class="icon">📊</span>Аналитика</div>
     <div class="sb-divider"></div>
@@ -89,6 +90,23 @@
     <div class="sep"></div>
     <h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text2)">Последние ответы</h3>
     <div id="home-history"></div>
+  </div>
+
+  <!-- STUDY -->
+  <div class="page" id="page-study">
+    <div class="study-layout">
+      <main class="study-main">
+        <div id="study-current"></div>
+        <div id="study-days"></div>
+        <div id="study-today"></div>
+        <div id="study-test"></div>
+      </main>
+      <aside class="study-side">
+        <div id="study-progress"></div>
+        <div id="study-trainers"></div>
+        <div id="study-senior-case"></div>
+      </aside>
+    </div>
   </div>
 
   <!-- EXAM -->
@@ -239,6 +257,6 @@
   </div>
 </div>
 
-<script src="./app.js?v=10"></script>
+<script src="./app.js?v=11"></script>
 </body>
 </html>

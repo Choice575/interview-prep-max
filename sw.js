@@ -1,11 +1,12 @@
-// Service Worker v10 — Interview Prep Max
-const CACHE_NAME = 'ipmax-v10';
+// Service Worker v11 — Interview Prep Max
+const CACHE_NAME = 'ipmax-v11';
 const ASSETS = [
   './', './index.html', './styles.css', './app.js', './interview-prep-max.webmanifest',
   './tasks/base_questions.json', './tasks/ts.json', './tasks/subnet.json',
   './tasks/cmd.json', './tasks/code.json', './tasks/git.json', './tasks/regex.json',
   './tasks/ansible_pb.json', './tasks/dockerfile.json', './tasks/k8s.json', './tasks/ports.json',
-  './tasks/labs.json', './tasks/tips.json'
+  './tasks/labs.json', './tasks/tips.json', './tasks/study_map.json', './tasks/study_tests.json',
+  './tasks/senior_cases.json'
 ];
 
 self.addEventListener('install', event => {

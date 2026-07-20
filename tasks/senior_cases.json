@@ -1,0 +1,502 @@
+{
+  "version": "4.0.0",
+  "title": "Senior Cases: DevOps Plan v4 Weeks 1-4",
+  "language": "ru",
+  "purpose": "Первый пакет production-кейсов для вкладки «Учёба» и режима Senior Simulator в Interview Prep Max.",
+  "caseSchema": {
+    "id": "string",
+    "week": "number",
+    "day": "number|null",
+    "level": "Middle+|Senior-track",
+    "topic": "string",
+    "type": "incident|diagnostic|tradeoff|rollback|postmortem",
+    "title": "string",
+    "context": "string",
+    "evidence": "string[]",
+    "task": "string",
+    "expectedActions": "string[]",
+    "commonMistakes": "string[]",
+    "scoring": "object",
+    "interviewPrepMax": "object"
+  },
+  "cases": [
+    {
+      "id": "linux-perm-001",
+      "week": 1,
+      "day": 4,
+      "level": "Middle+",
+      "topic": "Linux",
+      "type": "incident",
+      "title": "Сервис не читает конфиг после изменения прав",
+      "context": "После ручной правки конфига сервис перестал стартовать. Дежурный инженер видит ошибку Permission denied.",
+      "evidence": [
+        "$ systemctl status myapp",
+        "myapp.service: Failed with result 'exit-code'",
+        "Error: cannot read /etc/myapp/app.conf: Permission denied",
+        "$ ls -ld /etc/myapp",
+        "drwx------ 2 root root 4096 Jul 20 10:10 /etc/myapp",
+        "$ ls -l /etc/myapp/app.conf",
+        "-rw-r----- 1 root myapp 1240 Jul 20 10:05 /etc/myapp/app.conf",
+        "$ id myapp",
+        "uid=998(myapp) gid=998(myapp) groups=998(myapp)"
+      ],
+      "task": "Определи причину отказа и предложи минимальное безопасное исправление без chmod 777.",
+      "expectedActions": [
+        "Проверить права не только файла, но и всех директорий в пути.",
+        "Увидеть, что файл доступен группе myapp, но директория /etc/myapp доступна только root.",
+        "Исправить права директории минимально: дать execute/read нужной группе или сменить группу директории на myapp.",
+        "Пример безопасного исправления: chgrp myapp /etc/myapp && chmod 750 /etc/myapp.",
+        "Перезапустить сервис только после проверки прав и прочитать journalctl при повторной ошибке."
+      ],
+      "commonMistakes": [
+        "Сразу выполнить chmod 777 /etc/myapp/app.conf.",
+        "Проверить только файл и забыть про execute-бит директории.",
+        "Сменить владельца на root/root и сломать доступ сервисному пользователю.",
+        "Перезапускать сервис без устранения причины."
+      ],
+      "scoring": {
+        "rootCause": 40,
+        "minimalFix": 30,
+        "securityReasoning": 20,
+        "verification": 10
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": ["labs", "cmd", "exam"],
+        "tags": ["permissions", "systemd", "least-privilege"],
+        "relatedQuestionFilter": {
+          "topic": ["Linux", "Security"],
+          "category": ["scenario", "output"]
+        }
+      }
+    },
+    {
+      "id": "linux-perm-002",
+      "week": 1,
+      "day": 3,
+      "level": "Middle+",
+      "topic": "Linux",
+      "type": "diagnostic",
+      "title": "Файл читаемый, но доступ всё равно запрещён",
+      "context": "Пользователь утверждает, что файл имеет права 644, но приложение всё равно получает Permission denied.",
+      "evidence": [
+        "$ ls -l /opt/app/config/settings.yml",
+        "-rw-r--r-- 1 root root 840 Jul 20 09:30 /opt/app/config/settings.yml",
+        "$ ls -ld /opt /opt/app /opt/app/config",
+        "drwxr-xr-x 5 root root 4096 Jul 20 09:00 /opt",
+        "drwx------ 4 root root 4096 Jul 20 09:00 /opt/app",
+        "drwxr-xr-x 2 root root 4096 Jul 20 09:30 /opt/app/config",
+        "Application user: appuser"
+      ],
+      "task": "Объясни, почему файл с 644 может быть недоступен, и какое минимальное исправление нужно сделать.",
+      "expectedActions": [
+        "Понять, что для прохода через директорию нужен execute-бит на каждой директории пути.",
+        "Найти проблемную директорию /opt/app с правами 700 root/root.",
+        "Предложить минимальное исправление с группой приложения: chgrp appuser /opt/app && chmod 750 /opt/app или отдельная группа app.",
+        "Проверить доступ от имени пользователя приложения."
+      ],
+      "commonMistakes": [
+        "Смотреть только права settings.yml.",
+        "Сделать chmod -R 777 /opt/app.",
+        "Не проверить фактического пользователя, от которого работает приложение."
+      ],
+      "scoring": {
+        "pathPermissionUnderstanding": 50,
+        "minimalFix": 30,
+        "verification": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Middle+",
+        "trainers": ["labs", "exam"],
+        "tags": ["directory-execute-bit", "permissions"],
+        "relatedQuestionFilter": {
+          "topic": ["Linux"],
+          "category": ["scenario", "output"]
+        }
+      }
+    },
+    {
+      "id": "linux-security-003",
+      "week": 1,
+      "day": 5,
+      "level": "Senior-track",
+      "topic": "Security",
+      "type": "tradeoff",
+      "title": "Быстро починили через chmod 777",
+      "context": "Во время инцидента инженер сделал chmod -R 777 /var/www/app, сервис заработал. Нужно оценить решение и предложить правильное исправление.",
+      "evidence": [
+        "$ ls -ld /var/www/app",
+        "drwxrwxrwx 8 deploy deploy 4096 Jul 20 11:00 /var/www/app",
+        "$ find /var/www/app -type f -perm -002 | head",
+        "/var/www/app/.env",
+        "/var/www/app/config.yml",
+        "/var/www/app/releases/current/app.py"
+      ],
+      "task": "Объясни риски chmod 777, предложи план безопасного восстановления прав и проверку после исправления.",
+      "expectedActions": [
+        "Зафиксировать, что chmod 777 открыл запись всем пользователям, включая секреты и код.",
+        "Определить нужных владельцев: deploy для релиза, сервисный пользователь/группа для чтения конфигов.",
+        "Вернуть директориям минимальные права, например 750/755 по назначению.",
+        "Вернуть файлам минимальные права, например 640/644, секретам 600/640.",
+        "Проверить запуск сервиса и отсутствие world-writable файлов.",
+        "Добавить пункт в runbook: chmod 777 запрещён как аварийное исправление без последующего rollback прав."
+      ],
+      "commonMistakes": [
+        "Оставить 777, потому что сервис работает.",
+        "Сделать chmod -R 644 и сломать execute-бит директорий.",
+        "Не проверить .env и другие секреты.",
+        "Не оформить предотвращение повторения."
+      ],
+      "scoring": {
+        "riskExplanation": 30,
+        "recoveryPlan": 35,
+        "verification": 20,
+        "prevention": 15
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": ["labs", "exam"],
+        "tags": ["chmod-777", "security", "postmortem"],
+        "relatedQuestionFilter": {
+          "topic": ["Linux", "Security"],
+          "category": ["tradeoff", "scenario"]
+        }
+      }
+    },
+    {
+      "id": "net-dns-004",
+      "week": 2,
+      "day": 2,
+      "level": "Middle+",
+      "topic": "Сети",
+      "type": "diagnostic",
+      "title": "Приложение не может подключиться к БД: ENOTFOUND",
+      "context": "После деплоя приложение не может подключиться к базе данных db.internal.",
+      "evidence": [
+        "Application log:",
+        "ERROR Failed to connect to database: getaddrinfo ENOTFOUND db.internal",
+        "$ curl -s http://localhost:8080/health",
+        "{\"status\":\"degraded\",\"db\":\"unreachable\"}",
+        "$ getent hosts db.internal",
+        "<empty output>",
+        "$ cat /etc/resolv.conf",
+        "nameserver 10.0.0.53"
+      ],
+      "task": "Определи слой проблемы и составь порядок диагностики DNS без преждевременного перезапуска приложения.",
+      "expectedActions": [
+        "Определить, что ENOTFOUND указывает на DNS-резолвинг, а не на пароль БД или TCP-порт.",
+        "Проверить getent hosts/dig/nslookup для db.internal.",
+        "Проверить /etc/resolv.conf и доступность DNS-сервера.",
+        "Сравнить резолвинг с другой машины/контейнера/пода в той же сети.",
+        "После восстановления DNS проверить TCP-доступ к порту БД."
+      ],
+      "commonMistakes": [
+        "Менять пароль БД при ENOTFOUND.",
+        "Перезапускать приложение без проверки DNS.",
+        "Проверить DNS только на локальной машине, хотя проблема может быть в контейнере или pod.",
+        "Сразу менять firewall."
+      ],
+      "scoring": {
+        "layerIdentification": 35,
+        "diagnosticOrder": 35,
+        "verification": 20,
+        "avoidWrongFix": 10
+      },
+      "interviewPrepMax": {
+        "mode": "Middle+",
+        "trainers": ["ts", "labs", "exam"],
+        "tags": ["dns", "enotfound", "database-connectivity"],
+        "relatedQuestionFilter": {
+          "topic": ["Сети"],
+          "category": ["scenario", "output"]
+        }
+      }
+    },
+    {
+      "id": "net-http-005",
+      "week": 2,
+      "day": 3,
+      "level": "Middle+",
+      "topic": "Сети",
+      "type": "incident",
+      "title": "Nginx возвращает 502 после релиза",
+      "context": "Пользователи видят 502 Bad Gateway. Nginx работает, релиз только что завершился.",
+      "evidence": [
+        "$ curl -I https://api.example.ru/users",
+        "HTTP/2 502",
+        "$ tail -n 3 /var/log/nginx/error.log",
+        "connect() failed (111: Connection refused) while connecting to upstream, upstream: \"http://127.0.0.1:3000/users\"",
+        "$ ss -tuln | grep 3000",
+        "<empty output>",
+        "$ systemctl is-active myapp",
+        "failed"
+      ],
+      "task": "Определи root cause на уровне доступных данных и предложи порядок восстановления.",
+      "expectedActions": [
+        "Понять, что 502 от Nginx связан с upstream, а не обязательно с самим Nginx.",
+        "По connection refused и пустому ss определить, что backend не слушает порт 3000.",
+        "Проверить systemctl status и journalctl -u myapp -n 50.",
+        "Если релиз критичный, принять решение: быстрый rollback или исправление причины запуска.",
+        "После восстановления проверить curl к upstream и внешний endpoint."
+      ],
+      "commonMistakes": [
+        "Перезапустить nginx первым действием.",
+        "Увеличить nginx timeout при connection refused.",
+        "Не проверить порт backend.",
+        "Считать 502 проблемой DNS."
+      ],
+      "scoring": {
+        "rootCause": 35,
+        "diagnosticOrder": 30,
+        "rollbackThinking": 20,
+        "verification": 15
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": ["ts", "labs"],
+        "tags": ["nginx", "502", "upstream", "systemd"],
+        "relatedQuestionFilter": {
+          "topic": ["Сети", "Linux"],
+          "category": ["scenario", "output"]
+        }
+      }
+    },
+    {
+      "id": "net-cidr-006",
+      "week": 2,
+      "day": 4,
+      "level": "Middle+",
+      "topic": "Сети",
+      "type": "tradeoff",
+      "title": "Подсеть /26 выбрана для 70 хостов",
+      "context": "Команда планирует разместить 70 устройств в подсети /26. Нужно проверить, хватит ли адресов, и объяснить расчет.",
+      "evidence": [
+        "Planned subnet: 192.168.10.0/26",
+        "Required hosts: 70",
+        "Assumption: обычная IPv4-подсеть с network и broadcast адресами"
+      ],
+      "task": "Посчитай usable hosts для /26 и предложи подходящую маску с запасом.",
+      "expectedActions": [
+        "Использовать формулу: 32 - маска = биты под хосты.",
+        "Для /26 получить 6 бит под хосты.",
+        "Посчитать 2^6 - 2 = 62 usable hosts.",
+        "Сделать вывод, что 70 хостов не помещаются.",
+        "Предложить /25: 2^7 - 2 = 126 usable hosts, если нужен запас."
+      ],
+      "commonMistakes": [
+        "Считать 26 - 12 вместо 32 - 26.",
+        "Забыть вычесть network и broadcast.",
+        "Путать общее число адресов и usable hosts.",
+        "Выбрать /27, сделав подсеть еще меньше."
+      ],
+      "scoring": {
+        "formula": 30,
+        "calculation": 30,
+        "capacityDecision": 25,
+        "explanation": 15
+      },
+      "interviewPrepMax": {
+        "mode": "Middle+",
+        "trainers": ["subnet", "exam"],
+        "tags": ["cidr", "capacity-planning"],
+        "relatedQuestionFilter": {
+          "topic": ["Сети"],
+          "category": ["scenario"]
+        }
+      }
+    },
+    {
+      "id": "systemd-007",
+      "week": 3,
+      "day": 3,
+      "level": "Middle+",
+      "topic": "Linux",
+      "type": "incident",
+      "title": "Systemd restart loop после изменения env-файла",
+      "context": "Сервис myapp постоянно перезапускается. Перед аварией меняли environment-файл.",
+      "evidence": [
+        "$ systemctl status myapp",
+        "Active: activating (auto-restart) (Result: exit-code)",
+        "Main PID: 1842 (code=exited, status=1/FAILURE)",
+        "$ journalctl -u myapp -n 5",
+        "myapp[1842]: Error: required env DATABASE_URL is empty",
+        "systemd[1]: myapp.service: Scheduled restart job, restart counter is at 12.",
+        "$ grep EnvironmentFile /etc/systemd/system/myapp.service",
+        "EnvironmentFile=/etc/myapp/myapp.env"
+      ],
+      "task": "Определи причину restart loop и предложи безопасный порядок восстановления.",
+      "expectedActions": [
+        "Не перезапускать вслепую, а прочитать journalctl.",
+        "Определить, что сервис падает из-за пустого DATABASE_URL.",
+        "Проверить /etc/myapp/myapp.env и права доступа к нему.",
+        "Восстановить корректное значение переменной из безопасного источника, не публикуя секреты в чат/логи.",
+        "Выполнить systemctl daemon-reload только если менялся unit-файл, затем restart myapp.",
+        "Проверить active status и последние логи."
+      ],
+      "commonMistakes": [
+        "Бесконечно выполнять systemctl restart.",
+        "Печатать секрет DATABASE_URL в общий чат.",
+        "Делать daemon-reload после изменения env-файла как обязательный шаг, не понимая зачем.",
+        "Игнорировать restart counter."
+      ],
+      "scoring": {
+        "logReading": 35,
+        "rootCause": 30,
+        "safeRecovery": 25,
+        "verification": 10
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": ["labs", "ts", "cmd"],
+        "tags": ["systemd", "journalctl", "env", "restart-loop"],
+        "relatedQuestionFilter": {
+          "topic": ["Linux", "Security"],
+          "category": ["scenario", "output"]
+        }
+      }
+    },
+    {
+      "id": "process-008",
+      "week": 3,
+      "day": 2,
+      "level": "Middle+",
+      "topic": "Linux",
+      "type": "diagnostic",
+      "title": "Ctrl+Z остановил процесс, но порт остался занят",
+      "context": "Инженер запускал локальный dev-сервер, нажал Ctrl+Z и думает, что завершил его. Следующий запуск ведет себя странно.",
+      "evidence": [
+        "$ npm run dev",
+        "Local: http://localhost:5173/",
+        "^Z",
+        "[1]+  Stopped                 npm run dev",
+        "$ jobs -l",
+        "[1]+ 24510 Stopped           npm run dev",
+        "$ ps -p 24510 -o pid,stat,cmd",
+        "24510 T npm run dev"
+      ],
+      "task": "Объясни, что произошло после Ctrl+Z, и как корректно продолжить или завершить процесс.",
+      "expectedActions": [
+        "Объяснить, что Ctrl+Z отправил SIGTSTP и поставил foreground-процесс на паузу.",
+        "Показать, что job не завершен: jobs -l и состояние T в ps.",
+        "Для продолжения использовать fg %1 или bg %1.",
+        "Для корректного завершения вернуть fg %1 и нажать Ctrl+C или отправить SIGTERM по PID.",
+        "Не путать job id %1 и PID 24510."
+      ],
+      "commonMistakes": [
+        "Считать Ctrl+Z завершением процесса.",
+        "Пытаться запустить второй экземпляр, не разобравшись с первым.",
+        "Путать %1 и PID.",
+        "Сразу использовать kill -9."
+      ],
+      "scoring": {
+        "signalUnderstanding": 40,
+        "jobControl": 30,
+        "safeTermination": 20,
+        "terminology": 10
+      },
+      "interviewPrepMax": {
+        "mode": "Middle+",
+        "trainers": ["cmd", "exam"],
+        "tags": ["signals", "jobs", "ctrl-z", "sigtstp"],
+        "relatedQuestionFilter": {
+          "topic": ["Linux"],
+          "category": ["output", "scenario"]
+        }
+      }
+    },
+    {
+      "id": "ssh-009",
+      "week": 3,
+      "day": 4,
+      "level": "Middle+",
+      "topic": "Security",
+      "type": "diagnostic",
+      "title": "SSH отказывается использовать приватный ключ",
+      "context": "Подключение по SSH падает, хотя ключ существует и путь указан правильно.",
+      "evidence": [
+        "$ ssh -i ~/.ssh/prod_key deploy@server.example.ru",
+        "Bad permissions. Try chmod 600 ~/.ssh/prod_key",
+        "Permission denied (publickey).",
+        "$ ls -l ~/.ssh/prod_key",
+        "-rw-r--r-- 1 mikhail mikhail 3381 Jul 20 12:00 /home/mikhail/.ssh/prod_key"
+      ],
+      "task": "Объясни причину отказа SSH и безопасное исправление.",
+      "expectedActions": [
+        "Понять, что приватный ключ слишком открыт для чтения другими пользователями.",
+        "Исправить права: chmod 600 ~/.ssh/prod_key.",
+        "Проверить владельца ключа: ключ должен принадлежать текущему пользователю.",
+        "Повторить ssh с -v при необходимости для диагностики publickey.",
+        "Не отправлять приватный ключ в чат или репозиторий."
+      ],
+      "commonMistakes": [
+        "Менять права на публичный ключ вместо приватного.",
+        "Публиковать приватный ключ для проверки.",
+        "Делать chmod 777 на ~/.ssh.",
+        "Не отличать Permission denied publickey от сетевого timeout."
+      ],
+      "scoring": {
+        "rootCause": 35,
+        "secureFix": 30,
+        "keyConcepts": 20,
+        "verification": 15
+      },
+      "interviewPrepMax": {
+        "mode": "Middle+",
+        "trainers": ["labs", "cmd", "exam"],
+        "tags": ["ssh", "private-key", "permissions", "security"],
+        "relatedQuestionFilter": {
+          "topic": ["Linux", "Security"],
+          "category": ["scenario", "output"]
+        }
+      }
+    },
+    {
+      "id": "git-010",
+      "week": 4,
+      "day": 4,
+      "level": "Senior-track",
+      "topic": "Git",
+      "type": "rollback",
+      "title": "Плохой коммит попал в main",
+      "context": "В main попал коммит, который ломает production. Ветка публичная, от неё уже оттянулись другие разработчики.",
+      "evidence": [
+        "$ git log --oneline -5",
+        "a8f31c2 broken payment retry logic",
+        "77ab210 add payment retry tests",
+        "31df120 release 2026-07-20",
+        "9ac21e0 update nginx config",
+        "Production symptom: платежи повторяются дважды",
+        "Branch policy: main protected, force push запрещён"
+      ],
+      "task": "Выбери безопасный способ отката и объясни, почему reset/force push не подходит.",
+      "expectedActions": [
+        "Понять, что main публичная и защищенная, переписывать историю нельзя.",
+        "Выбрать git revert a8f31c2 для создания нового коммита, отменяющего изменения.",
+        "Если релиз уже выкачен, связать revert с hotfix/rollback pipeline.",
+        "Проверить тесты и diff revert-коммита перед деплоем.",
+        "После стабилизации оформить причину и добавить защиту: тест, review checklist или feature flag."
+      ],
+      "commonMistakes": [
+        "Сделать git reset --hard HEAD~1 в main.",
+        "Предложить force push в protected branch.",
+        "Откатить без тестов и проверки diff.",
+        "Не связать Git-откат с production-деплоем."
+      ],
+      "scoring": {
+        "rollbackChoice": 40,
+        "historySafety": 25,
+        "deploymentAwareness": 20,
+        "prevention": 15
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": ["git", "labs", "exam"],
+        "tags": ["git-revert", "protected-branch", "rollback", "incident"],
+        "relatedQuestionFilter": {
+          "topic": ["Git", "CI/CD"],
+          "category": ["tradeoff", "scenario"]
+        }
+      }
+    }
+  ]
+}
