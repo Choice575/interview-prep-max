@@ -1,6 +1,6 @@
 {
   "version": "4.0.0",
-  "title": "Study Tests: DevOps Plan v4 Weeks 1-4",
+  "title": "Study Tests: DevOps Plan v4 Weeks 1-8",
   "language": "ru",
   "purpose": "Мини-тесты по дням и пятничные тесты для вкладки «Учёба» в Interview Prep Max.",
   "grading": {
@@ -55,7 +55,10 @@
           "score": 1
         }
       ],
-      "commonMistakes": ["Путать `/` и `~`", "Считать скрытые файлы специальными системными файлами, которые нельзя читать"]
+      "commonMistakes": [
+        "Путать `/` и `~`",
+        "Считать скрытые файлы специальными системными файлами, которые нельзя читать"
+      ]
     },
     {
       "id": "mini-w1d2-linux-files",
@@ -89,7 +92,10 @@
           "score": 1
         }
       ],
-      "commonMistakes": ["Думать, что touch перезаписывает файл", "Удалять без проверки текущей директории"]
+      "commonMistakes": [
+        "Думать, что touch перезаписывает файл",
+        "Удалять без проверки текущей директории"
+      ]
     },
     {
       "id": "mini-w1d3-linux-permissions",
@@ -123,8 +129,16 @@
           "score": 1
         }
       ],
-      "commonMistakes": ["Путать 5 и 6", "Не понимать execute-бит директории", "Использовать 777 как универсальный фикс"],
-      "relatedSeniorCases": ["linux-perm-001", "linux-perm-002", "linux-security-003"]
+      "commonMistakes": [
+        "Путать 5 и 6",
+        "Не понимать execute-бит директории",
+        "Использовать 777 как универсальный фикс"
+      ],
+      "relatedSeniorCases": [
+        "linux-perm-001",
+        "linux-perm-002",
+        "linux-security-003"
+      ]
     },
     {
       "id": "mini-w1d4-linux-owner-group",
@@ -158,8 +172,15 @@
           "score": 1
         }
       ],
-      "commonMistakes": ["Проверять только файл", "Не знать пользователя процесса", "Смешивать chown и chmod"],
-      "relatedSeniorCases": ["linux-perm-001", "linux-perm-002"]
+      "commonMistakes": [
+        "Проверять только файл",
+        "Не знать пользователя процесса",
+        "Смешивать chown и chmod"
+      ],
+      "relatedSeniorCases": [
+        "linux-perm-001",
+        "linux-perm-002"
+      ]
     },
     {
       "id": "mini-w1d5-linux-review",
@@ -193,7 +214,10 @@
           "score": 1
         }
       ],
-      "relatedSeniorCases": ["linux-perm-001", "linux-security-003"]
+      "relatedSeniorCases": [
+        "linux-perm-001",
+        "linux-security-003"
+      ]
     },
     {
       "id": "mini-w2d1-network-basics",
@@ -260,7 +284,9 @@
           "score": 1
         }
       ],
-      "relatedSeniorCases": ["net-dns-004"]
+      "relatedSeniorCases": [
+        "net-dns-004"
+      ]
     },
     {
       "id": "mini-w2d3-http-curl",
@@ -294,7 +320,9 @@
           "score": 1
         }
       ],
-      "relatedSeniorCases": ["net-http-005"]
+      "relatedSeniorCases": [
+        "net-http-005"
+      ]
     },
     {
       "id": "mini-w2d4-cidr",
@@ -328,7 +356,9 @@
           "score": 1
         }
       ],
-      "relatedSeniorCases": ["net-cidr-006"]
+      "relatedSeniorCases": [
+        "net-cidr-006"
+      ]
     },
     {
       "id": "mini-w2d5-network-review",
@@ -362,7 +392,11 @@
           "score": 1
         }
       ],
-      "relatedSeniorCases": ["net-dns-004", "net-http-005", "net-cidr-006"]
+      "relatedSeniorCases": [
+        "net-dns-004",
+        "net-http-005",
+        "net-cidr-006"
+      ]
     },
     {
       "id": "mini-w3d1-processes",
@@ -429,7 +463,9 @@
           "score": 1
         }
       ],
-      "relatedSeniorCases": ["process-008"]
+      "relatedSeniorCases": [
+        "process-008"
+      ]
     },
     {
       "id": "mini-w3d3-systemd",
@@ -463,7 +499,9 @@
           "score": 1
         }
       ],
-      "relatedSeniorCases": ["systemd-007"]
+      "relatedSeniorCases": [
+        "systemd-007"
+      ]
     },
     {
       "id": "mini-w3d4-ssh",
@@ -497,7 +535,9 @@
           "score": 1
         }
       ],
-      "relatedSeniorCases": ["ssh-009"]
+      "relatedSeniorCases": [
+        "ssh-009"
+      ]
     },
     {
       "id": "mini-w3d5-process-systemd-review",
@@ -531,7 +571,11 @@
           "score": 1
         }
       ],
-      "relatedSeniorCases": ["systemd-007", "process-008", "ssh-009"]
+      "relatedSeniorCases": [
+        "systemd-007",
+        "process-008",
+        "ssh-009"
+      ]
     },
     {
       "id": "mini-w4d1-git-basics",
@@ -664,7 +708,9 @@
           "score": 1
         }
       ],
-      "relatedSeniorCases": ["git-010"]
+      "relatedSeniorCases": [
+        "git-010"
+      ]
     },
     {
       "id": "mini-w4d5-git-review",
@@ -698,7 +744,829 @@
           "score": 1
         }
       ],
-      "relatedSeniorCases": ["git-010"]
+      "relatedSeniorCases": [
+        "git-010"
+      ]
+    },
+    {
+      "id": "mini-w5d1-bash-health-011",
+      "week": 5,
+      "day": 1,
+      "title": "Неделя 5 День 1: Bash-скрипты для DevOps",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 5: Bash-скрипты для DevOps?",
+          "expected": "Рабочий артефакт: health-check script с кодами возврата для мониторинга. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "bash-health-011"
+      ]
+    },
+    {
+      "id": "mini-w5d2-bash-health-011",
+      "week": 5,
+      "day": 2,
+      "title": "Неделя 5 День 2: Bash-скрипты для DevOps",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 5: Bash-скрипты для DevOps?",
+          "expected": "Рабочий артефакт: health-check script с кодами возврата для мониторинга. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "bash-health-011"
+      ]
+    },
+    {
+      "id": "mini-w5d3-bash-health-011",
+      "week": 5,
+      "day": 3,
+      "title": "Неделя 5 День 3: Bash-скрипты для DevOps",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 5: Bash-скрипты для DevOps?",
+          "expected": "Рабочий артефакт: health-check script с кодами возврата для мониторинга. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "bash-health-011"
+      ]
+    },
+    {
+      "id": "mini-w5d4-bash-health-011",
+      "week": 5,
+      "day": 4,
+      "title": "Неделя 5 День 4: Bash-скрипты для DevOps",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 5: Bash-скрипты для DevOps?",
+          "expected": "Рабочий артефакт: health-check script с кодами возврата для мониторинга. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "bash-health-011"
+      ]
+    },
+    {
+      "id": "mini-w5d5-bash-health-011",
+      "week": 5,
+      "day": 5,
+      "title": "Неделя 5 День 5: Bash-скрипты для DevOps",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 5: Bash-скрипты для DevOps?",
+          "expected": "Рабочий артефакт: health-check script с кодами возврата для мониторинга. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "bash-health-011"
+      ]
+    },
+    {
+      "id": "mini-w6d1-docker-crash-012",
+      "week": 6,
+      "day": 1,
+      "title": "Неделя 6 День 1: Docker basics в production-ключе",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 6: Docker basics в production-ключе?",
+          "expected": "Рабочий артефакт: контейнер приложения с logs/exec/inspect и restart policy. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "docker-crash-012"
+      ]
+    },
+    {
+      "id": "mini-w6d2-docker-crash-012",
+      "week": 6,
+      "day": 2,
+      "title": "Неделя 6 День 2: Docker basics в production-ключе",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 6: Docker basics в production-ключе?",
+          "expected": "Рабочий артефакт: контейнер приложения с logs/exec/inspect и restart policy. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "docker-crash-012"
+      ]
+    },
+    {
+      "id": "mini-w6d3-docker-crash-012",
+      "week": 6,
+      "day": 3,
+      "title": "Неделя 6 День 3: Docker basics в production-ключе",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 6: Docker basics в production-ключе?",
+          "expected": "Рабочий артефакт: контейнер приложения с logs/exec/inspect и restart policy. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "docker-crash-012"
+      ]
+    },
+    {
+      "id": "mini-w6d4-docker-crash-012",
+      "week": 6,
+      "day": 4,
+      "title": "Неделя 6 День 4: Docker basics в production-ключе",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 6: Docker basics в production-ключе?",
+          "expected": "Рабочий артефакт: контейнер приложения с logs/exec/inspect и restart policy. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "docker-crash-012"
+      ]
+    },
+    {
+      "id": "mini-w6d5-docker-crash-012",
+      "week": 6,
+      "day": 5,
+      "title": "Неделя 6 День 5: Docker basics в production-ключе",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 6: Docker basics в production-ключе?",
+          "expected": "Рабочий артефакт: контейнер приложения с logs/exec/inspect и restart policy. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "docker-crash-012"
+      ]
+    },
+    {
+      "id": "mini-w7d1-dockerfile-root-013",
+      "week": 7,
+      "day": 1,
+      "title": "Неделя 7 День 1: Dockerfile и сборка образов",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 7: Dockerfile и сборка образов?",
+          "expected": "Рабочий артефакт: multi-stage Dockerfile с non-root пользователем и .dockerignore. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "dockerfile-root-013"
+      ]
+    },
+    {
+      "id": "mini-w7d2-dockerfile-root-013",
+      "week": 7,
+      "day": 2,
+      "title": "Неделя 7 День 2: Dockerfile и сборка образов",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 7: Dockerfile и сборка образов?",
+          "expected": "Рабочий артефакт: multi-stage Dockerfile с non-root пользователем и .dockerignore. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "dockerfile-root-013"
+      ]
+    },
+    {
+      "id": "mini-w7d3-dockerfile-root-013",
+      "week": 7,
+      "day": 3,
+      "title": "Неделя 7 День 3: Dockerfile и сборка образов",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 7: Dockerfile и сборка образов?",
+          "expected": "Рабочий артефакт: multi-stage Dockerfile с non-root пользователем и .dockerignore. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "dockerfile-root-013"
+      ]
+    },
+    {
+      "id": "mini-w7d4-dockerfile-root-013",
+      "week": 7,
+      "day": 4,
+      "title": "Неделя 7 День 4: Dockerfile и сборка образов",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 7: Dockerfile и сборка образов?",
+          "expected": "Рабочий артефакт: multi-stage Dockerfile с non-root пользователем и .dockerignore. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "dockerfile-root-013"
+      ]
+    },
+    {
+      "id": "mini-w7d5-dockerfile-root-013",
+      "week": 7,
+      "day": 5,
+      "title": "Неделя 7 День 5: Dockerfile и сборка образов",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 7: Dockerfile и сборка образов?",
+          "expected": "Рабочий артефакт: multi-stage Dockerfile с non-root пользователем и .dockerignore. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "dockerfile-root-013"
+      ]
+    },
+    {
+      "id": "mini-w8d1-compose-502-014",
+      "week": 8,
+      "day": 1,
+      "title": "Неделя 8 День 1: Docker Compose, reverse proxy, TLS basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 8: Docker Compose, reverse proxy, TLS basics?",
+          "expected": "Рабочий артефакт: compose-стенд app + db + nginx с healthcheck и диагностикой 502. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "compose-502-014"
+      ]
+    },
+    {
+      "id": "mini-w8d2-compose-502-014",
+      "week": 8,
+      "day": 2,
+      "title": "Неделя 8 День 2: Docker Compose, reverse proxy, TLS basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 8: Docker Compose, reverse proxy, TLS basics?",
+          "expected": "Рабочий артефакт: compose-стенд app + db + nginx с healthcheck и диагностикой 502. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "compose-502-014"
+      ]
+    },
+    {
+      "id": "mini-w8d3-compose-502-014",
+      "week": 8,
+      "day": 3,
+      "title": "Неделя 8 День 3: Docker Compose, reverse proxy, TLS basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 8: Docker Compose, reverse proxy, TLS basics?",
+          "expected": "Рабочий артефакт: compose-стенд app + db + nginx с healthcheck и диагностикой 502. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "compose-502-014"
+      ]
+    },
+    {
+      "id": "mini-w8d4-compose-502-014",
+      "week": 8,
+      "day": 4,
+      "title": "Неделя 8 День 4: Docker Compose, reverse proxy, TLS basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 8: Docker Compose, reverse proxy, TLS basics?",
+          "expected": "Рабочий артефакт: compose-стенд app + db + nginx с healthcheck и диагностикой 502. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "compose-502-014"
+      ]
+    },
+    {
+      "id": "mini-w8d5-compose-502-014",
+      "week": 8,
+      "day": 5,
+      "title": "Неделя 8 День 5: Docker Compose, reverse proxy, TLS basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 8: Docker Compose, reverse proxy, TLS basics?",
+          "expected": "Рабочий артефакт: compose-стенд app + db + nginx с healthcheck и диагностикой 502. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, exit code, вывод диагностических команд и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/inspect/config/diff.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: откат скрипта, контейнера, образа, compose-файла или конфигурации.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить healthcheck/логи/HTTP-ответ и убедиться, что нет новых ошибок.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "compose-502-014"
+      ]
     }
   ],
   "weeklyTests": [
@@ -861,6 +1729,162 @@
           "score": 15,
           "caseId": "git-010",
           "task": "Свяжи Git-откат с production rollback и prevention-действиями."
+        }
+      }
+    },
+    {
+      "id": "weekly-w5-bash-health-011",
+      "week": 5,
+      "title": "Неделя 5: Bash-скрипты для DevOps",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: health-check script с кодами возврата для мониторинга.",
+          "mustInclude": [
+            "цель",
+            "команды или конфиг",
+            "проверка результата",
+            "rollback-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: Bash-скрипты для DevOps?",
+            "Какие production-риски: Exit codes, stderr/stdout, cron, idempotent scripts, lock files?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Health-check молчит при падении сервиса. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence, затем построить гипотезы, проверить их read-only командами, применить минимальное исправление, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "bash-health-011",
+          "task": "Разбери кейс: Health-check молчит при падении сервиса"
+        }
+      }
+    },
+    {
+      "id": "weekly-w6-docker-crash-012",
+      "week": 6,
+      "title": "Неделя 6: Docker basics в production-ключе",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: контейнер приложения с logs/exec/inspect и restart policy.",
+          "mustInclude": [
+            "цель",
+            "команды или конфиг",
+            "проверка результата",
+            "rollback-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: Docker basics в production-ключе?",
+            "Какие production-риски: Logs, exec, inspect, restart policy, resource limits?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Контейнер стартует и сразу падает. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence, затем построить гипотезы, проверить их read-only командами, применить минимальное исправление, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "docker-crash-012",
+          "task": "Разбери кейс: Контейнер стартует и сразу падает"
+        }
+      }
+    },
+    {
+      "id": "weekly-w7-dockerfile-root-013",
+      "week": 7,
+      "title": "Неделя 7: Dockerfile и сборка образов",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: multi-stage Dockerfile с non-root пользователем и .dockerignore.",
+          "mustInclude": [
+            "цель",
+            "команды или конфиг",
+            "проверка результата",
+            "rollback-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: Dockerfile и сборка образов?",
+            "Какие production-риски: Размер образа, cache, non-root user, .dockerignore, secrets at build time?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Образ слишком большой и запускается от root. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence, затем построить гипотезы, проверить их read-only командами, применить минимальное исправление, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "dockerfile-root-013",
+          "task": "Разбери кейс: Образ слишком большой и запускается от root"
+        }
+      }
+    },
+    {
+      "id": "weekly-w8-compose-502-014",
+      "week": 8,
+      "title": "Неделя 8: Docker Compose, reverse proxy, TLS basics",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: compose-стенд app + db + nginx с healthcheck и диагностикой 502.",
+          "mustInclude": [
+            "цель",
+            "команды или конфиг",
+            "проверка результата",
+            "rollback-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: Docker Compose, reverse proxy, TLS basics?",
+            "Какие production-риски: depends_on limitations, healthcheck, networks, env/secrets, 502 upstream?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Nginx отдаёт 502 в Compose-сети. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence, затем построить гипотезы, проверить их read-only командами, применить минимальное исправление, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "compose-502-014",
+          "task": "Разбери кейс: Nginx отдаёт 502 в Compose-сети"
         }
       }
     }

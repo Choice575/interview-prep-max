@@ -1,6 +1,6 @@
 {
   "version": "4.0.0",
-  "title": "DevOps Plan v4 Middle+/Senior: Weeks 1-4 Study Map",
+  "title": "DevOps Plan v4 Middle+/Senior: Weeks 1-8 Study Map",
   "profile": "devops",
   "language": "ru",
   "weeklyRhythm": {
@@ -25,7 +25,9 @@
       "week": 1,
       "title": "Linux: навигация, файлы, права, базовый bash",
       "targetLevel": "Junior+ -> Middle base",
-      "mainTopics": ["Linux"],
+      "mainTopics": [
+        "Linux"
+      ],
       "goal": "Уверенно работать в файловой системе Linux, понимать права, владельцев, группы и типовые ошибки доступа.",
       "productionLayer": "Ошибки доступа, права директорий против прав файлов, безопасные изменения прав, диагностика Permission denied.",
       "artifact": "Мини-скрипт или чек-лист проверки доступа к конфигу сервиса.",
@@ -41,11 +43,24 @@
       },
       "interviewPrepMax": {
         "studyTabBlock": "Неделя 1",
-        "trainers": ["exam", "cmd", "labs"],
+        "trainers": [
+          "exam",
+          "cmd",
+          "labs"
+        ],
         "questionFilters": {
-          "topic": ["Linux"],
-          "level": ["Junior", "Middle"],
-          "category": ["definition", "scenario", "output"]
+          "topic": [
+            "Linux"
+          ],
+          "level": [
+            "Junior",
+            "Middle"
+          ],
+          "category": [
+            "definition",
+            "scenario",
+            "output"
+          ]
         },
         "newCasesNeeded": [
           "Permission denied на конфиге",
@@ -177,7 +192,9 @@
       "week": 2,
       "title": "Сети: TCP/IP, DNS, HTTP, curl, CIDR",
       "targetLevel": "Junior+ -> Middle base",
-      "mainTopics": ["Сети"],
+      "mainTopics": [
+        "Сети"
+      ],
       "goal": "Диагностировать доступность сервиса по слоям: DNS, TCP, TLS, HTTP, приложение.",
       "productionLayer": "Timeout, connection refused, HTTP 502/503, DNS failure, ICMP-блокировка, базовая CIDR-математика.",
       "artifact": "Дерево диагностики: сайт не открывается или API возвращает ошибку.",
@@ -194,11 +211,27 @@
       },
       "interviewPrepMax": {
         "studyTabBlock": "Неделя 2",
-        "trainers": ["exam", "subnet", "ports", "ts", "labs"],
+        "trainers": [
+          "exam",
+          "subnet",
+          "ports",
+          "ts",
+          "labs"
+        ],
         "questionFilters": {
-          "topic": ["Сети"],
-          "level": ["Junior", "Middle"],
-          "category": ["definition", "scenario", "output", "tradeoff"]
+          "topic": [
+            "Сети"
+          ],
+          "level": [
+            "Junior",
+            "Middle"
+          ],
+          "category": [
+            "definition",
+            "scenario",
+            "output",
+            "tradeoff"
+          ]
         },
         "newCasesNeeded": [
           "DNS ENOTFOUND",
@@ -215,45 +248,112 @@
           "title": "IP, порты, TCP/UDP",
           "level": "Junior+",
           "objective": "Понимать, что такое IP, порт, TCP-соединение и почему сервис может быть недоступен.",
-          "practice": ["ip addr", "ss -tuln", "ping -c 1 -w 1", "nc -vz"],
-          "pitfalls": ["считать ping полной проверкой сервиса", "путать порт и IP", "не отличать timeout от refused"],
-          "miniTest": ["Что проверяет ping?", "Что означает порт 443?", "Чем connection refused отличается от timeout?", "Что показывает ss -tuln?"]
+          "practice": [
+            "ip addr",
+            "ss -tuln",
+            "ping -c 1 -w 1",
+            "nc -vz"
+          ],
+          "pitfalls": [
+            "считать ping полной проверкой сервиса",
+            "путать порт и IP",
+            "не отличать timeout от refused"
+          ],
+          "miniTest": [
+            "Что проверяет ping?",
+            "Что означает порт 443?",
+            "Чем connection refused отличается от timeout?",
+            "Что показывает ss -tuln?"
+          ]
         },
         {
           "day": 2,
           "title": "DNS и разрешение имён",
           "level": "Middle base",
           "objective": "Понимать путь от имени домена до IP-адреса и диагностировать DNS-ошибки.",
-          "practice": ["dig", "nslookup", "getent hosts", "cat /etc/resolv.conf"],
-          "pitfalls": ["путать DNS с HTTP", "не проверять resolv.conf", "делать вывод по одному DNS-серверу"],
-          "miniTest": ["Что делает DNS?", "Что означает ENOTFOUND?", "Зачем проверять /etc/resolv.conf?", "Почему IP может открываться, а домен нет?"]
+          "practice": [
+            "dig",
+            "nslookup",
+            "getent hosts",
+            "cat /etc/resolv.conf"
+          ],
+          "pitfalls": [
+            "путать DNS с HTTP",
+            "не проверять resolv.conf",
+            "делать вывод по одному DNS-серверу"
+          ],
+          "miniTest": [
+            "Что делает DNS?",
+            "Что означает ENOTFOUND?",
+            "Зачем проверять /etc/resolv.conf?",
+            "Почему IP может открываться, а домен нет?"
+          ]
         },
         {
           "day": 3,
           "title": "HTTP, curl, методы, заголовки",
           "level": "Middle base",
           "objective": "Проверять HTTP-сервис через curl и понимать код ответа, заголовки и тело.",
-          "practice": ["curl -I", "curl -v", "curl -s", "curl -X POST", "curl -H", "curl -d"],
-          "pitfalls": ["думать, что -d выводит JSON", "путать HEAD и GET", "смотреть только тело ответа без кода"],
-          "miniTest": ["Чем HEAD отличается от GET?", "Что делает curl -I?", "Что делает -d?", "Что означает HTTP 503?"]
+          "practice": [
+            "curl -I",
+            "curl -v",
+            "curl -s",
+            "curl -X POST",
+            "curl -H",
+            "curl -d"
+          ],
+          "pitfalls": [
+            "думать, что -d выводит JSON",
+            "путать HEAD и GET",
+            "смотреть только тело ответа без кода"
+          ],
+          "miniTest": [
+            "Чем HEAD отличается от GET?",
+            "Что делает curl -I?",
+            "Что делает -d?",
+            "Что означает HTTP 503?"
+          ]
         },
         {
           "day": 4,
           "title": "CIDR и подсети",
           "level": "Middle base",
           "objective": "Считать количество адресов и понимать маску сети на базовом уровне.",
-          "practice": ["ipcalc или ручной расчет", "задачи /24, /26, /20", "таблица степеней двойки"],
-          "pitfalls": ["считать маска - 12 вместо 32 - маска", "забывать network и broadcast", "путать адреса и usable hosts"],
-          "miniTest": ["Сколько бит под хосты в /26?", "Сколько usable hosts в /26?", "Почему вычитаем 2 адреса?", "Что значит 32 - маска?"]
+          "practice": [
+            "ipcalc или ручной расчет",
+            "задачи /24, /26, /20",
+            "таблица степеней двойки"
+          ],
+          "pitfalls": [
+            "считать маска - 12 вместо 32 - маска",
+            "забывать network и broadcast",
+            "путать адреса и usable hosts"
+          ],
+          "miniTest": [
+            "Сколько бит под хосты в /26?",
+            "Сколько usable hosts в /26?",
+            "Почему вычитаем 2 адреса?",
+            "Что значит 32 - маска?"
+          ]
         },
         {
           "day": 5,
           "title": "Итог недели: диагностика недоступного сервиса",
           "level": "Middle base",
           "objective": "Собрать сетевые проверки в понятный порядок диагностики.",
-          "practice": ["проверить DNS", "проверить TCP-порт", "проверить HTTP-код", "разобрать curl -v", "составить дерево диагностики"],
+          "practice": [
+            "проверить DNS",
+            "проверить TCP-порт",
+            "проверить HTTP-код",
+            "разобрать curl -v",
+            "составить дерево диагностики"
+          ],
           "weeklyTest": {
-            "theory": ["Чем timeout отличается от connection refused?", "Что проверяет DNS?", "Почему ping не доказывает, что сайт работает?"],
+            "theory": [
+              "Чем timeout отличается от connection refused?",
+              "Что проверяет DNS?",
+              "Почему ping не доказывает, что сайт работает?"
+            ],
             "debug": "Дан вывод curl -v с 502/timeout/DNS error. Определи слой проблемы.",
             "practice": "Составь порядок проверки: пользователь жалуется, что сайт не открывается."
           }
@@ -264,7 +364,10 @@
       "week": 3,
       "title": "Процессы, systemd, journalctl, SSH",
       "targetLevel": "Middle base",
-      "mainTopics": ["Linux", "Security"],
+      "mainTopics": [
+        "Linux",
+        "Security"
+      ],
       "goal": "Управлять процессами, понимать сигналы, читать логи systemd и безопасно работать по SSH.",
       "productionLayer": "Restart loop, failed unit, SIGTERM/SIGKILL/SIGTSTP, journalctl, SSH hardening.",
       "artifact": "Скрипт process_check.sh и runbook диагностики упавшего systemd-сервиса.",
@@ -281,11 +384,25 @@
       },
       "interviewPrepMax": {
         "studyTabBlock": "Неделя 3",
-        "trainers": ["exam", "cmd", "labs", "ts"],
+        "trainers": [
+          "exam",
+          "cmd",
+          "labs",
+          "ts"
+        ],
         "questionFilters": {
-          "topic": ["Linux", "Security"],
-          "level": ["Junior", "Middle"],
-          "category": ["scenario", "output"]
+          "topic": [
+            "Linux",
+            "Security"
+          ],
+          "level": [
+            "Junior",
+            "Middle"
+          ],
+          "category": [
+            "scenario",
+            "output"
+          ]
         },
         "newCasesNeeded": [
           "Ctrl+Z и SIGTSTP",
@@ -300,45 +417,116 @@
           "title": "Процессы: ps, pstree, kill",
           "level": "Middle base",
           "objective": "Находить процессы, понимать PID/PPID и корректно завершать процесс.",
-          "practice": ["ps aux", "pstree", "pgrep", "kill -TERM", "kill -KILL"],
-          "pitfalls": ["использовать kill -9 сразу", "путать PID и порт", "не проверять родительский процесс"],
-          "miniTest": ["Что такое PID?", "Чем SIGTERM отличается от SIGKILL?", "Почему kill -9 не должен быть первым действием?", "Что показывает pstree?"]
+          "practice": [
+            "ps aux",
+            "pstree",
+            "pgrep",
+            "kill -TERM",
+            "kill -KILL"
+          ],
+          "pitfalls": [
+            "использовать kill -9 сразу",
+            "путать PID и порт",
+            "не проверять родительский процесс"
+          ],
+          "miniTest": [
+            "Что такое PID?",
+            "Чем SIGTERM отличается от SIGKILL?",
+            "Почему kill -9 не должен быть первым действием?",
+            "Что показывает pstree?"
+          ]
         },
         {
           "day": 2,
           "title": "Jobs, fg, bg, Ctrl+Z, nohup",
           "level": "Middle base",
           "objective": "Понимать foreground/background jobs и отличие паузы от завершения.",
-          "practice": ["sleep 300 &", "jobs -l", "fg %1", "Ctrl+Z", "bg %1", "nohup"],
-          "pitfalls": ["думать, что Ctrl+Z завершает процесс", "путать job id и PID", "забывать, что nohup не делает сервис production-ready"],
-          "miniTest": ["Что делает Ctrl+Z?", "Чем fg отличается от bg?", "Что показывает jobs -l?", "Когда нужен nohup?"]
+          "practice": [
+            "sleep 300 &",
+            "jobs -l",
+            "fg %1",
+            "Ctrl+Z",
+            "bg %1",
+            "nohup"
+          ],
+          "pitfalls": [
+            "думать, что Ctrl+Z завершает процесс",
+            "путать job id и PID",
+            "забывать, что nohup не делает сервис production-ready"
+          ],
+          "miniTest": [
+            "Что делает Ctrl+Z?",
+            "Чем fg отличается от bg?",
+            "Что показывает jobs -l?",
+            "Когда нужен nohup?"
+          ]
         },
         {
           "day": 3,
           "title": "systemd и journalctl",
           "level": "Middle base",
           "objective": "Проверять unit-файл, состояние сервиса и последние логи.",
-          "practice": ["systemctl status", "systemctl is-active", "journalctl -u", "journalctl -n", "journalctl -f"],
-          "pitfalls": ["перезапускать сервис без чтения логов", "путать loaded и active", "не смотреть exit code"],
-          "miniTest": ["Чем loaded отличается от active?", "Что показывает journalctl -u?", "Зачем смотреть последние 50 строк?", "Что такое restart loop?"]
+          "practice": [
+            "systemctl status",
+            "systemctl is-active",
+            "journalctl -u",
+            "journalctl -n",
+            "journalctl -f"
+          ],
+          "pitfalls": [
+            "перезапускать сервис без чтения логов",
+            "путать loaded и active",
+            "не смотреть exit code"
+          ],
+          "miniTest": [
+            "Чем loaded отличается от active?",
+            "Что показывает journalctl -u?",
+            "Зачем смотреть последние 50 строк?",
+            "Что такое restart loop?"
+          ]
         },
         {
           "day": 4,
           "title": "SSH и базовая безопасность доступа",
           "level": "Middle base",
           "objective": "Понимать SSH-ключи, права на ключи и базовые причины отказа подключения.",
-          "practice": ["ssh -V", "ssh-keygen", "chmod 600 ~/.ssh/id_rsa", "ssh -v", "sshd_config basics"],
-          "pitfalls": ["слишком открытые права ключа", "путать публичный и приватный ключ", "не использовать ssh -v для диагностики"],
-          "miniTest": ["Почему приватный ключ должен быть защищен?", "Что показывает ssh -v?", "Чем публичный ключ отличается от приватного?", "Что значит Permission denied publickey?"]
+          "practice": [
+            "ssh -V",
+            "ssh-keygen",
+            "chmod 600 ~/.ssh/id_rsa",
+            "ssh -v",
+            "sshd_config basics"
+          ],
+          "pitfalls": [
+            "слишком открытые права ключа",
+            "путать публичный и приватный ключ",
+            "не использовать ssh -v для диагностики"
+          ],
+          "miniTest": [
+            "Почему приватный ключ должен быть защищен?",
+            "Что показывает ssh -v?",
+            "Чем публичный ключ отличается от приватного?",
+            "Что значит Permission denied publickey?"
+          ]
         },
         {
           "day": 5,
           "title": "Итог недели: process_check.sh и диагностика сервиса",
           "level": "Middle base",
           "objective": "Собрать процессную диагностику в скрипт и runbook.",
-          "practice": ["написать process_check.sh", "проверить процесс", "проверить порт", "проверить systemd status", "вывести последние логи"],
+          "practice": [
+            "написать process_check.sh",
+            "проверить процесс",
+            "проверить порт",
+            "проверить systemd status",
+            "вывести последние логи"
+          ],
           "weeklyTest": {
-            "theory": ["Что делает Ctrl+Z?", "Чем SIGTERM отличается от SIGKILL?", "Что проверять при failed systemd unit?"],
+            "theory": [
+              "Что делает Ctrl+Z?",
+              "Чем SIGTERM отличается от SIGKILL?",
+              "Что проверять при failed systemd unit?"
+            ],
             "debug": "Дан вывод systemctl status и journalctl. Найди причину падения.",
             "practice": "Напиши структуру скрипта process_check.sh без готового копипаста."
           }
@@ -349,7 +537,10 @@
       "week": 4,
       "title": "Git, GitHub, GitLab workflow",
       "targetLevel": "Middle base",
-      "mainTopics": ["Git", "CI/CD"],
+      "mainTopics": [
+        "Git",
+        "CI/CD"
+      ],
       "goal": "Работать с ветками, коммитами, конфликтами, pull request и безопасным откатом изменений.",
       "productionLayer": "Protected branches, revert vs reset, rebase conflicts, release tags, безопасный rollback кода.",
       "artifact": "Репозиторий с ветками, PR-процессом, решенным конфликтом и документированным rollback-сценарием.",
@@ -366,11 +557,27 @@
       },
       "interviewPrepMax": {
         "studyTabBlock": "Неделя 4",
-        "trainers": ["exam", "git", "cmd", "labs"],
+        "trainers": [
+          "exam",
+          "git",
+          "cmd",
+          "labs"
+        ],
         "questionFilters": {
-          "topic": ["Git", "CI/CD"],
-          "level": ["Junior", "Middle"],
-          "category": ["definition", "scenario", "tradeoff", "output"]
+          "topic": [
+            "Git",
+            "CI/CD"
+          ],
+          "level": [
+            "Junior",
+            "Middle"
+          ],
+          "category": [
+            "definition",
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
         },
         "newCasesNeeded": [
           "merge conflict",
@@ -386,48 +593,784 @@
           "title": "Git basics: status, add, commit, log",
           "level": "Junior+",
           "objective": "Понимать состояние рабочей директории, индекс и историю коммитов.",
-          "practice": ["git status", "git add", "git commit", "git log --oneline", "git diff"],
-          "pitfalls": ["коммитить без diff", "путать рабочую директорию и индекс", "не писать понятные сообщения коммитов"],
-          "miniTest": ["Что показывает git status?", "Чем git diff отличается от git log?", "Что попадает в commit после git add?", "Почему перед commit полезно смотреть diff?"]
+          "practice": [
+            "git status",
+            "git add",
+            "git commit",
+            "git log --oneline",
+            "git diff"
+          ],
+          "pitfalls": [
+            "коммитить без diff",
+            "путать рабочую директорию и индекс",
+            "не писать понятные сообщения коммитов"
+          ],
+          "miniTest": [
+            "Что показывает git status?",
+            "Чем git diff отличается от git log?",
+            "Что попадает в commit после git add?",
+            "Почему перед commit полезно смотреть diff?"
+          ]
         },
         {
           "day": 2,
           "title": "Branches, merge, conflicts",
           "level": "Middle base",
           "objective": "Создавать ветки, сливать изменения и решать конфликт вручную.",
-          "practice": ["git branch", "git switch -c", "git merge", "conflict markers", "git status after conflict"],
-          "pitfalls": ["удалять conflict markers неосознанно", "коммитить конфликтный файл", "сливать без понимания изменений"],
-          "miniTest": ["Что такое ветка?", "Когда возникает merge conflict?", "Что означают маркеры <<<<<<< ======= >>>>>>>?", "Что нужно сделать после решения конфликта?"]
+          "practice": [
+            "git branch",
+            "git switch -c",
+            "git merge",
+            "conflict markers",
+            "git status after conflict"
+          ],
+          "pitfalls": [
+            "удалять conflict markers неосознанно",
+            "коммитить конфликтный файл",
+            "сливать без понимания изменений"
+          ],
+          "miniTest": [
+            "Что такое ветка?",
+            "Когда возникает merge conflict?",
+            "Что означают маркеры <<<<<<< ======= >>>>>>>?",
+            "Что нужно сделать после решения конфликта?"
+          ]
         },
         {
           "day": 3,
           "title": "Remote, GitHub/GitLab, pull request",
           "level": "Middle base",
           "objective": "Понимать remote, push/pull/fetch и командный workflow через PR/MR.",
-          "practice": ["git remote -v", "git fetch", "git pull", "git push", "pull request workflow"],
-          "pitfalls": ["путать fetch и pull", "push в main без review", "не обновлять ветку перед PR"],
-          "miniTest": ["Чем fetch отличается от pull?", "Зачем нужен pull request?", "Что такое origin?", "Почему main защищают?"]
+          "practice": [
+            "git remote -v",
+            "git fetch",
+            "git pull",
+            "git push",
+            "pull request workflow"
+          ],
+          "pitfalls": [
+            "путать fetch и pull",
+            "push в main без review",
+            "не обновлять ветку перед PR"
+          ],
+          "miniTest": [
+            "Чем fetch отличается от pull?",
+            "Зачем нужен pull request?",
+            "Что такое origin?",
+            "Почему main защищают?"
+          ]
         },
         {
           "day": 4,
           "title": "revert, reset, rebase и безопасный откат",
           "level": "Middle base",
           "objective": "Выбирать безопасный способ отката и понимать риски переписывания истории.",
-          "practice": ["git revert", "git reset --soft", "git reset --hard concept", "git rebase concept", "git reflog concept"],
-          "pitfalls": ["делать reset --hard в публичной ветке", "force push без согласования", "использовать rebase без понимания истории"],
-          "miniTest": ["Чем revert отличается от reset?", "Почему reset --hard опасен?", "Когда rebase допустим?", "Что делать, если плохой коммит уже в main?"]
+          "practice": [
+            "git revert",
+            "git reset --soft",
+            "git reset --hard concept",
+            "git rebase concept",
+            "git reflog concept"
+          ],
+          "pitfalls": [
+            "делать reset --hard в публичной ветке",
+            "force push без согласования",
+            "использовать rebase без понимания истории"
+          ],
+          "miniTest": [
+            "Чем revert отличается от reset?",
+            "Почему reset --hard опасен?",
+            "Когда rebase допустим?",
+            "Что делать, если плохой коммит уже в main?"
+          ]
         },
         {
           "day": 5,
           "title": "Итог недели: командный Git workflow и rollback",
           "level": "Middle base",
           "objective": "Пройти полный цикл: ветка, изменение, конфликт, PR, безопасный откат.",
-          "practice": ["создать ветку", "сделать коммит", "смоделировать конфликт", "решить конфликт", "выбрать rollback strategy"],
+          "practice": [
+            "создать ветку",
+            "сделать коммит",
+            "смоделировать конфликт",
+            "решить конфликт",
+            "выбрать rollback strategy"
+          ],
           "weeklyTest": {
-            "theory": ["Чем revert отличается от reset?", "Зачем protected branches?", "Что такое merge conflict?"],
+            "theory": [
+              "Чем revert отличается от reset?",
+              "Зачем protected branches?",
+              "Что такое merge conflict?"
+            ],
             "debug": "Дан граф истории и плохой коммит в main. Выбери безопасное действие.",
             "practice": "Опиши командный workflow для изменения в production-репозитории."
           }
+        }
+      ]
+    },
+    {
+      "week": 5,
+      "title": "Bash-скрипты для DevOps",
+      "targetLevel": "Middle base",
+      "mainTopics": [
+        "Linux"
+      ],
+      "goal": "Освоить тему: Bash-скрипты для DevOps на уровне Middle base с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "Exit codes, stderr/stdout, cron, idempotent scripts, lock files",
+      "artifact": "health-check script с кодами возврата для мониторинга",
+      "seniorChallenge": {
+        "title": "Health-check молчит при падении сервиса",
+        "task": "Разобрать production-ситуацию: Health-check молчит при падении сервиса. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 5",
+        "trainers": [
+          "exam",
+          "cmd",
+          "labs"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Linux"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Health-check молчит при падении сервиса",
+          "Диагностика: Bash-скрипты для DevOps",
+          "Rollback: Bash-скрипты для DevOps"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle base",
+          "objective": "Новая тема и базовая практика по теме: Bash-скрипты для DevOps.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 5: Bash-скрипты для DevOps?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle base",
+          "objective": "Углубление и работа с выводом по теме: Bash-скрипты для DevOps.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 5: Bash-скрипты для DevOps?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle base",
+          "objective": "Production-слой и типовые ошибки по теме: Bash-скрипты для DevOps.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 5: Bash-скрипты для DevOps?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle base",
+          "objective": "Мини-инцидент или сквозной проект по теме: Bash-скрипты для DevOps.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 5: Bash-скрипты для DevOps?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle base",
+          "objective": "Итог недели и Senior Challenge по теме: Bash-скрипты для DevOps.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 5: Bash-скрипты для DevOps?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 6,
+      "title": "Docker basics в production-ключе",
+      "targetLevel": "Middle",
+      "mainTopics": [
+        "Docker"
+      ],
+      "goal": "Освоить тему: Docker basics в production-ключе на уровне Middle с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "Logs, exec, inspect, restart policy, resource limits",
+      "artifact": "контейнер приложения с logs/exec/inspect и restart policy",
+      "seniorChallenge": {
+        "title": "Контейнер стартует и сразу падает",
+        "task": "Разобрать production-ситуацию: Контейнер стартует и сразу падает. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 6",
+        "trainers": [
+          "exam",
+          "cmd",
+          "labs"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Docker"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Контейнер стартует и сразу падает",
+          "Диагностика: Docker basics в production-ключе",
+          "Rollback: Docker basics в production-ключе"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle",
+          "objective": "Новая тема и базовая практика по теме: Docker basics в production-ключе.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 6: Docker basics в production-ключе?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle",
+          "objective": "Углубление и работа с выводом по теме: Docker basics в production-ключе.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 6: Docker basics в production-ключе?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle",
+          "objective": "Production-слой и типовые ошибки по теме: Docker basics в production-ключе.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 6: Docker basics в production-ключе?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle",
+          "objective": "Мини-инцидент или сквозной проект по теме: Docker basics в production-ключе.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 6: Docker basics в production-ключе?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle",
+          "objective": "Итог недели и Senior Challenge по теме: Docker basics в production-ключе.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 6: Docker basics в production-ключе?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 7,
+      "title": "Dockerfile и сборка образов",
+      "targetLevel": "Middle",
+      "mainTopics": [
+        "Docker"
+      ],
+      "goal": "Освоить тему: Dockerfile и сборка образов на уровне Middle с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "Размер образа, cache, non-root user, .dockerignore, secrets at build time",
+      "artifact": "multi-stage Dockerfile с non-root пользователем и .dockerignore",
+      "seniorChallenge": {
+        "title": "Образ слишком большой и запускается от root",
+        "task": "Разобрать production-ситуацию: Образ слишком большой и запускается от root. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 7",
+        "trainers": [
+          "exam",
+          "dockerfile",
+          "code"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Docker"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Образ слишком большой и запускается от root",
+          "Диагностика: Dockerfile и сборка образов",
+          "Rollback: Dockerfile и сборка образов"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle",
+          "objective": "Новая тема и базовая практика по теме: Dockerfile и сборка образов.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 7: Dockerfile и сборка образов?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle",
+          "objective": "Углубление и работа с выводом по теме: Dockerfile и сборка образов.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 7: Dockerfile и сборка образов?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle",
+          "objective": "Production-слой и типовые ошибки по теме: Dockerfile и сборка образов.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 7: Dockerfile и сборка образов?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle",
+          "objective": "Мини-инцидент или сквозной проект по теме: Dockerfile и сборка образов.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 7: Dockerfile и сборка образов?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle",
+          "objective": "Итог недели и Senior Challenge по теме: Dockerfile и сборка образов.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 7: Dockerfile и сборка образов?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 8,
+      "title": "Docker Compose, reverse proxy, TLS basics",
+      "targetLevel": "Middle",
+      "mainTopics": [
+        "Docker",
+        "Сети"
+      ],
+      "goal": "Освоить тему: Docker Compose, reverse proxy, TLS basics на уровне Middle с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "depends_on limitations, healthcheck, networks, env/secrets, 502 upstream",
+      "artifact": "compose-стенд app + db + nginx с healthcheck и диагностикой 502",
+      "seniorChallenge": {
+        "title": "Nginx отдаёт 502 в Compose-сети",
+        "task": "Разобрать production-ситуацию: Nginx отдаёт 502 в Compose-сети. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 8",
+        "trainers": [
+          "exam",
+          "ts",
+          "labs"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Docker",
+            "Сети"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Nginx отдаёт 502 в Compose-сети",
+          "Диагностика: Docker Compose, reverse proxy, TLS basics",
+          "Rollback: Docker Compose, reverse proxy, TLS basics"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle",
+          "objective": "Новая тема и базовая практика по теме: Docker Compose, reverse proxy, TLS basics.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 8: Docker Compose, reverse proxy, TLS basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle",
+          "objective": "Углубление и работа с выводом по теме: Docker Compose, reverse proxy, TLS basics.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 8: Docker Compose, reverse proxy, TLS basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle",
+          "objective": "Production-слой и типовые ошибки по теме: Docker Compose, reverse proxy, TLS basics.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 8: Docker Compose, reverse proxy, TLS basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle",
+          "objective": "Мини-инцидент или сквозной проект по теме: Docker Compose, reverse proxy, TLS basics.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 8: Docker Compose, reverse proxy, TLS basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle",
+          "objective": "Итог недели и Senior Challenge по теме: Docker Compose, reverse proxy, TLS basics.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 8: Docker Compose, reverse proxy, TLS basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
         }
       ]
     }

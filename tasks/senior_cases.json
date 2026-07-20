@@ -1,6 +1,6 @@
 {
   "version": "4.0.0",
-  "title": "Senior Cases: DevOps Plan v4 Weeks 1-4",
+  "title": "Senior Cases: DevOps Plan v4 Weeks 1-8",
   "language": "ru",
   "purpose": "Первый пакет production-кейсов для вкладки «Учёба» и режима Senior Simulator в Interview Prep Max.",
   "caseSchema": {
@@ -62,11 +62,25 @@
       },
       "interviewPrepMax": {
         "mode": "Senior Simulator",
-        "trainers": ["labs", "cmd", "exam"],
-        "tags": ["permissions", "systemd", "least-privilege"],
+        "trainers": [
+          "labs",
+          "cmd",
+          "exam"
+        ],
+        "tags": [
+          "permissions",
+          "systemd",
+          "least-privilege"
+        ],
         "relatedQuestionFilter": {
-          "topic": ["Linux", "Security"],
-          "category": ["scenario", "output"]
+          "topic": [
+            "Linux",
+            "Security"
+          ],
+          "category": [
+            "scenario",
+            "output"
+          ]
         }
       }
     },
@@ -107,11 +121,22 @@
       },
       "interviewPrepMax": {
         "mode": "Middle+",
-        "trainers": ["labs", "exam"],
-        "tags": ["directory-execute-bit", "permissions"],
+        "trainers": [
+          "labs",
+          "exam"
+        ],
+        "tags": [
+          "directory-execute-bit",
+          "permissions"
+        ],
         "relatedQuestionFilter": {
-          "topic": ["Linux"],
-          "category": ["scenario", "output"]
+          "topic": [
+            "Linux"
+          ],
+          "category": [
+            "scenario",
+            "output"
+          ]
         }
       }
     },
@@ -155,11 +180,24 @@
       },
       "interviewPrepMax": {
         "mode": "Senior Simulator",
-        "trainers": ["labs", "exam"],
-        "tags": ["chmod-777", "security", "postmortem"],
+        "trainers": [
+          "labs",
+          "exam"
+        ],
+        "tags": [
+          "chmod-777",
+          "security",
+          "postmortem"
+        ],
         "relatedQuestionFilter": {
-          "topic": ["Linux", "Security"],
-          "category": ["tradeoff", "scenario"]
+          "topic": [
+            "Linux",
+            "Security"
+          ],
+          "category": [
+            "tradeoff",
+            "scenario"
+          ]
         }
       }
     },
@@ -204,11 +242,24 @@
       },
       "interviewPrepMax": {
         "mode": "Middle+",
-        "trainers": ["ts", "labs", "exam"],
-        "tags": ["dns", "enotfound", "database-connectivity"],
+        "trainers": [
+          "ts",
+          "labs",
+          "exam"
+        ],
+        "tags": [
+          "dns",
+          "enotfound",
+          "database-connectivity"
+        ],
         "relatedQuestionFilter": {
-          "topic": ["Сети"],
-          "category": ["scenario", "output"]
+          "topic": [
+            "Сети"
+          ],
+          "category": [
+            "scenario",
+            "output"
+          ]
         }
       }
     },
@@ -253,11 +304,25 @@
       },
       "interviewPrepMax": {
         "mode": "Senior Simulator",
-        "trainers": ["ts", "labs"],
-        "tags": ["nginx", "502", "upstream", "systemd"],
+        "trainers": [
+          "ts",
+          "labs"
+        ],
+        "tags": [
+          "nginx",
+          "502",
+          "upstream",
+          "systemd"
+        ],
         "relatedQuestionFilter": {
-          "topic": ["Сети", "Linux"],
-          "category": ["scenario", "output"]
+          "topic": [
+            "Сети",
+            "Linux"
+          ],
+          "category": [
+            "scenario",
+            "output"
+          ]
         }
       }
     },
@@ -297,11 +362,21 @@
       },
       "interviewPrepMax": {
         "mode": "Middle+",
-        "trainers": ["subnet", "exam"],
-        "tags": ["cidr", "capacity-planning"],
+        "trainers": [
+          "subnet",
+          "exam"
+        ],
+        "tags": [
+          "cidr",
+          "capacity-planning"
+        ],
         "relatedQuestionFilter": {
-          "topic": ["Сети"],
-          "category": ["scenario"]
+          "topic": [
+            "Сети"
+          ],
+          "category": [
+            "scenario"
+          ]
         }
       }
     },
@@ -347,11 +422,26 @@
       },
       "interviewPrepMax": {
         "mode": "Senior Simulator",
-        "trainers": ["labs", "ts", "cmd"],
-        "tags": ["systemd", "journalctl", "env", "restart-loop"],
+        "trainers": [
+          "labs",
+          "ts",
+          "cmd"
+        ],
+        "tags": [
+          "systemd",
+          "journalctl",
+          "env",
+          "restart-loop"
+        ],
         "relatedQuestionFilter": {
-          "topic": ["Linux", "Security"],
-          "category": ["scenario", "output"]
+          "topic": [
+            "Linux",
+            "Security"
+          ],
+          "category": [
+            "scenario",
+            "output"
+          ]
         }
       }
     },
@@ -396,11 +486,24 @@
       },
       "interviewPrepMax": {
         "mode": "Middle+",
-        "trainers": ["cmd", "exam"],
-        "tags": ["signals", "jobs", "ctrl-z", "sigtstp"],
+        "trainers": [
+          "cmd",
+          "exam"
+        ],
+        "tags": [
+          "signals",
+          "jobs",
+          "ctrl-z",
+          "sigtstp"
+        ],
         "relatedQuestionFilter": {
-          "topic": ["Linux"],
-          "category": ["output", "scenario"]
+          "topic": [
+            "Linux"
+          ],
+          "category": [
+            "output",
+            "scenario"
+          ]
         }
       }
     },
@@ -442,11 +545,26 @@
       },
       "interviewPrepMax": {
         "mode": "Middle+",
-        "trainers": ["labs", "cmd", "exam"],
-        "tags": ["ssh", "private-key", "permissions", "security"],
+        "trainers": [
+          "labs",
+          "cmd",
+          "exam"
+        ],
+        "tags": [
+          "ssh",
+          "private-key",
+          "permissions",
+          "security"
+        ],
         "relatedQuestionFilter": {
-          "topic": ["Linux", "Security"],
-          "category": ["scenario", "output"]
+          "topic": [
+            "Linux",
+            "Security"
+          ],
+          "category": [
+            "scenario",
+            "output"
+          ]
         }
       }
     },
@@ -490,11 +608,275 @@
       },
       "interviewPrepMax": {
         "mode": "Senior Simulator",
-        "trainers": ["git", "labs", "exam"],
-        "tags": ["git-revert", "protected-branch", "rollback", "incident"],
+        "trainers": [
+          "git",
+          "labs",
+          "exam"
+        ],
+        "tags": [
+          "git-revert",
+          "protected-branch",
+          "rollback",
+          "incident"
+        ],
         "relatedQuestionFilter": {
-          "topic": ["Git", "CI/CD"],
-          "category": ["tradeoff", "scenario"]
+          "topic": [
+            "Git",
+            "CI/CD"
+          ],
+          "category": [
+            "tradeoff",
+            "scenario"
+          ]
+        }
+      }
+    },
+    {
+      "id": "bash-health-011",
+      "week": 5,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Linux",
+      "type": "diagnostic",
+      "title": "Health-check молчит при падении сервиса",
+      "context": "Учебный production-инцидент недели 5. Тема: Bash-скрипты для DevOps. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Bash-скрипты для DevOps",
+        "Symptom: Health-check молчит при падении сервиса",
+        "Impact: сервис или проверка работает некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, конфиги или diff.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist или runbook."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "cmd",
+          "labs"
+        ],
+        "tags": [
+          "Linux",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Linux"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "docker-crash-012",
+      "week": 6,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Docker",
+      "type": "incident",
+      "title": "Контейнер стартует и сразу падает",
+      "context": "Учебный production-инцидент недели 6. Тема: Docker basics в production-ключе. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Docker basics в production-ключе",
+        "Symptom: Контейнер стартует и сразу падает",
+        "Impact: сервис или проверка работает некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, конфиги или diff.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist или runbook."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "cmd",
+          "labs"
+        ],
+        "tags": [
+          "Docker",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Docker"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "dockerfile-root-013",
+      "week": 7,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Docker",
+      "type": "tradeoff",
+      "title": "Образ слишком большой и запускается от root",
+      "context": "Учебный production-инцидент недели 7. Тема: Dockerfile и сборка образов. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Dockerfile и сборка образов",
+        "Symptom: Образ слишком большой и запускается от root",
+        "Impact: сервис или проверка работает некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, конфиги или diff.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist или runbook."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "dockerfile",
+          "code"
+        ],
+        "tags": [
+          "Docker",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Docker"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "compose-502-014",
+      "week": 8,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Docker",
+      "type": "incident",
+      "title": "Nginx отдаёт 502 в Compose-сети",
+      "context": "Учебный production-инцидент недели 8. Тема: Docker Compose, reverse proxy, TLS basics. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Docker Compose, reverse proxy, TLS basics",
+        "Symptom: Nginx отдаёт 502 в Compose-сети",
+        "Impact: сервис или проверка работает некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, конфиги или diff.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist или runbook."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "ts",
+          "labs"
+        ],
+        "tags": [
+          "Docker",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Docker",
+            "Сети"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
         }
       }
     }
