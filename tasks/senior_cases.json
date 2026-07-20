@@ -1,6 +1,6 @@
 {
   "version": "4.0.0",
-  "title": "Senior Cases: DevOps Plan v4 Weeks 1-24",
+  "title": "Senior Cases: DevOps Plan v4 Weeks 1-32",
   "language": "ru",
   "purpose": "Первый пакет production-кейсов для вкладки «Учёба» и режима Senior Simulator в Interview Prep Max.",
   "caseSchema": {
@@ -1868,6 +1868,522 @@
             "Docker",
             "CI/CD",
             "Monitoring"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "prod-net-timeout-031",
+      "week": 25,
+      "day": 5,
+      "level": "Senior-track",
+      "topic": "Сети",
+      "type": "incident",
+      "title": "Часть пользователей видит timeout, часть 200 OK",
+      "context": "Учебный production-инцидент недели 25. Тема: Production networking. Нужно собрать evidence, оценить impact и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Production networking",
+        "Symptom: Часть пользователей видит timeout, часть 200 OK",
+        "Impact: production-сервис, данные, кластер или пользователи деградируют",
+        "Constraint: нельзя делать разрушительные действия без rollback/DR-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата, rollback/DR и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, метрики, topology, backup status или incident timeline.",
+        "Оценить impact, blast radius, RTO/RPO или пользовательский эффект.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback/DR-план.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не оценить blast radius.",
+        "Не иметь rollback/DR-плана.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "impact": 15,
+        "rootCause": 20,
+        "mitigation": 15,
+        "rollback": 15,
+        "prevention": 15
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "ts",
+          "ports"
+        ],
+        "tags": [
+          "Сети",
+          "incident",
+          "rollback",
+          "dr"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Сети",
+            "Security"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ha-edge-032",
+      "week": 26,
+      "day": 5,
+      "level": "Senior-track",
+      "topic": "Сети",
+      "type": "tradeoff",
+      "title": "Выбор L4/L7 балансировки и active/passive",
+      "context": "Учебный production-инцидент недели 26. Тема: Load balancing and HA edge. Нужно собрать evidence, оценить impact и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Load balancing and HA edge",
+        "Symptom: Выбор L4/L7 балансировки и active/passive",
+        "Impact: production-сервис, данные, кластер или пользователи деградируют",
+        "Constraint: нельзя делать разрушительные действия без rollback/DR-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата, rollback/DR и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, метрики, topology, backup status или incident timeline.",
+        "Оценить impact, blast radius, RTO/RPO или пользовательский эффект.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback/DR-план.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не оценить blast radius.",
+        "Не иметь rollback/DR-плана.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "impact": 15,
+        "rootCause": 20,
+        "mitigation": 15,
+        "rollback": 15,
+        "prevention": 15
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "ts",
+          "labs"
+        ],
+        "tags": [
+          "Сети",
+          "incident",
+          "rollback",
+          "dr"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Сети",
+            "Monitoring"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pg-restore-drill-033",
+      "week": 27,
+      "day": 5,
+      "level": "Senior-track",
+      "topic": "Monitoring",
+      "type": "rollback",
+      "title": "Restore drill показал, что backup не восстанавливается",
+      "context": "Учебный production-инцидент недели 27. Тема: PostgreSQL production. Нужно собрать evidence, оценить impact и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: PostgreSQL production",
+        "Symptom: Restore drill показал, что backup не восстанавливается",
+        "Impact: production-сервис, данные, кластер или пользователи деградируют",
+        "Constraint: нельзя делать разрушительные действия без rollback/DR-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата, rollback/DR и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, метрики, topology, backup status или incident timeline.",
+        "Оценить impact, blast radius, RTO/RPO или пользовательский эффект.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback/DR-план.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не оценить blast radius.",
+        "Не иметь rollback/DR-плана.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "impact": 15,
+        "rootCause": 20,
+        "mitigation": 15,
+        "rollback": 15,
+        "prevention": 15
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "labs"
+        ],
+        "tags": [
+          "Monitoring",
+          "incident",
+          "rollback",
+          "dr"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Monitoring",
+            "Linux"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pg-migration-lock-034",
+      "week": 28,
+      "day": 5,
+      "level": "Senior-track",
+      "topic": "Monitoring",
+      "type": "incident",
+      "title": "Миграция заблокировала таблицу в рабочее время",
+      "context": "Учебный production-инцидент недели 28. Тема: PostgreSQL migration and performance. Нужно собрать evidence, оценить impact и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: PostgreSQL migration and performance",
+        "Symptom: Миграция заблокировала таблицу в рабочее время",
+        "Impact: production-сервис, данные, кластер или пользователи деградируют",
+        "Constraint: нельзя делать разрушительные действия без rollback/DR-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата, rollback/DR и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, метрики, topology, backup status или incident timeline.",
+        "Оценить impact, blast radius, RTO/RPO или пользовательский эффект.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback/DR-план.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не оценить blast radius.",
+        "Не иметь rollback/DR-плана.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "impact": 15,
+        "rootCause": 20,
+        "mitigation": 15,
+        "rollback": 15,
+        "prevention": 15
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "labs"
+        ],
+        "tags": [
+          "Monitoring",
+          "incident",
+          "rollback",
+          "dr"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Monitoring"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "k8s-upgrade-035",
+      "week": 29,
+      "day": 5,
+      "level": "Senior-track",
+      "topic": "Kubernetes",
+      "type": "rollback",
+      "title": "План обновления кластера с rollback",
+      "context": "Учебный production-инцидент недели 29. Тема: Self-managed Kubernetes architecture. Нужно собрать evidence, оценить impact и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Self-managed Kubernetes architecture",
+        "Symptom: План обновления кластера с rollback",
+        "Impact: production-сервис, данные, кластер или пользователи деградируют",
+        "Constraint: нельзя делать разрушительные действия без rollback/DR-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата, rollback/DR и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, метрики, topology, backup status или incident timeline.",
+        "Оценить impact, blast radius, RTO/RPO или пользовательский эффект.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback/DR-план.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не оценить blast radius.",
+        "Не иметь rollback/DR-плана.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "impact": 15,
+        "rootCause": 20,
+        "mitigation": 15,
+        "rollback": 15,
+        "prevention": 15
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "k8s",
+          "labs"
+        ],
+        "tags": [
+          "Kubernetes",
+          "incident",
+          "rollback",
+          "dr"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Kubernetes"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "k8s-storage-036",
+      "week": 30,
+      "day": 5,
+      "level": "Senior-track",
+      "topic": "Kubernetes",
+      "type": "incident",
+      "title": "Pod переехал на другую node и потерял данные",
+      "context": "Учебный production-инцидент недели 30. Тема: Kubernetes storage and HA workloads. Нужно собрать evidence, оценить impact и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Kubernetes storage and HA workloads",
+        "Symptom: Pod переехал на другую node и потерял данные",
+        "Impact: production-сервис, данные, кластер или пользователи деградируют",
+        "Constraint: нельзя делать разрушительные действия без rollback/DR-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата, rollback/DR и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, метрики, topology, backup status или incident timeline.",
+        "Оценить impact, blast radius, RTO/RPO или пользовательский эффект.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback/DR-план.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не оценить blast radius.",
+        "Не иметь rollback/DR-плана.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "impact": 15,
+        "rootCause": 20,
+        "mitigation": 15,
+        "rollback": 15,
+        "prevention": 15
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "k8s",
+          "labs"
+        ],
+        "tags": [
+          "Kubernetes",
+          "incident",
+          "rollback",
+          "dr"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Kubernetes"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "obs-postmortem-037",
+      "week": 31,
+      "day": 5,
+      "level": "Senior-track",
+      "topic": "Monitoring",
+      "type": "postmortem",
+      "title": "Полный postmortem production-инцидента",
+      "context": "Учебный production-инцидент недели 31. Тема: Observability and incident management. Нужно собрать evidence, оценить impact и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Observability and incident management",
+        "Symptom: Полный postmortem production-инцидента",
+        "Impact: production-сервис, данные, кластер или пользователи деградируют",
+        "Constraint: нельзя делать разрушительные действия без rollback/DR-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата, rollback/DR и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, метрики, topology, backup status или incident timeline.",
+        "Оценить impact, blast radius, RTO/RPO или пользовательский эффект.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback/DR-план.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не оценить blast radius.",
+        "Не иметь rollback/DR-плана.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "impact": 15,
+        "rootCause": 20,
+        "mitigation": 15,
+        "rollback": 15,
+        "prevention": 15
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "labs"
+        ],
+        "tags": [
+          "Monitoring",
+          "incident",
+          "rollback",
+          "dr"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Monitoring"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "final-capstone-038",
+      "week": 32,
+      "day": 5,
+      "level": "Senior-track",
+      "topic": "Docker",
+      "type": "incident",
+      "title": "Финальный сценарий: сервис упал, БД деградирует",
+      "context": "Учебный production-инцидент недели 32. Тема: Production capstone. Нужно собрать evidence, оценить impact и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Production capstone",
+        "Symptom: Финальный сценарий: сервис упал, БД деградирует",
+        "Impact: production-сервис, данные, кластер или пользователи деградируют",
+        "Constraint: нельзя делать разрушительные действия без rollback/DR-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата, rollback/DR и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, метрики, topology, backup status или incident timeline.",
+        "Оценить impact, blast radius, RTO/RPO или пользовательский эффект.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback/DR-план.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не оценить blast radius.",
+        "Не иметь rollback/DR-плана.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "impact": 15,
+        "rootCause": 20,
+        "mitigation": 15,
+        "rollback": 15,
+        "prevention": 15
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "labs",
+          "ts"
+        ],
+        "tags": [
+          "Docker",
+          "incident",
+          "rollback",
+          "dr"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Docker",
+            "Kubernetes",
+            "CI/CD",
+            "Monitoring",
+            "Security"
           ],
           "category": [
             "scenario",

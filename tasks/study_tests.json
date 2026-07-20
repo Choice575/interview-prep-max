@@ -1,6 +1,6 @@
 {
   "version": "4.0.0",
-  "title": "Study Tests: DevOps Plan v4 Weeks 1-24",
+  "title": "Study Tests: DevOps Plan v4 Weeks 1-32",
   "language": "ru",
   "purpose": "Мини-тесты по дням и пятничные тесты для вкладки «Учёба» в Interview Prep Max.",
   "grading": {
@@ -4847,6 +4847,1646 @@
       "relatedSeniorCases": [
         "capstone-v1-030"
       ]
+    },
+    {
+      "id": "mini-w25d1-prod-net-timeout-031",
+      "week": 25,
+      "day": 1,
+      "title": "Неделя 25 День 1: Production networking",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 25: Production networking?",
+          "expected": "Рабочий артефакт: packet path, firewall, VPN, TLS chain. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "prod-net-timeout-031"
+      ]
+    },
+    {
+      "id": "mini-w25d2-prod-net-timeout-031",
+      "week": 25,
+      "day": 2,
+      "title": "Неделя 25 День 2: Production networking",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 25: Production networking?",
+          "expected": "Рабочий артефакт: packet path, firewall, VPN, TLS chain. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "prod-net-timeout-031"
+      ]
+    },
+    {
+      "id": "mini-w25d3-prod-net-timeout-031",
+      "week": 25,
+      "day": 3,
+      "title": "Неделя 25 День 3: Production networking",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 25: Production networking?",
+          "expected": "Рабочий артефакт: packet path, firewall, VPN, TLS chain. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "prod-net-timeout-031"
+      ]
+    },
+    {
+      "id": "mini-w25d4-prod-net-timeout-031",
+      "week": 25,
+      "day": 4,
+      "title": "Неделя 25 День 4: Production networking",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 25: Production networking?",
+          "expected": "Рабочий артефакт: packet path, firewall, VPN, TLS chain. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "prod-net-timeout-031"
+      ]
+    },
+    {
+      "id": "mini-w25d5-prod-net-timeout-031",
+      "week": 25,
+      "day": 5,
+      "title": "Неделя 25 День 5: Production networking",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 25: Production networking?",
+          "expected": "Рабочий артефакт: packet path, firewall, VPN, TLS chain. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "prod-net-timeout-031"
+      ]
+    },
+    {
+      "id": "mini-w26d1-ha-edge-032",
+      "week": 26,
+      "day": 1,
+      "title": "Неделя 26 День 1: Load balancing and HA edge",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 26: Load balancing and HA edge?",
+          "expected": "Рабочий артефакт: HAProxy/Nginx + health checks + failover test. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ha-edge-032"
+      ]
+    },
+    {
+      "id": "mini-w26d2-ha-edge-032",
+      "week": 26,
+      "day": 2,
+      "title": "Неделя 26 День 2: Load balancing and HA edge",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 26: Load balancing and HA edge?",
+          "expected": "Рабочий артефакт: HAProxy/Nginx + health checks + failover test. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ha-edge-032"
+      ]
+    },
+    {
+      "id": "mini-w26d3-ha-edge-032",
+      "week": 26,
+      "day": 3,
+      "title": "Неделя 26 День 3: Load balancing and HA edge",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 26: Load balancing and HA edge?",
+          "expected": "Рабочий артефакт: HAProxy/Nginx + health checks + failover test. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ha-edge-032"
+      ]
+    },
+    {
+      "id": "mini-w26d4-ha-edge-032",
+      "week": 26,
+      "day": 4,
+      "title": "Неделя 26 День 4: Load balancing and HA edge",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 26: Load balancing and HA edge?",
+          "expected": "Рабочий артефакт: HAProxy/Nginx + health checks + failover test. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ha-edge-032"
+      ]
+    },
+    {
+      "id": "mini-w26d5-ha-edge-032",
+      "week": 26,
+      "day": 5,
+      "title": "Неделя 26 День 5: Load balancing and HA edge",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 26: Load balancing and HA edge?",
+          "expected": "Рабочий артефакт: HAProxy/Nginx + health checks + failover test. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ha-edge-032"
+      ]
+    },
+    {
+      "id": "mini-w27d1-pg-restore-drill-033",
+      "week": 27,
+      "day": 1,
+      "title": "Неделя 27 День 1: PostgreSQL production",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 27: PostgreSQL production?",
+          "expected": "Рабочий артефакт: WAL archive + replication + restore drill. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-restore-drill-033"
+      ]
+    },
+    {
+      "id": "mini-w27d2-pg-restore-drill-033",
+      "week": 27,
+      "day": 2,
+      "title": "Неделя 27 День 2: PostgreSQL production",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 27: PostgreSQL production?",
+          "expected": "Рабочий артефакт: WAL archive + replication + restore drill. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-restore-drill-033"
+      ]
+    },
+    {
+      "id": "mini-w27d3-pg-restore-drill-033",
+      "week": 27,
+      "day": 3,
+      "title": "Неделя 27 День 3: PostgreSQL production",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 27: PostgreSQL production?",
+          "expected": "Рабочий артефакт: WAL archive + replication + restore drill. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-restore-drill-033"
+      ]
+    },
+    {
+      "id": "mini-w27d4-pg-restore-drill-033",
+      "week": 27,
+      "day": 4,
+      "title": "Неделя 27 День 4: PostgreSQL production",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 27: PostgreSQL production?",
+          "expected": "Рабочий артефакт: WAL archive + replication + restore drill. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-restore-drill-033"
+      ]
+    },
+    {
+      "id": "mini-w27d5-pg-restore-drill-033",
+      "week": 27,
+      "day": 5,
+      "title": "Неделя 27 День 5: PostgreSQL production",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 27: PostgreSQL production?",
+          "expected": "Рабочий артефакт: WAL archive + replication + restore drill. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-restore-drill-033"
+      ]
+    },
+    {
+      "id": "mini-w28d1-pg-migration-lock-034",
+      "week": 28,
+      "day": 1,
+      "title": "Неделя 28 День 1: PostgreSQL migration and performance",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 28: PostgreSQL migration and performance?",
+          "expected": "Рабочий артефакт: план миграции без долгих lock и диагностика slow queries. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-migration-lock-034"
+      ]
+    },
+    {
+      "id": "mini-w28d2-pg-migration-lock-034",
+      "week": 28,
+      "day": 2,
+      "title": "Неделя 28 День 2: PostgreSQL migration and performance",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 28: PostgreSQL migration and performance?",
+          "expected": "Рабочий артефакт: план миграции без долгих lock и диагностика slow queries. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-migration-lock-034"
+      ]
+    },
+    {
+      "id": "mini-w28d3-pg-migration-lock-034",
+      "week": 28,
+      "day": 3,
+      "title": "Неделя 28 День 3: PostgreSQL migration and performance",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 28: PostgreSQL migration and performance?",
+          "expected": "Рабочий артефакт: план миграции без долгих lock и диагностика slow queries. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-migration-lock-034"
+      ]
+    },
+    {
+      "id": "mini-w28d4-pg-migration-lock-034",
+      "week": 28,
+      "day": 4,
+      "title": "Неделя 28 День 4: PostgreSQL migration and performance",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 28: PostgreSQL migration and performance?",
+          "expected": "Рабочий артефакт: план миграции без долгих lock и диагностика slow queries. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-migration-lock-034"
+      ]
+    },
+    {
+      "id": "mini-w28d5-pg-migration-lock-034",
+      "week": 28,
+      "day": 5,
+      "title": "Неделя 28 День 5: PostgreSQL migration and performance",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 28: PostgreSQL migration and performance?",
+          "expected": "Рабочий артефакт: план миграции без долгих lock и диагностика slow queries. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-migration-lock-034"
+      ]
+    },
+    {
+      "id": "mini-w29d1-k8s-upgrade-035",
+      "week": 29,
+      "day": 1,
+      "title": "Неделя 29 День 1: Self-managed Kubernetes architecture",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 29: Self-managed Kubernetes architecture?",
+          "expected": "Рабочий артефакт: план обновления control plane с etcd backup. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "k8s-upgrade-035"
+      ]
+    },
+    {
+      "id": "mini-w29d2-k8s-upgrade-035",
+      "week": 29,
+      "day": 2,
+      "title": "Неделя 29 День 2: Self-managed Kubernetes architecture",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 29: Self-managed Kubernetes architecture?",
+          "expected": "Рабочий артефакт: план обновления control plane с etcd backup. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "k8s-upgrade-035"
+      ]
+    },
+    {
+      "id": "mini-w29d3-k8s-upgrade-035",
+      "week": 29,
+      "day": 3,
+      "title": "Неделя 29 День 3: Self-managed Kubernetes architecture",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 29: Self-managed Kubernetes architecture?",
+          "expected": "Рабочий артефакт: план обновления control plane с etcd backup. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "k8s-upgrade-035"
+      ]
+    },
+    {
+      "id": "mini-w29d4-k8s-upgrade-035",
+      "week": 29,
+      "day": 4,
+      "title": "Неделя 29 День 4: Self-managed Kubernetes architecture",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 29: Self-managed Kubernetes architecture?",
+          "expected": "Рабочий артефакт: план обновления control plane с etcd backup. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "k8s-upgrade-035"
+      ]
+    },
+    {
+      "id": "mini-w29d5-k8s-upgrade-035",
+      "week": 29,
+      "day": 5,
+      "title": "Неделя 29 День 5: Self-managed Kubernetes architecture",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 29: Self-managed Kubernetes architecture?",
+          "expected": "Рабочий артефакт: план обновления control plane с etcd backup. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "k8s-upgrade-035"
+      ]
+    },
+    {
+      "id": "mini-w30d1-k8s-storage-036",
+      "week": 30,
+      "day": 1,
+      "title": "Неделя 30 День 1: Kubernetes storage and HA workloads",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 30: Kubernetes storage and HA workloads?",
+          "expected": "Рабочий артефакт: PV/PVC/CSI/StatefulSet backup considerations. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "k8s-storage-036"
+      ]
+    },
+    {
+      "id": "mini-w30d2-k8s-storage-036",
+      "week": 30,
+      "day": 2,
+      "title": "Неделя 30 День 2: Kubernetes storage and HA workloads",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 30: Kubernetes storage and HA workloads?",
+          "expected": "Рабочий артефакт: PV/PVC/CSI/StatefulSet backup considerations. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "k8s-storage-036"
+      ]
+    },
+    {
+      "id": "mini-w30d3-k8s-storage-036",
+      "week": 30,
+      "day": 3,
+      "title": "Неделя 30 День 3: Kubernetes storage and HA workloads",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 30: Kubernetes storage and HA workloads?",
+          "expected": "Рабочий артефакт: PV/PVC/CSI/StatefulSet backup considerations. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "k8s-storage-036"
+      ]
+    },
+    {
+      "id": "mini-w30d4-k8s-storage-036",
+      "week": 30,
+      "day": 4,
+      "title": "Неделя 30 День 4: Kubernetes storage and HA workloads",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 30: Kubernetes storage and HA workloads?",
+          "expected": "Рабочий артефакт: PV/PVC/CSI/StatefulSet backup considerations. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "k8s-storage-036"
+      ]
+    },
+    {
+      "id": "mini-w30d5-k8s-storage-036",
+      "week": 30,
+      "day": 5,
+      "title": "Неделя 30 День 5: Kubernetes storage and HA workloads",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 30: Kubernetes storage and HA workloads?",
+          "expected": "Рабочий артефакт: PV/PVC/CSI/StatefulSet backup considerations. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "k8s-storage-036"
+      ]
+    },
+    {
+      "id": "mini-w31d1-obs-postmortem-037",
+      "week": 31,
+      "day": 1,
+      "title": "Неделя 31 День 1: Observability and incident management",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 31: Observability and incident management?",
+          "expected": "Рабочий артефакт: incident timeline, runbook, postmortem, action items. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "obs-postmortem-037"
+      ]
+    },
+    {
+      "id": "mini-w31d2-obs-postmortem-037",
+      "week": 31,
+      "day": 2,
+      "title": "Неделя 31 День 2: Observability and incident management",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 31: Observability and incident management?",
+          "expected": "Рабочий артефакт: incident timeline, runbook, postmortem, action items. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "obs-postmortem-037"
+      ]
+    },
+    {
+      "id": "mini-w31d3-obs-postmortem-037",
+      "week": 31,
+      "day": 3,
+      "title": "Неделя 31 День 3: Observability and incident management",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 31: Observability and incident management?",
+          "expected": "Рабочий артефакт: incident timeline, runbook, postmortem, action items. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "obs-postmortem-037"
+      ]
+    },
+    {
+      "id": "mini-w31d4-obs-postmortem-037",
+      "week": 31,
+      "day": 4,
+      "title": "Неделя 31 День 4: Observability and incident management",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 31: Observability and incident management?",
+          "expected": "Рабочий артефакт: incident timeline, runbook, postmortem, action items. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "obs-postmortem-037"
+      ]
+    },
+    {
+      "id": "mini-w31d5-obs-postmortem-037",
+      "week": 31,
+      "day": 5,
+      "title": "Неделя 31 День 5: Observability and incident management",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 31: Observability and incident management?",
+          "expected": "Рабочий артефакт: incident timeline, runbook, postmortem, action items. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "obs-postmortem-037"
+      ]
+    },
+    {
+      "id": "mini-w32d1-final-capstone-038",
+      "week": 32,
+      "day": 1,
+      "title": "Неделя 32 День 1: Production capstone",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 32: Production capstone?",
+          "expected": "Рабочий артефакт: финальный production-like проект и защита. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "final-capstone-038"
+      ]
+    },
+    {
+      "id": "mini-w32d2-final-capstone-038",
+      "week": 32,
+      "day": 2,
+      "title": "Неделя 32 День 2: Production capstone",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 32: Production capstone?",
+          "expected": "Рабочий артефакт: финальный production-like проект и защита. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "final-capstone-038"
+      ]
+    },
+    {
+      "id": "mini-w32d3-final-capstone-038",
+      "week": 32,
+      "day": 3,
+      "title": "Неделя 32 День 3: Production capstone",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 32: Production capstone?",
+          "expected": "Рабочий артефакт: финальный production-like проект и защита. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "final-capstone-038"
+      ]
+    },
+    {
+      "id": "mini-w32d4-final-capstone-038",
+      "week": 32,
+      "day": 4,
+      "title": "Неделя 32 День 4: Production capstone",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 32: Production capstone?",
+          "expected": "Рабочий артефакт: финальный production-like проект и защита. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "final-capstone-038"
+      ]
+    },
+    {
+      "id": "mini-w32d5-final-capstone-038",
+      "week": 32,
+      "day": 5,
+      "title": "Неделя 32 День 5: Production capstone",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 32: Production capstone?",
+          "expected": "Рабочий артефакт: финальный production-like проект и защита. Нужно уметь объяснить, как он проверяется, сопровождается и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Сетевой путь, логи, метрики, состояние HA/DB/K8s, backup status, timeline, impact и точный симптом.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status, logs, metrics, describe, route/cert check, backup validation или config review.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "План возврата: failback, предыдущий релиз/конфиг, restore, PITR, rollout undo, cluster backup или documented disaster recovery path.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходный сигнал, проверить метрики, логи, пользовательский путь, backup/restore result, алерты и отсутствие новых деградаций.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "final-capstone-038"
+      ]
     }
   ],
   "weeklyTests": [
@@ -5789,6 +7429,318 @@
           "score": 15,
           "caseId": "capstone-v1-030",
           "task": "Разбери кейс: Game day: сервис сломан, восстановить по runbook"
+        }
+      }
+    },
+    {
+      "id": "weekly-w25-prod-net-timeout-031",
+      "week": 25,
+      "title": "Неделя 25: Production networking",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: packet path, firewall, VPN, TLS chain.",
+          "mustInclude": [
+            "цель",
+            "evidence",
+            "проверка результата",
+            "rollback/DR-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: Production networking?",
+            "Какие production-риски: L3/L4/L7, HAProxy, Nginx, certificates, packet path?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback/DR-путь безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Часть пользователей видит timeout, часть 200 OK. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence и impact, затем построить гипотезы, проверить их read-only командами, применить минимальный mitigation, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "prod-net-timeout-031",
+          "task": "Разбери кейс: Часть пользователей видит timeout, часть 200 OK"
+        }
+      }
+    },
+    {
+      "id": "weekly-w26-ha-edge-032",
+      "week": 26,
+      "title": "Неделя 26: Load balancing and HA edge",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: HAProxy/Nginx + health checks + failover test.",
+          "mustInclude": [
+            "цель",
+            "evidence",
+            "проверка результата",
+            "rollback/DR-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: Load balancing and HA edge?",
+            "Какие production-риски: Keepalived, VRRP, active/passive, failover testing?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback/DR-путь безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Выбор L4/L7 балансировки и active/passive. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence и impact, затем построить гипотезы, проверить их read-only командами, применить минимальный mitigation, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "ha-edge-032",
+          "task": "Разбери кейс: Выбор L4/L7 балансировки и active/passive"
+        }
+      }
+    },
+    {
+      "id": "weekly-w27-pg-restore-drill-033",
+      "week": 27,
+      "title": "Неделя 27: PostgreSQL production",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: WAL archive + replication + restore drill.",
+          "mustInclude": [
+            "цель",
+            "evidence",
+            "проверка результата",
+            "rollback/DR-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: PostgreSQL production?",
+            "Какие production-риски: WAL archive, streaming replication, PITR, failover limits?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback/DR-путь безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Restore drill показал, что backup не восстанавливается. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence и impact, затем построить гипотезы, проверить их read-only командами, применить минимальный mitigation, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "pg-restore-drill-033",
+          "task": "Разбери кейс: Restore drill показал, что backup не восстанавливается"
+        }
+      }
+    },
+    {
+      "id": "weekly-w28-pg-migration-lock-034",
+      "week": 28,
+      "title": "Неделя 28: PostgreSQL migration and performance",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: план миграции без долгих lock и диагностика slow queries.",
+          "mustInclude": [
+            "цель",
+            "evidence",
+            "проверка результата",
+            "rollback/DR-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: PostgreSQL migration and performance?",
+            "Какие production-риски: locks, long transactions, indexes, slow queries, vacuum basics?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback/DR-путь безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Миграция заблокировала таблицу в рабочее время. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence и impact, затем построить гипотезы, проверить их read-only командами, применить минимальный mitigation, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "pg-migration-lock-034",
+          "task": "Разбери кейс: Миграция заблокировала таблицу в рабочее время"
+        }
+      }
+    },
+    {
+      "id": "weekly-w29-k8s-upgrade-035",
+      "week": 29,
+      "title": "Неделя 29: Self-managed Kubernetes architecture",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: план обновления control plane с etcd backup.",
+          "mustInclude": [
+            "цель",
+            "evidence",
+            "проверка результата",
+            "rollback/DR-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: Self-managed Kubernetes architecture?",
+            "Какие production-риски: etcd backup, kubelet, API server, CNI, cluster upgrade plan?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback/DR-путь безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: План обновления кластера с rollback. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence и impact, затем построить гипотезы, проверить их read-only командами, применить минимальный mitigation, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "k8s-upgrade-035",
+          "task": "Разбери кейс: План обновления кластера с rollback"
+        }
+      }
+    },
+    {
+      "id": "weekly-w30-k8s-storage-036",
+      "week": 30,
+      "title": "Неделя 30: Kubernetes storage and HA workloads",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: PV/PVC/CSI/StatefulSet backup considerations.",
+          "mustInclude": [
+            "цель",
+            "evidence",
+            "проверка результата",
+            "rollback/DR-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: Kubernetes storage and HA workloads?",
+            "Какие production-риски: StatefulSet, storage failure, backup for volumes?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback/DR-путь безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Pod переехал на другую node и потерял данные. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence и impact, затем построить гипотезы, проверить их read-only командами, применить минимальный mitigation, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "k8s-storage-036",
+          "task": "Разбери кейс: Pod переехал на другую node и потерял данные"
+        }
+      }
+    },
+    {
+      "id": "weekly-w31-obs-postmortem-037",
+      "week": 31,
+      "title": "Неделя 31: Observability and incident management",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: incident timeline, runbook, postmortem, action items.",
+          "mustInclude": [
+            "цель",
+            "evidence",
+            "проверка результата",
+            "rollback/DR-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: Observability and incident management?",
+            "Какие production-риски: MTTR, MTTD, on-call, severity, blameless postmortem?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback/DR-путь безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Полный postmortem production-инцидента. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence и impact, затем построить гипотезы, проверить их read-only командами, применить минимальный mitigation, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "obs-postmortem-037",
+          "task": "Разбери кейс: Полный postmortem production-инцидента"
+        }
+      }
+    },
+    {
+      "id": "weekly-w32-final-capstone-038",
+      "week": 32,
+      "title": "Неделя 32: Production capstone",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: финальный production-like проект и защита.",
+          "mustInclude": [
+            "цель",
+            "evidence",
+            "проверка результата",
+            "rollback/DR-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: Production capstone?",
+            "Какие production-риски: HA, backup, restore, monitoring, security, rollback, incident drill?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback/DR-путь безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Финальный сценарий: сервис упал, БД деградирует. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence и impact, затем построить гипотезы, проверить их read-only командами, применить минимальный mitigation, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "final-capstone-038",
+          "task": "Разбери кейс: Финальный сценарий: сервис упал, БД деградирует"
         }
       }
     }
