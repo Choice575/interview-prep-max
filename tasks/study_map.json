@@ -1,6 +1,6 @@
 {
   "version": "4.0.0",
-  "title": "DevOps Plan v4 Middle+/Senior: Weeks 1-16 Study Map",
+  "title": "DevOps Plan v4 Middle+/Senior: Weeks 1-24 Study Map",
   "profile": "devops",
   "language": "ru",
   "weeklyRhythm": {
@@ -2703,6 +2703,1341 @@
           ],
           "miniTest": [
             "Какой практический результат недели 16: PostgreSQL: WAL, PITR, replication basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 17,
+      "title": "Kubernetes basics",
+      "targetLevel": "Middle",
+      "mainTopics": [
+        "Kubernetes"
+      ],
+      "goal": "Освоить тему: Kubernetes basics на уровне Middle с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "rollout, rollback, logs, describe, events",
+      "artifact": "Deployment/Service/ConfigMap/Secret с rollout/rollback",
+      "seniorChallenge": {
+        "title": "Pod CrashLoopBackOff после релиза",
+        "task": "Разобрать production-ситуацию: Pod CrashLoopBackOff после релиза. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 17",
+        "trainers": [
+          "exam",
+          "k8s",
+          "labs"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Kubernetes"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Pod CrashLoopBackOff после релиза",
+          "Диагностика: Kubernetes basics",
+          "Rollback: Kubernetes basics"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle",
+          "objective": "Новая тема и базовая практика по теме: Kubernetes basics.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 17: Kubernetes basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle",
+          "objective": "Углубление и работа с выводом по теме: Kubernetes basics.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 17: Kubernetes basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle",
+          "objective": "Production-слой и типовые ошибки по теме: Kubernetes basics.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 17: Kubernetes basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle",
+          "objective": "Мини-инцидент или сквозной проект по теме: Kubernetes basics.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 17: Kubernetes basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle",
+          "objective": "Итог недели и Senior Challenge по теме: Kubernetes basics.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 17: Kubernetes basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 18,
+      "title": "Kubernetes networking and ingress",
+      "targetLevel": "Middle",
+      "mainTopics": [
+        "Kubernetes",
+        "Сети"
+      ],
+      "goal": "Освоить тему: Kubernetes networking and ingress на уровне Middle с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "CoreDNS, NetworkPolicy basics, ingress 502/404/TLS",
+      "artifact": "Service + Ingress + диагностика CoreDNS",
+      "seniorChallenge": {
+        "title": "Service есть, но Ingress отдаёт 502",
+        "task": "Разобрать production-ситуацию: Service есть, но Ingress отдаёт 502. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 18",
+        "trainers": [
+          "exam",
+          "k8s",
+          "ts"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Kubernetes",
+            "Сети"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Service есть, но Ingress отдаёт 502",
+          "Диагностика: Kubernetes networking and ingress",
+          "Rollback: Kubernetes networking and ingress"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle",
+          "objective": "Новая тема и базовая практика по теме: Kubernetes networking and ingress.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 18: Kubernetes networking and ingress?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle",
+          "objective": "Углубление и работа с выводом по теме: Kubernetes networking and ingress.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 18: Kubernetes networking and ingress?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle",
+          "objective": "Production-слой и типовые ошибки по теме: Kubernetes networking and ingress.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 18: Kubernetes networking and ingress?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle",
+          "objective": "Мини-инцидент или сквозной проект по теме: Kubernetes networking and ingress.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 18: Kubernetes networking and ingress?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle",
+          "objective": "Итог недели и Senior Challenge по теме: Kubernetes networking and ingress.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 18: Kubernetes networking and ingress?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 19,
+      "title": "Kubernetes resources and reliability",
+      "targetLevel": "Middle+",
+      "mainTopics": [
+        "Kubernetes",
+        "Monitoring"
+      ],
+      "goal": "Освоить тему: Kubernetes resources and reliability на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "readiness/liveness/startup probes, OOMKilled, evictions",
+      "artifact": "requests/limits/probes/HPA basics",
+      "seniorChallenge": {
+        "title": "Rolling update даёт 503 из-за readinessProbe",
+        "task": "Разобрать production-ситуацию: Rolling update даёт 503 из-за readinessProbe. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 19",
+        "trainers": [
+          "exam",
+          "k8s",
+          "labs"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Kubernetes",
+            "Monitoring"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Rolling update даёт 503 из-за readinessProbe",
+          "Диагностика: Kubernetes resources and reliability",
+          "Rollback: Kubernetes resources and reliability"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle+",
+          "objective": "Новая тема и базовая практика по теме: Kubernetes resources and reliability.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 19: Kubernetes resources and reliability?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle+",
+          "objective": "Углубление и работа с выводом по теме: Kubernetes resources and reliability.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 19: Kubernetes resources and reliability?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle+",
+          "objective": "Production-слой и типовые ошибки по теме: Kubernetes resources and reliability.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 19: Kubernetes resources and reliability?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle+",
+          "objective": "Мини-инцидент или сквозной проект по теме: Kubernetes resources and reliability.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 19: Kubernetes resources and reliability?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle+",
+          "objective": "Итог недели и Senior Challenge по теме: Kubernetes resources and reliability.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 19: Kubernetes resources and reliability?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 20,
+      "title": "Monitoring: Prometheus and Grafana",
+      "targetLevel": "Middle",
+      "mainTopics": [
+        "Monitoring"
+      ],
+      "goal": "Освоить тему: Monitoring: Prometheus and Grafana на уровне Middle с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "Метрики CPU/RAM/HTTP, cardinality, scrape failures",
+      "artifact": "dashboard с CPU/RAM/HTTP метриками",
+      "seniorChallenge": {
+        "title": "Метрика пропала после релиза",
+        "task": "Разобрать production-ситуацию: Метрика пропала после релиза. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 20",
+        "trainers": [
+          "exam",
+          "labs"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Monitoring"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Метрика пропала после релиза",
+          "Диагностика: Monitoring: Prometheus and Grafana",
+          "Rollback: Monitoring: Prometheus and Grafana"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle",
+          "objective": "Новая тема и базовая практика по теме: Monitoring: Prometheus and Grafana.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 20: Monitoring: Prometheus and Grafana?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle",
+          "objective": "Углубление и работа с выводом по теме: Monitoring: Prometheus and Grafana.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 20: Monitoring: Prometheus and Grafana?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle",
+          "objective": "Production-слой и типовые ошибки по теме: Monitoring: Prometheus and Grafana.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 20: Monitoring: Prometheus and Grafana?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle",
+          "objective": "Мини-инцидент или сквозной проект по теме: Monitoring: Prometheus and Grafana.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 20: Monitoring: Prometheus and Grafana?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle",
+          "objective": "Итог недели и Senior Challenge по теме: Monitoring: Prometheus and Grafana.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 20: Monitoring: Prometheus and Grafana?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 21,
+      "title": "Logging: Loki или ELK/OpenSearch",
+      "targetLevel": "Middle+",
+      "mainTopics": [
+        "Monitoring"
+      ],
+      "goal": "Освоить тему: Logging: Loki или ELK/OpenSearch на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "structured logs, log retention, correlation id, noisy logs",
+      "artifact": "централизованный сбор и поиск логов",
+      "seniorChallenge": {
+        "title": "500 ошибки есть, метрики молчат",
+        "task": "Разобрать production-ситуацию: 500 ошибки есть, метрики молчат. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 21",
+        "trainers": [
+          "exam",
+          "labs"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Monitoring"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "500 ошибки есть, метрики молчат",
+          "Диагностика: Logging: Loki или ELK/OpenSearch",
+          "Rollback: Logging: Loki или ELK/OpenSearch"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle+",
+          "objective": "Новая тема и базовая практика по теме: Logging: Loki или ELK/OpenSearch.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 21: Logging: Loki или ELK/OpenSearch?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle+",
+          "objective": "Углубление и работа с выводом по теме: Logging: Loki или ELK/OpenSearch.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 21: Logging: Loki или ELK/OpenSearch?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle+",
+          "objective": "Production-слой и типовые ошибки по теме: Logging: Loki или ELK/OpenSearch.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 21: Logging: Loki или ELK/OpenSearch?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle+",
+          "objective": "Мини-инцидент или сквозной проект по теме: Logging: Loki или ELK/OpenSearch.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 21: Logging: Loki или ELK/OpenSearch?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle+",
+          "objective": "Итог недели и Senior Challenge по теме: Logging: Loki или ELK/OpenSearch.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 21: Logging: Loki или ELK/OpenSearch?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 22,
+      "title": "Alerting, SLO, incident response",
+      "targetLevel": "Middle+",
+      "mainTopics": [
+        "Monitoring"
+      ],
+      "goal": "Освоить тему: Alerting, SLO, incident response на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "Alert fatigue, severity, escalation, SLO/SLI, error budget",
+      "artifact": "алерты, severity, incident report",
+      "seniorChallenge": {
+        "title": "Алерты шумят, реальный инцидент пропущен",
+        "task": "Разобрать production-ситуацию: Алерты шумят, реальный инцидент пропущен. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 22",
+        "trainers": [
+          "exam",
+          "labs"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Monitoring"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Алерты шумят, реальный инцидент пропущен",
+          "Диагностика: Alerting, SLO, incident response",
+          "Rollback: Alerting, SLO, incident response"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle+",
+          "objective": "Новая тема и базовая практика по теме: Alerting, SLO, incident response.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 22: Alerting, SLO, incident response?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle+",
+          "objective": "Углубление и работа с выводом по теме: Alerting, SLO, incident response.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 22: Alerting, SLO, incident response?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle+",
+          "objective": "Production-слой и типовые ошибки по теме: Alerting, SLO, incident response.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 22: Alerting, SLO, incident response?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle+",
+          "objective": "Мини-инцидент или сквозной проект по теме: Alerting, SLO, incident response.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 22: Alerting, SLO, incident response?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle+",
+          "objective": "Итог недели и Senior Challenge по теме: Alerting, SLO, incident response.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 22: Alerting, SLO, incident response?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 23,
+      "title": "Security baseline",
+      "targetLevel": "Middle+",
+      "mainTopics": [
+        "Security",
+        "Linux"
+      ],
+      "goal": "Освоить тему: Security baseline на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "SSH hardening, secrets, least privilege, image scanning, RBAC",
+      "artifact": "SSH hardening, secrets, least privilege",
+      "seniorChallenge": {
+        "title": "Секрет попал в pipeline logs",
+        "task": "Разобрать production-ситуацию: Секрет попал в pipeline logs. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 23",
+        "trainers": [
+          "exam",
+          "cmd",
+          "labs"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Security",
+            "Linux"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Секрет попал в pipeline logs",
+          "Диагностика: Security baseline",
+          "Rollback: Security baseline"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle+",
+          "objective": "Новая тема и базовая практика по теме: Security baseline.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 23: Security baseline?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle+",
+          "objective": "Углубление и работа с выводом по теме: Security baseline.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 23: Security baseline?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle+",
+          "objective": "Production-слой и типовые ошибки по теме: Security baseline.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 23: Security baseline?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle+",
+          "objective": "Мини-инцидент или сквозной проект по теме: Security baseline.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 23: Security baseline?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle+",
+          "objective": "Итог недели и Senior Challenge по теме: Security baseline.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 23: Security baseline?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 24,
+      "title": "Capstone v1: production-like service",
+      "targetLevel": "Middle+",
+      "mainTopics": [
+        "Docker",
+        "CI/CD",
+        "Monitoring"
+      ],
+      "goal": "Освоить тему: Capstone v1: production-like service на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "Deploy, rollback, backup, healthcheck, alerting",
+      "artifact": "сервис с deploy, rollback, backup, healthcheck, alerting",
+      "seniorChallenge": {
+        "title": "Game day: сервис сломан, восстановить по runbook",
+        "task": "Разобрать production-ситуацию: Game day: сервис сломан, восстановить по runbook. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 24",
+        "trainers": [
+          "exam",
+          "labs",
+          "ts"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Docker",
+            "CI/CD",
+            "Monitoring"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Game day: сервис сломан, восстановить по runbook",
+          "Диагностика: Capstone v1: production-like service",
+          "Rollback: Capstone v1: production-like service"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle+",
+          "objective": "Новая тема и базовая практика по теме: Capstone v1: production-like service.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 24: Capstone v1: production-like service?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle+",
+          "objective": "Углубление и работа с выводом по теме: Capstone v1: production-like service.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 24: Capstone v1: production-like service?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle+",
+          "objective": "Production-слой и типовые ошибки по теме: Capstone v1: production-like service.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 24: Capstone v1: production-like service?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle+",
+          "objective": "Мини-инцидент или сквозной проект по теме: Capstone v1: production-like service.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 24: Capstone v1: production-like service?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle+",
+          "objective": "Итог недели и Senior Challenge по теме: Capstone v1: production-like service.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 24: Capstone v1: production-like service?",
             "Какие evidence нужно собрать перед исправлением?",
             "Что будет безопасным первым шагом диагностики?",
             "Какой rollback-план нужен?"

@@ -1,6 +1,6 @@
 {
   "version": "4.0.0",
-  "title": "Senior Cases: DevOps Plan v4 Weeks 1-16",
+  "title": "Senior Cases: DevOps Plan v4 Weeks 1-24",
   "language": "ru",
   "purpose": "Первый пакет production-кейсов для вкладки «Учёба» и режима Senior Simulator в Interview Prep Max.",
   "caseSchema": {
@@ -1370,6 +1370,504 @@
           "topic": [
             "Monitoring",
             "Linux"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "k8s-crashloop-023",
+      "week": 17,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Kubernetes",
+      "type": "incident",
+      "title": "Pod CrashLoopBackOff после релиза",
+      "context": "Учебный production-инцидент недели 17. Тема: Kubernetes basics. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Kubernetes basics",
+        "Symptom: Pod CrashLoopBackOff после релиза",
+        "Impact: сервис, кластер, observability или безопасность работают некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, events, логи, метрики, конфиги или timeline.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "k8s",
+          "labs"
+        ],
+        "tags": [
+          "Kubernetes",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Kubernetes"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "k8s-ingress-024",
+      "week": 18,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Kubernetes",
+      "type": "diagnostic",
+      "title": "Service есть, но Ingress отдаёт 502",
+      "context": "Учебный production-инцидент недели 18. Тема: Kubernetes networking and ingress. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Kubernetes networking and ingress",
+        "Symptom: Service есть, но Ingress отдаёт 502",
+        "Impact: сервис, кластер, observability или безопасность работают некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, events, логи, метрики, конфиги или timeline.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "k8s",
+          "ts"
+        ],
+        "tags": [
+          "Kubernetes",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Kubernetes",
+            "Сети"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "k8s-readiness-025",
+      "week": 19,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Kubernetes",
+      "type": "incident",
+      "title": "Rolling update даёт 503 из-за readinessProbe",
+      "context": "Учебный production-инцидент недели 19. Тема: Kubernetes resources and reliability. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Kubernetes resources and reliability",
+        "Symptom: Rolling update даёт 503 из-за readinessProbe",
+        "Impact: сервис, кластер, observability или безопасность работают некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, events, логи, метрики, конфиги или timeline.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "k8s",
+          "labs"
+        ],
+        "tags": [
+          "Kubernetes",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Kubernetes",
+            "Monitoring"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "mon-metric-missing-026",
+      "week": 20,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Monitoring",
+      "type": "diagnostic",
+      "title": "Метрика пропала после релиза",
+      "context": "Учебный production-инцидент недели 20. Тема: Monitoring: Prometheus and Grafana. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Monitoring: Prometheus and Grafana",
+        "Symptom: Метрика пропала после релиза",
+        "Impact: сервис, кластер, observability или безопасность работают некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, events, логи, метрики, конфиги или timeline.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "labs"
+        ],
+        "tags": [
+          "Monitoring",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Monitoring"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "logs-500-027",
+      "week": 21,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Monitoring",
+      "type": "incident",
+      "title": "500 ошибки есть, метрики молчат",
+      "context": "Учебный production-инцидент недели 21. Тема: Logging: Loki или ELK/OpenSearch. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Logging: Loki или ELK/OpenSearch",
+        "Symptom: 500 ошибки есть, метрики молчат",
+        "Impact: сервис, кластер, observability или безопасность работают некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, events, логи, метрики, конфиги или timeline.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "labs"
+        ],
+        "tags": [
+          "Monitoring",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Monitoring"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "alert-fatigue-028",
+      "week": 22,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Monitoring",
+      "type": "postmortem",
+      "title": "Алерты шумят, реальный инцидент пропущен",
+      "context": "Учебный production-инцидент недели 22. Тема: Alerting, SLO, incident response. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Alerting, SLO, incident response",
+        "Symptom: Алерты шумят, реальный инцидент пропущен",
+        "Impact: сервис, кластер, observability или безопасность работают некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, events, логи, метрики, конфиги или timeline.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "labs"
+        ],
+        "tags": [
+          "Monitoring",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Monitoring"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "secret-leak-029",
+      "week": 23,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Security",
+      "type": "incident",
+      "title": "Секрет попал в pipeline logs",
+      "context": "Учебный production-инцидент недели 23. Тема: Security baseline. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Security baseline",
+        "Symptom: Секрет попал в pipeline logs",
+        "Impact: сервис, кластер, observability или безопасность работают некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, events, логи, метрики, конфиги или timeline.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "cmd",
+          "labs"
+        ],
+        "tags": [
+          "Security",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Security",
+            "Linux"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "capstone-v1-030",
+      "week": 24,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Docker",
+      "type": "incident",
+      "title": "Game day: сервис сломан, восстановить по runbook",
+      "context": "Учебный production-инцидент недели 24. Тема: Capstone v1: production-like service. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Capstone v1: production-like service",
+        "Symptom: Game day: сервис сломан, восстановить по runbook",
+        "Impact: сервис, кластер, observability или безопасность работают некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, events, логи, метрики, конфиги или timeline.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "labs",
+          "ts"
+        ],
+        "tags": [
+          "Docker",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Docker",
+            "CI/CD",
+            "Monitoring"
           ],
           "category": [
             "scenario",
