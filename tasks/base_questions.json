@@ -7512,7 +7512,7 @@
     "q": "Ядро Linux убивает процессы при нехватке памяти. Как настроить OOM killer для защиты критических процессов?",
     "options": [
       "a) Отключить OOM killer через /proc/sys/vm/panic_on_oom=1",
-      "b) b) oom_score_adj=-1000 в /proc/PID/oom_score_adj защищает процесс; systemd unit: OOMScoreAdjust=-1000; менее критичные: OOMScoreAdjust=+500; vm.overcommit_memory=2 предотвращает overcommit",
+      "b) oom_score_adj=-1000 в /proc/PID/oom_score_adj защищает процесс; systemd unit: OOMScoreAdjust=-1000; менее критичные: OOMScoreAdjust=+500; vm.overcommit_memory=2 предотвращает overcommit",
       "c) OOM killer нельзя настроить, только отключить",
       "d) cgroups v2 memory.max отключает OOM killer для cgroup"
     ],
@@ -7617,7 +7617,7 @@
     "q": "Как посмотреть детальную информацию о процессе через /proc/PID/?",
     "options": [
       "a) /proc/PID содержит только PID и имя процесса",
-      "b) b) /proc/PID/status (VmRSS, Threads, State), /proc/PID/maps (memory mappings), /proc/PID/fd/ (открытые файлы), /proc/PID/net/ (сетевые соединения), /proc/PID/environ (переменные среды)",
+      "b) /proc/PID/status (VmRSS, Threads, State), /proc/PID/maps (memory mappings), /proc/PID/fd/ (открытые файлы), /proc/PID/net/ (сетевые соединения), /proc/PID/environ (переменные среды)",
       "c) Для чтения /proc/PID нужны root права",
       "d) /proc/PID/status — только для отладки ядра"
     ],
@@ -7692,7 +7692,7 @@
     "q": "Чем отличается iBGP от eBGP и что такое проблема full mesh в iBGP?",
     "options": [
       "a) iBGP и eBGP идентичны, разница только в номере AS",
-      "b) b) iBGP: между роутерами одной AS (TTL=255, next-hop не меняется, нет split-horizon для route propagation — нужен full mesh или route reflector); eBGP: между разными AS (TTL=1 default, next-hop меняется)",
+      "b) iBGP: между роутерами одной AS (TTL=255, next-hop не меняется, нет split-horizon для route propagation — нужен full mesh или route reflector); eBGP: между разными AS (TTL=1 default, next-hop меняется)",
       "c) iBGP использует другой порт для соединения",
       "d) Route reflector нужен только в eBGP сетях"
     ],
@@ -7722,7 +7722,7 @@
     "q": "Что такое OSPF area types и как stub/NSSA area уменьшают размер LSDB?",
     "options": [
       "a) OSPF areas не влияют на размер таблицы маршрутизации",
-      "b) b) Stub area: нет external LSA (type 5), default route вместо; NSSA: нет external LSA но может анонсировать external через type 7 LSA; totally stub: нет inter-area и external — только default route",
+      "b) Stub area: нет external LSA (type 5), default route вместо; NSSA: нет external LSA но может анонсировать external через type 7 LSA; totally stub: нет inter-area и external — только default route",
       "c) Stub area не поддерживает суммаризацию маршрутов",
       "d) NSSA areas требуют OSPF v3"
     ],
@@ -7737,7 +7737,7 @@
     "q": "WireGuard vs IPSec: что выбрать для production VPN?",
     "options": [
       "a) WireGuard всегда лучше IPSec для любых задач",
-      "b) b) WireGuard: простота, ~4000 строк кода, быстрый handshake, нет negotiation overhead, kernel module; IPSec: гибкость алгоритмов, enterprise-grade, IKEv2 multivendor, site-to-site стандарт; WireGuard: peer-to-peer модель без central CA",
+      "b) WireGuard: простота, ~4000 строк кода, быстрый handshake, нет negotiation overhead, kernel module; IPSec: гибкость алгоритмов, enterprise-grade, IKEv2 multivendor, site-to-site стандарт; WireGuard: peer-to-peer модель без central CA",
       "c) IPSec всегда быстрее WireGuard",
       "d) WireGuard поддерживает динамические IP адреса нативно"
     ],
@@ -7752,7 +7752,7 @@
     "q": "Как работает Cilium и почему eBPF заменяет kube-proxy в Kubernetes?",
     "options": [
       "a) Cilium — это просто CNI plugin без отличий от Flannel",
-      "b) b) Cilium использует eBPF вместо iptables: нет iptables rules (O(n) → O(1) lookup через BPF map), identity-based security (не IP), L7 policy (HTTP/gRPC aware), замена kube-proxy через eBPF socket-based LB",
+      "b) Cilium использует eBPF вместо iptables: нет iptables rules (O(n) → O(1) lookup через BPF map), identity-based security (не IP), L7 policy (HTTP/gRPC aware), замена kube-proxy через eBPF socket-based LB",
       "c) Cilium требует изменения kernel на custom версию",
       "d) eBPF в Cilium работает только в userspace"
     ],
@@ -7767,7 +7767,7 @@
     "q": "Что такое QoS DSCP и как работает traffic policing vs shaping?",
     "options": [
       "a) DSCP и ToS — это одно и то же поле с одинаковым применением",
-      "b) b) DSCP (6 bits в ToS/TC): маркировка приоритета (EF=101110 для VoIP, AF, CS); policing: drop/remark при превышении rate (нет буферизации); shaping: задержка пакетов в очереди до выравнивания rate",
+      "b) DSCP (6 bits в ToS/TC): маркировка приоритета (EF=101110 для VoIP, AF, CS); policing: drop/remark при превышении rate (нет буферизации); shaping: задержка пакетов в очереди до выравнивания rate",
       "c) Traffic policing всегда лучше shaping для QoS",
       "d) DSCP работает только на L3, а 802.1p — только внутри одного канала"
     ],
@@ -7782,7 +7782,7 @@
     "q": "Как работает service mesh Istio: control plane vs data plane?",
     "options": [
       "a) Istio использует централизованный proxy вместо sidecar",
-      "b) b) Data plane: Envoy sidecar proxies перехватывают трафик через iptables redirect; Control plane: Istiod (Pilot: xDS, Citadel: mTLS certs, Galley: config validation) управляет Envoy через xDS API",
+      "b) Data plane: Envoy sidecar proxies перехватывают трафик через iptables redirect; Control plane: Istiod (Pilot: xDS, Citadel: mTLS certs, Galley: config validation) управляет Envoy через xDS API",
       "c) Istio control plane обрабатывает каждый пакет",
       "d) Envoy работает в kernel space для производительности"
     ],
@@ -7797,7 +7797,7 @@
     "q": "Что такое ECMP и как он реализован в Kubernetes/Linux?",
     "options": [
       "a) ECMP — это протокол резервирования шлюза",
-      "b) b) ECMP (Equal-Cost Multi-Path): несколько маршрутов одинаковой стоимости к одному назначению; хэш (src IP, dst IP, src port, dst port) выбирает path; ip route add с несколькими nexthop; Linux: multipath routing",
+      "b) ECMP (Equal-Cost Multi-Path): несколько маршрутов одинаковой стоимости к одному назначению; хэш (src IP, dst IP, src port, dst port) выбирает path; ip route add с несколькими nexthop; Linux: multipath routing",
       "c) ECMP работает только с протоколом OSPF",
       "d) ECMP в Kubernetes реализован через DNS round-robin"
     ],
@@ -7812,7 +7812,7 @@
     "q": "Что такое DNSSEC и какие проблемы оно решает?",
     "options": [
       "a) DNSSEC шифрует DNS запросы",
-      "b) b) DNSSEC обеспечивает аутентификацию DNS ответов через цифровые подписи (RRSIG, DNSKEY, DS, NSEC/NSEC3); защита от cache poisoning (Kaminsky attack); не шифрует — только целостность и аутентичность",
+      "b) DNSSEC обеспечивает аутентификацию DNS ответов через цифровые подписи (RRSIG, DNSKEY, DS, NSEC/NSEC3); защита от cache poisoning (Kaminsky attack); не шифрует — только целостность и аутентичность",
       "c) DNSSEC заменяет HTTPS для безопасности",
       "d) DNSSEC работает только с IPv6"
     ],
@@ -7827,7 +7827,7 @@
     "q": "Как работает HTTP/3 (QUIC) и чем он отличается от HTTP/2?",
     "options": [
       "a) HTTP/3 просто ускоренная версия HTTP/2 на TCP",
-      "b) b) HTTP/3 использует QUIC (UDP-based): устраняет TCP head-of-line blocking, 0-RTT resumption, connection migration (смена IP без reconnect), multiplexing без блокировки потоков",
+      "b) HTTP/3 использует QUIC (UDP-based): устраняет TCP head-of-line blocking, 0-RTT resumption, connection migration (смена IP без reconnect), multiplexing без блокировки потоков",
       "c) HTTP/3 не поддерживает мультиплексирование",
       "d) QUIC работает только в браузерах"
     ],
@@ -7842,7 +7842,7 @@
     "q": "Как работает mTLS в service mesh и что такое SPIFFE/SPIRE?",
     "options": [
       "a) mTLS в service mesh требует ручного управления сертификатами каждого сервиса",
-      "b) b) mTLS: взаимная аутентификация через сертификаты; SPIFFE (Secure Production Identity Framework): стандарт идентичности (SVID), SPIRE — реализация; Workload API выдаёт x509 SVID автоматически через attestation",
+      "b) mTLS: взаимная аутентификация через сертификаты; SPIFFE (Secure Production Identity Framework): стандарт идентичности (SVID), SPIRE — реализация; Workload API выдаёт x509 SVID автоматически через attestation",
       "c) mTLS в Istio шифрует только входящий трафик",
       "d) SPIFFE работает только с Kubernetes"
     ],
@@ -7857,7 +7857,7 @@
     "q": "Что такое SR-IOV и в каких сценариях он используется в cloud/k8s?",
     "options": [
       "a) SR-IOV — это стандарт виртуализации CPU",
-      "b) b) SR-IOV (Single Root I/O Virtualization): один физический NIC создаёт множество VF (Virtual Functions); VF напрямую в VM/контейнер через VFIO bypass kernel; линейная latency, zero-copy",
+      "b) SR-IOV (Single Root I/O Virtualization): один физический NIC создаёт множество VF (Virtual Functions); VF напрямую в VM/контейнер через VFIO bypass kernel; линейная latency, zero-copy",
       "c) SR-IOV требует специальной версии Linux ядра",
       "d) SR-IOV работает только с Infiniband адаптерами"
     ],
@@ -7872,7 +7872,7 @@
     "q": "Как работает consistent hashing в load balancers и зачем он нужен?",
     "options": [
       "a) Consistent hashing — это round-robin с весами",
-      "b) b) Consistent hashing: виртуальные узлы на кольце; при добавлении/удалении узла перераспределяется только K/n ключей (K — всего, n — узлов); sticky sessions без centralized state; используется в Maglev (Google LB)",
+      "b) Consistent hashing: виртуальные узлы на кольце; при добавлении/удалении узла перераспределяется только K/n ключей (K — всего, n — узлов); sticky sessions без centralized state; используется в Maglev (Google LB)",
       "c) Consistent hashing гарантирует равномерное распределение без виртуальных узлов",
       "d) Consistent hashing не поддерживает unhealthy node removal"
     ],
@@ -7887,7 +7887,7 @@
     "q": "Что такое BGP EVPN и для чего используется в современных дата-центрах?",
     "options": [
       "a) BGP EVPN — устаревший протокол для WAN соединений",
-      "b) b) EVPN (Ethernet VPN, RFC 7432): BGP-based control plane для L2/L3 VPN; MAC/IP advertisement через MP-BGP; eliminates BUM flooding; VXLAN + EVPN = современный DC fabric (leaf-spine)",
+      "b) EVPN (Ethernet VPN, RFC 7432): BGP-based control plane для L2/L3 VPN; MAC/IP advertisement через MP-BGP; eliminates BUM flooding; VXLAN + EVPN = современный DC fabric (leaf-spine)",
       "c) EVPN работает только с MPLS, не VXLAN",
       "d) BGP EVPN требует специальных лицензий на оборудовании"
     ],
@@ -7902,7 +7902,7 @@
     "q": "Как работает DDoS mitigation с помощью BGP blackholing и FlowSpec?",
     "options": [
       "a) DDoS mitigation возможен только через CDN",
-      "b) b) RTBH (Remote Triggered Black Hole): жертва анонсирует /32 с community 65535:666 — upstream дропает на edge; FlowSpec (RFC 5575): BGP распространяет flow rules (src/dst/port/protocol/rate-limit) для granular mitigation",
+      "b) RTBH (Remote Triggered Black Hole): жертва анонсирует /32 с community 65535:666 — upstream дропает на edge; FlowSpec (RFC 5575): BGP распространяет flow rules (src/dst/port/protocol/rate-limit) для granular mitigation",
       "c) BGP blackholing блокирует трафик на уровне L7",
       "d) FlowSpec работает только в iBGP сетях"
     ],
@@ -7917,7 +7917,7 @@
     "q": "Что такое DNS anycast и как он обеспечивает высокую доступность DNS?",
     "options": [
       "a) DNS anycast — это round-robin DNS с несколькими A записями",
-      "b) b) Anycast: один IP анонсируется из нескольких geographic PoP через BGP; клиент автоматически идёт к ближайшему PoP; при падении PoP BGP withdrawal перенаправляет к следующему",
+      "b) Anycast: один IP анонсируется из нескольких geographic PoP через BGP; клиент автоматически идёт к ближайшему PoP; при падении PoP BGP withdrawal перенаправляет к следующему",
       "c) DNS anycast требует специального DNS сервера",
       "d) Anycast работает только с UDP трафиком"
     ],
@@ -7932,7 +7932,7 @@
     "q": "Как работает Zero Trust networking и чем он отличается от традиционной периметровой безопасности?",
     "options": [
       "a) Zero Trust — это просто VPN с двухфакторной аутентификацией",
-      "b) b) Zero Trust: 'never trust, always verify'; identity-based access (не IP); micro-segmentation; continuous authentication; принципы: least privilege, assume breach, verify explicitly; реализации: BeyondCorp, Zscaler, Cloudflare Access",
+      "b) Zero Trust: 'never trust, always verify'; identity-based access (не IP); micro-segmentation; continuous authentication; принципы: least privilege, assume breach, verify explicitly; реализации: BeyondCorp, Zscaler, Cloudflare Access",
       "c) Zero Trust требует отказа от всех существующих сетевых устройств",
       "d) Zero Trust работает только для удалённого доступа"
     ],
@@ -7947,7 +7947,7 @@
     "q": "Как работает NetFlow/IPFIX и чем sFlow отличается от NetFlow?",
     "options": [
       "a) NetFlow и sFlow — идентичные протоколы разных вендоров",
-      "b) b) NetFlow/IPFIX: aggregated flow records (src/dst IP/port/proto, bytes, packets, timestamps); sFlow: packet sampling (1 из N пакетов) + counter samples; sFlow: меньше CPU overhead, NetFlow: точнее для маленьких flows",
+      "b) NetFlow/IPFIX: aggregated flow records (src/dst IP/port/proto, bytes, packets, timestamps); sFlow: packet sampling (1 из N пакетов) + counter samples; sFlow: меньше CPU overhead, NetFlow: точнее для маленьких flows",
       "c) IPFIX работает только на Cisco оборудовании",
       "d) sFlow шифрует все захваченные пакеты"
     ],
@@ -7962,7 +7962,7 @@
     "q": "Что такое IPv6 dual-stack и NAT64/DNS64 для миграции с IPv4?",
     "options": [
       "a) Dual-stack означает два отдельных независимых стека без взаимодействия",
-      "b) b) Dual-stack: каждый хост имеет IPv4 и IPv6; NAT64: шлюз транслирует IPv6 → IPv4 (для IPv6-only клиентов к IPv4 сервисам); DNS64: синтезирует AAAA из A записей; 464XLAT для мобильных сетей",
+      "b) Dual-stack: каждый хост имеет IPv4 и IPv6; NAT64: шлюз транслирует IPv6 → IPv4 (для IPv6-only клиентов к IPv4 сервисам); DNS64: синтезирует AAAA из A записей; 464XLAT для мобильных сетей",
       "c) NAT64 работает только в корпоративных сетях",
       "d) Dual-stack требует удвоения полосы пропускания"
     ],
@@ -7977,7 +7977,7 @@
     "q": "Как работает gRPC load balancing и чем он отличается от HTTP/1.1 LB?",
     "options": [
       "a) gRPC load balancing идентичен HTTP/1.1",
-      "b) b) gRPC (HTTP/2): множество RPC на одном TCP connection; L4 LB не балансирует per-RPC; нужен L7 LB или client-side LB; Envoy/Nginx/Traefik поддерживают gRPC L7; headless service + client-side LB в k8s",
+      "b) gRPC (HTTP/2): множество RPC на одном TCP connection; L4 LB не балансирует per-RPC; нужен L7 LB или client-side LB; Envoy/Nginx/Traefik поддерживают gRPC L7; headless service + client-side LB в k8s",
       "c) gRPC всегда использует round-robin без настройки",
       "d) gRPC load balancing работает только через DNS"
     ],
@@ -7992,7 +7992,7 @@
     "q": "Что такое SSL/TLS termination и где лучше её выполнять в архитектуре?",
     "options": [
       "a) TLS termination должна быть только на каждом микросервисе",
-      "b) b) TLS termination: расшифровка на edge (LB/proxy); варианты: edge termination (простота, нет E2E), re-encryption (edge→backend TLS), passthrough (сквозное TLS до приложения); mTLS в service mesh для E2E",
+      "b) TLS termination: расшифровка на edge (LB/proxy); варианты: edge termination (простота, нет E2E), re-encryption (edge→backend TLS), passthrough (сквозное TLS до приложения); mTLS в service mesh для E2E",
       "c) TLS termination всегда снижает производительность в 10 раз",
       "d) SSL offloading работает только на аппаратных балансировщиках"
     ],
@@ -8007,7 +8007,7 @@
     "q": "Как работает XDP (eXpress Data Path) в Linux?",
     "options": [
       "a) XDP — это замена iptables для фаерволла",
-      "b) b) XDP: eBPF программа запускается в NIC driver перед аллокацией socket buffer; действия: XDP_PASS/DROP/TX/REDIRECT; без memory allocation overhead; самая быстрая точка обработки пакетов в Linux",
+      "b) XDP: eBPF программа запускается в NIC driver перед аллокацией socket buffer; действия: XDP_PASS/DROP/TX/REDIRECT; без memory allocation overhead; самая быстрая точка обработки пакетов в Linux",
       "c) XDP работает только в userspace",
       "d) XDP требует специального оборудования с FPGA"
     ],
@@ -8022,7 +8022,7 @@
     "q": "Что такое CNI (Container Network Interface) и как он работает в Kubernetes?",
     "options": [
       "a) CNI — это встроенный в Kubernetes сетевой стек",
-      "b) b) CNI: спецификация + plugins для настройки сети контейнеров; kubelet вызывает CNI plugin при создании Pod; plugin настраивает veth pair, IP, маршруты; популярные: Calico, Flannel, Cilium, Weave",
+      "b) CNI: спецификация + plugins для настройки сети контейнеров; kubelet вызывает CNI plugin при создании Pod; plugin настраивает veth pair, IP, маршруты; популярные: Calico, Flannel, Cilium, Weave",
       "c) CNI работает только с containerd, не с CRI-O",
       "d) CNI plugins написаны только на Go"
     ],
@@ -8037,7 +8037,7 @@
     "q": "Когда использовать MPLS в современных сетях и актуален ли он в эпоху SDN?",
     "options": [
       "a) MPLS полностью заменён SDN и больше не используется",
-      "b) b) MPLS: label switching для traffic engineering (TE), MPLS L3VPN/VPLS для service providers, FRR (Fast ReRoute <50ms); актуален для telco/SP; в DC заменяется VXLAN+EVPN; SR (Segment Routing) модернизирует MPLS концепцию",
+      "b) MPLS: label switching для traffic engineering (TE), MPLS L3VPN/VPLS для service providers, FRR (Fast ReRoute <50ms); актуален для telco/SP; в DC заменяется VXLAN+EVPN; SR (Segment Routing) модернизирует MPLS концепцию",
       "c) MPLS быстрее IP routing в любом случае",
       "d) MPLS требует специального оборудования только класса enterprise"
     ],
@@ -8052,7 +8052,7 @@
     "q": "Как работает kube-proxy в режиме iptables и почему IPVS лучше при масштабировании?",
     "options": [
       "a) kube-proxy iptables и IPVS идентичны по производительности",
-      "b) b) iptables: линейный просмотр правил O(n), 10k services = 80k правил; IPVS: hash table O(1), предназначен для LB, больше алгоритмов (rr/lc/sh/sed/nq), меньше latency при тысячах services",
+      "b) iptables: линейный просмотр правил O(n), 10k services = 80k правил; IPVS: hash table O(1), предназначен для LB, больше алгоритмов (rr/lc/sh/sed/nq), меньше latency при тысячах services",
       "c) IPVS mode нестабилен и не рекомендован для production",
       "d) kube-proxy IPVS работает только на RHEL"
     ],
@@ -8067,7 +8067,7 @@
     "q": "Что такое NAT и чем SNAT отличается от DNAT?",
     "options": [
       "a) NAT и PAT — разные протоколы без связи",
-      "b) b) SNAT (Source NAT): изменяет source IP (выход в интернет через один IP); DNAT (Destination NAT): изменяет destination IP (port forwarding, load balancing); Masquerade — динамический SNAT",
+      "b) SNAT (Source NAT): изменяет source IP (выход в интернет через один IP); DNAT (Destination NAT): изменяет destination IP (port forwarding, load balancing); Masquerade — динамический SNAT",
       "c) DNAT работает только на входящих соединениях из интернета",
       "d) NAT сохраняет оригинальный IP в заголовке"
     ],
@@ -8082,7 +8082,7 @@
     "q": "Как работает TCP slow start и congestion control?",
     "options": [
       "a) TCP всегда передаёт данные с максимальной скоростью",
-      "b) b) Slow start: cwnd начинается с 1-10 MSS, удваивается каждый RTT до ssthresh; congestion avoidance: +1 MSS за RTT; при потере: ssthresh=cwnd/2, cubic/BBR более агрессивны",
+      "b) Slow start: cwnd начинается с 1-10 MSS, удваивается каждый RTT до ssthresh; congestion avoidance: +1 MSS за RTT; при потере: ssthresh=cwnd/2, cubic/BBR более агрессивны",
       "c) TCP congestion control работает только с UDP",
       "d) cwnd — это размер окна получателя, не отправителя"
     ],
@@ -8097,7 +8097,7 @@
     "q": "Что такое VLAN и как он реализован на уровне Ethernet?",
     "options": [
       "a) VLAN — это виртуальная машина в сети",
-      "b) b) VLAN (IEEE 802.1Q): 4-byte tag в Ethernet header (TPID=0x8100, PCP 3 bits, DEI, VID 12 bits = 4094 VLANs); trunk port передаёт tagged frames, access port — untagged для конечных устройств",
+      "b) VLAN (IEEE 802.1Q): 4-byte tag в Ethernet header (TPID=0x8100, PCP 3 bits, DEI, VID 12 bits = 4094 VLANs); trunk port передаёт tagged frames, access port — untagged для конечных устройств",
       "c) VLAN шифрует трафик между сегментами",
       "d) Максимум 256 VLAN на коммутаторе"
     ],
@@ -8112,7 +8112,7 @@
     "q": "Intermittent packet loss в Kubernetes cluster между подами. С чего начать диагностику?",
     "options": [
       "a) Перезагрузить все ноды кластера",
-      "b) b) ping + mtr между Pod IP; проверить CNI plugin logs; tcpdump на veth/overlay interface; проверить conntrack table (conntrack -L | wc -l vs nf_conntrack_max); eBPF (cilium monitor); MTU mismatch при VXLAN",
+      "b) ping + mtr между Pod IP; проверить CNI plugin logs; tcpdump на veth/overlay interface; проверить conntrack table (conntrack -L | wc -l vs nf_conntrack_max); eBPF (cilium monitor); MTU mismatch при VXLAN",
       "c) Только смотреть kubectl logs pods",
       "d) Заменить CNI plugin без диагностики"
     ],
@@ -8127,7 +8127,7 @@
     "q": "Что такое DNS over HTTPS (DoH) и DNS over TLS (DoT) и в чём их разница?",
     "options": [
       "a) DoH и DoT — устаревшие протоколы шифрования DNS",
-      "b) b) DoT (RFC 7858): DNS over TLS на port 853, отдельное соединение; DoH (RFC 8484): DNS в HTTP/2 POST/GET на port 443, неотличим от HTTPS; DoH обходит corporate firewall blocking по port 853",
+      "b) DoT (RFC 7858): DNS over TLS на port 853, отдельное соединение; DoH (RFC 8484): DNS в HTTP/2 POST/GET на port 443, неотличим от HTTPS; DoH обходит corporate firewall blocking по port 853",
       "c) Оба протокола используют UDP для транспорта",
       "d) DoH требует специального DNS сервера на клиенте"
     ],
@@ -8142,7 +8142,7 @@
     "q": "Как работает GENEVE и чем он отличается от VXLAN?",
     "options": [
       "a) GENEVE и VXLAN идентичны технически",
-      "b) b) GENEVE (RFC 8926): расширяемый overlay protocol с переменной длиной TLV options header; VXLAN: фиксированный 8-byte header; GENEVE гибче (metadata для NSH, OVN использует GENEVE по умолчанию)",
+      "b) GENEVE (RFC 8926): расширяемый overlay protocol с переменной длиной TLV options header; VXLAN: фиксированный 8-byte header; GENEVE гибче (metadata для NSH, OVN использует GENEVE по умолчанию)",
       "c) GENEVE использует TCP вместо UDP",
       "d) GENEVE не поддерживается в Linux kernel"
     ],
@@ -8157,7 +8157,7 @@
     "q": "Что такое BGP route filtering и зачем он нужен?",
     "options": [
       "a) BGP route filtering замедляет сходимость сети",
-      "b) b) Фильтрация BGP маршрутов: prefix-list (конкретные префиксы), route-map (match+set атрибуты), AS-path ACL; предотвращает route leak (случайный транзит), hijacking; RPKI (BGP origin validation) верифицирует AS origin",
+      "b) Фильтрация BGP маршрутов: prefix-list (конкретные префиксы), route-map (match+set атрибуты), AS-path ACL; предотвращает route leak (случайный транзит), hijacking; RPKI (BGP origin validation) верифицирует AS origin",
       "c) BGP route filtering работает только между iBGP соседями",
       "d) Prefix-list и route-map — это одно и то же"
     ],
@@ -8172,7 +8172,7 @@
     "q": "Что такое ARP и как он работает?",
     "options": [
       "a) ARP — это протокол для получения IP по MAC адресу",
-      "b) b) ARP (Address Resolution Protocol): разрешение IP → MAC в одном L2 сегменте; broadcast запрос 'who has 192.168.1.1?', ответ unicast; кэш: arp -n или ip neigh show; gratuitous ARP для обновления кэша",
+      "b) ARP (Address Resolution Protocol): разрешение IP → MAC в одном L2 сегменте; broadcast запрос 'who has 192.168.1.1?', ответ unicast; кэш: arp -n или ip neigh show; gratuitous ARP для обновления кэша",
       "c) ARP работает на L3, как IP",
       "d) ARP используется только в IPv6 сетях"
     ],
@@ -8187,7 +8187,7 @@
     "q": "Как диагностировать MTU-related проблемы в сети?",
     "options": [
       "a) MTU проблемы не существуют в современных сетях",
-      "b) b) ping -M do -s 1472 host (DF bit, 1500-28=1472); tracepath host (показывает MTU каждого hop); tcpdump для fragmentation; ip link show dev eth0 (mtu); PMTUD (Path MTU Discovery) может блокироваться ICMP filtering",
+      "b) ping -M do -s 1472 host (DF bit, 1500-28=1472); tracepath host (показывает MTU каждого hop); tcpdump для fragmentation; ip link show dev eth0 (mtu); PMTUD (Path MTU Discovery) может блокироваться ICMP filtering",
       "c) Только перезагрузка устройств решает MTU проблемы",
       "d) MTU всегда одинаковый на всём пути"
     ],
@@ -8202,7 +8202,7 @@
     "q": "Что такое Segment Routing (SR-MPLS/SRv6) и как он упрощает MPLS?",
     "options": [
       "a) Segment Routing — это просто новое название для MPLS TE",
-      "b) b) SR: source routing — исходный узел кодирует весь path в заголовке пакета (stack of segments); нет per-flow state в промежуточных узлах (в отличие от RSVP-TE); SRv6 использует IPv6 extension headers",
+      "b) SR: source routing — исходный узел кодирует весь path в заголовке пакета (stack of segments); нет per-flow state в промежуточных узлах (в отличие от RSVP-TE); SRv6 использует IPv6 extension headers",
       "c) Segment Routing требует замены всего оборудования",
       "d) SR работает только с BGP, не OSPF/IS-IS"
     ],
@@ -8217,7 +8217,7 @@
     "q": "Как работает Ingress controller в Kubernetes и в чём разница с LoadBalancer service?",
     "options": [
       "a) Ingress controller и LoadBalancer service — одно и то же",
-      "b) b) LoadBalancer service: отдельный external LB на каждый service (дорого в cloud); Ingress: один LB + Ingress controller routing по host/path к разным services; Ingress controller: Nginx, Traefik, HAProxy, AWS ALB controller",
+      "b) LoadBalancer service: отдельный external LB на каждый service (дорого в cloud); Ingress: один LB + Ingress controller routing по host/path к разным services; Ingress controller: Nginx, Traefik, HAProxy, AWS ALB controller",
       "c) Ingress работает только с HTTP, LoadBalancer — для TCP/UDP",
       "d) Ingress controller автоматически устанавливается в Kubernetes"
     ],
@@ -8232,7 +8232,7 @@
     "q": "Как реализовать high availability для BGP border routers без HSRP/VRRP?",
     "options": [
       "a) HA для BGP роутеров возможна только через VRRP",
-      "b) b) Anycast routing: оба роутера анонсируют одинаковый prefix; ECMP в upstream; BFD (Bidirectional Forwarding Detection) для fast failover; BGP graceful restart; route reflector cluster для внутренней iBGP HA",
+      "b) Anycast routing: оба роутера анонсируют одинаковый prefix; ECMP в upstream; BFD (Bidirectional Forwarding Detection) для fast failover; BGP graceful restart; route reflector cluster для внутренней iBGP HA",
       "c) BGP HA требует проприетарных протоколов вендора",
       "d) Два BGP роутера нельзя использовать в HA без специального ПО"
     ],
@@ -8247,7 +8247,7 @@
     "q": "Что такое Network Policy в Kubernetes и как она реализуется?",
     "options": [
       "a) Network Policy — это просто firewall правила на уровне iptables хоста",
-      "b) b) NetworkPolicy: L3/L4 whitelist правила для Pod трафика (podSelector, namespaceSelector, ports); реализуется CNI plugin (Calico, Cilium, Weave); без поддерживающего CNI — правила игнорируются",
+      "b) NetworkPolicy: L3/L4 whitelist правила для Pod трафика (podSelector, namespaceSelector, ports); реализуется CNI plugin (Calico, Cilium, Weave); без поддерживающего CNI — правила игнорируются",
       "c) Network Policy работает на L7 для HTTP фильтрации",
       "d) Network Policy автоматически применяется ко всем подам"
     ],
@@ -8262,7 +8262,7 @@
     "q": "Когда использовать overlay network (VXLAN) vs underlay (BGP) в Kubernetes?",
     "options": [
       "a) Overlay всегда лучше underlay для production",
-      "b) b) Overlay (VXLAN): простота, не требует настройки сетевого оборудования, работает поверх любого L3; Underlay (BGP, Calico): нет encapsulation overhead, нативная скорость, но требует BGP-capable infrastructure",
+      "b) Overlay (VXLAN): простота, не требует настройки сетевого оборудования, работает поверх любого L3; Underlay (BGP, Calico): нет encapsulation overhead, нативная скорость, но требует BGP-capable infrastructure",
       "c) Underlay всегда быстрее в 5x по сравнению с overlay",
       "d) BGP underlay требует BGP licence на каждой ноде"
     ],
@@ -8277,7 +8277,7 @@
     "q": "Что такое Ansible Collection и как организована его структура?",
     "options": [
       "a) Collection — это просто папка с playbooks",
-      "b) b) Collection: namespace.name структура; содержит roles/, modules/, plugins/, playbooks/, tests/; устанавливается через ansible-galaxy collection install; requirements.yml для зависимостей; galaxy.yml метаданные",
+      "b) Collection: namespace.name структура; содержит roles/, modules/, plugins/, playbooks/, tests/; устанавливается через ansible-galaxy collection install; requirements.yml для зависимостей; galaxy.yml метаданные",
       "c) Collections поддерживают только официальные Ansible модули",
       "d) Collection нельзя публиковать в Automation Hub"
     ],
@@ -8292,7 +8292,7 @@
     "q": "Как написать custom Ansible module на Python с поддержкой check mode?",
     "options": [
       "a) Custom модули пишутся только на bash",
-      "b) b) AnsibleModule(argument_spec, supports_check_mode=True); module.check_mode для условного пропуска изменений; module.exit_json(changed=True/False, result=...); module.fail_json(msg='error')",
+      "b) AnsibleModule(argument_spec, supports_check_mode=True); module.check_mode для условного пропуска изменений; module.exit_json(changed=True/False, result=...); module.fail_json(msg='error')",
       "c) Check mode в custom модулях включается автоматически без кода",
       "d) AnsibleModule не поддерживает сложные типы аргументов"
     ],
@@ -8307,7 +8307,7 @@
     "q": "Чем include_tasks отличается от import_tasks и когда использовать каждый?",
     "options": [
       "a) include_tasks и import_tasks полностью идентичны",
-      "b) b) import_tasks: статический (pre-processed), теги и when применяются к задачам внутри; include_tasks: динамический (runtime), переменные loop работают, но теги не propagate автоматически в задачи внутри",
+      "b) import_tasks: статический (pre-processed), теги и when применяются к задачам внутри; include_tasks: динамический (runtime), переменные loop работают, но теги не propagate автоматически в задачи внутри",
       "c) include_tasks нельзя использовать в handlers",
       "d) import_tasks не поддерживает переменные в имени файла"
     ],
@@ -8322,7 +8322,7 @@
     "q": "Как работает Ansible Vault с несколькими ключами (vault-id)?",
     "options": [
       "a) Ansible Vault поддерживает только один глобальный пароль",
-      "b) b) vault-id: --vault-id label@source (label@prompt, label@/path/to/file, label@script); файл может содержать несколько зашифрованных значений с разными vault-id; ansible-vault encrypt_string --vault-id prod@vault_pass_prod",
+      "b) vault-id: --vault-id label@source (label@prompt, label@/path/to/file, label@script); файл может содержать несколько зашифрованных значений с разными vault-id; ansible-vault encrypt_string --vault-id prod@vault_pass_prod",
       "c) Несколько vault-id нельзя использовать в одном playbook",
       "d) vault-id работает только в Ansible Tower/AWX"
     ],
@@ -8337,7 +8337,7 @@
     "q": "Как настроить Molecule для тестирования Ansible роли?",
     "options": [
       "a) Molecule — только для синтаксической проверки playbooks",
-      "b) b) Molecule: molecule init role; molecule.yml (driver: docker/vagrant/delegated), converge.yml (apply role), verify.yml (testinfra/pytest/ansible); molecule test запускает полный цикл create→converge→verify→destroy",
+      "b) Molecule: molecule init role; molecule.yml (driver: docker/vagrant/delegated), converge.yml (apply role), verify.yml (testinfra/pytest/ansible); molecule test запускает полный цикл create→converge→verify→destroy",
       "c) Molecule поддерживает только Docker driver",
       "d) Molecule тестирует только idempotency без проверки функциональности"
     ],
@@ -8352,7 +8352,7 @@
     "q": "Как работает Ansible callback plugin и для чего используется?",
     "options": [
       "a) Callback plugin — это просто альтернативное название для filter plugin",
-      "b) b) Callback plugin: хуки на события playbook (v2_playbook_on_start, v2_runner_on_ok/failed/skipped, v2_playbook_on_stats); используется для кастомного вывода, нотификаций (Slack, PagerDuty), audit logging, metrics",
+      "b) Callback plugin: хуки на события playbook (v2_playbook_on_start, v2_runner_on_ok/failed/skipped, v2_playbook_on_stats); используется для кастомного вывода, нотификаций (Slack, PagerDuty), audit logging, metrics",
       "c) Callback plugins работают только в AWX/Tower",
       "d) Можно активировать только один callback plugin одновременно"
     ],
@@ -8367,7 +8367,7 @@
     "q": "Как реализовать динамический инвентарь для AWS с помощью плагина?",
     "options": [
       "a) Динамический инвентарь AWS требует написания bash скрипта",
-      "b) b) aws_ec2 inventory plugin: aws_ec2.yml с plugin: amazon.aws.aws_ec2; regions, filters, keyed_groups (теги → Ansible группы); hostnames (предпочтительное имя хоста); compose для переменных",
+      "b) aws_ec2 inventory plugin: aws_ec2.yml с plugin: amazon.aws.aws_ec2; regions, filters, keyed_groups (теги → Ansible группы); hostnames (предпочтительное имя хоста); compose для переменных",
       "c) Динамический инвентарь работает только с EC2 classic",
       "d) aws_ec2 plugin требует установки boto3 только на target hosts"
     ],
@@ -8382,7 +8382,7 @@
     "q": "Что такое AWX/AAP (Ansible Automation Platform) и как устроены Workflows?",
     "options": [
       "a) AWX — это просто веб-интерфейс для запуска ansible-playbook",
-      "b) b) AWX: Job Templates (playbook + inventory + credentials), Workflows (DAG из Job Templates с условиями on_success/on_failure/always), RBAC, schedules, webhook triggers, API-first архитектура",
+      "b) AWX: Job Templates (playbook + inventory + credentials), Workflows (DAG из Job Templates с условиями on_success/on_failure/always), RBAC, schedules, webhook triggers, API-first архитектура",
       "c) Workflow в AWX не поддерживает условные ветки",
       "d) AWX не поддерживает работу с Vault credentials"
     ],
@@ -8397,7 +8397,7 @@
     "q": "Как работает Ansible connection plugin mitogen и каковы его преимущества?",
     "options": [
       "a) Mitogen — это способ шифрования Ansible трафика",
-      "b) b) Mitogen: alternative connection/strategy plugin; переиспользует SSH соединения, выполняет Python напрямую (не fork+exec), кэширует файлы модулей; ускорение 1.5-7x для больших инвентарей",
+      "b) Mitogen: alternative connection/strategy plugin; переиспользует SSH соединения, выполняет Python напрямую (не fork+exec), кэширует файлы модулей; ускорение 1.5-7x для больших инвентарей",
       "c) Mitogen несовместим с Ansible Collections",
       "d) Mitogen требует установки агента на target hosts"
     ],
@@ -8412,7 +8412,7 @@
     "q": "Как реализовать event-driven automation с Ansible EDA (Event-Driven Ansible)?",
     "options": [
       "a) EDA — это просто cron-based планировщик для Ansible",
-      "b) b) EDA: rulebooks (sources + rules + actions); sources: kafka, webhooks, alertmanager, aws_sqs; rules: условия (event.payload.status == 'firing'); actions: run_playbook, run_job_template, debug",
+      "b) EDA: rulebooks (sources + rules + actions); sources: kafka, webhooks, alertmanager, aws_sqs; rules: условия (event.payload.status == 'firing'); actions: run_playbook, run_job_template, debug",
       "c) EDA работает только с Prometheus alerts",
       "d) EDA не интегрируется с AWX/AAP"
     ],
@@ -8427,7 +8427,7 @@
     "q": "Как работают lookup plugins и приведите примеры практического использования?",
     "options": [
       "a) Lookup plugins используются только для чтения файлов",
-      "b) b) Lookup возвращает данные из внешних источников на control node; file, env, template, pipe (shell output), url, aws_ssm, hashi_vault, password (generate/store), csvfile, ini",
+      "b) Lookup возвращает данные из внешних источников на control node; file, env, template, pipe (shell output), url, aws_ssm, hashi_vault, password (generate/store), csvfile, ini",
       "c) Lookup plugins выполняются на target hosts",
       "d) Lookup результаты нельзя использовать в with_items"
     ],
@@ -8442,7 +8442,7 @@
     "q": "Как написать custom filter plugin для Ansible?",
     "options": [
       "a) Custom filter plugins пишутся только на Ruby",
-      "b) b) Python файл в filter_plugins/ или collection plugins/filter/; класс FilterModule с методом filters() возвращающим dict {name: function}; функция принимает value + опциональные args",
+      "b) Python файл в filter_plugins/ или collection plugins/filter/; класс FilterModule с методом filters() возвращающим dict {name: function}; функция принимает value + опциональные args",
       "c) Custom filters не поддерживают аргументы",
       "d) Filter plugins работают только с строками"
     ],
@@ -8457,7 +8457,7 @@
     "q": "Как работает Ansible Execution Environment (EE) и зачем нужен ansible-builder?",
     "options": [
       "a) Execution Environment — это VM для запуска Ansible",
-      "b) b) EE: OCI container image с Ansible + collections + Python dependencies; ansible-builder создаёт EE из execution-environment.yml; обеспечивает воспроизводимость; AWX/AAP запускает job в EE контейнере",
+      "b) EE: OCI container image с Ansible + collections + Python dependencies; ansible-builder создаёт EE из execution-environment.yml; обеспечивает воспроизводимость; AWX/AAP запускает job в EE контейнере",
       "c) EE работает только в cloud окружениях",
       "d) ansible-builder требует Docker Enterprise"
     ],
@@ -8472,7 +8472,7 @@
     "q": "Как настроить fact caching в Ansible для больших инвентарей?",
     "options": [
       "a) Fact caching отключает gather_facts полностью",
-      "b) b) ansible.cfg: fact_caching=jsonfile/redis/memcached; fact_caching_connection=/path или redis://; fact_caching_timeout=86400; gather_facts=smart (собирает только если кэш устарел); существенно ускоряет повторные запуски",
+      "b) ansible.cfg: fact_caching=jsonfile/redis/memcached; fact_caching_connection=/path или redis://; fact_caching_timeout=86400; gather_facts=smart (собирает только если кэш устарел); существенно ускоряет повторные запуски",
       "c) Fact caching работает только для custom facts",
       "d) Fact caching несовместим с dynamic inventory"
     ],
@@ -8487,7 +8487,7 @@
     "q": "Ansible playbook зависает на конкретном host. Как диагностировать?",
     "options": [
       "a) Убить процесс ansible и перезапустить",
-      "b) b) ANSIBLE_DEBUG=1; -vvvv для verbose; async + poll=0 с async_status; timeout параметр задач; проверить SSH соединение вручную; strace python process; ansible.cfg: timeout=30",
+      "b) ANSIBLE_DEBUG=1; -vvvv для verbose; async + poll=0 с async_status; timeout параметр задач; проверить SSH соединение вручную; strace python process; ansible.cfg: timeout=30",
       "c) Просто добавить ignore_errors: yes",
       "d) Перезагрузить target host"
     ],
@@ -8502,7 +8502,7 @@
     "q": "Как работает стратегия free в Ansible и когда её применять?",
     "options": [
       "a) Стратегия free означает выполнение без ограничений на хостах",
-      "b) b) strategy: free — каждый host выполняет задачи независимо, не ждёт остальных (vs linear: все хосты синхронизируются после каждой задачи); ускоряет при неоднородных хостах; host_pinned — free но без перехода к следующему play",
+      "b) strategy: free — каждый host выполняет задачи независимо, не ждёт остальных (vs linear: все хосты синхронизируются после каждой задачи); ускоряет при неоднородных хостах; host_pinned — free но без перехода к следующему play",
       "c) Free strategy запускает все задачи параллельно на каждом хосте",
       "d) Free strategy отключает error handling"
     ],
@@ -8517,7 +8517,7 @@
     "q": "Как работает network automation в Ansible: connection: network_cli vs httpapi?",
     "options": [
       "a) Network модули работают как обычные SSH модули",
-      "b) b) network_cli: SSH + CLI парсинг (show commands, configure mode); httpapi: REST/NETCONF API (более надёжный, structured data); ios/eos/nxos/junos модули; ansible_network_os определяет платформу",
+      "b) network_cli: SSH + CLI парсинг (show commands, configure mode); httpapi: REST/NETCONF API (более надёжный, structured data); ios/eos/nxos/junos модули; ansible_network_os определяет платформу",
       "c) Оба метода идентичны для всех сетевых устройств",
       "d) network_cli требует Python агента на сетевом устройстве"
     ],
@@ -8532,7 +8532,7 @@
     "q": "Как настроить error handling с block/rescue/always в Ansible?",
     "options": [
       "a) block/rescue/always аналогичен try/catch только для одной задачи",
-      "b) b) block: группа задач; rescue: выполняется при ошибке в block (как catch); always: выполняется всегда независимо от результата; ansible_failed_task и ansible_failed_result доступны в rescue",
+      "b) block: группа задач; rescue: выполняется при ошибке в block (как catch); always: выполняется всегда независимо от результата; ansible_failed_task и ansible_failed_result доступны в rescue",
       "c) rescue блок не может содержать notify handlers",
       "d) always блок пропускается если rescue завершился с ошибкой"
     ],
@@ -8547,7 +8547,7 @@
     "q": "Как использовать Jinja2 macros и loop controls в Ansible templates?",
     "options": [
       "a) Jinja2 macros в Ansible не поддерживаются",
-      "b) b) {% macro render_vhost(name, port) %}...{% endmacro %}; loop_control: label/pause/index_var/loop_var; | selectattr | map | unique | groupby фильтры для сложных трансформаций",
+      "b) {% macro render_vhost(name, port) %}...{% endmacro %}; loop_control: label/pause/index_var/loop_var; | selectattr | map | unique | groupby фильтры для сложных трансформаций",
       "c) Jinja2 macros работают только в файлах templates/, не в tasks",
       "d) loop_control поддерживает только label атрибут"
     ],
@@ -8562,7 +8562,7 @@
     "q": "Что такое Ansible Pull mode и как он работает?",
     "options": [
       "a) Ansible Pull — это способ передачи файлов на хосты",
-      "b) b) ansible-pull: целевой хост сам клонирует git repo и запускает playbook локально; инвертирует push → pull модель; масштабируется горизонтально без нагрузки на control node; запускается через cron или systemd timer",
+      "b) ansible-pull: целевой хост сам клонирует git repo и запускает playbook локально; инвертирует push → pull модель; масштабируется горизонтально без нагрузки на control node; запускается через cron или systemd timer",
       "c) ansible-pull требует Ansible Tower для работы",
       "d) Pull mode не поддерживает Vault encrypted variables"
     ],
@@ -8577,7 +8577,7 @@
     "q": "Как тестировать идемпотентность Ansible ролей и что проверяет ansible-lint?",
     "options": [
       "a) Идемпотентность проверяется только вручную",
-      "b) b) Molecule idempotency scenario: второй запуск converge должен вернуть changed=0; ansible-lint: синтаксис, best practices (no command/shell когда есть модуль, name на задачах, deprecated syntax, yaml lint)",
+      "b) Molecule idempotency scenario: второй запуск converge должен вернуть changed=0; ansible-lint: синтаксис, best practices (no command/shell когда есть модуль, name на задачах, deprecated syntax, yaml lint)",
       "c) ansible-lint проверяет только синтаксис YAML",
       "d) Идемпотентность гарантирована для всех встроенных модулей"
     ],
@@ -8592,7 +8592,7 @@
     "q": "Как оптимизировать производительность Ansible для 1000+ хостов?",
     "options": [
       "a) Просто увеличить forks до 1000",
-      "b) b) forks=50-100; pipelining=True; mitogen strategy; fact caching (redis); gather_subset (minimal facts); async tasks; serial для rolling; ssh ControlMaster/ControlPersist; delegation для heavy tasks",
+      "b) forks=50-100; pipelining=True; mitogen strategy; fact caching (redis); gather_subset (minimal facts); async tasks; serial для rolling; ssh ControlMaster/ControlPersist; delegation для heavy tasks",
       "c) Производительность Ansible не масштабируется выше 100 хостов",
       "d) Единственный способ — использовать AWX"
     ],
@@ -8607,7 +8607,7 @@
     "q": "Что такое Ansible tags и как их использовать эффективно?",
     "options": [
       "a) Tags в Ansible работают только на уровне play",
-      "b) b) tags на task/block/role уровне; ansible-playbook --tags deploy,config; --skip-tags; специальные: always (всегда), never (только явно); --list-tags; теги наследуются дочерними задачами блока",
+      "b) tags на task/block/role уровне; ansible-playbook --tags deploy,config; --skip-tags; специальные: always (всегда), never (только явно); --list-tags; теги наследуются дочерними задачами блока",
       "c) Tags нельзя применять к roles",
       "d) always и never — зарезервированные системные теги без возможности переопределения"
     ],
@@ -8622,7 +8622,7 @@
     "q": "Как работает serial в Ansible и зачем использовать rolling deployment?",
     "options": [
       "a) serial запускает playbook только на одном хосте",
-      "b) b) serial: N или [1, 5, 10%] — поэтапный rolling deploy; play выполняется на N хостах, затем следующая группа; max_fail_percentage: остановить если X% хостов упали; обеспечивает zero-downtime при обновлении",
+      "b) serial: N или [1, 5, 10%] — поэтапный rolling deploy; play выполняется на N хостах, затем следующая группа; max_fail_percentage: остановить если X% хостов упали; обеспечивает zero-downtime при обновлении",
       "c) serial конфликтует со стратегией free",
       "d) serial: 0 означает параллельное выполнение"
     ],
@@ -8637,7 +8637,7 @@
     "q": "Нужно обновить конфигурацию 500 серверов, но только если файл изменился. Как реализовать?",
     "options": [
       "a) Обновлять всегда, игнорируя изменения",
-      "b) b) template/copy модуль возвращает changed только при изменении контента (MD5 сравнение); handler вызывается только при changed; stat модуль для предварительной проверки; --check --diff для preview",
+      "b) template/copy модуль возвращает changed только при изменении контента (MD5 сравнение); handler вызывается только при changed; stat модуль для предварительной проверки; --check --diff для preview",
       "c) Использовать shell: diff для сравнения файлов",
       "d) Только синхронизация через rsync решает эту задачу"
     ],
@@ -8652,7 +8652,7 @@
     "q": "Что такое Ansible inventory и какие форматы поддерживаются?",
     "options": [
       "a) Inventory в Ansible — это только список IP адресов",
-      "b) b) Inventory: список хостов и групп; форматы: INI (hosts в секциях [group]), YAML (удобнее для сложных структур), dynamic (scripts/plugins); группы: all, ungrouped, user-defined; host/group vars",
+      "b) Inventory: список хостов и групп; форматы: INI (hosts в секциях [group]), YAML (удобнее для сложных структур), dynamic (scripts/plugins); группы: all, ungrouped, user-defined; host/group vars",
       "c) Ansible поддерживает только INI формат инвентаря",
       "d) Inventory обязательно должен быть одним файлом"
     ],
@@ -8667,7 +8667,7 @@
     "q": "Что такое Ansible role и какова её структура директорий?",
     "options": [
       "a) Роль — это просто отдельный playbook файл",
-      "b) b) Role: tasks/main.yml, handlers/main.yml, vars/main.yml, defaults/main.yml, templates/, files/, meta/main.yml (dependencies), tests/; позволяет переиспользовать код; ansible-galaxy role init",
+      "b) Role: tasks/main.yml, handlers/main.yml, vars/main.yml, defaults/main.yml, templates/, files/, meta/main.yml (dependencies), tests/; позволяет переиспользовать код; ansible-galaxy role init",
       "c) Роль обязательно должна содержать все директории",
       "d) defaults/main.yml и vars/main.yml — одно и то же"
     ],
@@ -8682,7 +8682,7 @@
     "q": "Как работает делегирование задач (delegate_to) в Ansible?",
     "options": [
       "a) delegate_to заставляет задачу выполняться на всех хостах одновременно",
-      "b) b) delegate_to: другой_хост — задача выполняется на указанном хосте, но переменные остаются от текущего inventory_host; delegate_facts: yes для сбора фактов на делегированном хосте; run_once: true для однократного выполнения",
+      "b) delegate_to: другой_хост — задача выполняется на указанном хосте, но переменные остаются от текущего inventory_host; delegate_facts: yes для сбора фактов на делегированном хосте; run_once: true для однократного выполнения",
       "c) delegate_to работает только с localhost",
       "d) delegate_to несовместимо с loop"
     ],
@@ -8697,7 +8697,7 @@
     "q": "Как использовать Ansible для управления секретами с HashiCorp Vault?",
     "options": [
       "a) HashiCorp Vault и Ansible Vault — одно и то же",
-      "b) b) hashi_vault lookup plugin: {{ lookup('hashi_vault', 'secret/data/db:password') }}; collection community.hashi_vault; аутентификация: token, approle, aws_iam; VAULT_ADDR и VAULT_TOKEN env vars или playbook vars",
+      "b) hashi_vault lookup plugin: {{ lookup('hashi_vault', 'secret/data/db:password') }}; collection community.hashi_vault; аутентификация: token, approle, aws_iam; VAULT_ADDR и VAULT_TOKEN env vars или playbook vars",
       "c) Ansible не может интегрироваться с HashiCorp Vault",
       "d) Vault integration работает только в AWX"
     ],
@@ -8712,7 +8712,7 @@
     "q": "Как работает ansible-navigator и в чём его преимущество перед ansible-playbook?",
     "options": [
       "a) ansible-navigator — это просто UI для ansible-playbook без новых функций",
-      "b) b) ansible-navigator: TUI interface, запускает playbooks в Execution Environment (контейнер), режимы stdout/interactive, replay артефакты для анализа; подготовлен для AAP workflow",
+      "b) ansible-navigator: TUI interface, запускает playbooks в Execution Environment (контейнер), режимы stdout/interactive, replay артефакты для анализа; подготовлен для AAP workflow",
       "c) ansible-navigator заменяет AWX для production",
       "d) ansible-navigator работает только с podman, не Docker"
     ],
@@ -8727,7 +8727,7 @@
     "q": "Ansible vs Terraform для configuration management: когда использовать каждый?",
     "options": [
       "a) Ansible полностью заменяет Terraform для любых задач",
-      "b) b) Terraform: infrastructure provisioning (создание ресурсов, state management, идемпотентность через state); Ansible: configuration management (установка ПО, управление файлами, orchestration); часто используются вместе: Terraform создаёт, Ansible настраивает",
+      "b) Terraform: infrastructure provisioning (создание ресурсов, state management, идемпотентность через state); Ansible: configuration management (установка ПО, управление файлами, orchestration); часто используются вместе: Terraform создаёт, Ansible настраивает",
       "c) Terraform умеет управлять конфигурацией приложений лучше Ansible",
       "d) Ansible имеет встроенный state management как Terraform"
     ],
@@ -8742,7 +8742,7 @@
     "q": "Как работают AWX webhook triggers и как интегрировать с GitLab CI?",
     "options": [
       "a) AWX не поддерживает webhook интеграцию",
-      "b) b) AWX Webhook: Job Template → Enable Webhook → GitHub/GitLab type → получаем URL + key; GitLab: Settings → Integrations → webhook URL; AWX верифицирует подпись; можно передавать переменные через webhook payload",
+      "b) AWX Webhook: Job Template → Enable Webhook → GitHub/GitLab type → получаем URL + key; GitLab: Settings → Integrations → webhook URL; AWX верифицирует подпись; можно передавать переменные через webhook payload",
       "c) Webhook в AWX работает только с GitHub",
       "d) Webhook trigger запускает только один раз и не повторяется"
     ],
@@ -8757,7 +8757,7 @@
     "q": "Как реализовать сложную логику в Ansible с использованием Jinja2 tests?",
     "options": [
       "a) Jinja2 tests в Ansible — это то же самое что filters",
-      "b) b) Tests (is/is not): value is defined, is string, is number, is iterable, is mapping, is version('2.0', '>='); custom tests в test_plugins/; используются в when: и selectattr(); возвращают bool",
+      "b) Tests (is/is not): value is defined, is string, is number, is iterable, is mapping, is version('2.0', '>='); custom tests в test_plugins/; используются в when: и selectattr(); возвращают bool",
       "c) Jinja2 tests доступны только в template файлах",
       "d) Tests не поддерживают сравнение версий"
     ],
@@ -8772,7 +8772,7 @@
     "q": "Что такое ansible-lint и как его интегрировать в CI/CD?",
     "options": [
       "a) ansible-lint проверяет только синтаксис YAML файлов",
-      "b) b) ansible-lint: статический анализ playbooks/roles/collections; правила: best practices, deprecated, FQCN, yaml formatting; .ansible-lint конфиг; интеграция в pre-commit, GitHub Actions, GitLab CI",
+      "b) ansible-lint: статический анализ playbooks/roles/collections; правила: best practices, deprecated, FQCN, yaml formatting; .ansible-lint конфиг; интеграция в pre-commit, GitHub Actions, GitLab CI",
       "c) ansible-lint работает только локально, не в CI",
       "d) Все ansible-lint предупреждения блокируют выполнение"
     ],
@@ -8787,7 +8787,7 @@
     "q": "Как управлять версиями ролей и коллекций через requirements.yml?",
     "options": [
       "a) requirements.yml поддерживает только Galaxy роли",
-      "b) b) requirements.yml: roles (galaxy/git source, version) и collections (name, version, source); ansible-galaxy install -r requirements.yml; ansible-galaxy collection install -r requirements.yml; поддерживает git refs и URL",
+      "b) requirements.yml: roles (galaxy/git source, version) и collections (name, version, source); ansible-galaxy install -r requirements.yml; ansible-galaxy collection install -r requirements.yml; поддерживает git refs и URL",
       "c) Версии в requirements.yml нельзя закрепить",
       "d) requirements.yml устарел в Ansible 2.10+"
     ],
@@ -8802,7 +8802,7 @@
     "q": "Что такое Ansible handlers и как они вызываются?",
     "options": [
       "a) Handlers — это задачи, выполняющиеся перед каждой основной задачей",
-      "b) b) Handlers: задачи, вызываемые через notify только при changed=True; выполняются один раз в конце play; flush_handlers для досрочного запуска; listen для группировки нескольких notify на один handler",
+      "b) Handlers: задачи, вызываемые через notify только при changed=True; выполняются один раз в конце play; flush_handlers для досрочного запуска; listen для группировки нескольких notify на один handler",
       "c) Handlers выполняются каждый раз независимо от changed",
       "d) Notify в handlers работает только с service модулем"
     ],
@@ -8817,7 +8817,7 @@
     "q": "Нужно деплоить приложение только на серверы с версией OS Ubuntu 22.04. Как фильтровать?",
     "options": [
       "a) Вручную поддерживать отдельный inventory для Ubuntu 22.04",
-      "b) b) when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '22.04'; или group_vars с условием; hosts с add_host после проверки; limit через --limit group_ubuntu22",
+      "b) when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '22.04'; или group_vars с условием; hosts с add_host после проверки; limit через --limit group_ubuntu22",
       "c) Использовать только отдельный playbook для каждой версии OS",
       "d) ansible_os_family включает номер версии"
     ],
@@ -8832,7 +8832,7 @@
     "q": "Как работает Ansible psrp connection для управления Windows?",
     "options": [
       "a) Ansible не поддерживает Windows серверы",
-      "b) b) psrp (PowerShell Remoting Protocol): WinRM over HTTP/HTTPS; ansible_connection=psrp; ansible_psrp_protocol=https; ansible_psrp_auth=kerberos/ntlm/credssp; win_* модули для Windows задач",
+      "b) psrp (PowerShell Remoting Protocol): WinRM over HTTP/HTTPS; ansible_connection=psrp; ansible_psrp_protocol=https; ansible_psrp_auth=kerberos/ntlm/credssp; win_* модули для Windows задач",
       "c) PSRP требует установки Python на Windows серверах",
       "d) WinRM доступен только в Windows Server 2019+"
     ],
@@ -8847,7 +8847,7 @@
     "q": "Что такое переменные в Ansible и каков порядок их приоритетов?",
     "options": [
       "a) Все переменные в Ansible имеют одинаковый приоритет",
-      "b) b) Приоритет (от низкого к высокому): role defaults → inventory group_vars → inventory host_vars → playbook group_vars → playbook host_vars → task vars → extra-vars (-e) (наивысший)",
+      "b) Приоритет (от низкого к высокому): role defaults → inventory group_vars → inventory host_vars → playbook group_vars → playbook host_vars → task vars → extra-vars (-e) (наивысший)",
       "c) host_vars всегда имеют наивысший приоритет",
       "d) extra-vars (командная строка) нельзя переопределить в playbook"
     ],
@@ -8862,7 +8862,7 @@
     "q": "Как использовать register и conditionals для построения сложной логики в Ansible?",
     "options": [
       "a) register сохраняет только stdout результата команды",
-      "b) b) register: result сохраняет полный return value модуля (stdout, stderr, rc, changed, failed, stdout_lines); when: result.rc == 0 or result.stdout | regex_search('pattern'); failed_when: result.rc not in [0, 2]",
+      "b) register: result сохраняет полный return value модуля (stdout, stderr, rc, changed, failed, stdout_lines); when: result.rc == 0 or result.stdout | regex_search('pattern'); failed_when: result.rc not in [0, 2]",
       "c) register работает только с command и shell модулями",
       "d) when условие нельзя использовать с зарегистрированными переменными из предыдущего хоста"
     ],

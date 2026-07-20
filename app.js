@@ -45,34 +45,59 @@ function dataSize(data){
   return 'object';
 }
 
+function renderLoadFailure(errors, loadedCount, totalCount) {
+  const box = document.getElementById('app-loading');
+  const pct = totalCount ? Math.round(loadedCount / totalCount * 100) : 0;
+  box.innerHTML =
+    '<div style="font-size:48px;margin-bottom:16px">⚠️</div>'+
+    '<div style="font-size:18px;font-weight:700;margin-bottom:8px;color:var(--red)">Не удалось загрузить данные</div>'+
+    '<div style="font-size:12px;color:var(--text2);max-width:520px;margin:0 auto;line-height:1.7">'+
+    '<div>APP_VERSION: <b>'+APP_VERSION+'</b> · пакеты: <b>'+loadedCount+'/'+totalCount+'</b> · '+pct+'%</div>'+
+    '<div style="margin-top:8px;text-align:left;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px">'+
+    errors.map(e => '<div>• '+esc(e)+'</div>').join('')+
+    '</div>'+
+    '<div style="margin-top:8px">Если проблема повторяется, очистите кэш сайта или проверьте доступность JSON-файлов.</div>'+
+    '</div>'+
+    '<div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'+
+    '<button class="btn btn-primary" onclick="location.reload()">🔄 Повторить загрузку</button>'+
+    '<button class="btn btn-outline" onclick="checkOfflineReady()">📶 Проверить оффлайн</button>'+
+    '</div>';
+}
+
 async function loadAllData() {
   const status = document.getElementById('load-status');
+  const totalCount = Object.keys(DATA_FILES).length;
   const errors = [];
+  let loadedCount = 0;
+  let lastProgressAt = Date.now();
+  const watchdog = setInterval(() => {
+    const elapsed = Math.round((Date.now() - lastProgressAt) / 1000);
+    if (elapsed >= 8 && status) {
+      status.textContent = `Загрузка данных... ${loadedCount}/${totalCount}. Нет ответа ${elapsed}с. APP_VERSION ${APP_VERSION}`;
+    }
+  }, 1000);
   const promises = Object.entries(DATA_FILES).map(async ([key, url]) => {
     try {
-      const resp = await fetch(url);
+      const resp = await fetch(url, {cache:'no-cache'});
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const data = await resp.json();
       window[DATA_VARS[key]] = data;
-      status.textContent = `Загружено: ${key} (${dataSize(data)})`;
+      loadedCount++;
+      lastProgressAt = Date.now();
+      status.textContent = `Загружено: ${key} (${dataSize(data)}) · ${loadedCount}/${totalCount}`;
     } catch (e) {
       console.error(`Failed to load ${url}:`, e);
-      errors.push(`${key}: ${e.message}`);
-      status.textContent = `Ошибка загрузки ${key}`;
+      errors.push(`${key}: ${url} — ${e.message}`);
+      status.textContent = `Ошибка загрузки ${key} · ${loadedCount}/${totalCount}`;
     }
   });
   await Promise.all(promises);
+  clearInterval(watchdog);
   if (errors.length > 0) {
-    document.getElementById('app-loading').innerHTML =
-      '<div style="font-size:48px;margin-bottom:16px">⚠️</div>'+
-      '<div style="font-size:18px;font-weight:700;margin-bottom:8px;color:var(--red)">Не удалось загрузить данные</div>'+
-      '<div style="font-size:12px;color:var(--text2);max-width:400px;margin:0 auto">'+
-      errors.map(e => '<div>• '+esc(e)+'</div>').join('')+
-      '</div>'+
-      '<div style="margin-top:16px"><button class="btn btn-primary" onclick="location.reload()">🔄 Попробовать снова</button></div>';
+    renderLoadFailure(errors, loadedCount, totalCount);
     throw new Error('Data loading failed: '+errors.join(', '));
   }
-  status.textContent = 'Инициализация...';
+  status.textContent = `Инициализация... APP_VERSION ${APP_VERSION}`;
 }
 
 // ═══ STORAGE ═══
@@ -230,6 +255,17 @@ function renderQuestions(){
   cont.innerHTML=qs.map(q=>renderQCard(q,false)).join('');
 }
 
+function updateQuestionProgressSummary(){
+  const pi=document.getElementById('progress-info');
+  const sb=document.getElementById('seg-bar');
+  if(!pi||!sb||!activeQuestions.length||sb.style.display==='none') return;
+  const qprog=getQProg();const total=activeQuestions.length;
+  let ok=0,err=0;
+  activeQuestions.forEach(q=>{const p=qprog[q.id];if(p){if(p.correct>p.wrong)ok++;else if(p.wrong>0)err++;}});
+  sb.innerHTML='<div class="seg-ok" style="width:'+(ok/total*100)+'%"></div><div class="seg-err" style="width:'+(err/total*100)+'%"></div><div class="seg-none" style="width:'+((total-ok-err)/total*100)+'%"></div>';
+  pi.innerHTML='<span style="font-size:12px;color:var(--text2)">Показано: <b>'+total+'</b> | ✅ '+ok+' | ❌ '+err+' | ⭕ '+(total-ok-err)+'</span>';
+}
+
 function renderQCard(q,sMode){
   const mistakes=getMistakes();const qprog=getQProg();const qp=qprog[q.id]||{correct:0,wrong:0};
   const L=['A','B','C','D','E'];const opts=(q.options||[]);
@@ -293,6 +329,7 @@ function pick(qid,chosen,correct){
   const hist=lsGet('history',[]);hist.unshift({date:new Date().toLocaleString('ru'),topic:q&&q.topic,correct:ok});if(hist.length>20)hist.pop();lsSet('history',hist);
   const today=new Date().toISOString().slice(0,10);const daily=lsGet('daily',{});daily[today]=(daily[today]||0)+1;lsSet('daily',daily);
   if(q&&q.explanation){const el=document.getElementById('qexpl-'+qid);if(el){el.innerHTML='💡 '+esc(q.explanation);el.style.display='block';}}
+  updateQuestionProgressSummary();
   clearTInterval();
   if(pageActive('home')) renderMasteryCards();
 }

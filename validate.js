@@ -22,6 +22,18 @@ function err(msg) { console.error('  ❌ ' + msg); errors++; }
 function warn(msg) { console.warn('  ⚠️  ' + msg); warnings++; }
 function ok(msg) { console.log('  ✅ ' + msg); }
 
+function normalizeOptionText(opt) {
+  return String(opt || '')
+    .trim()
+    .replace(/^[a-eа-е][).]\s*/i, '')
+    .replace(/\s+/g, ' ')
+    .toLowerCase();
+}
+
+function looksLikeOptionPrefixArtifact(opt) {
+  return /^[a-eа-е][).]\s*[a-eа-е][).]/i.test(String(opt || '').trim());
+}
+
 // ═══ 1. Вопросы ═══
 console.log('\n📋 Проверка вопросов (base_questions.json)...');
 const qfile = path.join(TASKS_DIR, 'base_questions.json');
@@ -53,17 +65,25 @@ else {
       warn(`${prefix}: неизвестная категория "${q.category}"`);
 
     // Валидация ответа
+    if (q.answer !== undefined && typeof q.answer !== 'number')
+      err(`${prefix}: answer должен быть числом, сейчас ${typeof q.answer}`);
     if (q.answer !== undefined && q.options && (q.answer < 0 || q.answer >= q.options.length))
       err(`${prefix}: answer=${q.answer} вне диапазона 0..${q.options.length - 1}`);
 
-    // Пустые опции
+    // Пустые опции и артефакты вариантов
     if (q.options) {
       q.options.forEach((opt, oi) => {
         if (!opt || opt.trim() === '') err(`${prefix}: вариант ${oi} пустой`);
+        if (looksLikeOptionPrefixArtifact(opt)) warn(`${prefix}: вариант ${oi} похож на артефакт префикса "${opt}"`);
       });
       // Проверка на дубликаты опций
       const unique = new Set(q.options);
       if (unique.size !== q.options.length) warn(`${prefix}: есть дубликаты вариантов`);
+      const normalized = q.options.map(normalizeOptionText);
+      const normalizedUnique = new Set(normalized);
+      if (normalizedUnique.size !== normalized.length) warn(`${prefix}: есть дубликаты вариантов после нормализации`);
+      const correctText = q.options[q.answer];
+      if (correctText && normalizeOptionText(correctText).length < 2) warn(`${prefix}: правильный вариант слишком короткий`);
     }
 
     // Дубли ID
@@ -74,6 +94,7 @@ else {
 
     // Объяснение
     if (!q.explanation) warn(`${prefix}: нет объяснения`);
+    else if (String(q.explanation).trim().length < 20) warn(`${prefix}: объяснение слишком короткое`);
   });
 
   if (dupIds.length) err(`Найдены дубликаты ID: ${dupIds.join(', ')}`);
