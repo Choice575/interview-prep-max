@@ -1,6 +1,6 @@
 {
   "version": "4.0.0",
-  "title": "Senior Cases: DevOps Plan v4 Weeks 1-8",
+  "title": "Senior Cases: DevOps Plan v4 Weeks 1-16",
   "language": "ru",
   "purpose": "Первый пакет production-кейсов для вкладки «Учёба» и режима Senior Simulator в Interview Prep Max.",
   "caseSchema": {
@@ -871,6 +871,505 @@
           "topic": [
             "Docker",
             "Сети"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "cicd-artifact-015",
+      "week": 9,
+      "day": 5,
+      "level": "Middle",
+      "topic": "CI/CD",
+      "type": "diagnostic",
+      "title": "Pipeline деплоит старый artifact",
+      "context": "Учебный production-инцидент недели 9. Тема: CI/CD: основы pipeline. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: CI/CD: основы pipeline",
+        "Symptom: Pipeline деплоит старый artifact",
+        "Impact: pipeline, инфраструктура, конфигурация или сервис работает некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, конфиги, diff, plan или backup status.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist или runbook."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "git",
+          "cmd"
+        ],
+        "tags": [
+          "CI/CD",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "CI/CD",
+            "Git"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "cicd-rollback-016",
+      "week": 10,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "CI/CD",
+      "type": "rollback",
+      "title": "После релиза выросли 500, нужен rollback за 5 минут",
+      "context": "Учебный production-инцидент недели 10. Тема: CI/CD: deployment, rollback, environments. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: CI/CD: deployment, rollback, environments",
+        "Symptom: После релиза выросли 500, нужен rollback за 5 минут",
+        "Impact: pipeline, инфраструктура, конфигурация или сервис работает некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, конфиги, diff, plan или backup status.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist или runbook."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "git",
+          "labs"
+        ],
+        "tags": [
+          "CI/CD",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "CI/CD",
+            "Git"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tf-plan-risk-017",
+      "week": 11,
+      "day": 5,
+      "level": "Middle",
+      "topic": "Terraform",
+      "type": "tradeoff",
+      "title": "Terraform plan удаляет ресурс перед apply",
+      "context": "Учебный production-инцидент недели 11. Тема: Terraform basics. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Terraform basics",
+        "Symptom: Terraform plan удаляет ресурс перед apply",
+        "Impact: pipeline, инфраструктура, конфигурация или сервис работает некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, конфиги, diff, plan или backup status.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist или runbook."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "code"
+        ],
+        "tags": [
+          "Terraform",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Terraform"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tf-lock-018",
+      "week": 12,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Terraform",
+      "type": "incident",
+      "title": "Terraform apply заблокирован после падения CI",
+      "context": "Учебный production-инцидент недели 12. Тема: Terraform modules, remote state, drift. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Terraform modules, remote state, drift",
+        "Symptom: Terraform apply заблокирован после падения CI",
+        "Impact: pipeline, инфраструктура, конфигурация или сервис работает некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, конфиги, diff, plan или backup status.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist или runbook."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "code",
+          "labs"
+        ],
+        "tags": [
+          "Terraform",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Terraform"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ansible-changed-019",
+      "week": 13,
+      "day": 5,
+      "level": "Middle",
+      "topic": "Ansible",
+      "type": "diagnostic",
+      "title": "Playbook каждый раз показывает changed",
+      "context": "Учебный production-инцидент недели 13. Тема: Ansible basics. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Ansible basics",
+        "Symptom: Playbook каждый раз показывает changed",
+        "Impact: pipeline, инфраструктура, конфигурация или сервис работает некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, конфиги, diff, plan или backup status.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist или runbook."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "ansible",
+          "cmd"
+        ],
+        "tags": [
+          "Ansible",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Ansible"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ansible-rolling-020",
+      "week": 14,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Ansible",
+      "type": "tradeoff",
+      "title": "Обновить nginx без одновременной остановки всех серверов",
+      "context": "Учебный production-инцидент недели 14. Тема: Ansible roles, vault, zero-downtime basics. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: Ansible roles, vault, zero-downtime basics",
+        "Symptom: Обновить nginx без одновременной остановки всех серверов",
+        "Impact: pipeline, инфраструктура, конфигурация или сервис работает некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, конфиги, diff, plan или backup status.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist или runbook."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "ansible",
+          "labs"
+        ],
+        "tags": [
+          "Ansible",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Ansible",
+            "Security"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pg-too-many-clients-021",
+      "week": 15,
+      "day": 5,
+      "level": "Middle",
+      "topic": "Linux",
+      "type": "incident",
+      "title": "PostgreSQL: too many clients",
+      "context": "Учебный production-инцидент недели 15. Тема: PostgreSQL для DevOps: база. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: PostgreSQL для DevOps: база",
+        "Symptom: PostgreSQL: too many clients",
+        "Impact: pipeline, инфраструктура, конфигурация или сервис работает некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, конфиги, diff, plan или backup status.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist или runbook."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "cmd",
+          "labs"
+        ],
+        "tags": [
+          "Linux",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Linux",
+            "Monitoring"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pg-pitr-022",
+      "week": 16,
+      "day": 5,
+      "level": "Middle+",
+      "topic": "Monitoring",
+      "type": "rollback",
+      "title": "Нужно восстановиться на момент до ошибочного DELETE",
+      "context": "Учебный production-инцидент недели 16. Тема: PostgreSQL: WAL, PITR, replication basics. Нужно собрать evidence и безопасно восстановить сервис.",
+      "evidence": [
+        "Topic: PostgreSQL: WAL, PITR, replication basics",
+        "Symptom: Нужно восстановиться на момент до ошибочного DELETE",
+        "Impact: pipeline, инфраструктура, конфигурация или сервис работает некорректно",
+        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+      ],
+      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "expectedActions": [
+        "Собрать evidence: статусы, логи, конфиги, diff, plan или backup status.",
+        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
+        "Выбрать минимальный mitigation.",
+        "Предложить постоянный fix и rollback-план.",
+        "Проверить результат тем же способом, которым был найден симптом.",
+        "Добавить prevention: тест, алерт, checklist или runbook."
+      ],
+      "commonMistakes": [
+        "Начать с перезапуска без диагностики.",
+        "Исправлять сразу несколько вещей.",
+        "Не иметь rollback-плана.",
+        "Не проверить результат после fix.",
+        "Не оформить action items."
+      ],
+      "scoring": {
+        "evidence": 20,
+        "rootCause": 25,
+        "mitigation": 20,
+        "rollback": 15,
+        "prevention": 20
+      },
+      "interviewPrepMax": {
+        "mode": "Senior Simulator",
+        "trainers": [
+          "exam",
+          "labs"
+        ],
+        "tags": [
+          "Monitoring",
+          "incident",
+          "rollback"
+        ],
+        "relatedQuestionFilter": {
+          "topic": [
+            "Monitoring",
+            "Linux"
           ],
           "category": [
             "scenario",

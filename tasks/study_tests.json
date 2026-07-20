@@ -1,6 +1,6 @@
 {
   "version": "4.0.0",
-  "title": "Study Tests: DevOps Plan v4 Weeks 1-8",
+  "title": "Study Tests: DevOps Plan v4 Weeks 1-16",
   "language": "ru",
   "purpose": "Мини-тесты по дням и пятничные тесты для вкладки «Учёба» в Interview Prep Max.",
   "grading": {
@@ -1567,6 +1567,1646 @@
       "relatedSeniorCases": [
         "compose-502-014"
       ]
+    },
+    {
+      "id": "mini-w9d1-cicd-artifact-015",
+      "week": 9,
+      "day": 1,
+      "title": "Неделя 9 День 1: CI/CD: основы pipeline",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 9: CI/CD: основы pipeline?",
+          "expected": "Рабочий артефакт: pipeline lint/test/build/artifact. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "cicd-artifact-015"
+      ]
+    },
+    {
+      "id": "mini-w9d2-cicd-artifact-015",
+      "week": 9,
+      "day": 2,
+      "title": "Неделя 9 День 2: CI/CD: основы pipeline",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 9: CI/CD: основы pipeline?",
+          "expected": "Рабочий артефакт: pipeline lint/test/build/artifact. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "cicd-artifact-015"
+      ]
+    },
+    {
+      "id": "mini-w9d3-cicd-artifact-015",
+      "week": 9,
+      "day": 3,
+      "title": "Неделя 9 День 3: CI/CD: основы pipeline",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 9: CI/CD: основы pipeline?",
+          "expected": "Рабочий артефакт: pipeline lint/test/build/artifact. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "cicd-artifact-015"
+      ]
+    },
+    {
+      "id": "mini-w9d4-cicd-artifact-015",
+      "week": 9,
+      "day": 4,
+      "title": "Неделя 9 День 4: CI/CD: основы pipeline",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 9: CI/CD: основы pipeline?",
+          "expected": "Рабочий артефакт: pipeline lint/test/build/artifact. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "cicd-artifact-015"
+      ]
+    },
+    {
+      "id": "mini-w9d5-cicd-artifact-015",
+      "week": 9,
+      "day": 5,
+      "title": "Неделя 9 День 5: CI/CD: основы pipeline",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 9: CI/CD: основы pipeline?",
+          "expected": "Рабочий артефакт: pipeline lint/test/build/artifact. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "cicd-artifact-015"
+      ]
+    },
+    {
+      "id": "mini-w10d1-cicd-rollback-016",
+      "week": 10,
+      "day": 1,
+      "title": "Неделя 10 День 1: CI/CD: deployment, rollback, environments",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 10: CI/CD: deployment, rollback, environments?",
+          "expected": "Рабочий артефакт: deploy с manual approval и rollback-путём. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "cicd-rollback-016"
+      ]
+    },
+    {
+      "id": "mini-w10d2-cicd-rollback-016",
+      "week": 10,
+      "day": 2,
+      "title": "Неделя 10 День 2: CI/CD: deployment, rollback, environments",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 10: CI/CD: deployment, rollback, environments?",
+          "expected": "Рабочий артефакт: deploy с manual approval и rollback-путём. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "cicd-rollback-016"
+      ]
+    },
+    {
+      "id": "mini-w10d3-cicd-rollback-016",
+      "week": 10,
+      "day": 3,
+      "title": "Неделя 10 День 3: CI/CD: deployment, rollback, environments",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 10: CI/CD: deployment, rollback, environments?",
+          "expected": "Рабочий артефакт: deploy с manual approval и rollback-путём. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "cicd-rollback-016"
+      ]
+    },
+    {
+      "id": "mini-w10d4-cicd-rollback-016",
+      "week": 10,
+      "day": 4,
+      "title": "Неделя 10 День 4: CI/CD: deployment, rollback, environments",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 10: CI/CD: deployment, rollback, environments?",
+          "expected": "Рабочий артефакт: deploy с manual approval и rollback-путём. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "cicd-rollback-016"
+      ]
+    },
+    {
+      "id": "mini-w10d5-cicd-rollback-016",
+      "week": 10,
+      "day": 5,
+      "title": "Неделя 10 День 5: CI/CD: deployment, rollback, environments",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 10: CI/CD: deployment, rollback, environments?",
+          "expected": "Рабочий артефакт: deploy с manual approval и rollback-путём. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "cicd-rollback-016"
+      ]
+    },
+    {
+      "id": "mini-w11d1-tf-plan-risk-017",
+      "week": 11,
+      "day": 1,
+      "title": "Неделя 11 День 1: Terraform basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 11: Terraform basics?",
+          "expected": "Рабочий артефакт: простая инфраструктура в коде с variables/outputs/state. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "tf-plan-risk-017"
+      ]
+    },
+    {
+      "id": "mini-w11d2-tf-plan-risk-017",
+      "week": 11,
+      "day": 2,
+      "title": "Неделя 11 День 2: Terraform basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 11: Terraform basics?",
+          "expected": "Рабочий артефакт: простая инфраструктура в коде с variables/outputs/state. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "tf-plan-risk-017"
+      ]
+    },
+    {
+      "id": "mini-w11d3-tf-plan-risk-017",
+      "week": 11,
+      "day": 3,
+      "title": "Неделя 11 День 3: Terraform basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 11: Terraform basics?",
+          "expected": "Рабочий артефакт: простая инфраструктура в коде с variables/outputs/state. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "tf-plan-risk-017"
+      ]
+    },
+    {
+      "id": "mini-w11d4-tf-plan-risk-017",
+      "week": 11,
+      "day": 4,
+      "title": "Неделя 11 День 4: Terraform basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 11: Terraform basics?",
+          "expected": "Рабочий артефакт: простая инфраструктура в коде с variables/outputs/state. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "tf-plan-risk-017"
+      ]
+    },
+    {
+      "id": "mini-w11d5-tf-plan-risk-017",
+      "week": 11,
+      "day": 5,
+      "title": "Неделя 11 День 5: Terraform basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 11: Terraform basics?",
+          "expected": "Рабочий артефакт: простая инфраструктура в коде с variables/outputs/state. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "tf-plan-risk-017"
+      ]
+    },
+    {
+      "id": "mini-w12d1-tf-lock-018",
+      "week": 12,
+      "day": 1,
+      "title": "Неделя 12 День 1: Terraform modules, remote state, drift",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 12: Terraform modules, remote state, drift?",
+          "expected": "Рабочий артефакт: module + remote state + drift check. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "tf-lock-018"
+      ]
+    },
+    {
+      "id": "mini-w12d2-tf-lock-018",
+      "week": 12,
+      "day": 2,
+      "title": "Неделя 12 День 2: Terraform modules, remote state, drift",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 12: Terraform modules, remote state, drift?",
+          "expected": "Рабочий артефакт: module + remote state + drift check. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "tf-lock-018"
+      ]
+    },
+    {
+      "id": "mini-w12d3-tf-lock-018",
+      "week": 12,
+      "day": 3,
+      "title": "Неделя 12 День 3: Terraform modules, remote state, drift",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 12: Terraform modules, remote state, drift?",
+          "expected": "Рабочий артефакт: module + remote state + drift check. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "tf-lock-018"
+      ]
+    },
+    {
+      "id": "mini-w12d4-tf-lock-018",
+      "week": 12,
+      "day": 4,
+      "title": "Неделя 12 День 4: Terraform modules, remote state, drift",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 12: Terraform modules, remote state, drift?",
+          "expected": "Рабочий артефакт: module + remote state + drift check. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "tf-lock-018"
+      ]
+    },
+    {
+      "id": "mini-w12d5-tf-lock-018",
+      "week": 12,
+      "day": 5,
+      "title": "Неделя 12 День 5: Terraform modules, remote state, drift",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 12: Terraform modules, remote state, drift?",
+          "expected": "Рабочий артефакт: module + remote state + drift check. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "tf-lock-018"
+      ]
+    },
+    {
+      "id": "mini-w13d1-ansible-changed-019",
+      "week": 13,
+      "day": 1,
+      "title": "Неделя 13 День 1: Ansible basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 13: Ansible basics?",
+          "expected": "Рабочий артефакт: inventory + playbook с handlers и check mode. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ansible-changed-019"
+      ]
+    },
+    {
+      "id": "mini-w13d2-ansible-changed-019",
+      "week": 13,
+      "day": 2,
+      "title": "Неделя 13 День 2: Ansible basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 13: Ansible basics?",
+          "expected": "Рабочий артефакт: inventory + playbook с handlers и check mode. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ansible-changed-019"
+      ]
+    },
+    {
+      "id": "mini-w13d3-ansible-changed-019",
+      "week": 13,
+      "day": 3,
+      "title": "Неделя 13 День 3: Ansible basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 13: Ansible basics?",
+          "expected": "Рабочий артефакт: inventory + playbook с handlers и check mode. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ansible-changed-019"
+      ]
+    },
+    {
+      "id": "mini-w13d4-ansible-changed-019",
+      "week": 13,
+      "day": 4,
+      "title": "Неделя 13 День 4: Ansible basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 13: Ansible basics?",
+          "expected": "Рабочий артефакт: inventory + playbook с handlers и check mode. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ansible-changed-019"
+      ]
+    },
+    {
+      "id": "mini-w13d5-ansible-changed-019",
+      "week": 13,
+      "day": 5,
+      "title": "Неделя 13 День 5: Ansible basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 13: Ansible basics?",
+          "expected": "Рабочий артефакт: inventory + playbook с handlers и check mode. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ansible-changed-019"
+      ]
+    },
+    {
+      "id": "mini-w14d1-ansible-rolling-020",
+      "week": 14,
+      "day": 1,
+      "title": "Неделя 14 День 1: Ansible roles, vault, zero-downtime basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 14: Ansible roles, vault, zero-downtime basics?",
+          "expected": "Рабочий артефакт: role + vault + rolling update. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ansible-rolling-020"
+      ]
+    },
+    {
+      "id": "mini-w14d2-ansible-rolling-020",
+      "week": 14,
+      "day": 2,
+      "title": "Неделя 14 День 2: Ansible roles, vault, zero-downtime basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 14: Ansible roles, vault, zero-downtime basics?",
+          "expected": "Рабочий артефакт: role + vault + rolling update. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ansible-rolling-020"
+      ]
+    },
+    {
+      "id": "mini-w14d3-ansible-rolling-020",
+      "week": 14,
+      "day": 3,
+      "title": "Неделя 14 День 3: Ansible roles, vault, zero-downtime basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 14: Ansible roles, vault, zero-downtime basics?",
+          "expected": "Рабочий артефакт: role + vault + rolling update. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ansible-rolling-020"
+      ]
+    },
+    {
+      "id": "mini-w14d4-ansible-rolling-020",
+      "week": 14,
+      "day": 4,
+      "title": "Неделя 14 День 4: Ansible roles, vault, zero-downtime basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 14: Ansible roles, vault, zero-downtime basics?",
+          "expected": "Рабочий артефакт: role + vault + rolling update. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ansible-rolling-020"
+      ]
+    },
+    {
+      "id": "mini-w14d5-ansible-rolling-020",
+      "week": 14,
+      "day": 5,
+      "title": "Неделя 14 День 5: Ansible roles, vault, zero-downtime basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 14: Ansible roles, vault, zero-downtime basics?",
+          "expected": "Рабочий артефакт: role + vault + rolling update. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "ansible-rolling-020"
+      ]
+    },
+    {
+      "id": "mini-w15d1-pg-too-many-clients-021",
+      "week": 15,
+      "day": 1,
+      "title": "Неделя 15 День 1: PostgreSQL для DevOps: база",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 15: PostgreSQL для DevOps: база?",
+          "expected": "Рабочий артефакт: установка PostgreSQL, backup/restore, роли и подключения. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-too-many-clients-021"
+      ]
+    },
+    {
+      "id": "mini-w15d2-pg-too-many-clients-021",
+      "week": 15,
+      "day": 2,
+      "title": "Неделя 15 День 2: PostgreSQL для DevOps: база",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 15: PostgreSQL для DevOps: база?",
+          "expected": "Рабочий артефакт: установка PostgreSQL, backup/restore, роли и подключения. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-too-many-clients-021"
+      ]
+    },
+    {
+      "id": "mini-w15d3-pg-too-many-clients-021",
+      "week": 15,
+      "day": 3,
+      "title": "Неделя 15 День 3: PostgreSQL для DevOps: база",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 15: PostgreSQL для DevOps: база?",
+          "expected": "Рабочий артефакт: установка PostgreSQL, backup/restore, роли и подключения. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-too-many-clients-021"
+      ]
+    },
+    {
+      "id": "mini-w15d4-pg-too-many-clients-021",
+      "week": 15,
+      "day": 4,
+      "title": "Неделя 15 День 4: PostgreSQL для DevOps: база",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 15: PostgreSQL для DevOps: база?",
+          "expected": "Рабочий артефакт: установка PostgreSQL, backup/restore, роли и подключения. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-too-many-clients-021"
+      ]
+    },
+    {
+      "id": "mini-w15d5-pg-too-many-clients-021",
+      "week": 15,
+      "day": 5,
+      "title": "Неделя 15 День 5: PostgreSQL для DevOps: база",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 15: PostgreSQL для DevOps: база?",
+          "expected": "Рабочий артефакт: установка PostgreSQL, backup/restore, роли и подключения. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-too-many-clients-021"
+      ]
+    },
+    {
+      "id": "mini-w16d1-pg-pitr-022",
+      "week": 16,
+      "day": 1,
+      "title": "Неделя 16 День 1: PostgreSQL: WAL, PITR, replication basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 16: PostgreSQL: WAL, PITR, replication basics?",
+          "expected": "Рабочий артефакт: backup strategy с RPO/RTO и restore drill. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-pitr-022"
+      ]
+    },
+    {
+      "id": "mini-w16d2-pg-pitr-022",
+      "week": 16,
+      "day": 2,
+      "title": "Неделя 16 День 2: PostgreSQL: WAL, PITR, replication basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 16: PostgreSQL: WAL, PITR, replication basics?",
+          "expected": "Рабочий артефакт: backup strategy с RPO/RTO и restore drill. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-pitr-022"
+      ]
+    },
+    {
+      "id": "mini-w16d3-pg-pitr-022",
+      "week": 16,
+      "day": 3,
+      "title": "Неделя 16 День 3: PostgreSQL: WAL, PITR, replication basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 16: PostgreSQL: WAL, PITR, replication basics?",
+          "expected": "Рабочий артефакт: backup strategy с RPO/RTO и restore drill. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-pitr-022"
+      ]
+    },
+    {
+      "id": "mini-w16d4-pg-pitr-022",
+      "week": 16,
+      "day": 4,
+      "title": "Неделя 16 День 4: PostgreSQL: WAL, PITR, replication basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 16: PostgreSQL: WAL, PITR, replication basics?",
+          "expected": "Рабочий артефакт: backup strategy с RPO/RTO и restore drill. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-pitr-022"
+      ]
+    },
+    {
+      "id": "mini-w16d5-pg-pitr-022",
+      "week": 16,
+      "day": 5,
+      "title": "Неделя 16 День 5: PostgreSQL: WAL, PITR, replication basics",
+      "questions": [
+        {
+          "q": "Какой практический результат недели 16: PostgreSQL: WAL, PITR, replication basics?",
+          "expected": "Рабочий артефакт: backup strategy с RPO/RTO и restore drill. Нужно уметь объяснить, как он проверяется и откатывается.",
+          "score": 1
+        },
+        {
+          "q": "Какие evidence нужно собрать перед исправлением?",
+          "expected": "Логи, статусы, конфиги, diff/plan, exit code, метрики или вывод диагностических команд.",
+          "score": 1
+        },
+        {
+          "q": "Что будет безопасным первым шагом диагностики?",
+          "expected": "Read-only проверка без изменения состояния: status/logs/diff/plan/check mode/config.",
+          "score": 1
+        },
+        {
+          "q": "Какой rollback-план нужен?",
+          "expected": "Понятный способ вернуть предыдущее состояние: предыдущий artifact, release tag, terraform state/plan, ansible rollback, backup/restore.",
+          "score": 1
+        },
+        {
+          "q": "Как проверить, что исправление сработало?",
+          "expected": "Повторить исходную проверку, проверить логи, pipeline/deploy status, healthcheck, метрики или restore result.",
+          "score": 1
+        }
+      ],
+      "commonMistakes": [
+        "исправлять без evidence",
+        "не иметь rollback-плана",
+        "не проверять результат после изменения"
+      ],
+      "relatedSeniorCases": [
+        "pg-pitr-022"
+      ]
     }
   ],
   "weeklyTests": [
@@ -1885,6 +3525,318 @@
           "score": 15,
           "caseId": "compose-502-014",
           "task": "Разбери кейс: Nginx отдаёт 502 в Compose-сети"
+        }
+      }
+    },
+    {
+      "id": "weekly-w9-cicd-artifact-015",
+      "week": 9,
+      "title": "Неделя 9: CI/CD: основы pipeline",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: pipeline lint/test/build/artifact.",
+          "mustInclude": [
+            "цель",
+            "команды или конфиг",
+            "проверка результата",
+            "rollback-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: CI/CD: основы pipeline?",
+            "Какие production-риски: GitLab CI stages, cache vs artifacts, variables, manual jobs?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Pipeline деплоит старый artifact. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence, затем построить гипотезы, проверить их read-only командами, применить минимальное исправление, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "cicd-artifact-015",
+          "task": "Разбери кейс: Pipeline деплоит старый artifact"
+        }
+      }
+    },
+    {
+      "id": "weekly-w10-cicd-rollback-016",
+      "week": 10,
+      "title": "Неделя 10: CI/CD: deployment, rollback, environments",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: deploy с manual approval и rollback-путём.",
+          "mustInclude": [
+            "цель",
+            "команды или конфиг",
+            "проверка результата",
+            "rollback-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: CI/CD: deployment, rollback, environments?",
+            "Какие production-риски: Environments, protected variables, release tags, rollback strategy?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: После релиза выросли 500, нужен rollback за 5 минут. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence, затем построить гипотезы, проверить их read-only командами, применить минимальное исправление, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "cicd-rollback-016",
+          "task": "Разбери кейс: После релиза выросли 500, нужен rollback за 5 минут"
+        }
+      }
+    },
+    {
+      "id": "weekly-w11-tf-plan-risk-017",
+      "week": 11,
+      "title": "Неделя 11: Terraform basics",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: простая инфраструктура в коде с variables/outputs/state.",
+          "mustInclude": [
+            "цель",
+            "команды или конфиг",
+            "проверка результата",
+            "rollback-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: Terraform basics?",
+            "Какие production-риски: plan/apply, provider, variables, outputs, state hygiene?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Terraform plan удаляет ресурс перед apply. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence, затем построить гипотезы, проверить их read-only командами, применить минимальное исправление, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "tf-plan-risk-017",
+          "task": "Разбери кейс: Terraform plan удаляет ресурс перед apply"
+        }
+      }
+    },
+    {
+      "id": "weekly-w12-tf-lock-018",
+      "week": 12,
+      "title": "Неделя 12: Terraform modules, remote state, drift",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: module + remote state + drift check.",
+          "mustInclude": [
+            "цель",
+            "команды или конфиг",
+            "проверка результата",
+            "rollback-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: Terraform modules, remote state, drift?",
+            "Какие production-риски: State lock, drift detection, import, provider pinning, workspaces?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Terraform apply заблокирован после падения CI. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence, затем построить гипотезы, проверить их read-only командами, применить минимальное исправление, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "tf-lock-018",
+          "task": "Разбери кейс: Terraform apply заблокирован после падения CI"
+        }
+      }
+    },
+    {
+      "id": "weekly-w13-ansible-changed-019",
+      "week": 13,
+      "title": "Неделя 13: Ansible basics",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: inventory + playbook с handlers и check mode.",
+          "mustInclude": [
+            "цель",
+            "команды или конфиг",
+            "проверка результата",
+            "rollback-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: Ansible basics?",
+            "Какие production-риски: become, idempotency, handlers, check mode, templates?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Playbook каждый раз показывает changed. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence, затем построить гипотезы, проверить их read-only командами, применить минимальное исправление, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "ansible-changed-019",
+          "task": "Разбери кейс: Playbook каждый раз показывает changed"
+        }
+      }
+    },
+    {
+      "id": "weekly-w14-ansible-rolling-020",
+      "week": 14,
+      "title": "Неделя 14: Ansible roles, vault, zero-downtime basics",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: role + vault + rolling update.",
+          "mustInclude": [
+            "цель",
+            "команды или конфиг",
+            "проверка результата",
+            "rollback-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: Ansible roles, vault, zero-downtime basics?",
+            "Какие production-риски: rolling deploy, serial, handlers, vault, inventory by environment?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Обновить nginx без одновременной остановки всех серверов. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence, затем построить гипотезы, проверить их read-only командами, применить минимальное исправление, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "ansible-rolling-020",
+          "task": "Разбери кейс: Обновить nginx без одновременной остановки всех серверов"
+        }
+      }
+    },
+    {
+      "id": "weekly-w15-pg-too-many-clients-021",
+      "week": 15,
+      "title": "Неделя 15: PostgreSQL для DevOps: база",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: установка PostgreSQL, backup/restore, роли и подключения.",
+          "mustInclude": [
+            "цель",
+            "команды или конфиг",
+            "проверка результата",
+            "rollback-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: PostgreSQL для DevOps: база?",
+            "Какие production-риски: pg_dump, pg_restore, max_connections, logs, slow queries?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: PostgreSQL: too many clients. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence, затем построить гипотезы, проверить их read-only командами, применить минимальное исправление, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "pg-too-many-clients-021",
+          "task": "Разбери кейс: PostgreSQL: too many clients"
+        }
+      }
+    },
+    {
+      "id": "weekly-w16-pg-pitr-022",
+      "week": 16,
+      "title": "Неделя 16: PostgreSQL: WAL, PITR, replication basics",
+      "maxScore": 100,
+      "parts": {
+        "practice": {
+          "score": 35,
+          "task": "Собери практический артефакт недели: backup strategy с RPO/RTO и restore drill.",
+          "mustInclude": [
+            "цель",
+            "команды или конфиг",
+            "проверка результата",
+            "rollback-план",
+            "краткий runbook"
+          ]
+        },
+        "theory": {
+          "score": 25,
+          "questions": [
+            "Какие ключевые сущности темы: PostgreSQL: WAL, PITR, replication basics?",
+            "Какие production-риски: RPO/RTO, replication lag, backup validation, restore drills?",
+            "Что является symptom, а что root cause?",
+            "Какой rollback безопасен?",
+            "Какие action items предотвратят повтор?"
+          ]
+        },
+        "debug": {
+          "score": 25,
+          "task": "Дан инцидент: Нужно восстановиться на момент до ошибочного DELETE. Опиши порядок диагностики от evidence до fix.",
+          "expected": "Сначала собрать evidence, затем построить гипотезы, проверить их read-only командами, применить минимальное исправление, проверить результат, оформить prevention."
+        },
+        "seniorChallenge": {
+          "score": 15,
+          "caseId": "pg-pitr-022",
+          "task": "Разбери кейс: Нужно восстановиться на момент до ошибочного DELETE"
         }
       }
     }

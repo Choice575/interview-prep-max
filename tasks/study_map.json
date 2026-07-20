@@ -1,6 +1,6 @@
 {
   "version": "4.0.0",
-  "title": "DevOps Plan v4 Middle+/Senior: Weeks 1-8 Study Map",
+  "title": "DevOps Plan v4 Middle+/Senior: Weeks 1-16 Study Map",
   "profile": "devops",
   "language": "ru",
   "weeklyRhythm": {
@@ -1367,6 +1367,1342 @@
           ],
           "miniTest": [
             "Какой практический результат недели 8: Docker Compose, reverse proxy, TLS basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 9,
+      "title": "CI/CD: основы pipeline",
+      "targetLevel": "Middle",
+      "mainTopics": [
+        "CI/CD",
+        "Git"
+      ],
+      "goal": "Освоить тему: CI/CD: основы pipeline на уровне Middle с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "GitLab CI stages, cache vs artifacts, variables, manual jobs",
+      "artifact": "pipeline lint/test/build/artifact",
+      "seniorChallenge": {
+        "title": "Pipeline деплоит старый artifact",
+        "task": "Разобрать production-ситуацию: Pipeline деплоит старый artifact. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 9",
+        "trainers": [
+          "exam",
+          "git",
+          "cmd"
+        ],
+        "questionFilters": {
+          "topic": [
+            "CI/CD",
+            "Git"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Pipeline деплоит старый artifact",
+          "Диагностика: CI/CD: основы pipeline",
+          "Rollback: CI/CD: основы pipeline"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle",
+          "objective": "Новая тема и базовая практика по теме: CI/CD: основы pipeline.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 9: CI/CD: основы pipeline?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle",
+          "objective": "Углубление и работа с выводом по теме: CI/CD: основы pipeline.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 9: CI/CD: основы pipeline?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle",
+          "objective": "Production-слой и типовые ошибки по теме: CI/CD: основы pipeline.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 9: CI/CD: основы pipeline?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle",
+          "objective": "Мини-инцидент или сквозной проект по теме: CI/CD: основы pipeline.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 9: CI/CD: основы pipeline?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle",
+          "objective": "Итог недели и Senior Challenge по теме: CI/CD: основы pipeline.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 9: CI/CD: основы pipeline?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 10,
+      "title": "CI/CD: deployment, rollback, environments",
+      "targetLevel": "Middle+",
+      "mainTopics": [
+        "CI/CD",
+        "Git"
+      ],
+      "goal": "Освоить тему: CI/CD: deployment, rollback, environments на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "Environments, protected variables, release tags, rollback strategy",
+      "artifact": "deploy с manual approval и rollback-путём",
+      "seniorChallenge": {
+        "title": "После релиза выросли 500, нужен rollback за 5 минут",
+        "task": "Разобрать production-ситуацию: После релиза выросли 500, нужен rollback за 5 минут. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 10",
+        "trainers": [
+          "exam",
+          "git",
+          "labs"
+        ],
+        "questionFilters": {
+          "topic": [
+            "CI/CD",
+            "Git"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "После релиза выросли 500, нужен rollback за 5 минут",
+          "Диагностика: CI/CD: deployment, rollback, environments",
+          "Rollback: CI/CD: deployment, rollback, environments"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle+",
+          "objective": "Новая тема и базовая практика по теме: CI/CD: deployment, rollback, environments.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 10: CI/CD: deployment, rollback, environments?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle+",
+          "objective": "Углубление и работа с выводом по теме: CI/CD: deployment, rollback, environments.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 10: CI/CD: deployment, rollback, environments?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle+",
+          "objective": "Production-слой и типовые ошибки по теме: CI/CD: deployment, rollback, environments.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 10: CI/CD: deployment, rollback, environments?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle+",
+          "objective": "Мини-инцидент или сквозной проект по теме: CI/CD: deployment, rollback, environments.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 10: CI/CD: deployment, rollback, environments?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle+",
+          "objective": "Итог недели и Senior Challenge по теме: CI/CD: deployment, rollback, environments.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 10: CI/CD: deployment, rollback, environments?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 11,
+      "title": "Terraform basics",
+      "targetLevel": "Middle",
+      "mainTopics": [
+        "Terraform"
+      ],
+      "goal": "Освоить тему: Terraform basics на уровне Middle с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "plan/apply, provider, variables, outputs, state hygiene",
+      "artifact": "простая инфраструктура в коде с variables/outputs/state",
+      "seniorChallenge": {
+        "title": "Terraform plan удаляет ресурс перед apply",
+        "task": "Разобрать production-ситуацию: Terraform plan удаляет ресурс перед apply. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 11",
+        "trainers": [
+          "exam",
+          "code"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Terraform"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Terraform plan удаляет ресурс перед apply",
+          "Диагностика: Terraform basics",
+          "Rollback: Terraform basics"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle",
+          "objective": "Новая тема и базовая практика по теме: Terraform basics.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 11: Terraform basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle",
+          "objective": "Углубление и работа с выводом по теме: Terraform basics.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 11: Terraform basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle",
+          "objective": "Production-слой и типовые ошибки по теме: Terraform basics.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 11: Terraform basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle",
+          "objective": "Мини-инцидент или сквозной проект по теме: Terraform basics.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 11: Terraform basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle",
+          "objective": "Итог недели и Senior Challenge по теме: Terraform basics.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 11: Terraform basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 12,
+      "title": "Terraform modules, remote state, drift",
+      "targetLevel": "Middle+",
+      "mainTopics": [
+        "Terraform"
+      ],
+      "goal": "Освоить тему: Terraform modules, remote state, drift на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "State lock, drift detection, import, provider pinning, workspaces",
+      "artifact": "module + remote state + drift check",
+      "seniorChallenge": {
+        "title": "Terraform apply заблокирован после падения CI",
+        "task": "Разобрать production-ситуацию: Terraform apply заблокирован после падения CI. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 12",
+        "trainers": [
+          "exam",
+          "code",
+          "labs"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Terraform"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Terraform apply заблокирован после падения CI",
+          "Диагностика: Terraform modules, remote state, drift",
+          "Rollback: Terraform modules, remote state, drift"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle+",
+          "objective": "Новая тема и базовая практика по теме: Terraform modules, remote state, drift.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 12: Terraform modules, remote state, drift?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle+",
+          "objective": "Углубление и работа с выводом по теме: Terraform modules, remote state, drift.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 12: Terraform modules, remote state, drift?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle+",
+          "objective": "Production-слой и типовые ошибки по теме: Terraform modules, remote state, drift.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 12: Terraform modules, remote state, drift?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle+",
+          "objective": "Мини-инцидент или сквозной проект по теме: Terraform modules, remote state, drift.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 12: Terraform modules, remote state, drift?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle+",
+          "objective": "Итог недели и Senior Challenge по теме: Terraform modules, remote state, drift.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 12: Terraform modules, remote state, drift?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 13,
+      "title": "Ansible basics",
+      "targetLevel": "Middle",
+      "mainTopics": [
+        "Ansible"
+      ],
+      "goal": "Освоить тему: Ansible basics на уровне Middle с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "become, idempotency, handlers, check mode, templates",
+      "artifact": "inventory + playbook с handlers и check mode",
+      "seniorChallenge": {
+        "title": "Playbook каждый раз показывает changed",
+        "task": "Разобрать production-ситуацию: Playbook каждый раз показывает changed. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 13",
+        "trainers": [
+          "exam",
+          "ansible",
+          "cmd"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Ansible"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Playbook каждый раз показывает changed",
+          "Диагностика: Ansible basics",
+          "Rollback: Ansible basics"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle",
+          "objective": "Новая тема и базовая практика по теме: Ansible basics.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 13: Ansible basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle",
+          "objective": "Углубление и работа с выводом по теме: Ansible basics.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 13: Ansible basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle",
+          "objective": "Production-слой и типовые ошибки по теме: Ansible basics.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 13: Ansible basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle",
+          "objective": "Мини-инцидент или сквозной проект по теме: Ansible basics.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 13: Ansible basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle",
+          "objective": "Итог недели и Senior Challenge по теме: Ansible basics.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 13: Ansible basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 14,
+      "title": "Ansible roles, vault, zero-downtime basics",
+      "targetLevel": "Middle+",
+      "mainTopics": [
+        "Ansible",
+        "Security"
+      ],
+      "goal": "Освоить тему: Ansible roles, vault, zero-downtime basics на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "rolling deploy, serial, handlers, vault, inventory by environment",
+      "artifact": "role + vault + rolling update",
+      "seniorChallenge": {
+        "title": "Обновить nginx без одновременной остановки всех серверов",
+        "task": "Разобрать production-ситуацию: Обновить nginx без одновременной остановки всех серверов. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 14",
+        "trainers": [
+          "exam",
+          "ansible",
+          "labs"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Ansible",
+            "Security"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Обновить nginx без одновременной остановки всех серверов",
+          "Диагностика: Ansible roles, vault, zero-downtime basics",
+          "Rollback: Ansible roles, vault, zero-downtime basics"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle+",
+          "objective": "Новая тема и базовая практика по теме: Ansible roles, vault, zero-downtime basics.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 14: Ansible roles, vault, zero-downtime basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle+",
+          "objective": "Углубление и работа с выводом по теме: Ansible roles, vault, zero-downtime basics.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 14: Ansible roles, vault, zero-downtime basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle+",
+          "objective": "Production-слой и типовые ошибки по теме: Ansible roles, vault, zero-downtime basics.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 14: Ansible roles, vault, zero-downtime basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle+",
+          "objective": "Мини-инцидент или сквозной проект по теме: Ansible roles, vault, zero-downtime basics.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 14: Ansible roles, vault, zero-downtime basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle+",
+          "objective": "Итог недели и Senior Challenge по теме: Ansible roles, vault, zero-downtime basics.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 14: Ansible roles, vault, zero-downtime basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 15,
+      "title": "PostgreSQL для DevOps: база",
+      "targetLevel": "Middle",
+      "mainTopics": [
+        "Linux",
+        "Monitoring"
+      ],
+      "goal": "Освоить тему: PostgreSQL для DevOps: база на уровне Middle с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "pg_dump, pg_restore, max_connections, logs, slow queries",
+      "artifact": "установка PostgreSQL, backup/restore, роли и подключения",
+      "seniorChallenge": {
+        "title": "PostgreSQL: too many clients",
+        "task": "Разобрать production-ситуацию: PostgreSQL: too many clients. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 15",
+        "trainers": [
+          "exam",
+          "cmd",
+          "labs"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Linux",
+            "Monitoring"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "PostgreSQL: too many clients",
+          "Диагностика: PostgreSQL для DevOps: база",
+          "Rollback: PostgreSQL для DevOps: база"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle",
+          "objective": "Новая тема и базовая практика по теме: PostgreSQL для DevOps: база.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 15: PostgreSQL для DevOps: база?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle",
+          "objective": "Углубление и работа с выводом по теме: PostgreSQL для DevOps: база.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 15: PostgreSQL для DevOps: база?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle",
+          "objective": "Production-слой и типовые ошибки по теме: PostgreSQL для DevOps: база.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 15: PostgreSQL для DevOps: база?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle",
+          "objective": "Мини-инцидент или сквозной проект по теме: PostgreSQL для DevOps: база.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 15: PostgreSQL для DevOps: база?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle",
+          "objective": "Итог недели и Senior Challenge по теме: PostgreSQL для DevOps: база.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 15: PostgreSQL для DevOps: база?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        }
+      ]
+    },
+    {
+      "week": 16,
+      "title": "PostgreSQL: WAL, PITR, replication basics",
+      "targetLevel": "Middle+",
+      "mainTopics": [
+        "Monitoring",
+        "Linux"
+      ],
+      "goal": "Освоить тему: PostgreSQL: WAL, PITR, replication basics на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
+      "productionLayer": "RPO/RTO, replication lag, backup validation, restore drills",
+      "artifact": "backup strategy с RPO/RTO и restore drill",
+      "seniorChallenge": {
+        "title": "Нужно восстановиться на момент до ошибочного DELETE",
+        "task": "Разобрать production-ситуацию: Нужно восстановиться на момент до ошибочного DELETE. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
+        "expectedSkills": [
+          "сбор evidence",
+          "root cause analysis",
+          "минимальное исправление",
+          "rollback thinking",
+          "prevention/action items"
+        ]
+      },
+      "interviewPrepMax": {
+        "studyTabBlock": "Неделя 16",
+        "trainers": [
+          "exam",
+          "labs"
+        ],
+        "questionFilters": {
+          "topic": [
+            "Monitoring",
+            "Linux"
+          ],
+          "level": [
+            "Middle",
+            "Senior"
+          ],
+          "category": [
+            "scenario",
+            "tradeoff",
+            "output"
+          ]
+        },
+        "newCasesNeeded": [
+          "Нужно восстановиться на момент до ошибочного DELETE",
+          "Диагностика: PostgreSQL: WAL, PITR, replication basics",
+          "Rollback: PostgreSQL: WAL, PITR, replication basics"
+        ]
+      },
+      "days": [
+        {
+          "day": 1,
+          "title": "Новая тема и базовая практика",
+          "level": "Middle+",
+          "objective": "Новая тема и базовая практика по теме: PostgreSQL: WAL, PITR, replication basics.",
+          "practice": [
+            "прочитать цель недели",
+            "выполнить базовую команду/конфиг",
+            "сохранить вывод",
+            "объяснить результат своими словами"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 16: PostgreSQL: WAL, PITR, replication basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "Углубление и работа с выводом",
+          "level": "Middle+",
+          "objective": "Углубление и работа с выводом по теме: PostgreSQL: WAL, PITR, replication basics.",
+          "practice": [
+            "получить подробный вывод",
+            "найти ключевые поля",
+            "сравнить нормальный и проблемный случай",
+            "записать выводы"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 16: PostgreSQL: WAL, PITR, replication basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Production-слой и типовые ошибки",
+          "level": "Middle+",
+          "objective": "Production-слой и типовые ошибки по теме: PostgreSQL: WAL, PITR, replication basics.",
+          "practice": [
+            "смоделировать типовую ошибку",
+            "найти root cause",
+            "предложить минимальное исправление",
+            "описать rollback"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 16: PostgreSQL: WAL, PITR, replication basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Мини-инцидент или сквозной проект",
+          "level": "Middle+",
+          "objective": "Мини-инцидент или сквозной проект по теме: PostgreSQL: WAL, PITR, replication basics.",
+          "practice": [
+            "собрать evidence",
+            "сформулировать гипотезы",
+            "проверить гипотезы по порядку",
+            "оформить короткий runbook"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 16: PostgreSQL: WAL, PITR, replication basics?",
+            "Какие evidence нужно собрать перед исправлением?",
+            "Что будет безопасным первым шагом диагностики?",
+            "Какой rollback-план нужен?"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Итог недели и Senior Challenge",
+          "level": "Middle+",
+          "objective": "Итог недели и Senior Challenge по теме: PostgreSQL: WAL, PITR, replication basics.",
+          "practice": [
+            "выполнить итоговую задачу",
+            "ответить на мини-тест",
+            "разобрать Senior Challenge",
+            "записать ошибки недели"
+          ],
+          "pitfalls": [
+            "исправлять без evidence",
+            "не иметь rollback-плана",
+            "не проверять результат после изменения"
+          ],
+          "miniTest": [
+            "Какой практический результат недели 16: PostgreSQL: WAL, PITR, replication basics?",
             "Какие evidence нужно собрать перед исправлением?",
             "Что будет безопасным первым шагом диагностики?",
             "Какой rollback-план нужен?"
