@@ -281,7 +281,7 @@ function renderQCard(q,sMode){
     '</div>'+
     '<div class="q-text">'+esc(q.q)+'</div>'+
     '<div class="q-options">'+
-    order.map((origIdx,visPos)=>'<div class="q-opt" id="opt-'+q.id+'-'+visPos+'" data-orig-idx="'+origIdx+'" data-answer="'+q.answer+'" onclick="pick('+q.id+','+origIdx+','+q.answer+')"><span class="opt-letter">'+L[visPos]+'</span><span>'+esc(opts[origIdx])+'</span></div>').join('')+
+    order.map((origIdx,visPos)=>'<button type="button" class="q-opt" id="opt-'+q.id+'-'+visPos+'" data-orig-idx="'+origIdx+'" data-answer="'+q.answer+'" onclick="pick('+q.id+','+origIdx+','+q.answer+')"><span class="opt-letter">'+L[visPos]+'</span><span>'+esc(opts[origIdx])+'</span></button>').join('')+
     '</div>'+
     (q.explanation&&studyMode?'<div class="q-explanation">💡 '+esc(q.explanation)+'</div>':'')+
     '<div id="qexpl-'+q.id+'" style="display:none" class="q-explanation"></div>'+
@@ -538,7 +538,7 @@ function renderStudyDays(week,activeDay){
   const prog=getStudyProgress();
   document.getElementById('study-days').innerHTML='<div class="study-days">'+(week.days||[]).map(d=>{
     const st=prog['w'+week.week+'d'+d.day]||(d.day===1?'todo':'locked');
-    return '<div class="study-day '+(d.day===activeDay?'active ':'')+esc(st)+'" onclick="setStudyPosition('+week.week+','+d.day+')"><div class="study-day-num">День '+d.day+' · '+statusLabel(st)+'</div><div class="study-day-title">'+esc(d.title)+'</div></div>';
+    return '<button type="button" class="study-day '+(d.day===activeDay?'active ':'')+esc(st)+'" onclick="setStudyPosition('+week.week+','+d.day+')"><div class="study-day-num">День '+d.day+' · '+statusLabel(st)+'</div><div class="study-day-title">'+esc(d.title)+'</div></button>';
   }).join('')+'</div>';
 }
 function renderStudyToday(day){
@@ -650,7 +650,7 @@ function renderMasteryCards(){
     const tqs=allQ.filter(q=>q.topic===t);
     const m=tqs.filter(q=>{const p=qprog[q.id];return p&&p.correct>p.wrong;}).length;
     const pct=tqs.length?Math.round(m/tqs.length*100):0;
-    return '<div class="mastery-card" data-topic="'+t+'" onclick="currentTopic=this.getAttribute(\'data-topic\');nav(\'exam\')">'+'<div style="font-size:20px">'+(icons[i]||'📋')+'</div>'+'<div class="mastery-pct" style="color:'+(colors[i]||'var(--primary)')+'">'+pct+'%</div>'+'<div class="mastery-name">'+t+'</div>'+'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+m+'/'+tqs.length+'</div>'+'<div class="mastery-bar"><div class="mastery-fill" style="width:'+pct+'%;background:'+(colors[i]||'var(--primary)')+'"></div></div></div>';
+    return '<button type="button" class="mastery-card" data-topic="'+t+'" onclick="currentTopic=this.getAttribute(\'data-topic\');nav(\'exam\')">'+'<div style="font-size:20px">'+(icons[i]||'📋')+'</div>'+'<div class="mastery-pct" style="color:'+(colors[i]||'var(--primary)')+'">'+pct+'%</div>'+'<div class="mastery-name">'+t+'</div>'+'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+m+'/'+tqs.length+'</div>'+'<div class="mastery-bar"><div class="mastery-fill" style="width:'+pct+'%;background:'+(colors[i]||'var(--primary)')+'"></div></div></button>';
   }).join('');
 }
 
@@ -1107,9 +1107,9 @@ function buildTopicFilters(){
   const topicChips = document.getElementById('topic-chips');
   if(topicChips){
     topicChips.innerHTML='';
-    const allChip=document.createElement('span');allChip.className='chip active';allChip.textContent='Все';allChip.onclick=function(){setTopic('all',this);};
+    const allChip=document.createElement('button');allChip.type='button';allChip.className='chip active';allChip.textContent='Все';allChip.onclick=function(){setTopic('all',this);};
     topicChips.appendChild(allChip);
-    topics.forEach(t=>{const chip=document.createElement('span');chip.className='chip';chip.textContent=t;chip.setAttribute('data-topic',t);chip.onclick=function(){setTopic(t,this);};topicChips.appendChild(chip);});
+    topics.forEach(t=>{const chip=document.createElement('button');chip.type='button';chip.className='chip';chip.textContent=t;chip.setAttribute('data-topic',t);chip.onclick=function(){setTopic(t,this);};topicChips.appendChild(chip);});
   }
   const allChip=document.querySelector('#mode-chips .chip:first-child');
   if(allChip) allChip.textContent='Все '+getAllQ().length;
