@@ -127,6 +127,8 @@ let activeQuestions=[],singleIdx=0;
 let streak=0;
 let questionStartTime={};
 let cmdMuscleActive=false;
+let interviewMode=false;
+let cameFromStudy=false;
 
 // ═══ NAV ═══
 const PAGE_TITLES={home:'Главная',study:'Учёба',exam:'Экзамен',analytics:'Аналитика',
@@ -136,6 +138,7 @@ const PAGE_TITLES={home:'Главная',study:'Учёба',exam:'Экзамен
   git:'Git-тренажёр',regex:'Regex-тренажёр',tips:'Советы'};
 function nav(page){
   stopActiveSessions();
+  if(page!=='exam'&&page!=='study'){cameFromStudy=false;interviewMode=false;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
   const pg=document.getElementById('page-'+page);
@@ -145,7 +148,7 @@ function nav(page){
   document.getElementById('page-title').textContent=PAGE_TITLES[page]||page;
   closeSidebar();
   if(page==='home') renderHome();
-  if(page==='study') renderStudy();
+  if(page==='study'){cameFromStudy=false;interviewMode=false;renderStudy();}
   if(page==='analytics') renderAnalytics();
   if(page==='subnet') renderSubnet();
   if(page==='ts') renderTsList();
@@ -207,6 +210,14 @@ function setTimer(s,el){timerSecs=s;setChip('timer-chips',el);}
 function setChip(groupId,el){document.querySelectorAll('#'+groupId+' .chip').forEach(c=>c.classList.remove('active'));if(el)el.classList.add('active');}
 function clearMistakes(){if(confirm('Сбросить все ошибки?')){lsSet('mistakes',{});renderQuestions();}}
 function clearTInterval(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+
+function toggleInterviewMode(){
+  interviewMode=!interviewMode;
+  if(interviewMode){cameFromStudy=false;document.getElementById('study-mode-cb').checked=false;}
+  const chip=document.getElementById('interview-chip');
+  if(chip){if(interviewMode)chip.classList.add('active');else chip.classList.remove('active');}
+  renderQuestions();
+}
 
 function filterQs(){
   let qs=getAllQ();
@@ -271,7 +282,8 @@ function renderQCard(q,sMode){
   const L=['A','B','C','D','E'];const opts=(q.options||[]);
   const order=[...Array(opts.length).keys()];
   for(let i=order.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[order[i],order[j]]=[order[j],order[i]];}
-  const studyMode=document.getElementById('study-mode-cb')?.checked;
+  const studyMode=document.getElementById('study-mode-cb')?.checked||cameFromStudy;
+  const isInterview=interviewMode&&!studyMode&&!cameFromStudy;
   questionStartTime[q.id]=Date.now();
   return '<div class="q-card" id="qcard-'+q.id+'">'+
     '<div class="q-meta">'+ttag(q.topic)+ltag(q.level)+ctag(q.category)+
@@ -283,9 +295,19 @@ function renderQCard(q,sMode){
     '<div class="q-options">'+
     order.map((origIdx,visPos)=>'<button type="button" class="q-opt" id="opt-'+q.id+'-'+visPos+'" data-orig-idx="'+origIdx+'" data-answer="'+q.answer+'" onclick="pick('+q.id+','+origIdx+','+q.answer+')"><span class="opt-letter">'+L[visPos]+'</span><span>'+esc(opts[origIdx])+'</span></button>').join('')+
     '</div>'+
-    (q.explanation&&studyMode?'<div class="q-explanation">💡 '+esc(q.explanation)+'</div>':'')+
+    (q.explanation&&studyMode?'<div class="q-explanation">💡 '+esc(q.explanation)+buildWhyWrong(q,opts)+'</div>':'')+
     '<div id="qexpl-'+q.id+'" style="display:none" class="q-explanation"></div>'+
+    (isInterview?'<div class="q-interview-note">🎤 Режим собеседования — отвечайте развёрнуто, без подсказок</div>':'')+
     '</div>';
+}
+
+function buildWhyWrong(q,opts){
+  if(!q.explanation||!opts) return '';
+  const correctIdx=q.answer;
+  const wrongOpts=opts.filter((_,i)=>i!==correctIdx);
+  if(!wrongOpts.length) return '';
+  return '<div class="q-why-wrong"><div style="font-size:11px;font-weight:700;color:var(--text3);margin-top:8px;margin-bottom:4px">❓ Почему остальные варианты неверны:</div>'+
+    wrongOpts.map(o=>'<div style="font-size:12px;color:var(--text2);margin-bottom:2px">• '+esc(o.slice(0,80))+(o.length>80?'…':'')+'</div>').join('')+'</div>';
 }
 
 function pick(qid,chosen,correct){
@@ -328,7 +350,7 @@ function pick(qid,chosen,correct){
   const stats=lsGet('stats',{total:0,correct:0});stats.total++;if(ok)stats.correct++;lsSet('stats',stats);
   const hist=lsGet('history',[]);hist.unshift({date:new Date().toLocaleString('ru'),topic:q&&q.topic,correct:ok});if(hist.length>20)hist.pop();lsSet('history',hist);
   const today=new Date().toISOString().slice(0,10);const daily=lsGet('daily',{});daily[today]=(daily[today]||0)+1;lsSet('daily',daily);
-  if(q&&q.explanation){const el=document.getElementById('qexpl-'+qid);if(el){el.innerHTML='💡 '+esc(q.explanation);el.style.display='block';}}
+  if(q&&q.explanation&&!interviewMode){const el=document.getElementById('qexpl-'+qid);if(el){el.innerHTML='💡 '+esc(q.explanation);el.style.display='block';}}
   updateQuestionProgressSummary();
   clearTInterval();
   if(pageActive('home')) renderMasteryCards();
@@ -607,6 +629,7 @@ function startStudyTrainer(trainerId,weekNum){
   if(trainerId==='exam'){
     const topics=filters.topic||[],levels=filters.level||[];
     currentTopic=topics.length===1?topics[0]:'all';currentLevel=levels.length===1?levels[0]:'all';currentCategory='all';currentMode='all';currentView='standard';
+    cameFromStudy=true;interviewMode=false;
     nav('exam');
     return;
   }
