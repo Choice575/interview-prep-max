@@ -54,7 +54,7 @@
 <div id="main">
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:10px">
-      <button class="btn-icon" id="menu-toggle" onclick="toggleSidebar()">☰</button>
+      <button class="btn-icon" id="menu-toggle" onclick="toggleSidebar()" aria-label="Открыть меню">☰</button>
       <h1 id="page-title">Загрузка...</h1>
     </div>
     <div class="topbar-right">
@@ -62,6 +62,9 @@
       <span class="score-display" id="streak-display">🔥 0</span>
       <button class="btn btn-outline btn-sm" onclick="openCustomModal()">+ Свой вопрос</button>
     </div>
+  </div>
+  <div id="update-banner" style="display:none;background:var(--primary-dim);color:var(--primary-h);text-align:center;padding:8px;font-size:13px;font-weight:600;cursor:pointer" onclick="location.reload()">
+    🔄 Доступна новая версия приложения. Нажмите, чтобы обновить.
   </div>
 
   <div id="app-loading" style="text-align:center;padding:80px 20px">
@@ -255,7 +258,7 @@
   <div class="modal" style="max-width:700px;max-height:85vh">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <h3 style="margin:0">📋 Шпаргалки</h3>
-      <button class="btn-icon" onclick="closeCheatSheet()" style="font-size:18px">✕</button>
+      <button class="btn-icon" onclick="closeCheatSheet()" style="font-size:18px" aria-label="Закрыть шпаргалки">✕</button>
     </div>
     <div class="filter-row" id="cheat-tabs" style="margin-bottom:12px;flex-wrap:wrap"></div>
     <div id="cheat-content" style="font-size:12px;line-height:1.8;max-height:55vh;overflow-y:auto"></div>

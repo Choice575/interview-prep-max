@@ -686,8 +686,19 @@ function renderHome(){
   document.getElementById('home-best-streak').textContent='Лучшая серия: '+best;
   const hist=lsGet('history',[]);
   const hc=document.getElementById('home-history');
-  if(!hist.length){hc.innerHTML='<p style="color:var(--text3);font-size:13px">История пуста. Начните экзамен!</p>';return;}
-  hc.innerHTML=hist.slice(0,5).map(h=>'<div class="history-item"><span style="color:var(--text3);font-size:11px">'+esc(h.date)+'</span><span>'+esc(h.topic||'')+'</span><span style="color:'+(h.correct?'var(--green)':'var(--red)')+'">'+(h.correct?'✅ Верно':'❌ Неверно')+'</span></div>').join('');
+  if(!hist.length){hc.innerHTML='<p style="color:var(--text3);font-size:13px">История пуста. Начните экзамен!</p>';}else{
+  hc.innerHTML=hist.slice(0,5).map(h=>'<div class="history-item"><span style="color:var(--text3);font-size:11px">'+esc(h.date)+'</span><span>'+esc(h.topic||'')+'</span><span style="color:'+(h.correct?'var(--green)':'var(--red)')+'">'+(h.correct?'✅ Верно':'❌ Неверно')+'</span></div>').join('');}
+  // Пересоздаём Блиц и Mock Interview (чтобы не пропадали при перерендере)
+  setTimeout(()=>{
+    const qa=document.querySelector('.quick-actions');
+    if(!qa) return;
+    if(!document.getElementById('blitz-btn')){
+      const btn=document.createElement('button');btn.id='blitz-btn';btn.className='btn btn-outline';btn.style.cssText='background:var(--primary-dim);color:var(--primary-h);border-color:var(--primary)';btn.textContent='⚡ Блиц (5 мин)';btn.onclick=startBlitz;btn.setAttribute('aria-label','Блиц-опрос на 5 минут');qa.appendChild(btn);
+    }
+    if(!document.getElementById('mock-btn')){
+      const mockBtn=document.createElement('button');mockBtn.id='mock-btn';mockBtn.className='btn btn-outline';mockBtn.style.cssText='background:var(--primary-dim);color:var(--primary-h);border-color:var(--primary)';mockBtn.textContent='🎤 Mock Interview (30 мин)';mockBtn.onclick=startMockInterview;mockBtn.setAttribute('aria-label','Mock интервью на 30 минут');qa.appendChild(mockBtn);
+    }
+  },100);
 }
 function renderMasteryCards(){
   const qprog=getQProg(),allQ=getAllQ();
@@ -1174,6 +1185,25 @@ async function initApp(){
   document.getElementById('app-loading').style.display='none';
   document.getElementById('page-title').textContent = 'Главная';
 
+  // Слушаем обновления Service Worker
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistration().then(reg=>{
+      if(!reg) return;
+      reg.addEventListener('updatefound',()=>{
+        const newWorker=reg.installing;
+        if(!newWorker) return;
+        newWorker.addEventListener('statechange',()=>{
+          if(newWorker.state==='installed'&&navigator.serviceWorker.controller){
+            const banner=document.getElementById('update-banner');
+            if(banner) banner.style.display='block';
+          }
+        });
+      });
+      // Проверяем, есть ли ожидающее обновление
+      if(reg.waiting){const banner=document.getElementById('update-banner');if(banner)banner.style.display='block';}
+    });
+  }
+
   // Рендерим
   renderHome();
   renderQuestions();
@@ -1181,10 +1211,10 @@ async function initApp(){
   // Блиц-кнопка
   setTimeout(()=>{
     const qa=document.querySelector('.quick-actions');
-    if(qa){const btn=document.createElement('button');btn.className='btn btn-outline';btn.style.cssText='background:var(--primary-dim);color:var(--primary-h);border-color:var(--primary)';btn.textContent='⚡ Блиц (5 мин)';btn.onclick=startBlitz;qa.appendChild(btn);
+    if(qa){const btn=document.createElement('button');btn.className='btn btn-outline';btn.style.cssText='background:var(--primary-dim);color:var(--primary-h);border-color:var(--primary)';btn.textContent='⚡ Блиц (5 мин)';btn.onclick=startBlitz;btn.setAttribute('aria-label','Блиц-опрос на 5 минут');qa.appendChild(btn);
       const mockBtn=document.createElement('button');mockBtn.className='btn btn-outline';
       mockBtn.style.cssText='background:var(--primary-dim);color:var(--primary-h);border-color:var(--primary)';
-      mockBtn.textContent='🎤 Mock Interview (30 мин)';mockBtn.onclick=startMockInterview;qa.appendChild(mockBtn);}
+      mockBtn.textContent='🎤 Mock Interview (30 мин)';mockBtn.onclick=startMockInterview;mockBtn.setAttribute('aria-label','Mock интервью на 30 минут');qa.appendChild(mockBtn);}
   },200);
 }
 
