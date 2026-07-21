@@ -195,6 +195,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   .subnet-inputs{grid-template-columns:1fr 1fr}
   .ts-sc-list{grid-template-columns:1fr}
 }
+@media(max-width:600px){
+  .topbar{flex-direction:column;align-items:flex-start;gap:10px;padding:12px 14px}
+  .topbar h1{font-size:15px}
+  .topbar-right{width:100%;justify-content:flex-start;flex-wrap:wrap}
+  .home-grid{grid-template-columns:1fr}
+  .analytics-grid{grid-template-columns:1fr}
+  .exam-controls{flex-direction:column}
+  .study-layout{grid-template-columns:1fr}
+  .study-days{grid-template-columns:repeat(auto-fit,minmax(58px,1fr));gap:5px}
+  .study-day{padding:7px 6px;min-height:60px}
+  .study-day-title{font-size:11px}
+  .q-card{padding:14px}
+  .q-text{font-size:14px}
+  .q-opt{padding:10px 11px;font-size:13px;word-break:break-word}
+  .opt-letter{width:20px;height:20px;font-size:10px;flex-shrink:0}
+  .single-controls button{font-size:12px;padding:8px 12px}
+  .quick-actions button{font-size:12px;padding:7px 12px}
+  .modal{width:95%;padding:18px}
+}
 
 /* ═══ V5 additions ═══ */
 .tag-docker{background:#0c3040;color:#38bdf8}
