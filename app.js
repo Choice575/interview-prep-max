@@ -227,7 +227,10 @@ function filterQs(){
   const s=document.getElementById('exam-search')?.value?.toLowerCase()||'';
   if(s) qs=qs.filter(q=>q.q.toLowerCase().includes(s)||(q.options||[]).some(o=>o.toLowerCase().includes(s)));
   const mistakes=getMistakes();const qprog=getQProg();
-  if(currentMode==='mistakes') qs=qs.filter(q=>mistakes[q.id]);
+  if(currentMode==='mistakes'){
+    qs=qs.filter(q=>mistakes[q.id]);
+    if(!qs.length){document.getElementById('questions-container').innerHTML='<div class="empty-state"><div class="icon">✅</div><p>Ошибок нет — отличная работа!</p><button class="btn btn-primary btn-sm" onclick="currentMode=\'all\';renderQuestions()">Показать все вопросы</button></div>';return qs;}
+  }
   if(currentMode==='smart'||currentMode==='srs'){
     const now=Date.now();
     if(currentMode==='srs'){
@@ -760,6 +763,10 @@ function renderMasteryCards(){
 // ═══ ANALYTICS ═══
 function renderAnalytics(){
   const stats=lsGet('stats',{total:0,correct:0});const qprog=getQProg(),allQ=getAllQ(),mistakes=getMistakes();
+  if(!stats.total){
+    document.getElementById('stat-cards').innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="icon">📊</div><p>Статистика появится после первых ответов</p><button class="btn btn-primary btn-sm" onclick="nav(\'exam\')">⚡ Начать экзамен</button><button class="btn btn-outline btn-sm" onclick="startDiagnostic()" style="margin-left:8px">🔬 Пройти диагностику</button></div>';
+    return;
+  }
   const pct=stats.total?Math.round(stats.correct/stats.total*100):0;
   let totalTime=0,totalCount=0;
   Object.values(qprog).forEach(p=>{if(p.times){p.times.forEach(t=>{totalTime+=t;totalCount++;});}});
