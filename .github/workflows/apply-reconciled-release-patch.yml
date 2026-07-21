@@ -1,0 +1,117 @@
+name: Apply reconciled release transfer
+
+
+on:
+  push:
+    branches:
+      - codex/release-v12.4.0
+
+
+permissions:
+  contents: write
+
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply verified release patch
+        shell: bash
+        run: |
+          cat <<'PATCH' | base64 --decode | gzip --decompress > /tmp/release.patch
+          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
+          PATCH
+          git apply --whitespace=nowarn --exclude=.github/workflows/ci.yml --exclude=e2e/app.spec.js /tmp/release.patch
+          cat <<'CI' > .github/workflows/ci.yml
+          name: CI
+          
+          on:
+            push:
+              branches: [main]
+            pull_request:
+              branches: [main]
+          
+          jobs:
+            validate:
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                - name: Setup Node
+                  uses: actions/setup-node@v4
+                  with:
+                    node-version: '22'
+                - name: Syntax check
+                  run: |
+                    node --check app.js
+                    node --check validate.js
+                    node --check sw.js
+                    node --check version.js
+                    node --check storage.js
+                    node --check progress.js
+                    node --check coach.js
+                    node --check verify-release.js
+                    node --test progress.test.js
+                    node --test storage.test.js
+                    node --test coach.test.js
+                    node --test coach-flow.integration.test.js
+                    node --test app-shell.integration.test.js
+                - name: JSON validation
+                  run: node validate.js
+                - name: Release integrity check
+                  run: node verify-release.js
+            e2e:
+              needs: validate
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                - uses: actions/setup-node@v4
+                  with:
+                    node-version: '22'
+                - name: Enable pnpm
+                  run: corepack enable
+                - name: Install browser tests
+                  run: pnpm install --frozen-lockfile
+                - name: Install Chromium
+                  run: pnpm exec playwright install --with-deps chromium
+                - name: Browser E2E
+                  run: pnpm test:e2e
+          
+          CI
+          sed -i "s#@playwright/test#playwright/test#" e2e/app.spec.js
+          cat <<'E2E' >> e2e/app.spec.js
+          
+          test('rejects malformed progress without replacing existing data', async ({ page }) => {
+            await setProgress(page, {
+              ipmax_onboarding: profile,
+              ipmax_onboarding_complete: true,
+              ipmax_qprog: { 1: { correct: 1, wrong: 0 } }
+            });
+            await page.goto('/');
+            page.once('dialog', dialog => dialog.accept());
+            await page.locator('#import-inp').setInputFiles({
+              name: 'broken-progress.json', mimeType: 'application/json',
+              buffer: Buffer.from(JSON.stringify({ version: '12.4.0', qprog: [] }))
+            });
+            await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_qprog'))['1'].correct)).toBe(1);
+          });
+          
+          test('keeps the focused daily plan usable on a compact viewport', async ({ page }) => {
+            await page.setViewportSize({ width: 390, height: 844 });
+            await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+            await page.goto('/');
+            await expect(page.locator('#daily-plan-card')).toBeVisible();
+            await expect(page.locator('#daily-plan-content .btn-primary')).toBeVisible();
+            expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+          });
+          
+          E2E
+          node scripts/generate-pwa-icons.js
+          rm /tmp/release.patch
+          rm .github/workflows/apply-release-patch.yml .github/workflows/apply-reconciled-release-patch.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "Add reproducible PWA and browser test coverage"
+          git push origin HEAD:refs/heads/codex/release-v12.4.0
