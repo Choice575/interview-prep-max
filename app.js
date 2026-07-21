@@ -696,7 +696,7 @@ function renderAnalytics(){
   allQ.forEach(q=>{const p=qprog[q.id];if(p){if(p.correct>p.wrong)ok++;else if(p.wrong>0)err++;}});
   document.getElementById('analytics-seg-bar').innerHTML='<div class="seg-ok" style="width:'+(ok/tot*100)+'%"></div><div class="seg-err" style="width:'+(err/tot*100)+'%"></div><div class="seg-none" style="width:'+((tot-ok-err)/tot*100)+'%"></div>';
   document.getElementById('analytics-seg-label').textContent='✅ Изучено: '+ok+' | ❌ Ошибки: '+err+' | ⭕ Не отвечено: '+(tot-ok-err)+' из '+tot;
-  drawRadar();renderTimeChart();renderCategoryStats();renderWeakSpots();renderGradeReadiness();
+  drawRadar();renderTimeChart();renderCategoryStats();renderWeakSpots();renderGradeReadiness();renderReadinessScore();renderNextQuestions();
 }
 function drawRadar(){
   const canvas=document.getElementById('radarCanvas');if(!canvas) return;const ctx=canvas.getContext('2d');
@@ -751,6 +751,42 @@ function renderGradeReadiness(){
     }).join('')+
     '<div style="font-size:11px;color:var(--text3);margin-top:8px">Оценка: ≥70% Junior → готов к Middle, ≥70% Middle → готов к Senior</div>';
   container.appendChild(div);
+}
+
+function renderReadinessScore(){
+  const el=document.getElementById('readiness-content');if(!el) return;
+  const qprog=getQProg(),allQ=getAllQ();
+  const answered=allQ.filter(q=>{const p=qprog[q.id];return p&&(p.correct+p.wrong)>0;});
+  if(!answered.length){el.innerHTML='<p style="color:var(--text3);font-size:13px">Ответьте хотя бы на 10 вопросов для оценки готовности.</p>';return;}
+  const ok=answered.filter(q=>{const p=qprog[q.id];return p&&p.correct>p.wrong;});
+  const score=Math.round(ok.length/answered.length*100);
+  const tier=score>=80?'🟢 Высокая':score>=50?'🟡 Средняя':'🔴 Низкая';
+  const tip=score>=80?'Можно пробовать собеседование Middle':score>=50?'Закройте слабые темы и повторите ошибки':'Сосредоточьтесь на базовых темах и регулярной практике';
+  el.innerHTML='<div style="font-size:48px;font-weight:800;color:var(--primary-h);margin-bottom:6px">'+score+'%</div>'+
+    '<div style="font-size:16px;font-weight:700;margin-bottom:8px">'+tier+'</div>'+
+    '<div style="font-size:12px;color:var(--text2);max-width:300px;margin:0 auto">'+tip+'</div>'+
+    '<div style="font-size:11px;color:var(--text3);margin-top:8px">'+ok.length+'/'+answered.length+' вопросов освоено</div>';
+}
+
+function renderNextQuestions(){
+  const el=document.getElementById('next-questions-list');if(!el) return;
+  const qprog=getQProg(),allQ=getAllQ();
+  const weak=allQ.filter(q=>{const p=qprog[q.id];return !p||p.wrong>=p.correct;});
+  if(!weak.length){
+    el.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 0">Все вопросы освоены! Пройдите Senior Simulator.</p>';
+    return;
+  }
+  const byTopic={};weak.forEach(q=>{byTopic[q.topic]=(byTopic[q.topic]||[]);byTopic[q.topic].push(q);});
+  const pick=[];const topics=Object.keys(byTopic).sort((a,b)=>byTopic[a].length-byTopic[b].length);
+  for(const t of topics){
+    const qs=byTopic[t];pick.push(qs[Math.floor(Math.random()*qs.length)]);
+    if(pick.length>=10) break;
+  }
+  el.innerHTML=pick.map((q,i)=>'<button type="button" class="weak-item" style="width:100%;cursor:pointer;border:0" onclick="currentTopic=\''+esc(q.topic)+'\';currentLevel=\'all\';currentMode=\'all\';nav(\'exam\')">'+
+    '<span style="font-size:11px;color:var(--text3);min-width:20px">#'+(i+1)+'</span>'+
+    '<span class="weak-txt" title="'+esc(q.q)+'" style="text-align:left">'+esc(q.q.slice(0,70))+(q.q.length>70?'…':'')+'</span>'+
+    '<span style="font-size:10px;color:var(--primary-h)">'+esc(q.topic)+'</span></button>').join('')+
+    '<div style="text-align:center;margin-top:8px"><button class="btn btn-primary btn-sm" onclick="currentMode=\'mix10\';nav(\'exam\')">⚡ Пройти эти 10</button></div>';
 }
 
 // ═══ SUBNET ═══
