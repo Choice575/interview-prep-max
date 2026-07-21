@@ -986,6 +986,21 @@ function checkPort(){const inp=document.getElementById('pt-inp');const fb=docume
 function skipPort(){const fb=document.getElementById('pt-feedback');fb.style.display='block';fb.innerHTML='<span style="color:var(--yellow)">💡 '+ptCurrent.service+' → порт <b>'+ptCurrent.port+'</b></span>';setTimeout(renderPortQ,1200);}
 function updatePtProg(){const done=Object.keys(ptDone).length;document.getElementById('pt-pb').style.width=(done/PORTS_TASKS.length*100)+'%';document.getElementById('pt-score-lbl').textContent=done+' / '+PORTS_TASKS.length+' портов';}
 
+// ═══ ONBOARDING ═══
+function saveOnboarding(){
+  const role=document.getElementById('onb-role').value;
+  const level=document.getElementById('onb-level').value;
+  const date=document.getElementById('onb-date').value;
+  lsSet('onboarding',{role,level,date,completedAt:new Date().toISOString()});
+  lsSet('onboarding_complete',true);
+  document.getElementById('onboarding-modal').classList.remove('open');
+  renderHome();
+}
+function skipOnboarding(){
+  lsSet('onboarding_complete',true);
+  document.getElementById('onboarding-modal').classList.remove('open');
+}
+
 // ═══ GIT TRAINER ═══
 let gitDone={};
 function renderGit(){gitDone=lsGet('git_prog',{});const L=['A','B','C','D'];document.getElementById('git-container').innerHTML=GIT_TASKS.map(t=>{const done=gitDone[t.id];return '<div class="git-card" id="gt-'+t.id+'"><div class="git-num">Задача #'+t.id+'</div><div class="git-task">'+esc(t.task)+'</div><div class="git-opts">'+t.opts.map((o,i)=>'<button type="button" class="git-opt'+(done!==undefined?' disabled':'')+'" id="go-'+t.id+'-'+i+'" onclick="pickGit('+t.id+','+i+')"><span style="font-weight:600;margin-right:8px;color:var(--text3)">'+L[i]+')</span>'+esc(o)+'</button>').join('')+'</div><div class="git-exp" id="gexp-'+t.id+'">💡 '+esc(t.exp)+'</div></div>';}).join('');Object.entries(gitDone).forEach(([id,c])=>applyGitState(parseInt(id),c));updateGitProg();}
@@ -1320,6 +1335,11 @@ async function initApp(){
   // Рендерим
   renderHome();
   renderQuestions();
+
+  // Онбординг
+  if(!lsGet('onboarding_complete',false)){
+    setTimeout(()=>{document.getElementById('onboarding-modal').classList.add('open');},500);
+  }
 
   // Блиц-кнопка
   setTimeout(()=>{

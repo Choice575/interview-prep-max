@@ -269,6 +269,24 @@
   </div>
 </div>
 
+<!-- ONBOARDING MODAL -->
+<div class="modal-overlay" id="onboarding-modal">
+  <div class="modal" style="max-width:420px">
+    <h3>🚀 Добро пожаловать в Interview Prep Max</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Ответьте на 3 вопроса, чтобы приложение построило ваш персональный план подготовки.</p>
+    <div class="form-group"><label>🎯 Целевая роль</label>
+      <select class="form-input" id="onb-role"><option value="DevOps">DevOps Engineer</option><option value="SRE">SRE</option><option value="Platform">Platform Engineer</option><option value="Cloud">Cloud Engineer</option></select></div>
+    <div class="form-group"><label>📊 Текущий уровень</label>
+      <select class="form-input" id="onb-level"><option value="Junior">Junior — начинаю путь</option><option value="Middle" selected>Middle — есть база, хочу углубить</option><option value="Senior">Senior — готовлюсь к сложным собесам</option></select></div>
+    <div class="form-group"><label>📅 Дата интервью (опционально)</label>
+      <input class="form-input" id="onb-date" type="date"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
+      <button class="btn btn-outline btn-sm" onclick="skipOnboarding()">Пропустить</button>
+      <button class="btn btn-primary" onclick="saveOnboarding()">Начать подготовку →</button>
+    </div>
+  </div>
+</div>
+
 <script src="./app.js?v=12"></script>
 </body>
 </html>
