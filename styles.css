@@ -44,7 +44,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .btn-sm{padding:6px 12px;font-size:12px}
 .btn-icon{padding:8px;background:transparent;border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text2);font-size:16px;transition:all .15s}
 .btn-icon:hover{background:var(--bg3);color:var(--text)}
-.btn:focus-visible,.btn-icon:focus-visible,.sb-item:focus-visible,.chip:focus-visible,.q-opt:focus-visible,.study-day:focus-visible,.mastery-card:focus-visible{outline:2px solid var(--primary-h);outline-offset:2px}
+.btn:focus-visible,.btn-icon:focus-visible,.sb-item:focus-visible,.chip:focus-visible,.q-opt:focus-visible,.study-day:focus-visible,.mastery-card:focus-visible,.ts-sc-card:focus-visible,.ts-choice:focus-visible,.cmd-opt:focus-visible,.code-opt:focus-visible,.git-opt:focus-visible,.rx-opt:focus-visible,.tip-header:focus-visible{outline:2px solid var(--primary-h);outline-offset:2px}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
 .card-title{font-size:14px;font-weight:700;margin-bottom:14px}
 .chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font:inherit;font-size:11px;font-weight:600;border:1px solid transparent;cursor:pointer;transition:all .15s}
