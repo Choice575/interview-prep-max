@@ -1,8 +1,8 @@
 /**
- * Interview Prep Max v11 — Application Logic
- * APP_VERSION: 11.0.0
+ * Interview Prep Max v12 — Application Logic
+ * APP_VERSION: 12.0.0
  */
-const APP_VERSION = '11.0.0';
+const APP_VERSION = '12.0.0';
 
 // ═══ DATA LOADING ═══
 var BASE_QUESTIONS = [], SUBNET_PROBLEMS = [], TS_SCENARIOS = [], CMD_TASKS = [],

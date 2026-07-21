@@ -14,7 +14,7 @@ const KNOWN_LEVELS = ['Junior', 'Middle', 'Senior', 'Junior+', 'Middle+', 'Senio
 const KNOWN_CATEGORIES = ['definition', 'scenario', 'tradeoff', 'output'];
 const KNOWN_STUDY_TYPES = ['incident', 'diagnostic', 'tradeoff', 'rollback', 'postmortem'];
 const KNOWN_TRAINERS = ['exam', 'analytics', 'subnet', 'ts', 'cmd', 'labs', 'code', 'ansible', 'dockerfile', 'k8s', 'ports', 'git', 'regex', 'tips'];
-const APP_VERSION = '11.0.0';
+const APP_VERSION = '12.0.0';
 
 let errors = 0, warnings = 0;
 
