@@ -20,15 +20,31 @@ jobs:
           node --check app.js
           node --check validate.js
           node --check sw.js
+          node --check version.js
+          node --check storage.js
+          node --check progress.js
+          node --check coach.js
+          node --check verify-release.js
+          node --test progress.test.js
+          node --test storage.test.js
+          node --test coach.test.js
+          node --test coach-flow.integration.test.js
+          node --test app-shell.integration.test.js
       - name: JSON validation
         run: node validate.js
-      - name: Version sync check
-        run: |
-          APP_VER=$(grep -oP "APP_VERSION\s*=\s*'\K[^']+" app.js)
-          SW_VER=$(grep -oP "CACHE_NAME\s*=\s*'\K[^']+" sw.js)
-          HTML_VER=$(grep -oP "app\.js\?v=\K[0-9]+" index.html)
-          echo "app.js: APP_VERSION=$APP_VER"
-          echo "sw.js: CACHE_NAME=$SW_VER"
-          echo "index.html: v=$HTML_VER"
-          if [ "$HTML_VER" != "${APP_VER%%.*}" ]; then echo "VERSION MISMATCH"; exit 1; fi
-          echo "Versions synced OK"
+      - name: Release integrity check
+        run: node verify-release.js
+  e2e:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser tests
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser E2E
+        run: npm run test:e2e

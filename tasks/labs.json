@@ -2,6 +2,7 @@
   {
     "id": 1,
     "type": "yaml",
+    "topic": "Docker",
     "title": "Почини Docker Compose — неверный отступ",
     "scenario": "docker-compose up падает с ошибкой: 'services.web.ports must be a list'",
     "code": "version: '3'\nservices:\n  web:\n    image: nginx:alpine\n    ports:\n      - \"80:80\"\n  db:\n  image: postgres:15\n    environment:\n      POSTGRES_PASSWORD: secret",
@@ -19,6 +20,7 @@
   {
     "id": 2,
     "type": "log",
+    "topic": "Monitoring",
     "title": "Диагноз по логу: nginx 502",
     "scenario": "Пользователи жалуются на 502 ошибку. Вы зашли на сервер и выполнили tail -20 /var/log/nginx/error.log. Что случилось?",
     "code": "2024/07/15 14:23:01 [error] 1234#1234: *56 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.1.5, server: api.example.com, request: \"GET /users HTTP/1.1\", upstream: \"http://127.0.0.1:3000/users\"",
@@ -36,6 +38,7 @@
   {
     "id": 3,
     "type": "incident",
+    "topic": "Kubernetes",
     "title": "Pod CrashLoopBackOff — диагностика",
     "scenario": "Вы задеплоили новую версию приложения. kubectl get pods показывает: myapp-7d4f8b9c-xyz 0/1 CrashLoopBackOff. Ваши действия?",
     "code": "$ kubectl describe pod myapp-7d4f8b9c-xyz\n...\nState: Waiting (CrashLoopBackOff)\nLast State: Terminated (Error: exit code 1)\n...\n$ kubectl logs myapp-7d4f8b9c-xyz --previous\nError: Cannot find module '/app/dist/server.js'",
@@ -53,6 +56,7 @@
   {
     "id": 4,
     "type": "yaml",
+    "topic": "Terraform",
     "title": "Почини Terraform — неверный тип переменной",
     "scenario": "terraform plan выдаёт ошибку: 'Invalid value for input variable'. Вы смотрите в конфиг.",
     "code": "variable \"instance_count\" {\n  type    = number\n  default = \"3\"\n}\n\nresource \"aws_instance\" \"web\" {\n  count = var.instance_count\n  ami   = \"ami-0c55b159cbfafe1f0\"\n  instance_type = \"t3.micro\"\n}",
@@ -70,6 +74,7 @@
   {
     "id": 5,
     "type": "log",
+    "topic": "Linux",
     "title": "Диагноз по логу: OOM Killer",
     "scenario": "Сервис неожиданно перезапустился. Вы смотрите dmesg. Что произошло?",
     "code": "$ dmesg | tail -5\n[12345.678] Out of memory: Killed process 9876 (java) total-vm:4194304kB, anon-rss:2048000kB, file-rss:0kB, shmem-rss:0kB\n[12345.789] oom_reaper: reaped process 9876 (java), now anon-rss:0kB, file-rss:0kB, shmem-rss:0kB",
@@ -87,6 +92,7 @@
   {
     "id": 6,
     "type": "incident",
+    "topic": "Terraform",
     "title": "Terraform state lock — что делать?",
     "scenario": "Вы запускаете terraform apply в CI/CD, но получаете ошибку. Команда упала на середине.",
     "code": "$ terraform apply -auto-approve\nError: Error acquiring the state lock\n...\nLock Info:\n  ID: a1b2c3d4-xxxx\n  Operation: OperationTypeApply\n  Who: @jenkins\n  Created: 2024-07-15 10:00:00\n\nTerraform acquires a state lock to protect the state from being written by multiple users at the same time.",
@@ -104,6 +110,7 @@
   {
     "id": 7,
     "type": "log",
+    "topic": "Сети",
     "title": "Диагноз по логу: DNS resolution failed",
     "scenario": "Микросервис не может подключиться к БД. Вы смотрите логи приложения.",
     "code": "$ tail -10 /var/log/myapp/app.log\n2024-07-15 15:00:01 ERROR - Failed to connect to database: getaddrinfo ENOTFOUND db.internal\n2024-07-15 15:00:01 ERROR - Retrying in 5s...\n2024-07-15 15:00:06 ERROR - Failed to connect to database: getaddrinfo ENOTFOUND db.internal",
@@ -121,6 +128,7 @@
   {
     "id": 8,
     "type": "yaml",
+    "topic": "Kubernetes",
     "title": "Почини K8s манифест — missing readinessProbe",
     "scenario": "После деплоя часть запросов получает 503. Rolling update идёт, но новые поды не готовы принимать трафик.",
     "code": "apiVersion: apps/v1\nkind: Deployment\nspec:\n  replicas: 3\n  template:\n    spec:\n      containers:\n      - name: api\n        image: myapp:v2\n        ports:\n        - containerPort: 8080\n        resources:\n          requests:\n            cpu: 100m\n            memory: 128Mi",
@@ -138,6 +146,7 @@
   {
     "id": 9,
     "type": "incident",
+    "topic": "Monitoring",
     "title": "502 после деплоя — быстрая диагностика",
     "scenario": "Только что задеплоили новую версию. Nginx возвращает 502. Времени мало, нужно быстро понять что сломалось.",
     "code": "Хронология:\n1. Деплой прошёл успешно (по логам CI)\n2. Health-check эндпоинт /health возвращает 200\n3. Но при запросе /api/users — nginx 502\n\nЧто проверяете ПЕРВЫМ?",
@@ -155,6 +164,7 @@
   {
     "id": 10,
     "type": "log",
+    "topic": "Linux",
     "title": "Диагноз по логу: disk full — inodes",
     "scenario": "Приложение не может писать временные файлы. df -h показывает 45% использования. Но ошибка остаётся.",
     "code": "$ df -h\nFilesystem  Size  Used Avail Use% Mounted on\n/dev/sda1   100G   45G   55G  45% /\n\n$ df -i\nFilesystem  Inodes IUsed IFree IUse% Mounted on\n/dev/sda1   655360 655360     0  100% /\n\n$ touch /tmp/test\ntouch: cannot touch '/tmp/test': No space left on device",
@@ -172,6 +182,7 @@
   {
     "id": 11,
     "type": "incident",
+    "topic": "Security",
     "title": "SSL-сертификат истёк — экстренное решение",
     "scenario": "3 часа ночи, мониторинг: сайт недоступен. Браузер показывает NET::ERR_CERT_DATE_INVALID.",
     "code": "$ openssl s_client -connect site.ru:443 -servername site.ru | openssl x509 -noout -dates\nnotBefore=Apr 15 00:00:00 2024 GMT\nnotAfter=Jul 14 23:59:59 2024 GMT\n\nСегодня 15 июля. Сертификат истёк вчера.",
@@ -189,6 +200,7 @@
   {
     "id": 12,
     "type": "yaml",
+    "topic": "Ansible",
     "title": "Почини Ansible — missing become",
     "scenario": "Ansible падает при установке пакета: 'Permission denied'. Плейбук запускается от обычного пользователя.",
     "code": "- name: Install nginx\n  hosts: webservers\n  tasks:\n    - name: Install package\n      apt:\n        name: nginx\n        state: present\n        update_cache: yes",
@@ -206,6 +218,7 @@
   {
     "id": 13,
     "type": "log",
+    "topic": "Monitoring",
     "title": "Диагноз по логу: PostgreSQL too many clients",
     "scenario": "Приложение падает с ошибкой БД. Вы проверяете логи PostgreSQL.",
     "code": "$ tail -5 /var/log/postgresql/postgresql-15-main.log\n2024-07-15 16:30:01 FATAL: remaining connection slots are reserved for non-replication superuser connections\n2024-07-15 16:30:01 FATAL: sorry, too many clients already\n\n$ psql -c \"SELECT count(*) FROM pg_stat_activity;\"\n count\n-------\n   100",
@@ -223,6 +236,7 @@
   {
     "id": 14,
     "type": "incident",
+    "topic": "Monitoring",
     "title": "Redis out of memory — что делать?",
     "scenario": "Redis перестал отвечать на запросы. Приложение пишет: 'OOM command not allowed when used memory > maxmemory'.",
     "code": "$ redis-cli INFO memory\nused_memory_human: 2.50G\nmaxmemory_human: 2.00G\nmaxmemory_policy: noeviction\n\n$ redis-cli SET cache:key \"value\"\n(error) OOM command not allowed when used memory > 'maxmemory'",
@@ -240,6 +254,7 @@
   {
     "id": 15,
     "type": "log",
+    "topic": "Docker",
     "title": "Диагноз по логу: Docker daemon not running",
     "scenario": "docker ps выдаёт ошибку. Контейнеры не запускаются после перезагрузки сервера.",
     "code": "$ docker ps\nCannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?\n\n$ systemctl status docker\n● docker.service - Docker Application Container Engine\n   Loaded: loaded (/lib/systemd/system/docker.service; disabled)\n   Active: inactive (dead)",

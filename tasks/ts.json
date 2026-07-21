@@ -2,6 +2,7 @@
   {
     "id": 1,
     "title": "Nginx отдаёт 502 Bad Gateway",
+    "topic": "Monitoring",
     "context": "Приложение недоступно. Nginx запущен, но возвращает 502 Bad Gateway.",
     "nodes": {
       "start": {
@@ -236,6 +237,7 @@
   {
     "id": 2,
     "title": "Диск заполнен на 100%",
+    "topic": "Linux",
     "context": "Все сервисы деградировали. df -h показывает /var 100%.",
     "nodes": {
       "start": {
@@ -419,6 +421,7 @@
   {
     "id": 3,
     "title": "Сервис не запускается после обновления конфига",
+    "topic": "Linux",
     "context": "После обновления конфига systemd сервис в статусе failed.",
     "nodes": {
       "start": {
@@ -584,6 +587,7 @@
   {
     "id": 4,
     "title": "Terraform state lock завис",
+    "topic": "Terraform",
     "context": "terraform apply зависло. Коллега говорит его apply упал 15 минут назад.",
     "nodes": {
       "start": {
@@ -742,6 +746,7 @@
   {
     "id": 5,
     "title": "Высокая нагрузка CPU (GC thrashing)",
+    "topic": "Linux",
     "context": "Сервер тормозит. Load average 12.0 при 4 ядрах. Пользователи жалуются.",
     "nodes": {
       "start": {
@@ -907,6 +912,7 @@
   {
     "id": 6,
     "title": "Ansible UNREACHABLE после ротации SSH ключей",
+    "topic": "Ansible",
     "context": "После ротации SSH ключей все хосты UNREACHABLE в Ansible.",
     "nodes": {
       "start": {
@@ -1052,6 +1058,7 @@
   {
     "id": 7,
     "title": "Kubernetes Pod в CrashLoopBackOff",
+    "topic": "Kubernetes",
     "context": "Pod сервиса api-backend постоянно перезапускается. kubectl get pods показывает статус CrashLoopBackOff. Приложение недоступно.",
     "nodes": {
       "start": {
@@ -1224,6 +1231,7 @@
   {
     "id": 8,
     "title": "GitLab CI Runner не подхватывает задачи",
+    "topic": "CI/CD",
     "context": "Pipeline запущен, задачи в статусе 'pending' уже 30 минут. Раньше всё работало. Runner зарегистрирован в GitLab UI.",
     "nodes": {
       "start": {
@@ -1414,6 +1422,7 @@
   {
     "id": 9,
     "title": "Redis неожиданно удаляет ключи",
+    "topic": "Monitoring",
     "context": "Приложение периодически получает nil вместо данных из Redis. Ключи существуют, но исчезают через несколько часов. TTL не установлен.",
     "nodes": {
       "start": {
@@ -1580,6 +1589,7 @@
   {
     "id": 10,
     "title": "Docker контейнер без доступа к сети",
+    "topic": "Docker",
     "context": "Запущенный Docker контейнер не может обращаться к внешним адресам. curl из контейнера зависает. На хосте интернет работает.",
     "nodes": {
       "start": {
@@ -1770,6 +1780,7 @@
   {
     "id": 11,
     "title": "Kubernetes ImagePullBackOff",
+    "topic": "Kubernetes",
     "context": "После деплоя новой версии pod не может стартовать. kubectl get pods показывает статус ImagePullBackOff. Образ существует в приватном registry.",
     "nodes": {
       "start": {
@@ -1982,6 +1993,7 @@
   {
     "id": 12,
     "title": "Высокий iowait на сервере",
+    "topic": "Linux",
     "context": "Сервер тормозит. top показывает iowait 75%. Load average 8.0 при 4 ядрах. Диск в порядке по SMART. Приложения деградируют.",
     "nodes": {
       "start": {

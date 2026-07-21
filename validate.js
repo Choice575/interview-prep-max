@@ -83,7 +83,7 @@ else {
       const normalizedUnique = new Set(normalized);
       if (normalizedUnique.size !== normalized.length) warn(`${prefix}: есть дубликаты вариантов после нормализации`);
       const correctText = q.options[q.answer];
-      if (correctText && normalizeOptionText(correctText).length < 2) warn(`${prefix}: правильный вариант слишком короткий`);
+      if (correctText && normalizeOptionText(correctText).length < 2 && !/^\d+$/.test(normalizeOptionText(correctText))) warn(`${prefix}: правильный вариант слишком короткий`);
     }
 
     // Дубли ID
@@ -134,6 +134,8 @@ if (fs.existsSync(tsfile)) {
     if (!s.id) err(`TS: нет id`);
     else if (tsIds.has(s.id)) err(`TS: дубликат id=${s.id}`);
     else tsIds.add(s.id);
+    if (!s.topic) err(`TS#${s.id || '?'}: нет topic`);
+    else if (!KNOWN_TOPICS.includes(s.topic)) err(`TS#${s.id || '?'}: неизвестная тема "${s.topic}"`);
 
     if (!s.nodes || !s.nodes.start) err(`TS#${s.id}: нет nodes.start`);
     else {
@@ -183,6 +185,10 @@ trainers.forEach(t => {
       if (task[t.answerField] < 0 || task[t.answerField] >= task.opts.length)
         err(`${t.name}#${id}: answer=${task[t.answerField]} вне диапазона 0..${task.opts.length - 1}`);
     }
+    if (t.file === 'labs.json') {
+      if (!task.topic) err(`${t.name}#${id}: нет topic`);
+      else if (!KNOWN_TOPICS.includes(task.topic)) err(`${t.name}#${id}: неизвестная тема "${task.topic}"`);
+    }
   });
 });
 
@@ -200,7 +206,52 @@ function readJsonTask(file, label) {
   }
 }
 
-// ═══ 5. Учебная вкладка ═══
+// ═══ 5. Incident Simulator ═══
+console.log('\n🚨 Проверка Incident Simulator (incidents.json)...');
+const incidents = readJsonTask('incidents.json', 'Incident simulator');
+if (incidents) {
+  if (!Array.isArray(incidents)) {
+    err('incidents.json: должен быть массивом сценариев');
+  } else {
+    ok(`Загружено ${incidents.length} incident-сценариев`);
+    const incidentIds = new Set();
+    const phases = new Set(['triage', 'diagnosis', 'remediation', 'postmortem']);
+    incidents.forEach((incident, i) => {
+      const prefix = `Incident#${incident.id || '?'}[${i}]`;
+      ['id', 'title', 'topic', 'level', 'context'].forEach(key => {
+        if (incident[key] === undefined || incident[key] === null || incident[key] === '') err(`${prefix}: нет ${key}`);
+      });
+      if (incident.id) {
+        if (incidentIds.has(incident.id)) err(`${prefix}: дубликат id=${incident.id}`);
+        incidentIds.add(incident.id);
+      }
+      if (incident.topic && !KNOWN_TOPICS.includes(incident.topic)) warn(`${prefix}: неизвестная тема "${incident.topic}"`);
+      if (incident.level && !KNOWN_LEVELS.includes(incident.level)) warn(`${prefix}: неизвестный уровень "${incident.level}"`);
+      if (!Array.isArray(incident.phases) || incident.phases.length === 0) {
+        err(`${prefix}: phases должен быть непустым массивом`);
+        return;
+      }
+      if (incident.phases.length !== 4) warn(`${prefix}: обычно ожидается 4 фазы, найдено ${incident.phases.length}`);
+      const phaseNames = new Set();
+      incident.phases.forEach((phase, pi) => {
+        const phasePrefix = `${prefix}/Phase#${pi + 1}`;
+        ['phase', 'title', 'question', 'explanation'].forEach(key => {
+          if (phase[key] === undefined || phase[key] === null || phase[key] === '') err(`${phasePrefix}: нет ${key}`);
+        });
+        if (phase.phase) {
+          if (!phases.has(phase.phase)) err(`${phasePrefix}: неизвестная фаза "${phase.phase}"`);
+          if (phaseNames.has(phase.phase)) err(`${phasePrefix}: дубликат фазы "${phase.phase}"`);
+          phaseNames.add(phase.phase);
+        }
+        if (!Array.isArray(phase.options) || phase.options.length < 2) err(`${phasePrefix}: нужно минимум 2 варианта`);
+        if (!Number.isInteger(phase.answer)) err(`${phasePrefix}: answer должен быть целым числом`);
+        else if (Array.isArray(phase.options) && (phase.answer < 0 || phase.answer >= phase.options.length)) err(`${phasePrefix}: answer=${phase.answer} вне диапазона вариантов`);
+      });
+    });
+  }
+}
+
+// ═══ 6. Учебная вкладка ═══
 console.log('\n🎓 Проверка учебной вкладки (study_*.json)...');
 const studyMap = readJsonTask('study_map.json', 'Study map');
 const studyTests = readJsonTask('study_tests.json', 'Study tests');
