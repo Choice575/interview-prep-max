@@ -698,6 +698,9 @@ function renderHome(){
     if(!document.getElementById('mock-btn')){
       const mockBtn=document.createElement('button');mockBtn.id='mock-btn';mockBtn.className='btn btn-outline';mockBtn.style.cssText='background:var(--primary-dim);color:var(--primary-h);border-color:var(--primary)';mockBtn.textContent='🎤 Mock Interview (30 мин)';mockBtn.onclick=startMockInterview;mockBtn.setAttribute('aria-label','Mock интервью на 30 минут');qa.appendChild(mockBtn);
     }
+    if(!document.getElementById('diag-btn')){
+      const diagBtn=document.createElement('button');diagBtn.id='diag-btn';diagBtn.className='btn btn-outline';diagBtn.style.cssText='background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)';diagBtn.textContent='🔬 Диагностика';diagBtn.onclick=startDiagnostic;diagBtn.setAttribute('aria-label','Диагностический тест на 15 вопросов');qa.appendChild(diagBtn);
+    }
   },100);
 }
 function renderMasteryCards(){
@@ -1093,6 +1096,78 @@ function endBlitz(){
   document.getElementById('questions-container').innerHTML=
     '<div style="text-align:center;padding:40px 20px"><div style="font-size:60px;margin-bottom:10px">'+(s>=18?'🏆':s>=14?'🎯':s>=10?'📚':'💪')+'</div><div style="font-size:28px;font-weight:800;margin-bottom:8px">Блиц завершён!</div><div style="font-size:48px;font-weight:800;color:var(--primary-h);margin-bottom:12px">'+s+' / '+total+'</div><div style="font-size:16px;color:var(--text2);margin-bottom:20px">'+grade+'</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn btn-primary" onclick="startBlitz()">🔄 Ещё блиц</button><button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
   document.getElementById('single-controls').style.display='none';
+}
+
+// ═══ DIAGNOSTIC TEST ═══
+let diagnosticState={questions:[], idx:0, answers:[], active:false};
+function startDiagnostic(){
+  const allQ=getAllQ();
+  const topics=['Linux','Docker','Kubernetes','CI/CD','Terraform','Ansible','Сети','Monitoring','Security'];
+  const perTopic=[];topics.forEach(t=>{const qs=allQ.filter(q=>q.topic===t);for(let i=0;i<Math.min(3,qs.length);i++)perTopic.push(qs[Math.floor(Math.random()*qs.length)]);});
+  diagnosticState.questions=shuffle(perTopic).slice(0,15);
+  diagnosticState.idx=0;diagnosticState.answers=[];diagnosticState.active=true;
+  nav('exam');
+  document.getElementById('exam-controls').style.display='none';
+  document.getElementById('progress-info').style.display='block';
+  document.getElementById('seg-bar').style.display='none';
+  document.getElementById('single-controls').style.display='none';
+  renderDiagnosticQ();
+}
+function renderDiagnosticQ(){
+  if(diagnosticState.idx>=diagnosticState.questions.length){endDiagnostic();return;}
+  const q=diagnosticState.questions[diagnosticState.idx];
+  const opts=(q.options||[]);const L=['A','B','C','D','E'];
+  const order=[...Array(opts.length).keys()];
+  for(let i=order.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[order[i],order[j]]=[order[j],order[i]];}
+  document.getElementById('progress-info').innerHTML='<span style="font-size:12px;color:var(--text2)">🔬 Диагностика: вопрос <b>'+(diagnosticState.idx+1)+'</b> / 15</span>';
+  document.getElementById('questions-container').innerHTML=
+    '<div class="q-card" style="border:2px solid var(--primary);max-width:700px;margin:0 auto">'+
+    '<div class="q-meta">'+ttag(q.topic)+ltag(q.level||'Middle')+'<span class="q-num">#'+q.id+'</span></div>'+
+    '<div class="q-text">'+esc(q.q)+'</div>'+
+    '<div class="q-options">'+
+    order.map((origIdx,visPos)=>'<button type="button" class="q-opt" id="dx-opt-'+visPos+'" data-orig-idx="'+origIdx+'" data-answer="'+q.answer+'" onclick="diagnosticPick('+q.id+','+origIdx+','+q.answer+')"><span class="opt-letter">'+L[visPos]+'</span><span>'+esc(opts[origIdx])+'</span></button>').join('')+
+    '</div><div id="dx-exp-'+q.id+'" style="display:none" class="q-explanation"></div>'+
+    '<div style="text-align:center;margin-top:14px;display:none" id="dx-next-btn"><button class="btn btn-primary" onclick="diagnosticNext()">Следующий →</button></div></div>';
+}
+function diagnosticPick(qid,chosen,correct){
+  const ok=chosen===correct;diagnosticState.answers.push({qid,ok,topic:diagnosticState.questions[diagnosticState.idx].topic});
+  const opts=document.querySelectorAll('#questions-container .q-opt');
+  opts.forEach(o=>{o.classList.add('disabled');const oi=parseInt(o.getAttribute('data-orig-idx'));if(oi===correct)o.classList.add('correct-opt');else if(oi===chosen)o.classList.add('wrong-opt');});
+  const q=diagnosticState.questions[diagnosticState.idx];
+  const el=document.getElementById('dx-exp-'+qid);
+  if(el&&q.explanation){el.innerHTML='💡 '+esc(q.explanation);el.style.display='block';}
+  const nextBtn=document.getElementById('dx-next-btn');if(nextBtn)nextBtn.style.display='block';
+  const qprog=getQProg();if(!qprog[qid])qprog[qid]={correct:0,wrong:0};qprog[qid][ok?'correct':'wrong']++;lsSet('qprog',qprog);
+  const stats=lsGet('stats',{total:0,correct:0});stats.total++;if(ok)stats.correct++;lsSet('stats',stats);
+}
+function diagnosticNext(){diagnosticState.idx++;renderDiagnosticQ();}
+function endDiagnostic(){
+  diagnosticState.active=false;
+  document.getElementById('exam-controls').style.display='';
+  document.getElementById('single-controls').style.display='';
+  document.getElementById('progress-info').style.display='';
+  document.getElementById('seg-bar').style.display='';
+  const total=diagnosticState.answers.length;
+  const ok=diagnosticState.answers.filter(a=>a.ok).length;
+  const pct=Math.round(ok/total*100);
+  const byTopic={};diagnosticState.answers.forEach(a=>{if(!byTopic[a.topic])byTopic[a.topic]={total:0,ok:0};byTopic[a.topic].total++;if(a.ok)byTopic[a.topic].ok++;});
+  const level=pct>=80?'Middle+ / Senior':pct>=50?'Middle':'Junior+';
+  lsSet('diagnostic_result',{date:new Date().toISOString(),total,ok,pct,byTopic,level});
+  document.getElementById('questions-container').innerHTML=
+    '<div style="text-align:center;padding:30px 20px;max-width:800px;margin:0 auto">'+
+    '<div style="font-size:48px;margin-bottom:8px">🔬</div>'+
+    '<div style="font-size:24px;font-weight:800;margin-bottom:4px">Диагностика завершена</div>'+
+    '<div style="font-size:48px;font-weight:800;color:var(--primary-h);margin-bottom:6px">'+pct+'%</div>'+
+    '<div style="font-size:18px;font-weight:700;margin-bottom:16px;color:'+(pct>=80?'var(--green)':pct>=50?'var(--yellow)':'var(--red)')+'">Уровень: '+level+'</div>'+
+    '<div class="card" style="text-align:left;margin-bottom:14px"><div class="card-title">📊 Профиль по темам</div>'+
+    Object.entries(byTopic).sort((a,b)=>a[1].ok/a[1].total-b[1].ok/b[1].total).map(([t,d])=>{
+      const tp=Math.round(d.ok/d.total*100);const barClr=tp>=80?'var(--green)':tp>=50?'var(--yellow)':'var(--red)';
+      return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">'+esc(t)+'</span><span style="color:var(--text2)">'+d.ok+'/'+d.total+' ('+tp+'%)</span></div><div style="height:6px;background:var(--bg3);border-radius:3px"><div style="height:100%;width:'+tp+'%;background:'+barClr+';border-radius:3px"></div></div></div>';
+    }).join('')+'</div>'+
+    '<div style="font-size:13px;color:var(--text2);margin-bottom:16px">Рекомендация: '+(pct>=80?'Пробуйте Mock Interview на Middle+/Senior.':pct>=50?'Сфокусируйтесь на слабых темах через вкладку «Учёба».':'Начните с Недели 1 учебного плана и пройдите базовые темы.')+'</div>'+
+    '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'+
+    '<button class="btn btn-primary" onclick="startDiagnostic()">🔄 Пройти заново</button>'+
+    '<button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
 }
 
 // ═══ EXPORT / IMPORT (с APP_VERSION) ═══
