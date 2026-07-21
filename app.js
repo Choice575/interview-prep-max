@@ -679,6 +679,7 @@ function markSeniorCaseDone(id){const p=lsGet('senior_case_prog',{});p[id]={stat
 function updateStreakDisplay(){const sd=document.getElementById('streak-display');if(sd)sd.textContent='🔥 '+streak;}
 function renderHome(){
   renderMasteryCards();
+  renderDailyPlan();
   const s=streak,best=lsGet('streak_best',0);
   const banner=document.getElementById('home-streak-banner');
   if(s>0||best>0){banner.style.display='flex';}
@@ -703,6 +704,43 @@ function renderHome(){
     }
   },100);
 }
+function renderDailyPlan(){
+  const el=document.getElementById('daily-plan-card');const c=document.getElementById('daily-plan-content');
+  if(!el||!c) return;
+  const pos=lsGet('study_position',{week:1,day:1});
+  const week=pos.week||1;const day=pos.day||1;
+  const qprog=getQProg(),allQ=getAllQ();
+  const now=Date.now();
+  // SRS: вопросы, которые пора повторить
+  const srsQs=allQ.filter(q=>{const p=qprog[q.id];return p&&p.nextReviewAt&&p.nextReviewAt<=now;}).slice(0,5);
+  // Новые вопросы из текущей учебной недели
+  const sw=getStudyWeek(week);
+  const studyTopics=sw?sw.mainTopics||[]:[];
+  const newQs=allQ.filter(q=>{const p=qprog[q.id];return (!p||p.correct+p.wrong===0)&&studyTopics.includes(q.topic);}).slice(0,3);
+  if(!srsQs.length&&!newQs.length){el.style.display='none';return;}
+  el.style.display='block';
+  let html='';
+  if(srsQs.length){
+    html+='<div style="margin-bottom:8px"><span style="font-weight:700;color:var(--primary-h)">🔄 Повторить ('+srsQs.length+'):</span> '+
+      srsQs.map(q=>'<button class="btn btn-outline btn-sm" style="margin:2px" onclick="currentTopic=\''+esc(q.topic)+'\';currentMode=\'srs\';nav(\'exam\')">'+esc(q.topic)+'</button>').join(' ')+'</div>';
+  }
+  if(newQs.length){
+    html+='<div style="margin-bottom:8px"><span style="font-weight:700;color:var(--green)">🆕 Новые из недели '+week+' ('+newQs.length+'):</span> '+
+      newQs.map(q=>'<button class="btn btn-outline btn-sm" style="margin:2px" onclick="currentTopic=\''+esc(q.topic)+'\';currentMode=\'all\';currentLevel=\'all\';nav(\'exam\')">'+esc(q.topic)+'</button>').join(' ')+'</div>';
+  }
+  // Senior case
+  const cases=getSeniorCaseList().filter(c=>c.week===week);
+  if(cases.length){
+    const c0=cases[0];const prog=lsGet('senior_case_prog',{})[c0.id];
+    if(!prog||prog.status!=='done'){
+      html+='<div><span style="font-weight:700;color:var(--yellow)">🔥 Senior Challenge недели '+week+':</span> '+
+        '<button class="btn btn-outline btn-sm" style="margin:2px" onclick="nav(\'study\');setStudyPosition('+week+',5)">'+esc(c0.title)+'</button></div>';
+    }
+  }
+  html+='<div style="margin-top:8px"><button class="btn btn-primary btn-sm" onclick="currentMode=\'mix10\';nav(\'exam\')">⚡ Быстрая тренировка (10 вопросов)</button></div>';
+  c.innerHTML=html;
+}
+
 function renderMasteryCards(){
   const qprog=getQProg(),allQ=getAllQ();
   const topics=getAllTopics();
