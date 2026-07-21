@@ -8,6 +8,7 @@ const APP_VERSION = '11.0.0';
 var BASE_QUESTIONS = [], SUBNET_PROBLEMS = [], TS_SCENARIOS = [], CMD_TASKS = [],
     CODE_TASKS = [], GIT_TASKS = [], REGEX_TASKS = [], ANSIBLE_PB_TASKS = [],
     DOCKERFILE_TASKS = [], K8S_TASKS = [], PORTS_TASKS = [], LABS_TASKS = [], TIPS = [],
+    INCIDENTS = [],
     STUDY_MAP = null, STUDY_TESTS = null, SENIOR_CASES = [];
 
 const DATA_FILES = {
@@ -24,6 +25,7 @@ const DATA_FILES = {
   ports: 'tasks/ports.json',
   labs: 'tasks/labs.json',
   tips: 'tasks/tips.json',
+  incidents: 'tasks/incidents.json',
   study_map: 'tasks/study_map.json',
   study_tests: 'tasks/study_tests.json',
   senior_cases: 'tasks/senior_cases.json'
@@ -33,7 +35,7 @@ const DATA_VARS = {
   base_questions: 'BASE_QUESTIONS', subnet: 'SUBNET_PROBLEMS', ts: 'TS_SCENARIOS',
   cmd: 'CMD_TASKS', code: 'CODE_TASKS', git: 'GIT_TASKS', regex: 'REGEX_TASKS',
   ansible_pb: 'ANSIBLE_PB_TASKS', dockerfile: 'DOCKERFILE_TASKS', k8s: 'K8S_TASKS',
-  ports: 'PORTS_TASKS', labs: 'LABS_TASKS', tips: 'TIPS', study_map: 'STUDY_MAP',
+  ports: 'PORTS_TASKS', labs: 'LABS_TASKS', tips: 'TIPS', incidents: 'INCIDENTS', study_map: 'STUDY_MAP',
   study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES'
 };
 
@@ -705,6 +707,9 @@ function renderHome(){
     }
     if(!document.getElementById('diag-btn')){
       const diagBtn=document.createElement('button');diagBtn.id='diag-btn';diagBtn.className='btn btn-outline';diagBtn.style.cssText='background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)';diagBtn.textContent='🔬 Диагностика';diagBtn.onclick=startDiagnostic;diagBtn.setAttribute('aria-label','Диагностический тест на 15 вопросов');qa.appendChild(diagBtn);
+    }
+    if(!document.getElementById('inc-btn')){
+      const incBtn=document.createElement('button');incBtn.id='inc-btn';incBtn.className='btn btn-outline';incBtn.style.cssText='background:var(--red-dim);color:var(--red);border-color:var(--red)';incBtn.textContent='🚨 Инцидент';incBtn.onclick=startIncidentSim;incBtn.setAttribute('aria-label','Симуляция инцидента');qa.appendChild(incBtn);
     }
   },100);
 }
@@ -1430,4 +1435,61 @@ function toggleMasteryGrid(){
   if(!grid||!btn) return;
   if(grid.style.display==='none'){grid.style.display='';btn.textContent='📋 Скрыть все темы ▲';}
   else{grid.style.display='none';btn.textContent='📋 Все темы ▼';}
+}
+
+// ═══ INCIDENT SIMULATION ═══
+let incState={incident:null,phase:0,score:0,answers:[]};
+function startIncidentSim(){
+  if(!INCIDENTS.length){alert("Нет сценариев инцидентов");return;}
+  incState.incident=INCIDENTS[Math.floor(Math.random()*INCIDENTS.length)];
+  incState.phase=0;incState.score=0;incState.answers=[];
+  nav("exam");
+  document.getElementById("exam-controls").style.display="none";
+  document.getElementById("progress-info").style.display="none";
+  document.getElementById("seg-bar").style.display="none";
+  document.getElementById("single-controls").style.display="none";
+  renderIncidentPhase();
+}
+function renderIncidentPhase(){
+  const inc=incState.incident;if(!inc) return;
+  const ph=inc.phases[incState.phase];
+  if(!ph){endIncidentSim();return;}
+  const L=["A","B","C","D"];const opts=ph.options||[];
+  document.getElementById("questions-container").innerHTML=
+    '<div class="q-card" style="border:2px solid var(--red);max-width:700px;margin:0 auto">'+
+    '<div class="q-meta">'+ttag(inc.topic)+'<span class="tag tag-sr">'+esc(inc.level)+'</span><span class="tag tag-sc">Фаза '+(incState.phase+1)+'/'+inc.phases.length+'</span></div>'+
+    '<div style="font-size:14px;font-weight:700;margin-bottom:10px">'+esc(ph.title)+'</div>'+
+    '<div class="q-text">'+esc(ph.question)+'</div>'+
+    '<div class="q-options">'+
+    opts.map((o,i)=>'<button type="button" class="q-opt" id="inc-opt-'+i+'" onclick="incPick('+i+','+ph.answer+')"><span class="opt-letter">'+L[i]+'</span><span>'+esc(o)+'</span></button>').join('')+
+    '</div><div id="inc-exp" style="display:none" class="q-explanation"></div>'+
+    '<div style="text-align:center;margin-top:14px;display:none" id="inc-next-btn"><button class="btn btn-primary" onclick="incState.phase++;renderIncidentPhase();">Следующая фаза →</button></div></div>';
+}
+function incPick(chosen,correct){
+  const ok=chosen===correct;incState.answers.push({phase:incState.phase,ok});
+  if(ok) incState.score++;
+  const opts=document.querySelectorAll("#questions-container .q-opt");
+  opts.forEach(o=>{o.classList.add("disabled");const oi=parseInt(o.id.split("-").pop());if(oi===correct)o.classList.add("correct-opt");else if(oi===chosen)o.classList.add("wrong-opt");});
+  const ph=incState.incident.phases[incState.phase];
+  const el=document.getElementById("inc-exp");
+  if(el&&ph.explanation){el.innerHTML="💡 "+esc(ph.explanation);el.style.display="block";}
+  document.getElementById("inc-next-btn").style.display="block";
+}
+function endIncidentSim(){
+  document.getElementById("exam-controls").style.display="";
+  document.getElementById("single-controls").style.display="";
+  const total=incState.incident.phases.length;const s=incState.score;
+  const grade=s===total?"🏆 Отлично!":s>=total*0.7?"👍 Хорошо":"📚 Нужно подтянуть";
+  const phases=["triage","diagnosis","remediation","postmortem"];
+  document.getElementById("questions-container").innerHTML=
+    '<div style="text-align:center;padding:30px 20px;max-width:700px;margin:0 auto">'+
+    '<div style="font-size:48px;margin-bottom:8px">🚨</div>'+
+    '<div style="font-size:24px;font-weight:800;margin-bottom:4px">Инцидент разобран</div>'+
+    '<div style="font-size:14px;color:var(--text2);margin-bottom:12px">'+esc(incState.incident.title)+'</div>'+
+    '<div style="font-size:48px;font-weight:800;color:var(--primary-h);margin-bottom:6px">'+s+' / '+total+'</div>'+
+    '<div style="font-size:16px;color:var(--text2);margin-bottom:20px">'+grade+'</div>'+
+    phases.map((p,i)=>{const a=incState.answers[i];return '<div style="font-size:13px;padding:4px 0">'+(a&&a.ok?"✅":"❌")+' '+p+'</div>';}).join('')+
+    '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">'+
+    '<button class="btn btn-primary" onclick="startIncidentSim()">🔄 Другой инцидент</button>'+
+    '<button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
 }
