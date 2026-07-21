@@ -457,11 +457,11 @@ function renderFreeformResults(){
 }
 
 // ═══ MOCK INTERVIEW ═══
-let mockState={questions:[],idx:0,answers:[],timeLeft:1800,timer:null,active:false};
+let mockState={questions:[],idx:0,answers:[],timeLeft:1800,timer:null,active:false,qTimeLeft:120,qTimer:null,level:'all'};
 function startMockInterview(){
-  const allQ=getAllQ();if(allQ.length<15){alert('Нужно минимум 15 вопросов');return;}
-  mockState.questions=shuffle(allQ).slice(0,15);
-  mockState.idx=0;mockState.answers=[];mockState.timeLeft=1800;mockState.active=true;
+  const allQ=getAllQ();if(allQ.length<10){alert('Нужно минимум 10 вопросов');return;}
+  mockState.questions=shuffle(allQ).slice(0,12);
+  mockState.idx=0;mockState.answers=[];mockState.timeLeft=1800;mockState.active=true;mockState.qTimeLeft=120;
   nav('exam');
   document.getElementById('exam-controls').style.display='none';
   document.getElementById('progress-info').style.display='none';
@@ -470,49 +470,76 @@ function startMockInterview(){
   renderMockQ();mockState.timer=setInterval(mockTick,1000);
 }
 function mockTick(){
-  mockState.timeLeft--;
+  mockState.timeLeft--;mockState.qTimeLeft--;
   const el=document.getElementById('mock-timer');
   if(el){const m=Math.floor(mockState.timeLeft/60),s=('0'+mockState.timeLeft%60).slice(-2);el.textContent=m+':'+s;if(mockState.timeLeft<=120)el.style.color='var(--red)';}
-  if(mockState.timeLeft<=0)endMockInterview();
+  const qel=document.getElementById('mock-q-timer');
+  if(qel){qel.textContent=Math.max(0,mockState.qTimeLeft)+'с';if(mockState.qTimeLeft<=30)qel.style.color='var(--red)';else if(mockState.qTimeLeft<=60)qel.style.color='var(--yellow)';}
+  if(mockState.timeLeft<=0||mockState.qTimeLeft<=0)mockNext();
 }
 function renderMockQ(){
   if(mockState.idx>=mockState.questions.length){endMockInterview();return;}
-  const q=mockState.questions[mockState.idx];
+  const q=mockState.questions[mockState.idx];mockState.qTimeLeft=120;
   document.getElementById('questions-container').innerHTML=
     '<div style="background:var(--bg2);border:2px solid var(--primary);border-radius:14px;padding:24px;max-width:700px;margin:0 auto">'+
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'+
     '<div style="display:flex;gap:6px">'+ttag(q.topic)+ltag(q.level)+'</div>'+
     '<div style="font-size:18px;font-weight:800" id="mock-timer">'+Math.floor(mockState.timeLeft/60)+':'+('0'+mockState.timeLeft%60).slice(-2)+'</div>'+
-    '<div style="font-size:13px;color:var(--text2)">Вопрос '+(mockState.idx+1)+'/15</div></div>'+
-    '<div class="q-text" style="font-size:16px;margin-bottom:20px">'+esc(q.q)+'</div>'+
-    '<textarea class="form-input" id="mock-inp" rows="5" placeholder="Ваш ответ..." style="width:100%;font-size:14px;margin-bottom:12px"></textarea>'+
+    '<div style="font-size:13px;color:var(--text2)">Вопрос '+(mockState.idx+1)+'/12</div></div>'+
+    '<div class="q-text" style="font-size:16px;margin-bottom:8px">'+esc(q.q)+'</div>'+
+    '<div style="font-size:12px;color:var(--yellow);margin-bottom:12px">⏱ На этот вопрос: <b id="mock-q-timer">120с</b></div>'+
+    '<textarea class="form-input" id="mock-inp" rows="5" placeholder="Ваш ответ... (можно кратко, как на собеседовании)" style="width:100%;font-size:14px;margin-bottom:12px"></textarea>'+
+    '<div style="font-size:11px;color:var(--text3);margin-bottom:8px">👎 1 — совсем не знаю · 2 — смутно · 3 — частично · 4 — хорошо · 5 👍 — отлично</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'+
+    [1,2,3,4,5].map(n=>'<button type="button" class="btn btn-outline btn-sm mock-rate-btn" onclick="mockRateQuestion('+n+')">'+n+'</button>').join('')+'</div>'+
     '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
-    '<button class="btn btn-primary" onclick="mockNext()">Следующий →</button>'+
+    '<button class="btn btn-primary" id="mock-next-btn" style="display:none" onclick="mockNext()">Следующий →</button>'+
     '<button class="btn btn-outline btn-sm" onclick="mockSkip()">Пропустить</button>'+
     '<button class="btn btn-outline btn-sm" onclick="endMockInterview()" style="color:var(--red)">Завершить</button>'+
     '</div></div>';
   setTimeout(()=>document.getElementById('mock-inp')?.focus(),100);
 }
-function mockNext(){mockState.answers.push({q:mockState.questions[mockState.idx],answer:document.getElementById('mock-inp')?.value||'(пусто)'});mockState.idx++;renderMockQ();}
-function mockSkip(){mockState.answers.push({q:mockState.questions[mockState.idx],answer:'(пропущено)'});mockState.idx++;renderMockQ();}
+
+let mockLastRating=0;
+function mockRateQuestion(n){
+  mockLastRating=n;
+  document.querySelectorAll('.mock-rate-btn').forEach((b,i)=>{if(i+1===n)b.style.background='var(--primary-dim)';else b.style.background='';});
+  document.getElementById('mock-next-btn').style.display='';
+  document.getElementById('mock-next-btn').textContent='Следующий → (оценка: '+n+'/5)';
+}
+
+function mockNext(){
+  const answer=document.getElementById('mock-inp')?.value||'(пусто)';
+  mockState.answers.push({q:mockState.questions[mockState.idx],answer:answer,rating:mockLastRating});
+  mockLastRating=0;mockState.idx++;renderMockQ();
+}
+function mockSkip(){
+  mockState.answers.push({q:mockState.questions[mockState.idx],answer:'(пропущено)',rating:0});
+  mockLastRating=0;mockState.idx++;renderMockQ();
+}
 function endMockInterview(){
   clearInterval(mockState.timer);mockState.active=false;
   document.getElementById('exam-controls').style.display='';
   document.getElementById('progress-info').style.display='';
   document.getElementById('seg-bar').style.display='';
-  if(mockState.idx<mockState.questions.length) mockState.answers.push({q:mockState.questions[mockState.idx],answer:document.getElementById('mock-inp')?.value||'(не закончено)'});
-  // Анализ по темам
+  if(mockState.idx<mockState.questions.length) mockState.answers.push({q:mockState.questions[mockState.idx],answer:document.getElementById('mock-inp')?.value||'(не закончено)',rating:0});
   const byTopic={};mockState.answers.forEach(a=>{const t=a.q.topic;if(!byTopic[t])byTopic[t]=[];byTopic[t].push(a);});
   const totalQ=mockState.answers.length;
+  const rated=Object.values(mockState.answers).filter(a=>a.rating>0);
+  const avgRating=rated.length?Math.round(rated.reduce((s,a)=>s+a.rating,0)/rated.length*10)/10:0;
+  const level=avgRating>=4.0?'Senior':avgRating>=3.0?'Middle+':'Junior+';
+  const levelColor=avgRating>=4.0?'var(--green)':avgRating>=3.0?'var(--yellow)':'var(--orange)';
   document.getElementById('questions-container').innerHTML=
     '<div style="text-align:center;padding:30px 20px;max-width:800px;margin:0 auto">'+
     '<div style="font-size:48px;margin-bottom:8px">🎤</div>'+
     '<div style="font-size:24px;font-weight:800;margin-bottom:4px">Mock Interview завершён</div>'+
-    '<div style="font-size:14px;color:var(--text2);margin-bottom:20px">Ответов: '+totalQ+' | Время: '+Math.floor((1800-mockState.timeLeft)/60)+' мин</div>'+
+    '<div style="font-size:14px;color:var(--text2);margin-bottom:8px">Ответов: '+totalQ+' | Время: '+Math.floor((1800-mockState.timeLeft)/60)+' мин</div>'+
+    '<div style="font-size:36px;font-weight:800;margin-bottom:4px" style="color:'+levelColor+'">'+level+'</div>'+
+    '<div style="font-size:13px;color:var(--text2);margin-bottom:16px">Средняя самооценка: '+avgRating+'/5</div>'+
     '<div class="card" style="text-align:left;margin-bottom:14px"><div class="card-title">📊 Разбор по темам</div>'+
-    Object.entries(byTopic).map(([t,as])=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;font-size:13px"><span>'+esc(t)+'</span><span style="color:var(--text2)">'+as.length+' вопр.</span></div>').join('')+'</div>'+
+    Object.entries(byTopic).map(([t,as])=>{const tr=Math.round(as.filter(a=>a.rating>0).reduce((s,a)=>s+a.rating,0)/Math.max(1,as.filter(a=>a.rating>0).length)*10)/10;return '<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;font-size:13px"><span>'+esc(t)+' ('+as.length+' вопр.)</span><span style="color:'+(tr>=4?'var(--green)':tr>=2.5?'var(--yellow)':'var(--red)')+'">'+tr+'/5</span></div>';}).join('')+'</div>'+
     '<div class="card" style="text-align:left"><div class="card-title">📝 Ваши ответы и правильные</div>'+
-    mockState.answers.map(a=>'<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)"><div style="font-weight:600;margin-bottom:4px">'+esc(a.q.q)+'</div><div style="font-size:12px;color:var(--text2);margin-bottom:4px">Ваш ответ: <span style="color:var(--yellow)">'+esc(a.answer.substring(0,200))+'</span></div><div style="font-size:12px;color:var(--green)">✅ Правильный: '+esc((a.q.options||[])[a.q.answer]||'')+'</div></div>').join('')+'</div>'+
+    mockState.answers.map(a=>'<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)"><div style="font-weight:600;margin-bottom:4px">'+esc(a.q.q)+'</div><div style="font-size:12px;color:var(--text2);margin-bottom:4px">Ваш ответ: <span style="color:var(--yellow)">'+esc(a.answer.substring(0,200))+'</span></div><div style="font-size:12px;color:var(--green)">✅ Правильный: '+esc((a.q.options||[])[a.q.answer]||'')+'</div>'+(a.rating?'<div style="font-size:11px;color:var(--primary-h);margin-top:2px">⭐ Самооценка: '+a.rating+'/5</div>':'')+'</div>').join('')+'</div>'+
     '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">'+
     '<button class="btn btn-primary" onclick="startMockInterview()">🔄 Ещё интервью</button>'+
     '<button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
