@@ -27,7 +27,7 @@ test('opens only due repetitions from the coach plan', async ({ page }) => {
   await setProgress(page, {
     ipmax_onboarding: profile,
     ipmax_onboarding_complete: true,
-    ipmax_qprog: { 1: { correct: 0, wrong: 1, nextReviewAt: 0 } }
+    ipmax_qprog: { 1: { correct: 0, wrong: 1, nextReviewAt: Date.now() - 1 } }
   });
   await page.goto('/');
   await page.locator('#daily-plan-content .btn-outline').click();
