@@ -146,7 +146,7 @@ function nav(page){
   const pg=document.getElementById('page-'+page);
   const sb=document.querySelector('[data-page="'+page+'"]');
   if(pg) pg.classList.add('active');
-  if(sb) sb.classList.add('active');
+  if(sb){sb.classList.add('active');sb.setAttribute('aria-current','page');}
   document.getElementById('page-title').textContent=PAGE_TITLES[page]||page;
   closeSidebar();
   if(page==='home') renderHome();
