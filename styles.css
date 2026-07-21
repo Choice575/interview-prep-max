@@ -122,7 +122,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .trainer-pb-fill{height:100%;background:var(--primary);border-radius:3px;transition:width .4s}
 .trainer-score{font-size:14px;font-weight:700;color:var(--primary-h)}
 .ts-sc-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
-.ts-sc-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;transition:all .2s}
+.ts-sc-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;transition:all .2s;color:var(--text);font:inherit;text-align:left;width:100%}
 .ts-sc-card:hover{border-color:var(--primary);transform:translateY(-2px)}
 .ts-sc-card.done{border-color:var(--green)}
 .ts-score-badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:700;background:var(--primary-dim);color:var(--primary-h)}
@@ -131,7 +131,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .ts-context-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:18px}
 .ts-obs{background:var(--bg3);border-radius:8px;padding:14px;margin-bottom:14px;font-size:14px;line-height:1.6;border-left:3px solid var(--primary)}
 .ts-choices{display:flex;flex-direction:column;gap:9px}
-.ts-choice{padding:13px 15px;border:1px solid var(--border2);border-radius:8px;cursor:pointer;font-size:14px;transition:all .15s;display:flex;align-items:center;gap:9px}
+.ts-choice{padding:13px 15px;border:1px solid var(--border2);border-radius:8px;cursor:pointer;font-size:14px;transition:all .15s;display:flex;align-items:center;gap:9px;background:transparent;color:var(--text);font:inherit;text-align:left;width:100%}
 .ts-choice:hover{background:var(--bg3);border-color:var(--primary)}
 .ts-choice.ch-ok{background:var(--green-dim);border-color:var(--green);color:var(--green)}
 .ts-choice.ch-bad{background:var(--red-dim);border-color:var(--red);color:var(--red)}
@@ -142,7 +142,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cmd-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:14px}
 .cmd-task-text{font-size:15px;font-weight:500;margin-bottom:16px;line-height:1.5}
 .cmd-opts{display:flex;flex-direction:column;gap:7px}
-.cmd-opt{font-family:'JetBrains Mono',monospace;font-size:13px;padding:11px 14px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:9px}
+.cmd-opt{font-family:'JetBrains Mono',monospace;font-size:13px;padding:11px 14px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:9px;background:transparent;color:var(--text);font:inherit;text-align:left;width:100%}
 .cmd-opt:hover:not(.disabled){border-color:var(--border2);background:var(--bg3)}
 .cmd-opt.correct{border-color:var(--green);background:var(--green-dim);color:var(--green)}
 .cmd-opt.wrong{border-color:var(--red);background:var(--red-dim);color:var(--red)}
@@ -153,7 +153,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 [data-theme="light"] .code-block{background:#f6f8fa;color:#24292f}
 .code-question{font-size:14px;font-weight:600;margin-bottom:10px;color:var(--yellow)}
 .code-opts{display:flex;flex-direction:column;gap:7px}
-.code-opt{padding:10px 13px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:all .15s;display:flex;align-items:flex-start;gap:7px;line-height:1.5}
+.code-opt{padding:10px 13px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:all .15s;display:flex;align-items:flex-start;gap:7px;line-height:1.5;background:transparent;color:var(--text);font:inherit;text-align:left;width:100%}
 .code-opt:hover:not(.disabled){border-color:var(--border2);background:var(--bg3)}
 .code-opt.correct{border-color:var(--green);background:var(--green-dim);color:var(--green)}
 .code-opt.wrong{border-color:var(--red);background:var(--red-dim);color:var(--red)}
@@ -168,7 +168,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .form-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:9px 11px;font-size:13px;color:var(--text)}
 .form-input:focus{outline:none;border-color:var(--primary)}
 .tip-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px}
-.tip-header{padding:13px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;transition:background .15s}
+.tip-header{padding:13px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;transition:background .15s;background:transparent;color:var(--text);font:inherit;text-align:left;width:100%;border:0}
 .tip-header:hover{background:var(--bg3)}
 .tip-body{padding:0 16px 13px;font-size:13px;color:var(--text2);line-height:1.7;display:none}
 .tip-body.open{display:block}
@@ -230,7 +230,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .rx-ctx{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg3);padding:6px 10px;border-radius:5px;margin-bottom:10px;color:var(--text2)}
 .git-opts,.rx-opts{display:flex;flex-direction:column;gap:6px}
 .git-opt,.rx-opt{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 12px;cursor:pointer;
-  font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.4;transition:all .15s}
+  font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.4;transition:all .15s;color:var(--text);text-align:left;width:100%}
 .git-opt:hover:not(.disabled),.rx-opt:hover:not(.disabled){border-color:var(--border2);background:var(--bg2)}
 .git-opt.correct,.rx-opt.correct{border-color:var(--green)!important;background:var(--green-dim)!important;color:var(--green)}
 .git-opt.wrong-pick,.rx-opt.wrong-pick{border-color:var(--red)!important;background:var(--red-dim)!important;color:var(--red)}
