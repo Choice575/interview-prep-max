@@ -678,8 +678,9 @@ function markSeniorCaseDone(id){const p=lsGet('senior_case_prog',{});p[id]={stat
 // ═══ HOME ═══
 function updateStreakDisplay(){const sd=document.getElementById('streak-display');if(sd)sd.textContent='🔥 '+streak;}
 function renderHome(){
-  renderMasteryCards();
   renderDailyPlan();
+  renderReadinessHome();
+  renderMasteryCards();
   const s=streak,best=lsGet('streak_best',0);
   const banner=document.getElementById('home-streak-banner');
   if(s>0||best>0){banner.style.display='flex';}
@@ -1400,3 +1401,26 @@ if ('serviceWorker' in navigator) {
 
 // Запуск
 initApp();
+
+function renderReadinessHome(){
+  const el=document.getElementById('daily-plan-card');if(!el) return;
+  const qprog=getQProg(),allQ=getAllQ();
+  const answered=allQ.filter(q=>{const p=qprog[q.id];return p&&(p.correct+p.wrong)>0;});
+  if(!answered.length) return;
+  const ok=answered.filter(q=>{const p=qprog[q.id];return p&&p.correct>p.wrong;});
+  const score=Math.round(ok.length/answered.length*100);
+  const tier=score>=80?'🟢':score>=50?'🟡':'🔴';
+  const c=document.getElementById('daily-plan-content');
+  if(!document.getElementById('home-readiness')){
+    const div=document.createElement('div');div.id='home-readiness';div.className='home-readiness-row';
+    div.innerHTML='<span>🎯 Готовность</span><span class="home-readiness-score">'+tier+' '+score+'%</span>';
+    c.appendChild(div);
+  }
+}
+function toggleMasteryGrid(){
+  const grid=document.getElementById('mastery-cards');
+  const btn=document.getElementById('toggle-mastery-btn');
+  if(!grid||!btn) return;
+  if(grid.style.display==='none'){grid.style.display='';btn.textContent='📋 Скрыть все темы ▲';}
+  else{grid.style.display='none';btn.textContent='📋 Все темы ▼';}
+}
