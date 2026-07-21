@@ -20,9 +20,15 @@
 ```
 index.html          — SPA shell
 app.js              — логика приложения (UI, state, SRS, trainers)
+storage.js          — контракт localStorage и безопасная JSON-сериализация
+coach.js            — чистая логика персонального плана: роль, уровень, дата интервью, приоритет тем
+progress.js         — единый SRS и журнал попыток по всем форматам тренировки
 styles.css          — стили (тёмная/светлая тема, responsive)
 sw.js               — Service Worker (PWA, offline cache)
 validate.js         — валидатор JSON-данных
+coach.test.js       — unit-тесты приоритизации персонального плана
+progress.test.js    — unit-тесты SRS и журнала компетенций
+*.integration.test.js — проверка цепочки рекомендаций и отдачи app shell
 tasks/              — данные
   base_questions.json     — 746 вопросов
   subnet.json             — задачи на подсети
@@ -50,7 +56,21 @@ python -m http.server 8080
 
 # Проверить данные
 node validate.js
+node --test coach.test.js
+node --test progress.test.js
+node --test storage.test.js
+node --test coach-flow.integration.test.js
+node --test app-shell.integration.test.js
+node verify-release.js
+
+# Браузерные E2E-тесты
+npm install
+npm run test:e2e
 ```
+
+## Персональный план
+
+После онбординга главная страница строит ежедневную сессию под выбранную роль, уровень и дату интервью. Тренер учитывает точность, охват тем, практические тренажёры и просроченные SRS-повторы; из плана можно сразу запустить фокусную тренировку или повторение.
 
 ## Формат вопросов
 
