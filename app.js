@@ -209,7 +209,7 @@ function setTopic(t,el){currentTopic=t;setChip('topic-chips',el);renderQuestions
 function setLevel(l,el){currentLevel=l;setChip('level-chips',el);renderQuestions();}
 function setCategory(c,el){currentCategory=c;setChip('cat-chips',el);renderQuestions();}
 function setTimer(s,el){timerSecs=s;setChip('timer-chips',el);}
-function setChip(groupId,el){document.querySelectorAll('#'+groupId+' .chip').forEach(c=>c.classList.remove('active'));if(el)el.classList.add('active');}
+function setChip(groupId,el){document.querySelectorAll('#'+groupId+' .chip').forEach(c=>{c.classList.remove('active');c.removeAttribute('aria-pressed');});if(el){el.classList.add('active');el.setAttribute('aria-pressed','true');}}
 function clearMistakes(){if(confirm('Сбросить все ошибки?')){lsSet('mistakes',{});renderQuestions();}}
 function clearTInterval(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
 
@@ -217,7 +217,7 @@ function toggleInterviewMode(){
   interviewMode=!interviewMode;
   if(interviewMode){cameFromStudy=false;document.getElementById('study-mode-cb').checked=false;}
   const chip=document.getElementById('interview-chip');
-  if(chip){if(interviewMode)chip.classList.add('active');else chip.classList.remove('active');}
+  if(chip){if(interviewMode){chip.classList.add('active');chip.setAttribute('aria-pressed','true');}else{chip.classList.remove('active');chip.removeAttribute('aria-pressed');}}
   renderQuestions();
 }
 
@@ -1371,7 +1371,7 @@ function buildTopicFilters(){
     topicChips.innerHTML='';
     const allChip=document.createElement('button');allChip.type='button';allChip.className='chip active';allChip.textContent='Все';allChip.onclick=function(){setTopic('all',this);};
     topicChips.appendChild(allChip);
-    topics.forEach(t=>{const chip=document.createElement('button');chip.type='button';chip.className='chip';chip.textContent=t;chip.setAttribute('data-topic',t);chip.onclick=function(){setTopic(t,this);};topicChips.appendChild(chip);});
+    topics.forEach(t=>{const chip=document.createElement('button');chip.type='button';chip.className='chip';chip.textContent=t;chip.setAttribute('data-topic',t);chip.setAttribute('aria-pressed','false');chip.onclick=function(){setTopic(t,this);};topicChips.appendChild(chip);});
   }
   const allChip=document.querySelector('#mode-chips .chip:first-child');
   if(allChip) allChip.textContent='Все '+getAllQ().length;
