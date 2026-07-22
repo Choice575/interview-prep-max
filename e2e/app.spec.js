@@ -58,3 +58,43 @@ test('imports a validated personal profile through the file control', async ({ p
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_onboarding')).role)).toBe('Cloud');
   await expect(page.locator('.coach-role')).toContainText('Cloud Engineer');
 });
+
+test('rejects malformed progress without replacing existing data', async ({ page }) => {
+  await setProgress(page, {
+    ipmax_onboarding: profile,
+    ipmax_onboarding_complete: true,
+    ipmax_qprog: { 1: { correct: 1, wrong: 0 } }
+  });
+  await page.goto('/');
+  page.once('dialog', dialog => dialog.dismiss());
+  await page.locator('#import-inp').setInputFiles({
+    name: 'broken-progress.json', mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify({ version: '12.4.0', qprog: [] }))
+  });
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_qprog'))['1'].correct)).toBe(1);
+});
+
+test('keeps the focused daily plan usable on a compact viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+  await expect(page.locator('#daily-plan-card')).toBeVisible();
+  await expect(page.locator('#daily-plan-content .btn-primary')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+});
+
+test('loads the app shell after the network goes offline', async ({ page, context }) => {
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+  await page.evaluate(() => navigator.serviceWorker.ready.then(() => true));
+  await page.reload();
+  await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+
+  await context.setOffline(true);
+  try {
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#daily-plan-card')).toBeVisible();
+  } finally {
+    await context.setOffline(false);
+  }
+});

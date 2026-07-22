@@ -2,7 +2,7 @@ importScripts('./version.js');
 const CACHE_NAME = self.IPMAX_CACHE_NAME;
 
 const ASSETS = [
-  './', './index.html', './styles.css', './version.js', './storage.js', './progress.js', './coach.js', './app.js', './interview-prep-max.webmanifest',
+  './', './index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './app.js', './interview-prep-max.webmanifest',
   './tasks/base_questions.json', './tasks/ts.json', './tasks/subnet.json',
   './tasks/cmd.json', './tasks/code.json', './tasks/git.json', './tasks/regex.json',
   './tasks/ansible_pb.json', './tasks/dockerfile.json', './tasks/k8s.json', './tasks/ports.json',

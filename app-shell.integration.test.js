@@ -26,7 +26,9 @@ test('serves the complete app shell and personal-coach modules', async () => {
   }).on('error', reject));
 
   try {
-    const [html, tracker, coach, app, questions] = await Promise.all(['/', '/progress.js', '/coach.js', '/app.js', '/tasks/base_questions.json'].map(request));
+    const [html, dates, tracker, coach, app, questions] = await Promise.all(['/', '/date.js', '/progress.js', '/coach.js', '/app.js', '/tasks/base_questions.json'].map(request));
+    assert.ok(html.indexOf('./date.js') < html.indexOf('./coach.js'));
+    assert.match(dates, /localDateKey/);
     assert.ok(html.indexOf('./progress.js') < html.indexOf('./coach.js'));
     assert.match(tracker, /recordQuestionAttempt/);
     assert.match(coach, /skillEvents/);

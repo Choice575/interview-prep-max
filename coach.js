@@ -1,8 +1,9 @@
 (function(root, factory) {
-  const api = factory();
+  const dates = typeof module !== 'undefined' && module.exports ? require('./date.js') : root.IPMaxDate;
+  const api = factory(dates);
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.InterviewCoach = api;
-})(typeof self !== 'undefined' ? self : globalThis, function() {
+})(typeof self !== 'undefined' ? self : globalThis, function(dates) {
   const ROLE_TOPICS = {
     SRE: ['Linux', 'Сети', 'Kubernetes', 'Monitoring', 'Security', 'CI/CD'],
     Platform: ['Kubernetes', 'Terraform', 'Ansible', 'CI/CD', 'Docker', 'Git'],
@@ -25,13 +26,7 @@
     return Math.max(0, Math.min(100, Math.round(event.score / event.possible * 100)));
   }
   function getDaysUntil(date, now) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date || ''))) return null;
-    const target = new Date(date + 'T00:00:00');
-    const [year, month, day] = date.split('-').map(Number);
-    if (!Number.isFinite(target.getTime()) || target.getFullYear() !== year || target.getMonth() !== month - 1 || target.getDate() !== day) return null;
-    const today = new Date(now || Date.now());
-    today.setHours(0, 0, 0, 0);
-    return Math.ceil((target - today) / 86400000);
+    return dates && typeof dates.daysUntil === 'function' ? dates.daysUntil(date, now) : null;
   }
   function getSessionSize(daysUntil) {
     if (daysUntil !== null && daysUntil >= 0 && daysUntil <= 7) return 20;
