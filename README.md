@@ -20,12 +20,14 @@
 ```
 index.html          — SPA shell
 app.js              — логика приложения (UI, state, SRS, trainers)
+date.js             — локальные календарные даты без UTC/DST-сдвигов
 storage.js          — контракт localStorage и безопасная JSON-сериализация
 coach.js            — чистая логика персонального плана: роль, уровень, дата интервью, приоритет тем
 progress.js         — единый SRS и журнал попыток по всем форматам тренировки
 styles.css          — стили (тёмная/светлая тема, responsive)
 sw.js               — Service Worker (PWA, offline cache)
 validate.js         — валидатор JSON-данных
+date.test.js        — unit-тесты календарных границ
 coach.test.js       — unit-тесты приоритизации персонального плана
 progress.test.js    — unit-тесты SRS и журнала компетенций
 *.integration.test.js — проверка цепочки рекомендаций и отдачи app shell
@@ -55,16 +57,10 @@ python -m http.server 8080
 # Открыть http://localhost:8080
 
 # Проверить данные
+npm ci
+npm test
 node validate.js
-node --test coach.test.js
-node --test progress.test.js
-node --test storage.test.js
-node --test coach-flow.integration.test.js
-node --test app-shell.integration.test.js
 node verify-release.js
-
-# Браузерные E2E-тесты
-npm install
 npm run test:e2e
 ```
 

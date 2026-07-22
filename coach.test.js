@@ -21,10 +21,11 @@ test('prioritizes a weak role-relevant topic', () => {
 });
 
 test('increases session volume before the interview and counts repetitions', () => {
+  const localNoon = new Date(2026, 6, 21, 12).getTime();
   const plan = coach.buildPlan({
     questions,
     progress: { 1: { correct: 0, wrong: 1, nextReviewAt: Date.UTC(2026, 6, 20) } },
-    profile: { role: 'Cloud', level: 'Senior', date: '2026-07-25' }, now: Date.UTC(2026, 6, 21)
+    profile: { role: 'Cloud', level: 'Senior', date: '2026-07-25' }, now: localNoon
   });
   assert.equal(plan.daysUntil, 4);
   assert.equal(plan.sessionSize, 20);

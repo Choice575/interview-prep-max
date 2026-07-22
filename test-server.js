@@ -8,7 +8,7 @@ const contentTypes = {
   '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json'
 };
 
-http.createServer((request, response) => {
+const server = http.createServer((request, response) => {
   let name = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
   if (name === '/') name = '/index.html';
   const file = path.resolve(root, '.' + name);
@@ -18,4 +18,13 @@ http.createServer((request, response) => {
     response.writeHead(200, { 'Content-Type': contentTypes[path.extname(file)] || 'application/octet-stream' });
     response.end(body);
   });
-}).listen(4173, '127.0.0.1');
+});
+
+server.listen(4173, '127.0.0.1');
+
+function shutdown() {
+  server.close(() => process.exit(0));
+}
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);

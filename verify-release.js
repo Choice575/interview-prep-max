@@ -20,11 +20,12 @@ expect(/importScripts\('\.\/version\.js'\);/.test(sw), 'sw.js должен им�
 expect(/const CACHE_NAME\s*=\s*self\.IPMAX_CACHE_NAME;/.test(sw), 'sw.js должен использовать IPMAX_CACHE_NAME');
 
 const versionScriptIndex = html.indexOf('<script src="./version.js"></script>');
+const dateScriptIndex = html.indexOf('<script src="./date.js"></script>');
 const storageScriptIndex = html.indexOf('<script src="./storage.js"></script>');
 const progressScriptIndex = html.indexOf('<script src="./progress.js"></script>');
 const coachScriptIndex = html.indexOf('<script src="./coach.js"></script>');
 const appScriptIndex = html.indexOf('<script src="./app.js"></script>');
-expect(versionScriptIndex !== -1 && storageScriptIndex > versionScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && appScriptIndex > coachScriptIndex, 'index.html должен загружать version.js, storage.js, progress.js, coach.js и app.js в этом порядке');
+expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && appScriptIndex > coachScriptIndex, 'index.html должен загружать version.js, date.js, storage.js, progress.js, coach.js и app.js в этом порядке');
 expect(manifest.start_url === './' && manifest.scope === './', 'manifest должен использовать относительные start_url и scope');
 
 const dataFilesBlock = app.match(/const DATA_FILES = \{([\s\S]*?)\n\};/);
@@ -36,7 +37,7 @@ dataFiles.forEach(file => expect(fs.existsSync(path.join(root, file)), `отсу
 const assetsBlock = sw.match(/const ASSETS = \[([\s\S]*?)\];/);
 expect(!!assetsBlock, 'не найден ASSETS в sw.js');
 const assets = assetsBlock ? [...assetsBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
-['./index.html', './styles.css', './version.js', './storage.js', './progress.js', './coach.js', './app.js', './interview-prep-max.webmanifest'].forEach(file => {
+['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './app.js', './interview-prep-max.webmanifest'].forEach(file => {
   expect(assets.includes(file), `offline-кеш не содержит ${file}`);
 });
 dataFiles.forEach(file => expect(assets.includes('./' + file), `offline-кеш не содержит ./${file}`));

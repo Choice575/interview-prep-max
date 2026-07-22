@@ -2,6 +2,7 @@
  * Interview Prep Max — Application Logic
  */
 const APP_VERSION = self.IPMAX_VERSION || 'dev';
+if (typeof IPMaxDate === 'undefined') throw new Error('IPMaxDate is required');
 
 // ═══ DATA LOADING ═══
 var BASE_QUESTIONS = [], SUBNET_PROBLEMS = [], TS_SCENARIOS = [], CMD_TASKS = [],
@@ -135,7 +136,7 @@ function recordQuestionResult(question,input){
   if(input?.history){
     const hist=lsGet('history',[]);hist.unshift({date:new Date(now).toLocaleString('ru'),topic:question.topic,correct:result.score>=0.5});if(hist.length>20)hist.pop();lsSet('history',hist);
   }
-  if(input?.daily!==false){const today=new Date(now).toISOString().slice(0,10);const daily=lsGet('daily',{});daily[today]=(daily[today]||0)+1;lsSet('daily',daily);}
+  if(input?.daily!==false){const today=IPMaxDate.localDateKey(now);const daily=lsGet('daily',{});daily[today]=(daily[today]||0)+1;lsSet('daily',daily);}
   recordSkillEvent({source:input?.source||'exam',topic:question.topic,skill:question.topic,score:result.score,possible:1,durationSeconds:input?.responseSeconds,at:now});
   return result;
 }
@@ -144,10 +145,7 @@ const ONBOARDING_ROLES=['DevOps','SRE','Platform','Cloud'];
 const ONBOARDING_LEVELS=['Junior','Middle','Senior'];
 function isValidOnboardingDate(date){
   if(date==='') return true;
-  if(typeof date!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
-  const parsed=new Date(date+'T00:00:00');
-  const [year,month,day]=date.split('-').map(Number);
-  return Number.isFinite(parsed.getTime())&&parsed.getFullYear()===year&&parsed.getMonth()===month-1&&parsed.getDate()===day;
+  return IPMaxDate.isValidDateKey(date);
 }
 function normalizeOnboardingProfile(value){
   if(!isRecord(value)||!ONBOARDING_ROLES.includes(value.role)||!ONBOARDING_LEVELS.includes(value.level)) return null;
@@ -853,7 +851,7 @@ function drawRadar(){
 function renderTimeChart(){
   const daily=lsGet('daily',{});const bars=document.getElementById('act-bars');const totalEl=document.getElementById('act-total');if(!bars) return;
   const days=14;const today=new Date();let maxVal=1,total=0;const data=[];
-  for(let i=days-1;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);const key=d.toISOString().slice(0,10);const cnt=daily[key]||0;data.push({key,cnt,label:d.toLocaleDateString('ru',{day:'numeric',month:'numeric'})});if(cnt>maxVal)maxVal=cnt;total+=cnt;}
+  for(let i=days-1;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);const key=IPMaxDate.localDateKey(d.getTime());const cnt=daily[key]||0;data.push({key,cnt,label:d.toLocaleDateString('ru',{day:'numeric',month:'numeric'})});if(cnt>maxVal)maxVal=cnt;total+=cnt;}
   bars.innerHTML=data.map(d=>{const h=Math.max(2,Math.round(d.cnt/maxVal*68));return '<div class="ab-wrap"><div class="ab-cnt">'+(d.cnt||'')+'</div><div class="ab-fill" style="height:'+h+'px"></div><div class="ab-lbl">'+d.label+'</div></div>';}).join('');
   if(totalEl) totalEl.textContent='Всего за 14 дней: '+total+' ответов';
 }
@@ -1295,7 +1293,7 @@ function exportProgress(){
   const text=JSON.stringify(data,null,2);
   // Файл
   const blob=new Blob([text],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ipmax_'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href);
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ipmax_'+IPMaxDate.localDateKey()+'.json';a.click();URL.revokeObjectURL(a.href);
   // Буфер обмена
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>{}).catch(()=>{});}
   else{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);}

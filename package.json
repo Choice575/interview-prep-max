@@ -2,7 +2,8 @@
   "name": "interview-prep-max",
   "private": true,
   "scripts": {
-    "test:e2e": "playwright test"
+    "test": "node --test date.test.js progress.test.js storage.test.js coach.test.js coach-flow.integration.test.js app-shell.integration.test.js",
+    "test:e2e": "node scripts/run-e2e.js"
   },
   "devDependencies": {
     "@playwright/test": "1.54.1"
