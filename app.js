@@ -191,7 +191,7 @@ function getAllTopics(){const topics=new Set();getAllQ().forEach(q=>topics.add(q
 
 // ═══ STATE ═══
 let currentMode='all',currentView='standard',currentTopic='all',currentLevel='all',currentCategory='all';
-let timerSecs=0,timerInterval=null;
+let timerSecs=0,timerInterval=null,timerDeadline=0;
 let activeQuestions=[],singleIdx=0;
 let streak=0;
 let questionStartTime={};
@@ -243,8 +243,10 @@ function closeSidebar(){document.getElementById('sidebar').classList.remove('ope
 document.getElementById('sidebar-overlay').onclick=closeSidebar;
 
 function stopActiveSessions(){
-  if(blitzState.timer){clearInterval(blitzState.timer);blitzState.timer=null;blitzState.active=false;}
-  if(mockState.timer){clearInterval(mockState.timer);mockState.timer=null;mockState.active=false;}
+  if(blitzState.timer){clearInterval(blitzState.timer);blitzState.timer=null;}
+  blitzState.active=false;blitzState.deadline=0;
+  if(mockState.timer){clearInterval(mockState.timer);mockState.timer=null;}
+  mockState.active=false;mockState.deadline=0;mockState.questionDeadline=0;
   if(cmdMuscleActive){cmdMuscleActive=false;renderCmd();}
 }
 
@@ -270,6 +272,53 @@ function toggleTheme(){
 // ═══ HELPERS ═══
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[b[i],b[j]]=[b[j],b[i]];}return b;}
+function secondsUntil(deadline){return deadline?Math.max(0,Math.ceil((deadline-Date.now())/1000)):0;}
+
+const MODAL_FOCUSABLE='button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])';
+let activeModalOverlay=null,modalReturnFocus=null;
+function getModalFocusable(overlay){
+  return [...overlay.querySelectorAll(MODAL_FOCUSABLE)].filter(el=>el.getClientRects().length>0&&el.getAttribute('aria-hidden')!=='true');
+}
+function openAccessibleModal(id,initialFocusSelector){
+  const overlay=document.getElementById(id);if(!overlay) return;
+  const alreadyOpen=overlay.classList.contains('open');
+  if(activeModalOverlay&&activeModalOverlay!==overlay) closeAccessibleModal(activeModalOverlay.id,false);
+  if(!alreadyOpen) modalReturnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
+  overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');
+  document.body.classList.add('modal-open');activeModalOverlay=overlay;
+  if(!alreadyOpen){
+    requestAnimationFrame(()=>{
+      const target=(initialFocusSelector&&overlay.querySelector(initialFocusSelector))||getModalFocusable(overlay)[0]||overlay.querySelector('[role="dialog"]');
+      target?.focus();
+    });
+  }
+}
+function closeAccessibleModal(id,restoreFocus=true){
+  const overlay=document.getElementById(id);if(!overlay) return;
+  overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');
+  if(activeModalOverlay!==overlay) return;
+  const returnFocus=modalReturnFocus;
+  activeModalOverlay=null;modalReturnFocus=null;document.body.classList.remove('modal-open');
+  if(restoreFocus){
+    requestAnimationFrame(()=>{
+      const target=returnFocus?.isConnected?returnFocus:document.querySelector('[data-modal-trigger="'+id+'"]');
+      target?.focus();
+    });
+  }
+}
+document.addEventListener('keydown',function(e){
+  const overlay=activeModalOverlay;
+  if(!overlay||!overlay.classList.contains('open')) return;
+  if(e.key==='Escape'){
+    e.preventDefault();e.stopImmediatePropagation();closeAccessibleModal(overlay.id);return;
+  }
+  if(e.key!=='Tab') return;
+  const focusable=getModalFocusable(overlay);
+  if(!focusable.length){e.preventDefault();overlay.querySelector('[role="dialog"]')?.focus();return;}
+  const first=focusable[0],last=focusable[focusable.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+});
 
 // ═══ TAGS ═══
 const TAG_MAP={Terraform:'tf',Linux:'lx','Сети':'net',Ansible:'ans',Docker:'docker',Kubernetes:'k8s','CI/CD':'cicd',Git:'git',Regex:'rx',Monitoring:'mon',Cloud:'cloud',Security:'sec'};
@@ -292,7 +341,7 @@ function setCategory(c,el){coachSessionLimit=0;currentCategory=c;resetQuestionRe
 function setTimer(s,el){timerSecs=s;setChip('timer-chips',el);}
 function setChip(groupId,el){document.querySelectorAll('#'+groupId+' .chip').forEach(c=>{c.classList.remove('active');c.removeAttribute('aria-pressed');});if(el){el.classList.add('active');el.setAttribute('aria-pressed','true');}}
 function clearMistakes(){if(confirm('Сбросить все ошибки?')){lsSet('mistakes',{});resetQuestionRenderLimit();renderQuestions();}}
-function clearTInterval(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+function clearTInterval(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}timerDeadline=0;}
 
 function toggleInterviewMode(){
   interviewMode=!interviewMode;
@@ -448,7 +497,15 @@ function renderSingle(){
 }
 function singleNext(){clearTInterval();if(singleIdx<activeQuestions.length-1){singleIdx++;renderSingle();}}
 function singlePrev(){clearTInterval();if(singleIdx>0){singleIdx--;renderSingle();}}
-function startTimer(qid,secs){clearTInterval();let rem=secs;timerInterval=setInterval(()=>{rem--;const el=document.getElementById('timer-'+qid);if(el){el.textContent=rem+'с';if(rem<=5)el.classList.add('urgent');}if(rem<=0){clearTInterval();autoFail(qid);}},1000);}
+function startTimer(qid,secs){
+  clearTInterval();timerDeadline=Date.now()+secs*1000;
+  const tick=()=>{
+    const rem=secondsUntil(timerDeadline);const el=document.getElementById('timer-'+qid);
+    if(el){el.textContent=rem+'с';el.classList.toggle('urgent',rem<=5);}
+    if(rem<=0){clearTInterval();autoFail(qid);}
+  };
+  tick();timerInterval=setInterval(tick,1000);
+}
 function autoFail(qid){const q=getAllQ().find(x=>x.id===qid);if(!q) return;const c=document.getElementById('qcard-'+qid);if(!c||c.querySelector('.q-opt.correct-opt')) return;pick(qid,-1,q.answer);}
 
 function renderFlashcardMarkup(qs){
@@ -532,12 +589,13 @@ function renderFreeformResults(){
 }
 
 // ═══ MOCK INTERVIEW ═══
-let mockState={questions:[],idx:0,answers:[],timeLeft:1800,timer:null,active:false,qTimeLeft:120,qTimer:null,level:'all'};
+let mockState={questions:[],idx:0,answers:[],timeLeft:1800,timer:null,active:false,qTimeLeft:120,deadline:0,questionDeadline:0,level:'all'};
 function startMockInterview(){
   const allQ=getAllQ();if(allQ.length<10){alert('Нужно минимум 10 вопросов');return;}
   mockState.questions=shuffle(allQ).slice(0,12);
-  mockState.idx=0;mockState.answers=[];mockState.timeLeft=1800;mockState.active=true;mockState.qTimeLeft=120;mockLastRating=0;
   nav('exam');
+  mockState.idx=0;mockState.answers=[];mockState.timeLeft=1800;mockState.active=true;mockState.qTimeLeft=120;mockLastRating=0;
+  mockState.deadline=Date.now()+1800*1000;
   document.getElementById('exam-controls').style.display='none';
   document.getElementById('progress-info').style.display='none';
   document.getElementById('seg-bar').style.display='none';
@@ -545,24 +603,29 @@ function startMockInterview(){
   renderMockQ();mockState.timer=setInterval(mockTick,1000);
 }
 function mockTick(){
-  mockState.timeLeft--;mockState.qTimeLeft--;
+  if(!mockState.active) return;
+  mockState.timeLeft=secondsUntil(mockState.deadline);mockState.qTimeLeft=secondsUntil(mockState.questionDeadline);
   const el=document.getElementById('mock-timer');
   if(el){const m=Math.floor(mockState.timeLeft/60),s=('0'+mockState.timeLeft%60).slice(-2);el.textContent=m+':'+s;if(mockState.timeLeft<=120)el.style.color='var(--red)';}
   const qel=document.getElementById('mock-q-timer');
   if(qel){qel.textContent=Math.max(0,mockState.qTimeLeft)+'с';if(mockState.qTimeLeft<=30)qel.style.color='var(--red)';else if(mockState.qTimeLeft<=60)qel.style.color='var(--yellow)';}
-  if(mockState.timeLeft<=0||mockState.qTimeLeft<=0)mockNext();
+  if(mockState.timeLeft<=0){endMockInterview();return;}
+  if(mockState.qTimeLeft<=0)mockNext();
 }
 function renderMockQ(){
   if(mockState.idx>=mockState.questions.length){endMockInterview();return;}
-  const q=mockState.questions[mockState.idx];mockState.qTimeLeft=120;questionStartTime[q.id]=Date.now();
+  const q=mockState.questions[mockState.idx];
+  mockState.timeLeft=secondsUntil(mockState.deadline);
+  mockState.questionDeadline=Math.min(mockState.deadline,Date.now()+120*1000);
+  mockState.qTimeLeft=secondsUntil(mockState.questionDeadline);questionStartTime[q.id]=Date.now();
   document.getElementById('questions-container').innerHTML=
     '<div style="background:var(--bg2);border:2px solid var(--primary);border-radius:14px;padding:24px;max-width:700px;margin:0 auto">'+
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'+
     '<div style="display:flex;gap:6px">'+ttag(q.topic)+ltag(q.level)+'</div>'+
-    '<div style="font-size:18px;font-weight:800" id="mock-timer">'+Math.floor(mockState.timeLeft/60)+':'+('0'+mockState.timeLeft%60).slice(-2)+'</div>'+
+    '<div style="font-size:18px;font-weight:800" id="mock-timer" role="timer" aria-label="Осталось времени на интервью">'+Math.floor(mockState.timeLeft/60)+':'+('0'+mockState.timeLeft%60).slice(-2)+'</div>'+
     '<div style="font-size:13px;color:var(--text2)">Вопрос '+(mockState.idx+1)+'/12</div></div>'+
     '<div class="q-text" style="font-size:16px;margin-bottom:8px">'+esc(q.q)+'</div>'+
-    '<div style="font-size:12px;color:var(--yellow);margin-bottom:12px">⏱ На этот вопрос: <b id="mock-q-timer">120с</b></div>'+
+    '<div style="font-size:12px;color:var(--yellow);margin-bottom:12px">⏱ На этот вопрос: <b id="mock-q-timer" role="timer" aria-label="Осталось времени на вопрос">'+mockState.qTimeLeft+'с</b></div>'+
     '<textarea class="form-input" id="mock-inp" rows="5" placeholder="Ваш ответ... (можно кратко, как на собеседовании)" style="width:100%;font-size:14px;margin-bottom:12px"></textarea>'+
     '<div style="font-size:11px;color:var(--text3);margin-bottom:8px">👎 1 — совсем не знаю · 2 — смутно · 3 — частично · 4 — хорошо · 5 👍 — отлично</div>'+
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'+
@@ -589,18 +652,21 @@ function mockRateQuestion(n){
 }
 
 function mockNext(){
+  if(!mockState.active||mockState.idx>=mockState.questions.length) return;
   const answer=document.getElementById('mock-inp')?.value||'(пусто)';
   recordMockAttempt(mockState.questions[mockState.idx],mockLastRating);
   mockState.answers.push({q:mockState.questions[mockState.idx],answer:answer,rating:mockLastRating});
   mockLastRating=0;mockState.idx++;renderMockQ();
 }
 function mockSkip(){
+  if(!mockState.active||mockState.idx>=mockState.questions.length) return;
   recordMockAttempt(mockState.questions[mockState.idx],0);
   mockState.answers.push({q:mockState.questions[mockState.idx],answer:'(пропущено)',rating:0});
   mockLastRating=0;mockState.idx++;renderMockQ();
 }
 function endMockInterview(){
-  clearInterval(mockState.timer);mockState.timer=null;mockState.active=false;
+  if(mockState.deadline) mockState.timeLeft=secondsUntil(mockState.deadline);
+  clearInterval(mockState.timer);mockState.timer=null;mockState.active=false;mockState.deadline=0;mockState.questionDeadline=0;
   restoreExamControls();
   if(mockState.idx<mockState.questions.length){recordMockAttempt(mockState.questions[mockState.idx],0);mockState.answers.push({q:mockState.questions[mockState.idx],answer:document.getElementById('mock-inp')?.value||'(не закончено)',rating:0});}
   const byTopic={};mockState.answers.forEach(a=>{const t=a.q.topic;if(!byTopic[t])byTopic[t]=[];byTopic[t].push(a);});
@@ -794,7 +860,7 @@ function renderDailyPlan(){
   el.style.display='block';
   const plan=getCoachPlan();
   if(!plan){
-    c.innerHTML='<div class="coach-empty"><span>Укажите цель подготовки, чтобы получить персональный план.</span><button type="button" class="btn btn-primary btn-sm" onclick="editOnboarding()">Настроить цель</button></div>';
+    c.innerHTML='<div class="coach-empty"><span>Укажите цель подготовки, чтобы получить персональный план.</span><button type="button" class="btn btn-primary btn-sm" data-modal-trigger="onboarding-modal" onclick="editOnboarding()">Настроить цель</button></div>';
     return;
   }
   const focus=plan.focus;
@@ -802,7 +868,7 @@ function renderDailyPlan(){
   const focusDetail=focus?(focus.practiceCount?focus.practiceScore+'% практика · '+focus.accuracy+'% тесты':focus.accuracy+'% точность · '+focus.coverage+'% охват'):'Начните с базового микса вопросов';
   const focusAction=focus?' data-coach-topic="'+escAttr(focus.topic)+'" data-coach-page="'+escAttr(focus.action?.page||'')+'" onclick="startCoachSession(this.dataset.coachTopic,this.dataset.coachPage)"':'';
   c.innerHTML='<div class="coach-head"><div><div class="coach-role">'+esc(plan.roleLabel)+' · '+esc(plan.level)+'</div><div class="coach-date">'+formatInterviewTiming(plan.daysUntil)+'</div></div>'+
-    '<button type="button" class="btn-icon" title="Изменить цель подготовки" aria-label="Изменить цель подготовки" onclick="editOnboarding()">⚙</button></div>'+
+    '<button type="button" class="btn-icon" title="Изменить цель подготовки" aria-label="Изменить цель подготовки" data-modal-trigger="onboarding-modal" onclick="editOnboarding()">⚙</button></div>'+
     '<div class="coach-metrics"><div class="coach-metric"><b>'+plan.sessionSize+'</b><span>вопросов сегодня</span></div><div class="coach-metric"><b>'+plan.dueCount+'</b><span>SRS к повторению</span></div><div class="coach-metric"><b>'+plan.targetAccuracy+'%</b><span>целевая точность</span></div></div>'+
     '<div class="coach-focus"><span class="coach-focus-kicker">Главный фокус</span><strong>'+focusName+'</strong><span>'+focusDetail+'</span></div>'+
     '<div class="coach-actions"><button type="button" class="btn btn-primary btn-sm"'+focusAction+'>Начать фокус</button>'+
@@ -1090,13 +1156,13 @@ function saveOnboarding(){
   if(!profile){alert('Проверьте дату интервью.');return;}
   lsSet('onboarding',profile);
   lsSet('onboarding_complete',true);
-  document.getElementById('onboarding-modal').classList.remove('open');
+  closeAccessibleModal('onboarding-modal');
   renderHome();
 }
 function skipOnboarding(){
   if(!getOnboardingProfile()) lsSet('onboarding',{role:'DevOps',level:'Middle',date:'',completedAt:new Date().toISOString()});
   lsSet('onboarding_complete',true);
-  document.getElementById('onboarding-modal').classList.remove('open');
+  closeAccessibleModal('onboarding-modal');
   renderHome();
 }
 function editOnboarding(){
@@ -1104,7 +1170,7 @@ function editOnboarding(){
   document.getElementById('onb-role').value=profile.role;
   document.getElementById('onb-level').value=profile.level;
   document.getElementById('onb-date').value=profile.date;
-  document.getElementById('onboarding-modal').classList.add('open');
+  openAccessibleModal('onboarding-modal','#onb-role');
 }
 
 // ═══ GIT TRAINER ═══
@@ -1128,12 +1194,12 @@ function toggleTip(i){const b=document.getElementById('tb-'+i);const a=document.
 
 // ═══ CUSTOM Q ═══
 function openCustomModal(){
-  document.getElementById('custom-modal').classList.add('open');
   // Заполняем список тем динамически
   const sel = document.getElementById('cq-topic');
   sel.innerHTML = getAllTopics().map(t => '<option>'+esc(t)+'</option>').join('');
+  openAccessibleModal('custom-modal','#cq-topic');
 }
-function closeCustomModal(){document.getElementById('custom-modal').classList.remove('open');}
+function closeCustomModal(){closeAccessibleModal('custom-modal');}
 function saveCustomQ(){
   const q=document.getElementById('cq-q').value.trim();
   const a=document.getElementById('cq-a').value.trim();
@@ -1178,27 +1244,39 @@ const CHEAT_SHEETS = {
   ports:{title:"Порты",icon:"🔌",content:'<table style="width:100%;border-collapse:collapse"><tr style="color:var(--primary-h);font-weight:700"><td style="padding:4px 8px">Порт</td><td style="padding:4px 8px">Сервис</td></tr>'+PORTS_TASKS.map(p=>'<tr><td style="padding:4px 8px;font-family:monospace;font-weight:700">'+p.port+'</td><td style="padding:4px 8px">'+p.service+'</td></tr>').join('')+'</table>'}
 };
 let cheatTab='linux';
-function openCheatSheet(){
+function renderCheatSheet(){
   const tabs=Object.keys(CHEAT_SHEETS);
-  document.getElementById('cheat-tabs').innerHTML=tabs.map(k=>'<span class="chip'+(k===cheatTab?' active':'')+'" onclick="cheatTab=\''+k+'\';openCheatSheet()">'+CHEAT_SHEETS[k].icon+' '+CHEAT_SHEETS[k].title+'</span>').join('');
+  const tabList=document.getElementById('cheat-tabs');
+  tabList.innerHTML=tabs.map(k=>'<button type="button" class="chip'+(k===cheatTab?' active':'')+'" data-cheat-tab="'+k+'" aria-pressed="'+(k===cheatTab)+'">'+CHEAT_SHEETS[k].icon+' '+CHEAT_SHEETS[k].title+'</button>').join('');
+  tabList.querySelectorAll('[data-cheat-tab]').forEach(button=>button.addEventListener('click',()=>{
+    cheatTab=button.dataset.cheatTab;renderCheatSheet();
+    requestAnimationFrame(()=>document.querySelector('[data-cheat-tab="'+cheatTab+'"]')?.focus());
+  }));
   document.getElementById('cheat-content').innerHTML=CHEAT_SHEETS[cheatTab].content;
-  document.getElementById('cheatsheet-modal').classList.add('open');
 }
-function closeCheatSheet(){document.getElementById('cheatsheet-modal').classList.remove('open');}
+function openCheatSheet(){renderCheatSheet();openAccessibleModal('cheatsheet-modal','.btn-icon');}
+function closeCheatSheet(){closeAccessibleModal('cheatsheet-modal');}
 document.getElementById('cheatsheet-modal').addEventListener('click',function(e){if(e.target===this)closeCheatSheet();});
 
 // ═══ BLITZ MODE (с data-атрибутами вместо regex) ═══
-let blitzState={questions:[],idx:0,score:0,timeLeft:300,timer:null,active:false};
+let blitzState={questions:[],idx:0,score:0,timeLeft:300,timer:null,active:false,deadline:0};
 function startBlitz(){
   const allQ=getAllQ();if(allQ.length<20){alert('Нужно минимум 20 вопросов');return;}
-  blitzState.questions=shuffle(allQ).slice(0,20);blitzState.idx=0;blitzState.score=0;blitzState.timeLeft=300;blitzState.active=true;
+  blitzState.questions=shuffle(allQ).slice(0,20);
   nav('exam');
+  blitzState.idx=0;blitzState.score=0;blitzState.timeLeft=300;blitzState.active=true;blitzState.deadline=Date.now()+300*1000;
   document.getElementById('exam-controls').style.display='none';
   document.getElementById('progress-info').style.display='none';
   document.getElementById('seg-bar').style.display='none';
   renderBlitzQ();blitzState.timer=setInterval(blitzTick,1000);
 }
-function blitzTick(){blitzState.timeLeft--;const tEl=document.getElementById('blitz-timer');if(tEl){tEl.textContent=Math.floor(blitzState.timeLeft/60)+':'+('0'+(blitzState.timeLeft%60)).slice(-2);if(blitzState.timeLeft<=30)tEl.style.color='var(--red)';}if(blitzState.timeLeft<=0)endBlitz();}
+function blitzTick(){
+  if(!blitzState.active) return;
+  blitzState.timeLeft=secondsUntil(blitzState.deadline);
+  const tEl=document.getElementById('blitz-timer');
+  if(tEl){tEl.textContent=Math.floor(blitzState.timeLeft/60)+':'+('0'+(blitzState.timeLeft%60)).slice(-2);if(blitzState.timeLeft<=30)tEl.style.color='var(--red)';}
+  if(blitzState.timeLeft<=0)endBlitz();
+}
 function renderBlitzQ(){
   if(blitzState.idx>=blitzState.questions.length){endBlitz();return;}
   const q=blitzState.questions[blitzState.idx];const L=['A','B','C','D'];const opts=q.options||[];
@@ -1208,7 +1286,7 @@ function renderBlitzQ(){
     '<div style="background:var(--bg2);border:2px solid var(--primary);border-radius:14px;padding:24px;max-width:700px;margin:0 auto">'+
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'+
     '<div style="display:flex;gap:6px">'+ttag(q.topic)+ltag(q.level)+'</div>'+
-    '<div style="font-size:18px;font-weight:800" id="blitz-timer">'+Math.floor(blitzState.timeLeft/60)+':'+('0'+(blitzState.timeLeft%60)).slice(-2)+'</div>'+
+    '<div style="font-size:18px;font-weight:800" id="blitz-timer" role="timer" aria-label="Осталось времени на блиц">'+Math.floor(blitzState.timeLeft/60)+':'+('0'+(blitzState.timeLeft%60)).slice(-2)+'</div>'+
     '<div style="font-size:13px;color:var(--text2)">Вопрос '+(blitzState.idx+1)+'/20</div></div>'+
     '<div class="q-text" style="font-size:16px;margin-bottom:20px">'+esc(q.q)+'</div>'+
     '<div class="q-options">'+
@@ -1238,7 +1316,7 @@ function blitzPick(qid,chosen,correct){
 }
 function blitzNext(){blitzState.idx++;blitzState.active=true;if(blitzState.idx>=blitzState.questions.length){endBlitz();return;}renderBlitzQ();}
 function endBlitz(){
-  clearInterval(blitzState.timer);blitzState.timer=null;blitzState.active=false;
+  clearInterval(blitzState.timer);blitzState.timer=null;blitzState.active=false;blitzState.deadline=0;
   restoreExamControls();
   const s=blitzState.score,total=blitzState.questions.length;
   const grade=s>=18?'🏆 Отлично!':s>=14?'👍 Хорошо':s>=10?'📚 Удовлетворительно':'💪 Нужно подтянуть';
@@ -1494,7 +1572,7 @@ async function initApp(){
 
   // Онбординг
   if(!getOnboardingProfile()){
-    setTimeout(()=>{document.getElementById('onboarding-modal').classList.add('open');},500);
+    setTimeout(()=>openAccessibleModal('onboarding-modal','#onb-role'),500);
   }
 
 }
