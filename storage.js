@@ -37,12 +37,45 @@
         return false;
       }
     }
+    function setMany(entries) {
+      if (!store || !entries || typeof entries !== 'object' || Array.isArray(entries)) {
+        return { ok: false, error: new Error('Invalid storage batch') };
+      }
+      const items = Object.entries(entries);
+      if (items.some(([key]) => !names[key])) {
+        return { ok: false, error: new Error('Unknown storage key') };
+      }
+      let prepared;
+      try {
+        prepared = items.map(([key, value]) => {
+          const serialised = JSON.stringify(value);
+          if (serialised === undefined) throw new Error(`Storage value for ${key} is not serialisable`);
+          return { key, name: names[key], value: serialised, previous: store.getItem(names[key]) };
+        });
+      } catch (error) {
+        return { ok: false, error };
+      }
+      try {
+        prepared.forEach(item => store.setItem(item.name, item.value));
+        return { ok: true };
+      } catch (error) {
+        const rollbackFailed = [];
+        prepared.forEach(item => {
+          try { store.removeItem(item.name); } catch (_) { rollbackFailed.push(item.key); }
+        });
+        prepared.forEach(item => {
+          if (item.previous === null) return;
+          try { store.setItem(item.name, item.previous); } catch (_) { rollbackFailed.push(item.key); }
+        });
+        return { ok: false, error, rollbackFailed: [...new Set(rollbackFailed)] };
+      }
+    }
     function remove(key) {
       if (!store || !names[key]) return false;
       try { store.removeItem(names[key]); return true; }
       catch (error) { console.warn('storage remove error:', error); return false; }
     }
-    return { get, set, remove, keys: names };
+    return { get, set, setMany, remove, keys: names };
   }
 
   return { DEFAULT_KEYS, create };
