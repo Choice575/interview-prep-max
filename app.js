@@ -200,6 +200,8 @@ let interviewMode=false;
 let cameFromStudy=false;
 let updateReloadPending=false;
 let coachSessionLimit=0;
+const QUESTION_BATCH_SIZE=60;
+let questionRenderLimit=QUESTION_BATCH_SIZE;
 
 // ═══ NAV ═══
 const PAGE_TITLES={home:'Главная',study:'Учёба',exam:'Экзамен',analytics:'Аналитика',
@@ -231,7 +233,7 @@ function nav(page){
   if(page==='k8s') renderK8s();
   if(page==='ports') renderPorts();
   if(page==='tips') renderTips();
-  if(page==='exam'){restoreExamControls();renderQuestions();}
+  if(page==='exam'){resetQuestionRenderLimit();restoreExamControls();renderQuestions();}
   if(page==='git') renderGit();
   if(page==='regex') renderRegex();
 }
@@ -272,8 +274,8 @@ function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.ra
 // ═══ TAGS ═══
 const TAG_MAP={Terraform:'tf',Linux:'lx','Сети':'net',Ansible:'ans',Docker:'docker',Kubernetes:'k8s','CI/CD':'cicd',Git:'git',Regex:'rx',Monitoring:'mon',Cloud:'cloud',Security:'sec'};
 function ttag(t){return '<span class="tag tag-'+(TAG_MAP[t]||'tf')+'">'+esc(t)+'</span>';}
-function ltag(l){const m={Junior:'jr',Middle:'md',Senior:'sr'};return '<span class="tag tag-'+(m[l]||'jr')+'">'+l+'</span>';}
-function ctag(c){if(!c||c==='definition') return '';const lbl={scenario:'Сценарий',tradeoff:'Trade-off',output:'Анализ вывода'};const cls={scenario:'sc',tradeoff:'tr',output:'out'};return '<span class="tag tag-'+(cls[c]||'sc')+'">'+(lbl[c]||c)+'</span>';}
+function ltag(l){const m={Junior:'jr',Middle:'md',Senior:'sr'};return '<span class="tag tag-'+(m[l]||'jr')+'">'+esc(l)+'</span>';}
+function ctag(c){if(!c||c==='definition') return '';const lbl={scenario:'Сценарий',tradeoff:'Trade-off',output:'Анализ вывода'};const cls={scenario:'sc',tradeoff:'tr',output:'out'};return '<span class="tag tag-'+(cls[c]||'sc')+'">'+esc(lbl[c]||c)+'</span>';}
 
 // ═══ SYNTAX HIGHLIGHTING ═══
 function highlightDockerfile(code){return esc(code).replace(/^(FROM\s+.+)$/gm,'<span style="color:#c084fc">$1</span>').replace(/^(RUN\s+.+)$/gm,'<span style="color:#fbbf24">$1</span>').replace(/^(COPY|ADD)\s+(.+)$/gm,'<span style="color:#38bdf8">$1</span> <span style="color:#a5b4fc">$2</span>').replace(/^(CMD|ENTRYPOINT)\s+(.+)$/gm,'<span style="color:#4ade80">$1</span> <span style="color:#fde68a">$2</span>').replace(/^(WORKDIR|EXPOSE|ENV|USER|HEALTHCHECK)\s+(.+)$/gm,'<span style="color:#fb923c">$1</span> <span style="color:#cbd5e1">$2</span>').replace(/^(#.+)$/gm,'<span style="color:#64748b">$1</span>').replace(/--([a-z-]+)/g,'<span style="color:#f59e0b">--$1</span>');}
@@ -281,14 +283,15 @@ function highlightYAML(code){return esc(code).replace(/^(\s*)([a-z_][a-z_0-9]*):
 function highlightHCL(code){return esc(code).replace(/(resource|data|variable|output|provider|module|terraform)\s+"([^"]+)"/g,'<span style="color:#c084fc">$1</span> <span style="color:#4ade80">"$2"</span>').replace(/(resource|data|variable|output|provider|module|terraform)\s+/g,'<span style="color:#c084fc">$1</span> ').replace(/=\s*(true|false)/g,'= <span style="color:#f59e0b">$1</span>').replace(/(#.+)$/gm,'<span style="color:#64748b">$1</span>').replace(/"([^"]*)"/g,'<span style="color:#4ade80">"$1"</span>');}
 
 // ═══ EXAM ═══
-function setMode(m,el){coachSessionLimit=0;currentMode=m;setChip('mode-chips',el);clearTInterval();renderQuestions();}
-function setView(v,el){currentView=v;setChip('view-chips',el);clearTInterval();renderQuestions();}
-function setTopic(t,el){coachSessionLimit=0;currentTopic=t;setChip('topic-chips',el);renderQuestions();}
-function setLevel(l,el){coachSessionLimit=0;currentLevel=l;setChip('level-chips',el);renderQuestions();}
-function setCategory(c,el){coachSessionLimit=0;currentCategory=c;setChip('cat-chips',el);renderQuestions();}
+function resetQuestionRenderLimit(){questionRenderLimit=QUESTION_BATCH_SIZE;}
+function setMode(m,el){coachSessionLimit=0;currentMode=m;resetQuestionRenderLimit();setChip('mode-chips',el);clearTInterval();renderQuestions();}
+function setView(v,el){currentView=v;resetQuestionRenderLimit();setChip('view-chips',el);clearTInterval();renderQuestions();}
+function setTopic(t,el){coachSessionLimit=0;currentTopic=t;resetQuestionRenderLimit();setChip('topic-chips',el);renderQuestions();}
+function setLevel(l,el){coachSessionLimit=0;currentLevel=l;resetQuestionRenderLimit();setChip('level-chips',el);renderQuestions();}
+function setCategory(c,el){coachSessionLimit=0;currentCategory=c;resetQuestionRenderLimit();setChip('cat-chips',el);renderQuestions();}
 function setTimer(s,el){timerSecs=s;setChip('timer-chips',el);}
 function setChip(groupId,el){document.querySelectorAll('#'+groupId+' .chip').forEach(c=>{c.classList.remove('active');c.removeAttribute('aria-pressed');});if(el){el.classList.add('active');el.setAttribute('aria-pressed','true');}}
-function clearMistakes(){if(confirm('Сбросить все ошибки?')){lsSet('mistakes',{});renderQuestions();}}
+function clearMistakes(){if(confirm('Сбросить все ошибки?')){lsSet('mistakes',{});resetQuestionRenderLimit();renderQuestions();}}
 function clearTInterval(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
 
 function toggleInterviewMode(){
@@ -296,7 +299,7 @@ function toggleInterviewMode(){
   if(interviewMode){cameFromStudy=false;document.getElementById('study-mode-cb').checked=false;}
   const chip=document.getElementById('interview-chip');
   if(chip){if(interviewMode){chip.classList.add('active');chip.setAttribute('aria-pressed','true');}else{chip.classList.remove('active');chip.removeAttribute('aria-pressed');}}
-  renderQuestions();
+  resetQuestionRenderLimit();renderQuestions();
 }
 
 function filterQs(){
@@ -347,7 +350,30 @@ function renderQuestions(){
   if(currentView==='freeform'){renderFreeform();sc.style.display='none';return;}
   if(currentView==='single'){singleIdx=0;renderSingle();sc.style.display='block';return;}
   sc.style.display='none';
-  cont.innerHTML=qs.map(q=>renderQCard(q,false)).join('');
+  const visible=qs.slice(0,questionRenderLimit);
+  questionRenderLimit=visible.length;
+  cont.innerHTML=visible.map(q=>renderQCard(q,false)).join('')+renderLoadMoreQuestions(qs.length);
+  bindLoadMoreQuestions();
+}
+
+function renderLoadMoreQuestions(total){
+  if(questionRenderLimit>=total) return '';
+  return '<div id="questions-load-more" style="text-align:center;padding:18px"><button type="button" class="btn btn-outline">Показать ещё '+Math.min(QUESTION_BATCH_SIZE,total-questionRenderLimit)+' · '+questionRenderLimit+'/'+total+'</button></div>';
+}
+function bindLoadMoreQuestions(){
+  document.querySelector('#questions-load-more button')?.addEventListener('click',loadMoreQuestions);
+}
+function loadMoreQuestions(){
+  const cont=document.getElementById('questions-container');
+  if(!cont) return;
+  document.getElementById('questions-load-more')?.remove();
+  const start=questionRenderLimit;
+  const end=Math.min(start+QUESTION_BATCH_SIZE,activeQuestions.length);
+  const questions=activeQuestions.slice(start,end);
+  questionRenderLimit=end;
+  const html=currentView==='flashcard'?renderFlashcardMarkup(questions):questions.map(q=>renderQCard(q,false)).join('');
+  cont.insertAdjacentHTML('beforeend',html+renderLoadMoreQuestions(activeQuestions.length));
+  bindLoadMoreQuestions();
 }
 
 function updateQuestionProgressSummary(){
@@ -425,12 +451,18 @@ function singlePrev(){clearTInterval();if(singleIdx>0){singleIdx--;renderSingle(
 function startTimer(qid,secs){clearTInterval();let rem=secs;timerInterval=setInterval(()=>{rem--;const el=document.getElementById('timer-'+qid);if(el){el.textContent=rem+'с';if(rem<=5)el.classList.add('urgent');}if(rem<=0){clearTInterval();autoFail(qid);}},1000);}
 function autoFail(qid){const q=getAllQ().find(x=>x.id===qid);if(!q) return;const c=document.getElementById('qcard-'+qid);if(!c||c.querySelector('.q-opt.correct-opt')) return;pick(qid,-1,q.answer);}
 
-function renderFlashcards(qs){
-  document.getElementById('questions-container').innerHTML=qs.map((q,i)=>
+function renderFlashcardMarkup(qs){
+  return qs.map(q=>
     '<div class="flashcard" id="fc-'+q.id+'" onclick="flipCard('+q.id+')"><div class="flashcard-inner"><div class="fc-front"><div class="q-meta" style="justify-content:center;margin-bottom:10px">'+ttag(q.topic)+ltag(q.level)+'</div><p>'+esc(q.q)+'</p><div style="margin-top:10px;font-size:11px;color:var(--text3)">Нажмите для ответа</div></div>'+
     '<div class="fc-back"><div style="font-weight:700;color:var(--primary-h);margin-bottom:8px">✅ '+esc((q.options||[])[q.answer]||'')+'</div>'+(q.explanation?'<p style="font-size:13px;color:var(--text2)">'+esc(q.explanation)+'</p>':'')+
     '</div></div></div>'
   ).join('');
+}
+function renderFlashcards(qs){
+  const visible=qs.slice(0,questionRenderLimit);
+  questionRenderLimit=visible.length;
+  document.getElementById('questions-container').innerHTML=renderFlashcardMarkup(visible)+renderLoadMoreQuestions(qs.length);
+  bindLoadMoreQuestions();
 }
 function flipCard(id){document.getElementById('fc-'+id)?.classList.toggle('flipped');}
 
@@ -917,11 +949,17 @@ function renderNextQuestions(){
     const qs=byTopic[t];pick.push(qs[Math.floor(Math.random()*qs.length)]);
     if(pick.length>=10) break;
   }
-  el.innerHTML=pick.map((q,i)=>'<button type="button" class="weak-item" style="width:100%;cursor:pointer;border:0" onclick="currentTopic=\''+esc(q.topic)+'\';currentLevel=\'all\';currentMode=\'all\';nav(\'exam\')">'+
+  el.innerHTML=pick.map((q,i)=>'<button type="button" class="weak-item" data-next-question="'+i+'" style="width:100%;cursor:pointer;border:0">'+
     '<span style="font-size:11px;color:var(--text3);min-width:20px">#'+(i+1)+'</span>'+
     '<span class="weak-txt" title="'+esc(q.q)+'" style="text-align:left">'+esc(q.q.slice(0,70))+(q.q.length>70?'…':'')+'</span>'+
     '<span style="font-size:10px;color:var(--primary-h)">'+esc(q.topic)+'</span></button>').join('')+
     '<div style="text-align:center;margin-top:8px"><button class="btn btn-primary btn-sm" onclick="currentMode=\'mix10\';nav(\'exam\')">⚡ Пройти эти 10</button></div>';
+  el.querySelectorAll('[data-next-question]').forEach(button=>{
+    const question=pick[Number(button.dataset.nextQuestion)];
+    button.addEventListener('click',()=>{
+      currentTopic=question.topic;currentLevel='all';currentMode='all';nav('exam');
+    });
+  });
 }
 
 // ═══ SUBNET ═══
@@ -1121,9 +1159,11 @@ function saveCustomQ(){
     explanation: document.getElementById('cq-exp').value.trim(),
     category: document.getElementById('cq-category').value
   });
-  lsSet('custom',customs);
+  if(!lsSet('custom',customs)){alert('Не удалось сохранить вопрос: хранилище браузера недоступно или заполнено.');return;}
   closeCustomModal();
-  renderQuestions();
+  buildTopicFilters();
+  document.getElementById('sb-counter').textContent='DevOps Edition · '+getAllQ().length+' вопросов';
+  if(pageActive('exam')){resetQuestionRenderLimit();renderQuestions();}else renderHome();
   // Очищаем форму
   ['cq-q','cq-a','cq-b','cq-c','cq-d','cq-exp'].forEach(id => document.getElementById(id).value='');
   document.getElementById('cq-ans').value='0';
@@ -1277,6 +1317,11 @@ function endDiagnostic(){
 }
 
 // ═══ EXPORT / IMPORT (с APP_VERSION) ═══
+const IMPORT_MAX_BYTES=2*1024*1024;
+const IMPORT_MAX_DEPTH=10;
+const IMPORT_MAX_NODES=50000;
+const IMPORT_RECORD_KEYS=['mistakes','stats','qprog','ts_scores','cmd_prog','code_prog','subnet_prog','git_prog','regex_prog','ans_prog','df_prog','k8s_prog','pt_prog','labs_prog','daily','study_progress','study_answers','senior_case_prog'];
+const IMPORT_ARRAY_KEYS=['history','custom','skill_events'];
 function exportProgress(){
   const onboarding=getOnboardingProfile();
   const data={
@@ -1301,27 +1346,79 @@ function exportProgress(){
 }
 function importProgress(inp){
   const file=inp.files[0];if(!file) return;
+  if(file.size>IMPORT_MAX_BYTES){alert('Ошибка: файл прогресса больше 2 МБ.');inp.value='';return;}
   const reader=new FileReader();
-  reader.onload=e=>{try{importProgressData(JSON.parse(e.target.result));}catch(err){alert('Ошибка: '+err.message);}};
+  reader.onload=e=>{try{importProgressText(e.target.result);}catch(err){alert('Ошибка: '+err.message);}};
   reader.readAsText(file);inp.value='';
 }
+function importProgressText(text){
+  if(typeof text!=='string'||new Blob([text]).size>IMPORT_MAX_BYTES) throw new Error('данные прогресса больше 2 МБ.');
+  importProgressData(JSON.parse(text));
+}
 function pasteProgressFromClipboard(){
-  if(!navigator.clipboard||!navigator.clipboard.readText){const text=prompt('Вставьте JSON прогресса:');if(text){try{importProgressData(JSON.parse(text));}catch(e){alert('Ошибка JSON: '+e.message);}}return;}
-  navigator.clipboard.readText().then(text=>{importProgressData(JSON.parse(text));}).catch(()=>{const text=prompt('Не удалось прочитать буфер. Вставьте JSON:');if(text){try{importProgressData(JSON.parse(text));}catch(e){alert('Ошибка JSON: '+e.message);}}});
+  const manualPaste=()=>{const text=prompt('Вставьте JSON прогресса:');if(text){try{importProgressText(text);}catch(e){alert('Ошибка JSON: '+e.message);}}};
+  if(!navigator.clipboard||!navigator.clipboard.readText){manualPaste();return;}
+  navigator.clipboard.readText().then(text=>{try{importProgressText(text);}catch(e){alert('Ошибка JSON: '+e.message);}},manualPaste);
 }
 function isRecord(value){return !!value&&typeof value==='object'&&!Array.isArray(value);}
+function validateBoundedImportValue(value,path,depth,state){
+  state.nodes++;if(state.nodes>IMPORT_MAX_NODES) throw new Error('Слишком много значений в импорте.');
+  if(value===null||typeof value==='boolean') return;
+  if(typeof value==='number'){if(!Number.isFinite(value)) throw new Error('Некорректное число в '+path+'.');return;}
+  if(typeof value==='string'){if(value.length>20000) throw new Error('Слишком длинная строка в '+path+'.');return;}
+  if(depth>=IMPORT_MAX_DEPTH) throw new Error('Слишком глубокая структура в '+path+'.');
+  if(Array.isArray(value)){
+    if(value.length>5000) throw new Error('Слишком большой список в '+path+'.');
+    value.forEach((item,index)=>validateBoundedImportValue(item,path+'['+index+']',depth+1,state));return;
+  }
+  if(!isRecord(value)) throw new Error('Недопустимое значение в '+path+'.');
+  const keys=Object.keys(value);if(keys.length>5000) throw new Error('Слишком много полей в '+path+'.');
+  keys.forEach(key=>{
+    if(['__proto__','prototype','constructor'].includes(key)) throw new Error('Недопустимое поле '+path+'.'+key+'.');
+    validateBoundedImportValue(value[key],path+'.'+key,depth+1,state);
+  });
+}
 function validateCustomQuestions(questions){
-  return questions.every(q=>isRecord(q)&&Number.isInteger(q.id)&&typeof q.topic==='string'&&typeof q.level==='string'&&typeof q.q==='string'&&Array.isArray(q.options)&&q.options.length>=2&&q.options.every(o=>typeof o==='string')&&Number.isInteger(q.answer)&&q.answer>=0&&q.answer<q.options.length);
+  if(questions.length>1000) return false;
+  const ids=new Set(BASE_QUESTIONS.map(q=>q.id));
+  return questions.every(q=>{
+    if(!isRecord(q)||!Number.isSafeInteger(q.id)||q.id<1||ids.has(q.id)) return false;
+    ids.add(q.id);
+    return typeof q.topic==='string'&&q.topic.trim().length>0&&q.topic.length<=80&&
+      ['Junior','Middle','Senior'].includes(q.level)&&
+      typeof q.q==='string'&&q.q.trim().length>0&&q.q.length<=4000&&
+      Array.isArray(q.options)&&q.options.length>=2&&q.options.length<=6&&q.options.every(o=>typeof o==='string'&&o.trim().length>0&&o.length<=2000)&&
+      Number.isInteger(q.answer)&&q.answer>=0&&q.answer<q.options.length&&
+      (!('explanation' in q)||typeof q.explanation==='string')&&
+      (!('category' in q)||['definition','scenario','tradeoff','output'].includes(q.category));
+  });
+}
+function validateQuestionProgress(progress){
+  const numeric=['correct','wrong','lastSeen','ease','interval','repetitions','nextReviewAt'];
+  return Object.entries(progress).every(([id,item])=>/^\d+$/.test(id)&&isRecord(item)&&
+    numeric.every(key=>!(key in item)||(Number.isFinite(item[key])&&item[key]>=0))&&
+    (!('times' in item)||(Array.isArray(item.times)&&item.times.length<=100&&item.times.every(value=>Number.isFinite(value)&&value>=0)))&&
+    (!('lastSource' in item)||(typeof item.lastSource==='string'&&item.lastSource.length<=40)));
+}
+function validateHistory(history){
+  return history.length<=1000&&history.every(item=>isRecord(item)&&typeof item.date==='string'&&item.date.length<=100&&typeof item.topic==='string'&&item.topic.length<=80&&typeof item.correct==='boolean');
 }
 function validateProgressImport(data){
   if(!isRecord(data)) throw new Error('Файл прогресса должен содержать JSON-объект.');
-  const recordKeys=['mistakes','stats','qprog','ts_scores','cmd_prog','code_prog','subnet_prog','git_prog','regex_prog','ans_prog','df_prog','k8s_prog','pt_prog','labs_prog','daily','study_progress','study_answers','senior_case_prog'];
-  const arrayKeys=['history','custom','skill_events'];
+  validateBoundedImportValue(data,'progress',0,{nodes:0});
   const invalid=[];
-  recordKeys.forEach(key=>{if(key in data&&!isRecord(data[key])) invalid.push(key);});
-  arrayKeys.forEach(key=>{if(key in data&&!Array.isArray(data[key])) invalid.push(key);});
+  IMPORT_RECORD_KEYS.forEach(key=>{if(key in data&&!isRecord(data[key])) invalid.push(key);});
+  IMPORT_ARRAY_KEYS.forEach(key=>{if(key in data&&!Array.isArray(data[key])) invalid.push(key);});
+  if('version' in data&&(typeof data.version!=='string'||data.version.length>40)) invalid.push('version');
   if('streak_best' in data&&(!Number.isFinite(data.streak_best)||data.streak_best<0)) invalid.push('streak_best');
-  if('study_position' in data&&(!isRecord(data.study_position)||!Number.isInteger(data.study_position.week)||!Number.isInteger(data.study_position.day)||data.study_position.week<1||data.study_position.day<1)) invalid.push('study_position');
+  if('stats' in data&&isRecord(data.stats)&&(
+    ('total' in data.stats&&(!Number.isFinite(data.stats.total)||data.stats.total<0))||
+    ('correct' in data.stats&&(!Number.isFinite(data.stats.correct)||data.stats.correct<0))||
+    (Number.isFinite(data.stats.total)&&Number.isFinite(data.stats.correct)&&data.stats.correct>data.stats.total)
+  )) invalid.push('stats');
+  if('qprog' in data&&isRecord(data.qprog)&&!validateQuestionProgress(data.qprog)) invalid.push('qprog');
+  if('history' in data&&Array.isArray(data.history)&&!validateHistory(data.history)) invalid.push('history');
+  if('study_position' in data&&(!isRecord(data.study_position)||!Number.isInteger(data.study_position.week)||!Number.isInteger(data.study_position.day)||data.study_position.week<1||data.study_position.week>100||data.study_position.day<1||data.study_position.day>31)) invalid.push('study_position');
   if('onboarding' in data&&!normalizeOnboardingProfile(data.onboarding)) invalid.push('onboarding');
   if('onboarding_complete' in data&&typeof data.onboarding_complete!=='boolean') invalid.push('onboarding_complete');
   if(Array.isArray(data.custom)&&!validateCustomQuestions(data.custom)) invalid.push('custom');
@@ -1332,16 +1429,22 @@ function validateProgressImport(data){
 function importProgressData(rawData){
   const data=validateProgressImport(rawData);
   if(!data.version){alert('⚠️ Старый формат без версии. Импортированы только проверенные поля.');}
-  const recordKeys=['mistakes','stats','qprog','ts_scores','cmd_prog','code_prog','subnet_prog','git_prog','regex_prog','ans_prog','df_prog','k8s_prog','pt_prog','labs_prog','daily','study_progress','study_answers','senior_case_prog'];
-  const arrayKeys=['history','custom','skill_events'];
-  recordKeys.forEach(key=>{if(key in data) lsSet(key,data[key]);});
-  arrayKeys.forEach(key=>{if(key in data) lsSet(key,key==='skill_events'&&typeof ProgressTracker!=='undefined'?data[key].slice(-ProgressTracker.EVENT_LIMIT):data[key]);});
-  if('streak_best' in data) lsSet('streak_best',data.streak_best);
-  if('study_position' in data) lsSet('study_position',data.study_position);
-  if('onboarding' in data) lsSet('onboarding',normalizeOnboardingProfile(data.onboarding));
-  if('onboarding_complete' in data) lsSet('onboarding_complete',data.onboarding_complete);
-  else if('onboarding' in data) lsSet('onboarding_complete',true);
+  const entries={};
+  IMPORT_RECORD_KEYS.forEach(key=>{if(key in data) entries[key]=data[key];});
+  IMPORT_ARRAY_KEYS.forEach(key=>{if(key in data) entries[key]=key==='skill_events'&&typeof ProgressTracker!=='undefined'?data[key].slice(-ProgressTracker.EVENT_LIMIT):data[key];});
+  if('streak_best' in data) entries.streak_best=data.streak_best;
+  if('study_position' in data) entries.study_position=data.study_position;
+  if('onboarding' in data) entries.onboarding=normalizeOnboardingProfile(data.onboarding);
+  if('onboarding_complete' in data) entries.onboarding_complete=data.onboarding_complete;
+  else if('onboarding' in data) entries.onboarding_complete=true;
+  const result=appStorage&&typeof appStorage.setMany==='function'?appStorage.setMany(entries):{ok:false};
+  if(!result.ok){
+    if(result.rollbackFailed&&result.rollbackFailed.length) throw new Error('Не удалось сохранить импорт и полностью восстановить прежний прогресс. Не закрывайте страницу и экспортируйте текущие данные.');
+    throw new Error('Не удалось сохранить импорт. Прежний прогресс восстановлен.');
+  }
   streak=lsGet('streak_best',0);
+  buildTopicFilters();
+  document.getElementById('sb-counter').textContent='DevOps Edition · '+getAllQ().length+' вопросов';
   alert('✅ Прогресс импортирован v'+(data.version||'?')+'!');
   nav('home');
 }
@@ -1388,7 +1491,6 @@ async function initApp(){
 
   // Рендерим
   renderHome();
-  renderQuestions();
 
   // Онбординг
   if(!getOnboardingProfile()){
