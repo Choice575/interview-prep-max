@@ -9,7 +9,7 @@ var BASE_QUESTIONS = [], SUBNET_PROBLEMS = [], TS_SCENARIOS = [], CMD_TASKS = []
     CODE_TASKS = [], GIT_TASKS = [], REGEX_TASKS = [], ANSIBLE_PB_TASKS = [],
     DOCKERFILE_TASKS = [], K8S_TASKS = [], PORTS_TASKS = [], LABS_TASKS = [], TIPS = [],
     INCIDENTS = [],
-    STUDY_MAP = null, STUDY_TESTS = null, SENIOR_CASES = [];
+    STUDY_MAP = null, STUDY_TESTS = null, SENIOR_CASES = [], BEST_PRACTICES = null;
 
 const DATA_FILES = {
   base_questions: 'tasks/base_questions.json',
@@ -28,7 +28,8 @@ const DATA_FILES = {
   incidents: 'tasks/incidents.json',
   study_map: 'tasks/study_map.json',
   study_tests: 'tasks/study_tests.json',
-  senior_cases: 'tasks/senior_cases.json'
+  senior_cases: 'tasks/senior_cases.json',
+  best_practices: 'tasks/best_practices.json'
 };
 
 const DATA_VARS = {
@@ -36,7 +37,7 @@ const DATA_VARS = {
   cmd: 'CMD_TASKS', code: 'CODE_TASKS', git: 'GIT_TASKS', regex: 'REGEX_TASKS',
   ansible_pb: 'ANSIBLE_PB_TASKS', dockerfile: 'DOCKERFILE_TASKS', k8s: 'K8S_TASKS',
   ports: 'PORTS_TASKS', labs: 'LABS_TASKS', tips: 'TIPS', incidents: 'INCIDENTS', study_map: 'STUDY_MAP',
-  study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES'
+  study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES'
 };
 
 function dataSize(data){
@@ -44,6 +45,7 @@ function dataSize(data){
   if(data&&Array.isArray(data.weeks)) return data.weeks.length+' недель';
   if(data&&Array.isArray(data.miniTests)) return data.miniTests.length+' мини-тестов';
   if(data&&Array.isArray(data.cases)) return data.cases.length+' кейсов';
+  if(data&&Array.isArray(data.topics)) return data.topics.length+' тем';
   return 'object';
 }
 
@@ -200,11 +202,12 @@ let interviewMode=false;
 let cameFromStudy=false;
 let updateReloadPending=false;
 let coachSessionLimit=0;
+let currentPracticeTopic='';
 const QUESTION_BATCH_SIZE=60;
 let questionRenderLimit=QUESTION_BATCH_SIZE;
 
 // ═══ NAV ═══
-const PAGE_TITLES={home:'Главная',study:'Учёба',exam:'Экзамен',analytics:'Аналитика',
+const PAGE_TITLES={home:'Главная',study:'Учёба',practices:'Best Practices',exam:'Экзамен',analytics:'Аналитика',
   subnet:'Тренажёр подсетей',ts:'Troubleshooting-симулятор',
   cmd:'Command Builder',code:'Code Reviewer',
   ansible:'Ansible Playbook',dockerfile:'Dockerfile',k8s:'K8s YAML',ports:'Порты TCP',labs:'Debugging',
@@ -222,6 +225,7 @@ function nav(page){
   closeSidebar();
   if(page==='home') renderHome();
   if(page==='study'){cameFromStudy=false;interviewMode=false;renderStudy();}
+  if(page==='practices') renderBestPractices();
   if(page==='analytics') renderAnalytics();
   if(page==='subnet') renderSubnet();
   if(page==='ts') renderTsList();
@@ -1191,6 +1195,54 @@ function updateRxProg(){const done=Object.keys(rxDone).length;const ok=Object.en
 function renderTips(){document.getElementById('tips-container').innerHTML=TIPS.map((t,i)=>'<div class="tip-card"><button type="button" class="tip-header" onclick="toggleTip('+i+')"><span>💡 '+esc(t.title)+'</span><span id="ta-'+i+'">▼</span></button><div class="tip-body" id="tb-'+i+'">'+esc(t.body)+'</div></div>').join('');}
 function toggleTip(i){const b=document.getElementById('tb-'+i);const a=document.getElementById('ta-'+i);b.classList.toggle('open');a.textContent=b.classList.contains('open')?'▲':'▼';}
 
+// ═══ BEST PRACTICES ═══
+function getBestPracticeTopics(){return Array.isArray(BEST_PRACTICES?.topics)?BEST_PRACTICES.topics:[];}
+function renderBestPractices(requestedTopic,restoreFocus){
+  const topics=getBestPracticeTopics();
+  const tabs=document.getElementById('practice-tabs');
+  const panel=document.getElementById('practice-panel');
+  if(!tabs||!panel) return;
+  if(!topics.length){panel.innerHTML='<div class="empty-state"><p>Раздел пока недоступен.</p></div>';return;}
+  const selected=topics.find(topic=>topic.topic===(requestedTopic||currentPracticeTopic))||topics[0];
+  currentPracticeTopic=selected.topic;
+  document.getElementById('practice-topic-count').textContent=topics.length;
+  document.getElementById('practice-card-count').textContent=topics.reduce((sum,topic)=>sum+topic.practices.length,0);
+  document.getElementById('practice-reviewed-date').textContent=BEST_PRACTICES.updated||'—';
+  tabs.innerHTML=topics.map(topic=>{
+    const active=topic.topic===selected.topic;
+    return '<button type="button" class="practice-tab" role="tab" id="practice-tab-'+escAttr(topic.slug)+'" aria-controls="practice-panel" aria-selected="'+active+'" tabindex="'+(active?'0':'-1')+'" data-practice-topic="'+escAttr(topic.topic)+'"><span aria-hidden="true">'+esc(topic.icon)+'</span><span>'+esc(topic.topic)+'</span></button>';
+  }).join('');
+  tabs.querySelectorAll('[data-practice-topic]').forEach(button=>{
+    button.addEventListener('click',()=>renderBestPractices(button.dataset.practiceTopic,true));
+    button.addEventListener('keydown',movePracticeTab);
+  });
+
+  panel.setAttribute('aria-labelledby','practice-tab-'+selected.slug);
+  panel.innerHTML='<div class="practice-panel-head"><div class="practice-topic-icon" aria-hidden="true">'+esc(selected.icon)+'</div><div><div class="practice-kicker">Проверенный рабочий подход</div><h2>'+esc(selected.topic)+'</h2><p>'+esc(selected.summary)+'</p></div></div>'+
+    '<div class="practice-grid">'+selected.practices.map((practice,index)=>
+      '<article class="practice-card"><div class="practice-card-number">'+String(index+1).padStart(2,'0')+'</div><h3>'+esc(practice.title)+'</h3><p class="practice-why">'+esc(practice.why)+'</p><div class="practice-action"><span>Применить</span><p>'+esc(practice.action)+'</p></div></article>'
+    ).join('')+'</div>'+
+    '<div class="practice-footer"><div><strong>'+selected.practices.length+' практик</strong><span> · ревизия '+esc(BEST_PRACTICES.updated||'—')+'</span></div><button type="button" class="btn btn-primary" id="practice-trainer" data-topic="'+escAttr(selected.topic)+'" data-page="'+escAttr(selected.trainer||'exam')+'">Перейти к практике →</button></div>';
+  document.getElementById('practice-trainer').addEventListener('click',startPracticeTraining);
+  if(restoreFocus) requestAnimationFrame(()=>document.getElementById('practice-tab-'+selected.slug)?.focus());
+}
+function movePracticeTab(event){
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+  event.preventDefault();
+  const buttons=[...document.querySelectorAll('#practice-tabs [role="tab"]')];
+  const current=buttons.indexOf(event.currentTarget);
+  let next=event.key==='Home'?0:event.key==='End'?buttons.length-1:current+(event.key==='ArrowRight'?1:-1);
+  next=(next+buttons.length)%buttons.length;
+  buttons[next].click();
+}
+function startPracticeTraining(event){
+  const topic=event.currentTarget.dataset.topic;
+  const page=event.currentTarget.dataset.page;
+  if(page!=='exam'){nav(page);return;}
+  currentTopic=topic;currentLevel='all';currentCategory='all';currentMode='all';currentView='standard';
+  nav('exam');
+}
+
 
 // ═══ CUSTOM Q ═══
 function openCustomModal(){
@@ -1606,7 +1658,7 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 async function checkOfflineReady(){
   const files=['./','./index.html','./styles.css','./version.js','./storage.js','./progress.js','./coach.js','./app.js','./interview-prep-max.webmanifest'];
-  const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','labs','tips','incidents','study_map','study_tests','senior_cases'];
+  const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','labs','tips','incidents','study_map','study_tests','senior_cases','best_practices'];
   tasks.forEach(t=>files.push('./tasks/'+t+'.json'));
   let ok=0,fail=0;const results=[];
   for(const f of files){

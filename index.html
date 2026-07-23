@@ -24,6 +24,7 @@
   <div class="sb-nav">
     <button type="button" class="sb-item active" onclick="nav('home')" data-page="home"><span class="icon">🏠</span>Главная</button>
     <button type="button" class="sb-item" onclick="nav('study')" data-page="study"><span class="icon">🎓</span>Учёба</button>
+    <button type="button" class="sb-item" onclick="nav('practices')" data-page="practices"><span class="icon">✦</span>Best Practices</button>
     <button type="button" class="sb-item" onclick="nav('exam')" data-page="exam"><span class="icon">📋</span>Экзамен</button>
     <button type="button" class="sb-item" onclick="nav('analytics')" data-page="analytics"><span class="icon">📊</span>Аналитика</button>
     <div class="sb-divider"></div>
@@ -114,6 +115,28 @@
         <div id="study-senior-case"></div>
       </aside>
     </div>
+  </div>
+
+  <!-- BEST PRACTICES -->
+  <div class="page" id="page-practices">
+    <section class="practices-hero">
+      <div class="practices-hero-copy">
+        <div class="practice-kicker">От знания команды — к инженерному решению</div>
+        <h2>Best Practices по каждой теме</h2>
+        <p>Короткие правила с объяснением риска и конкретным следующим действием. Используйте их как чек-лист перед собеседованием, review или production-изменением.</p>
+      </div>
+      <div class="practices-stats" aria-label="Состав раздела">
+        <div><strong id="practice-topic-count">0</strong><span>тем</span></div>
+        <div><strong id="practice-card-count">0</strong><span>практик</span></div>
+        <div><strong id="practice-reviewed-date">—</strong><span>ревизия</span></div>
+      </div>
+    </section>
+    <section class="practices-shell">
+      <div class="practice-tabs-wrap">
+        <div class="practice-tabs" id="practice-tabs" role="tablist" aria-label="Темы Best Practices"></div>
+      </div>
+      <div class="practice-panel" id="practice-panel" role="tabpanel" tabindex="0"></div>
+    </section>
   </div>
 
   <!-- EXAM -->

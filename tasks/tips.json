@@ -5,11 +5,11 @@
   },
   {
     "title": "Terraform — state lock",
-    "body": "State lock защищает от одновременного apply. При зависшем lock: terraform force-unlock ID. Для S3 backend нужна DynamoDB таблица. НИКОГДА не удаляй tfstate вручную."
+    "body": "State lock защищает от конкурентной записи. Для актуального S3 backend включай use_lockfile = true и права на объект .tflock; DynamoDB locking устарел. force-unlock используй только после проверки, что активных операций нет."
   },
   {
     "title": "Terraform — remote backend",
-    "body": "Local backend: tfstate рядом с кодом — опасно для команды. Remote (S3+DynamoDB): shared state, locking, versioning. Правило: если больше одного человека или prod — только remote."
+    "body": "Для командного или production state используй защищённый remote backend. В S3 включай versioning, encryption, минимальные IAM-права и use_lockfile; разделяй state по окружениям и blast radius."
   },
   {
     "title": "Linux — load average",

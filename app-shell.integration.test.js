@@ -26,7 +26,7 @@ test('serves the complete app shell and personal-coach modules', async () => {
   }).on('error', reject));
 
   try {
-    const [html, dates, tracker, coach, app, questions] = await Promise.all(['/', '/date.js', '/progress.js', '/coach.js', '/app.js', '/tasks/base_questions.json'].map(request));
+    const [html, dates, tracker, coach, app, questions, practices] = await Promise.all(['/', '/date.js', '/progress.js', '/coach.js', '/app.js', '/tasks/base_questions.json', '/tasks/best_practices.json'].map(request));
     assert.ok(html.indexOf('./date.js') < html.indexOf('./coach.js'));
     assert.match(dates, /localDateKey/);
     assert.ok(html.indexOf('./progress.js') < html.indexOf('./coach.js'));
@@ -34,6 +34,7 @@ test('serves the complete app shell and personal-coach modules', async () => {
     assert.match(coach, /skillEvents/);
     assert.match(app, /recordQuestionResult/);
     assert.equal(JSON.parse(questions).length, 746);
+    assert.equal(JSON.parse(practices).topics.length, 12);
   } finally {
     await new Promise(resolve => server.close(resolve));
   }

@@ -204,6 +204,35 @@ test('keeps the focused daily plan usable on a compact viewport', async ({ page 
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
 });
 
+test('shows Best Practices for every topic and opens the related trainer', async ({ page }) => {
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+  await page.locator('[data-page="practices"]').click();
+  await expect(page.locator('#page-practices')).toHaveClass(/active/);
+  await expect(page.getByRole('tab')).toHaveCount(12);
+  await expect(page.locator('.practice-card')).toHaveCount(5);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+
+  await page.getByRole('tab', { name: 'Kubernetes' }).click();
+  await expect(page.getByRole('tabpanel')).toContainText('Kubernetes');
+  await expect(page.locator('.practice-card')).toHaveCount(5);
+  await page.locator('#practice-trainer').click();
+  await expect(page.locator('#page-k8s')).toHaveClass(/active/);
+  await expect(page.locator('#k8s-container .code-card').first()).toBeVisible();
+});
+
+test('keeps Best Practices usable on a compact viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+  await page.locator('#menu-toggle').click();
+  await page.locator('[data-page="practices"]').click();
+  await expect(page.locator('.practice-card').first()).toBeVisible();
+  await page.getByRole('tab', { name: 'Linux' }).click();
+  await expect(page.getByRole('tabpanel')).toContainText('Linux');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+});
+
 test('loads the app shell after the network goes offline', async ({ page, context }) => {
   await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
   await page.goto('/');
