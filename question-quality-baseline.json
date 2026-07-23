@@ -8,34 +8,34 @@
     186
   ],
   "issueBudget": {
-    "length-cue": 522,
+    "length-cue": 492,
     "question-echo": 20,
-    "absolute-distractor": 258,
+    "absolute-distractor": 253,
     "duplicate-question": 5
   },
   "topics": {
     "Terraform": {
-      "length-cue": 57,
+      "length-cue": 52,
       "question-echo": 3,
-      "absolute-distractor": 37,
+      "absolute-distractor": 36,
       "duplicate-question": 3
     },
     "Linux": {
-      "length-cue": 84,
+      "length-cue": 79,
       "question-echo": 3,
       "absolute-distractor": 39,
       "duplicate-question": 0
     },
     "Сети": {
-      "length-cue": 71,
+      "length-cue": 66,
       "question-echo": 7,
       "absolute-distractor": 45,
       "duplicate-question": 0
     },
     "Ansible": {
-      "length-cue": 88,
+      "length-cue": 73,
       "question-echo": 0,
-      "absolute-distractor": 48,
+      "absolute-distractor": 44,
       "duplicate-question": 0
     },
     "Docker": {
@@ -77,15 +77,15 @@
   },
   "levels": {
     "Middle": {
-      "length-cue": 193,
+      "length-cue": 181,
       "question-echo": 7,
-      "absolute-distractor": 88,
+      "absolute-distractor": 87,
       "duplicate-question": 2
     },
     "Senior": {
-      "length-cue": 248,
+      "length-cue": 230,
       "question-echo": 11,
-      "absolute-distractor": 148,
+      "absolute-distractor": 144,
       "duplicate-question": 1
     },
     "Junior": {

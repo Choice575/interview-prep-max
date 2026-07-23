@@ -3784,13 +3784,13 @@
     "level": "Senior",
     "q": "Как работает dynamic inventory в Ansible?",
     "options": [
-      "Инвентарь с шаблонами",
-      "Автоматический discovery",
-      "Плагин/скрипт, возвращающий JSON с хостами из AWS/GCP/Vault/CMDB",
-      "Тип inventory файла"
+      "Статический YAML, который Jinja2 дополняет переменными перед каждым play",
+      "Файл host_vars, пересобираемый из результатов gather_facts на хостах",
+      "Inventory plugin или совместимый script получает хосты из внешнего источника",
+      "Callback plugin добавляет хосты после завершения каждого отдельного play"
     ],
     "answer": 2,
-    "explanation": "Плагин amazon.aws.ec2 возвращает EC2 с тегами как группами. ansible-inventory --list показывает структуру. Можно писать custom плагины.",
+    "explanation": "Ansible поддерживает inventory plugins и legacy inventory scripts; для новых интеграций рекомендуются плагины. Они получают данные из API или другого источника и строят hosts, groups и variables. Результат удобно проверять через ansible-inventory --list.",
     "id": 271
   },
   {
@@ -3798,13 +3798,13 @@
     "level": "Senior",
     "q": "Как организовать управление секретами с Ansible Vault?",
     "options": [
-      "Встроенного vault достаточно",
-      "Все секреты без шифрования",
-      "Только env переменные",
-      "Шифрование vault файлов, пароль в CI secrets, разные vault IDs для окружений"
+      "Хранить секреты в закрытом vars_files и полагаться на права контроллера",
+      "Передавать общий пароль Vault окружениям через переменную репозитория",
+      "Помещать значения в inventory и маскировать их вывод параметром no_log",
+      "Шифровать данные, разделять vault ID и брать пароль из защищённого CI source"
     ],
     "answer": 3,
-    "explanation": "--vault-id prod@vault-pass-file, разные пароли per окружение. Интеграция с HashiCorp Vault через hashi_vault lookup plugin.",
+    "explanation": "Vault защищает данные в покое, а --vault-id связывает метку с источником пароля: prompt, file или client script. Пароль не следует хранить рядом с ciphertext; в CI его получают из защищённого secret source. Для внешних secret stores используют подходящий lookup plugin.",
     "id": 272
   },
   {
@@ -3812,27 +3812,27 @@
     "level": "Senior",
     "q": "Что такое execution environment (EE) в Ansible?",
     "options": [
-      "Контейнерный образ с Ansible, collections и зависимостями для воспроизводимых запусков",
-      "VM для Ansible",
-      "Тип конфигурации AWX",
-      "Python virtualenv"
+      "OCI-образ с ansible-core, collections и зависимостями для одинаковых запусков",
+      "Виртуальная машина с AWX и базой данных для хранения результатов задач",
+      "Набор параметров ansible.cfg, применяемый controller к одному inventory",
+      "Python virtualenv, автоматически создаваемый на каждом управляемом хосте"
     ],
     "answer": 0,
-    "explanation": "EE (ansible-builder) решают «works on my machine». Образ: Ansible core + collections + Python deps. Поддерживаются в AAP, AWX, ansible-navigator.",
+    "explanation": "Execution environment — контейнерный образ с ansible-core, ansible-runner, collections, Python- и системными зависимостями. Его можно собирать через ansible-builder и запускать в ansible-navigator или automation controller, получая одинаковое окружение выполнения.",
     "id": 273
   },
   {
     "topic": "Ansible",
     "level": "Senior",
-    "q": "Как оптимизировать производительность Ansible?",
+    "q": "Как безопасно искать и устранять узкие места Ansible?",
     "options": [
-      "Только увеличить forks",
-      "Pipelining, mitogen, facts caching, forks, strategy free, gather_facts: no",
-      "async везде",
-      "Отключить проверки"
+      "Сразу поднять forks до числа хостов и отключить проверку SSH host keys",
+      "Измерить длительность задач, затем настроить forks, pipelining, facts и strategy",
+      "Перевести длительные задачи на poll: 0, не проверяя их итоговый статус",
+      "Отключить сбор фактов и callbacks независимо от зависимостей playbook"
     ],
     "answer": 1,
-    "explanation": "pipelining=True снижает SSH roundtrips. Mitogen ускоряет в 2-7 раз. forks=20+. fact_caching=jsonfile. profile_tasks callback для поиска узких мест.",
+    "explanation": "Сначала измеряют длительность задач, например callback-профилированием. Затем по результатам подбирают forks, включают поддерживаемый connection plugin pipelining, ограничивают ненужный сбор facts и оценивают strategy. Увеличение параллелизма меняет нагрузку и иногда порядок выполнения, поэтому фиксированные значения не универсальны.",
     "id": 274
   },
   {
@@ -3840,13 +3840,13 @@
     "level": "Senior",
     "q": "Что такое Ansible collections?",
     "options": [
-      "Тип инвентаря",
-      "Набор ролей в Galaxy",
-      "Пакеты с модулями, плагинами, ролями и playbook от вендоров и сообщества",
-      "Коллекция переменных"
+      "Файл inventory, объединяющий группы хостов из нескольких источников",
+      "Каталог Galaxy, где совместно хранятся роли без модулей и плагинов",
+      "Версионируемый пакет модулей, плагинов, ролей, playbook и документации",
+      "Набор переменных роли, доступный через namespace во время выполнения"
     ],
     "answer": 2,
-    "explanation": "Формат: namespace.collection. Устанавливаются: ansible-galaxy collection install. requirements.yml фиксирует версии. Заменили extras модули.",
+    "explanation": "Collection распространяет связанный контент под именем namespace.collection: modules, plugins, roles, playbooks и docs. Её устанавливают через ansible-galaxy collection install, а версии и источники зависимостей обычно фиксируют в requirements.yml.",
     "id": 275
   },
   {
@@ -3854,13 +3854,13 @@
     "level": "Senior",
     "q": "Как работает pipelining в Ansible?",
     "options": [
-      "Метод передачи файлов",
-      "Параллельная обработка хостов",
-      "Тип стратегии",
-      "Передаёт Python-код по SSH stdin без записи на диск, снижая число roundtrips"
+      "Пакетно передаёт templates и files одним архивом перед запуском play",
+      "Одновременно выполняет очередную task на каждой группе из inventory",
+      "Меняет порядок task между медленными и быстрыми managed hosts",
+      "Сокращает SSH-операции: модули выполняются без отдельной передачи файла"
     ],
     "answer": 3,
-    "explanation": "pipelining=True: код передаётся по stdin вместо copy+execute+delete. Требует requiretty отключён в sudoers. Ускоряет до 40%.",
+    "explanation": "Если connection plugin поддерживает pipelining, Ansible может выполнять многие модули без фактической передачи временного файла и уменьшает число сетевых операций. Эффект зависит от подключения; при sudo параметр может конфликтовать с requiretty, а ANSIBLE_KEEP_REMOTE_FILES отключает pipelining.",
     "id": 276
   },
   {
@@ -3868,13 +3868,13 @@
     "level": "Senior",
     "q": "Чем inventory plugins отличаются от inventory scripts?",
     "options": [
-      "Плагины — native Python API (предпочтительны), скрипты — legacy JSON через stdout",
-      "Они одинаковы",
-      "Скрипты быстрее",
-      "Плагины только для cloud"
+      "Плагины используют API Ansible и кеш; scripts отдают legacy JSON в stdout",
+      "Плагины выполняются на managed host, а scripts запускает controller",
+      "Scripts поддерживают compose и keyed_groups, а плагины читают готовый YAML",
+      "Плагины предназначены для cloud API, а scripts — для локальных YAML-файлов"
     ],
     "answer": 0,
-    "explanation": "Plugins реализуют InventoryModule API — лучше кешируются, поддерживают compose, keyed_groups, filters. Скрипты (legacy) — через stdout JSON.",
+    "explanation": "Inventory plugins интегрированы с Ansible Core API и могут использовать общие возможности вроде cache, compose и keyed_groups. Executable inventory scripts остаются совместимым legacy-интерфейсом, который выдаёт ожидаемый JSON. Документация Ansible рекомендует plugins для новых источников.",
     "id": 277
   },
   {
@@ -3882,13 +3882,13 @@
     "level": "Senior",
     "q": "Что такое ARA (ARA Records Ansible)?",
     "options": [
-      "Тип callback",
-      "Callback plugin записывающий результаты playbook в БД с Web UI для анализа",
-      "Инвентарный плагин",
-      "Система мониторинга"
+      "Stdout callback, меняющий формат консольного вывода ansible-playbook",
+      "Callback и API-сервис, сохраняющие результаты Ansible для поиска и анализа",
+      "Inventory plugin, формирующий группы из истории предыдущих запусков",
+      "Система метрик хостов, опрашивающая exporters после каждого play"
     ],
     "answer": 1,
-    "explanation": "ARA автоматически записывает все runs в SQLite/MySQL/PostgreSQL. REST API и веб-интерфейс для анализа. Устанавливается как callback plugin.",
+    "explanation": "ARA — отдельный community-проект. Его callback передаёт данные о playbook runs в API, где они сохраняются и становятся доступны через REST API и веб-интерфейс. Это журнал результатов автоматизации, а не inventory или host-monitoring system.",
     "id": 278
   },
   {
@@ -3896,13 +3896,13 @@
     "level": "Senior",
     "q": "Как реализовать идемпотентность сложного playbook?",
     "options": [
-      "Только встроенные модули",
-      "Запускать playbook один раз",
-      "Идемпотентные модули, проверка состояния через facts/stat, changed_when для shell/command",
-      "ignore_errors: yes везде"
+      "Выбирать модули по короткому имени и ставить changed_when: false каждой task",
+      "Запускать playbook с --check и считать отсутствие ошибок доказательством",
+      "Описывать desired state, применять state-aware modules и guards для command",
+      "Продолжать через ignore_errors, если ресурс уже существует на managed host"
     ],
     "answer": 2,
-    "explanation": "changed_when: false для read-only команд. creates/removes в command/shell. Проверка через stat + register + when. Встроенные модули идемпотентны.",
+    "explanation": "Идемпотентность достигают описанием состояния и модулями, которые умеют сравнивать его с текущим. Для command/shell применяют creates/removes или явную проверку состояния, а changed_when задают по реальному результату. Повторный run и check mode полезны для проверки, но сами по себе ничего не гарантируют.",
     "id": 279
   },
   {
@@ -3910,13 +3910,13 @@
     "level": "Senior",
     "q": "Как работает async с poll: 0 в Ansible?",
     "options": [
-      "Тип стратегии free",
-      "Параллельно запускает все задачи",
-      "Фоновый процесс навсегда",
-      "Fire-and-forget: запускает задачу и не ждёт, возвращает async job ID"
+      "Меняет strategy на free и снимает ограничение forks для текущего play",
+      "Запускает task вне очереди, игнорируя настройки serial и throttle",
+      "Оставляет процесс без timeout и удаляет его job ID сразу после старта",
+      "Запускает task в пределах async timeout и сразу возвращает job ID"
     ],
     "answer": 3,
-    "explanation": "async: 3600, poll: 0 запускает и переходит к следующим задачам. async_status: jid={{ result.ansible_job_id }} проверяет позже.",
+    "explanation": "При poll: 0 controller запускает asynchronous task и переходит дальше, не ожидая результата. Параметр async всё равно ограничивает время работы. Возвращённый ansible_job_id можно сохранить через register и позднее проверить модулем async_status.",
     "id": 280
   },
   {
@@ -3926,13 +3926,13 @@
     "category": "scenario",
     "q": "terraform apply завис и показывает 'Acquiring state lock'. Коллега сказал, что его apply упал с ошибкой 10 минут назад. Ваши действия?",
     "options": [
-      "Запустить terraform force-unlock <LOCK_ID> после проверки, что нет активных операций",
-      "Удалить файл .terraform.tfstate.lock.info вручную",
-      "Удалить запись в DynamoDB таблице state lock",
-      "Перезапустить terraform apply с флагом -lock=false"
+      "Сверить отсутствие active run и выполнить force-unlock с показанным LOCK_ID",
+      "Удалить локальный .terraform.tfstate.lock.info и сразу повторить apply",
+      "Удалить lock-объект backend напрямую по времени его создания",
+      "Повторить apply с -lock=false, чтобы следующий run не ожидал блокировку"
     ],
     "answer": 0,
-    "explanation": "terraform force-unlock <ID> — правильный путь. ID берётся из ошибки блокировки или из DynamoDB. Удалять файл или запись напрямую опасно. -lock=false — крайняя мера, не рекомендуется в продакшн."
+    "explanation": "Сначала подтверждают, что другая операция не использует state. Затем terraform force-unlock <LOCK_ID> снимает lock текущего backend и не меняет инфраструктуру; уникальный ID выводится при ошибке unlock. Прямое удаление backend lock или -lock=false повышают риск конкурентной записи state."
   },
   {
     "id": 282,
@@ -3941,13 +3941,13 @@
     "category": "scenario",
     "q": "Вы мигрируете ресурс с count на for_each. После terraform plan видите: '-/+ destroy and then create replacement' для всех ресурсов. Как мигрировать без пересоздания?",
     "options": [
-      "Добавить lifecycle { ignore_changes = all }",
-      "Использовать terraform state mv для переименования ресурсов в нужный ключ for_each",
-      "Запустить apply — Terraform сам разберётся",
-      "Удалить state и пересоздать с нуля"
+      "Добавить ignore_changes = all, чтобы сохранить прежние addresses instances",
+      "Добавить moved blocks от прежних индексов к ключам for_each и проверить migration",
+      "Применить for_each: provider сопоставит объекты по их cloud identifiers",
+      "Удалить объекты из state и разрешить apply импортировать их автоматически"
     ],
     "answer": 1,
-    "explanation": "При смене count → for_each адрес ресурса меняется с aws_instance.web[0] на aws_instance.web[\"key\"]. terraform state mv старый_адрес новый_адрес позволяет переименовать без пересоздания."
+    "explanation": "Адрес меняется, например с aws_instance.web[0] на aws_instance.web[\"blue\"]. Отдельный moved block для каждого соответствия сообщает Terraform, что это тот же объект. После проверки plan migration можно применить без replacement. terraform state mv остаётся процедурной альтернативой для разового переноса."
   },
   {
     "id": 283,
@@ -3956,28 +3956,28 @@
     "category": "scenario",
     "q": "terraform init выдаёт: 'Could not retrieve the list of available versions for provider hashicorp/aws'. Интернет есть, но вы в корпоративной сети. Что проверить первым?",
     "options": [
-      "Переустановить Terraform",
-      "Удалить папку .terraform и повторить",
-      "Проверить настройки proxy (HTTPS_PROXY) и наличие корпоративного CA в системе",
-      "Указать версию provider явно в required_providers"
+      "Обновить Terraform: init не использует системное доверенное хранилище",
+      "Удалить .terraform: повторная загрузка обойдёт TLS inspection на proxy",
+      "Проверить HTTPS proxy, доверие к corporate CA и доступ к registry endpoints",
+      "Зафиксировать provider version: это отключит запрос registry metadata"
     ],
     "answer": 2,
-    "explanation": "В корпоративных сетях часто SSL-инспекция обрывает TLS. Нужно: export HTTPS_PROXY=..., и/или добавить корпоративный CA. Также можно использовать plugin_cache_dir или filesystem mirror."
+    "explanation": "Сначала проверяют HTTPS_PROXY/NO_PROXY, доверие процесса к корпоративному CA и доступ к registry.terraform.io и download endpoints. Если прямой доступ запрещён политикой, Terraform поддерживает provider_installation с network или filesystem mirror. Один plugin cache не заменяет первичное разрешение версии."
   },
   {
     "id": 284,
     "topic": "Terraform",
     "level": "Middle",
     "category": "scenario",
-    "q": "terraform apply завершился успешно (exit 0), но ресурс в облаке не изменился. В чём может быть причина?",
+    "q": "terraform plan сообщает No changes, хотя внешний оператор изменил тег ресурса. Что проверить?",
     "options": [
-      "Баг в Terraform",
-      "Provider не поддерживает update, только create",
-      "apply применил только часть изменений",
-      "lifecycle { ignore_changes } включает изменяемый атрибут"
+      "Provider принял drift за update и записал новое значение в state без refresh",
+      "Ресурс поддерживает create и read, но не реализует update этого атрибута",
+      "Предыдущий apply применил часть плана, поэтому новый plan пропустил drift",
+      "lifecycle.ignore_changes исключает этот атрибут из планирования update"
     ],
     "answer": 3,
-    "explanation": "ignore_changes = [attribute] заставляет Terraform игнорировать изменения этого атрибута. Plan покажет changes, но apply их пропустит. Также возможно: target указан на другой ресурс, или ресурс вообще не в state."
+    "explanation": "ignore_changes перечисляет атрибуты, которые Terraform учитывает при create, но игнорирует при планировании последующих updates. Поэтому внешний drift по такому тегу не появится как изменение в plan. Это поведение нужно отличать от ошибки provider или частичного apply."
   },
   {
     "id": 285,
@@ -3986,13 +3986,13 @@
     "category": "scenario",
     "q": "Кто-то случайно удалил terraform.tfstate. Инфраструктура в облаке существует. Как восстановить state без пересоздания ресурсов?",
     "options": [
-      "Восстановить из резервной копии S3 versioning (если есть), иначе terraform import для каждого ресурса",
-      "Запустить terraform apply — он пересоздаст всё",
-      "Использовать terraform refresh",
-      "Скопировать tfstate от соседнего env"
+      "Восстановить версию remote state; без backup импортировать существующие ресурсы",
+      "Запустить apply с пустым state, затем привязать созданные duplicates к адресам",
+      "Выполнить refresh-only apply: Terraform найдёт ресурсы без сохранённых IDs",
+      "Скопировать state другого environment и заменить в нём имена ресурсов"
     ],
     "answer": 0,
-    "explanation": "Лучший вариант — S3 versioning (именно для этого его включают). Иначе — terraform import <resource_address> <cloud_id> для каждого ресурса. terraform refresh без state не поможет. Это главная причина хранить state в remote backend с версионированием."
+    "explanation": "Самый точный путь — восстановить предыдущую версию remote state или другой проверенный backup. Если backup нет, конфигурацию и addresses восстанавливают через import blocks или terraform import для каждого существующего объекта и проверяют plan. Refresh-only не может угадать ресурсы, IDs которых отсутствуют в state."
   },
   {
     "id": 286,
@@ -4001,13 +4001,13 @@
     "category": "scenario",
     "q": "После деплоя приложения SSH на сервер недоступен. Консоль облака работает. Ваши первые 3 действия через консоль?",
     "options": [
-      "Перезагрузить сервер, проверить логи, переустановить SSH",
-      "systemctl status sshd → проверить /var/log/auth.log → проверить firewall (iptables/ufw/security group)",
-      "Удалить и пересоздать инстанс",
-      "Изменить порт SSH и перезапустить"
+      "Перезапустить VM, затем восстановить sshd и network rules из backup",
+      "Проверить status/logs sshd, listener на порту и firewall/security-group rules",
+      "Переустановить openssh-server, сохранив sshd_config без диагностики",
+      "Сменить SSH port и открыть его во внешнем firewall перед проверкой logs"
     ],
     "answer": 1,
-    "explanation": "Порядок: 1) systemctl status sshd — запущен ли демон; 2) journalctl -u sshd или /var/log/auth.log — ошибки конфига; 3) iptables -L / ufw status + security groups в облаке — не заблокирован ли порт. Перезагрузка — последнее средство."
+    "explanation": "Через консоль проверяют systemctl status ssh/sshd и journalctl, валидируют конфигурацию через sshd -t, затем смотрят listener командой ss -lntp и сетевые правила ОС и облака. Это разделяет сбой daemon, неверную конфигурацию и блокировку трафика до перезапуска или переустановки."
   },
   {
     "id": 287,
@@ -4016,28 +4016,28 @@
     "category": "scenario",
     "q": "Сервер резко замедлился после деплоя. CPU 15%, disk I/O нормальный, RAM свободна. top показывает load average 8.0 при 4 ядрах. Что проверить?",
     "options": [
-      "Увеличить swap",
-      "Перезагрузить сервер",
-      "Проверить состояния D (uninterruptible sleep) процессов — скорее всего блокировка на I/O или сетевой ресурс",
-      "Добавить ядра CPU"
+      "Увеличить swap и снизить swappiness, не исследуя состояния processes",
+      "Перезапустить server, чтобы сбросить накопленное значение load average",
+      "Найти tasks в D-state и выяснить, какой I/O или NFS resource их удерживает",
+      "Добавить CPU cores: высокий load означает исчерпание processor capacity"
     ],
     "answer": 2,
-    "explanation": "Load average считает процессы в состоянии R (running) + D (uninterruptible). Если CPU свободен, а LA высокий — процессы висят в D-state (ожидание диска, NFS, сети). ps aux | grep ' D ' покажет их. Далее: iotop, netstat, strace -p <pid>."
+    "explanation": "Linux load average включает runnable tasks и tasks в uninterruptible wait. При свободном CPU нужно проверить STAT и WCHAN через ps, затем определить источник ожидания с iostat, pid stack, nfsstat или профильным инструментом. D-state указывает на ожидание kernel resource, но сам по себе не называет конкретную причину."
   },
   {
     "id": 288,
     "topic": "Linux",
     "level": "Middle",
     "category": "scenario",
-    "q": "df -h показывает /var/log занимает 95%. Сервис писать в лог не может. Как быстро освободить место не перезапуская сервисы?",
+    "q": "Filesystem с /var/log заполнен на 95%; du нашёл активный app.log. Как срочно освободить место без restart?",
     "options": [
-      "rm -f /var/log/app/*.log",
-      "Переместить логи на другой диск",
-      "Перезагрузить сервер",
-      "Найти большой файл через du -sh /var/log/* и сделать > /var/log/app/app.log (truncate) без удаления"
+      "Удалить открытый log: filesystem вернёт место сразу после unlink",
+      "Переместить log: открытый descriptor переключится на новый path",
+      "Перезагрузить server, чтобы logrotate создал новый log file",
+      "Проверить выбранный file и обнулить его через truncate -s 0 без unlink"
     ],
     "answer": 3,
-    "explanation": "> file или truncate -s 0 file обнуляет файл без удаления inode — работающий процесс продолжает писать в тот же дескриптор. rm удалит inode, но дескриптор останется открытым — место не освободится пока процесс жив. После truncate место освобождается немедленно."
+    "explanation": "После проверки пути truncate -s 0 сохраняет inode, поэтому процесс продолжает писать в тот же открытый файл, а занятые blocks освобождаются. Unlink открытого файла может не вернуть место до закрытия descriptor. Это аварийная мера с потерей содержимого; затем настраивают logrotate и лимиты хранения."
   },
   {
     "id": 289,
@@ -4046,13 +4046,13 @@
     "category": "scenario",
     "q": "ps aux показывает процесс со статусом Z (zombie). Как от него избавиться?",
     "options": [
-      "Найти и перезапустить родительский процесс, который не вызывает wait()",
-      "kill -9 <zombie_pid>",
-      "reboot",
-      "Использовать kill -CHLD <parent_pid>"
+      "Проверить parent и исправить или restart его, чтобы он вызвал wait() для child",
+      "Отправить SIGKILL zombie: kernel завершит оставшуюся часть процесса",
+      "Перезапустить host, потому что zombie не принимает пользовательские signals",
+      "Изменить nice parent: scheduler заставит его автоматически вызвать wait()"
     ],
     "answer": 0,
-    "explanation": "Zombie уже мёртв — kill на него не действует. Он существует потому что родитель не вызвал wait(). Нужно: найти родителя (ps -o ppid= -p <zombie_pid>), затем kill -CHLD <parent_pid> (сигнал для повторного вызова wait) или перезапустить/убить родителя. При kill родителя зомби усыновит init и сразу очистится."
+    "explanation": "Zombie уже завершился и сохраняет лишь запись до wait() со стороны parent, поэтому signal самому zombie не поможет. Нужно найти PPID, понять, почему parent не reap-ит children, и безопасно исправить или перезапустить его. Ручная отправка SIGCHLD не гарантирует, что приложение вызовет wait()."
   },
   {
     "id": 290,
@@ -4061,13 +4061,13 @@
     "category": "scenario",
     "q": "После перезагрузки сетевой интерфейс eth1 не поднимается, хотя ip link show его видит. В чём проблема и как исправить?",
     "options": [
-      "Перезагрузить ещё раз",
-      "Проверить /etc/network/interfaces или netplan YAML — интерфейс не настроен для auto-up. Добавить конфигурацию и применить.",
-      "Выполнить ip link set eth1 up вручную",
-      "Удалить и переустановить сетевые драйверы"
+      "Повторить reboot: udev при следующем старте создаст connection profile",
+      "Проверить profile в NetworkManager/netplan/networkd и включить autoconnect",
+      "Выполнить ip link set eth1 up: состояние сохранится после следующего reboot",
+      "Переустановить driver, раз kernel уже показывает interface через ip link"
     ],
     "answer": 1,
-    "explanation": "ip link set eth1 up работает до перезагрузки. Для постоянного эффекта нужна конфигурация: Debian/Ubuntu старый — /etc/network/interfaces (auto eth1, iface eth1 inet dhcp), Ubuntu новый — netplan YAML с renderer: networkd, RHEL — /etc/sysconfig/network-scripts/ifcfg-eth1 с ONBOOT=yes."
+    "explanation": "ip link подтверждает, что kernel видит устройство, но не наличие постоянного L3 profile. Нужно определить управляющий stack — NetworkManager, netplan/systemd-networkd или ifupdown — проверить match/name, autoconnect и адреса, затем применить его штатной командой. ip link set up даёт лишь временное административное состояние."
   },
   {
     "id": 291,
@@ -4076,13 +4076,13 @@
     "category": "scenario",
     "q": "Приложение не может подключиться к БД на порту 5432. ping до БД работает. Что проверить по порядку?",
     "options": [
-      "Перезагрузить БД",
-      "Проверить DNS",
-      "telnet/nc DB_IP 5432 → iptables на DB сервере → pg_hba.conf → postgresql.conf listen_addresses",
-      "Перезапустить приложение"
+      "Перезапустить PostgreSQL до проверки listener и database logs",
+      "Проверить DNS resolver, хотя client обращается к явному DB_IP",
+      "Проверить nc с client; затем listener, firewall, pg_hba и DB logs",
+      "Перезапустить application, не сверяя timeout и текст database error"
     ],
     "answer": 2,
-    "explanation": "Порядок: 1) nc -zv DB_IP 5432 — доступен ли порт; 2) на сервере БД: iptables -L, ss -tlnp | grep 5432; 3) pg_hba.conf — разрешён ли доступ с IP приложения; 4) postgresql.conf: listen_addresses = '*' или конкретный IP. ping работает на L3, проблема может быть на L4 (firewall) или L7 (конфиг)."
+    "explanation": "nc -zv с client отделяет TCP timeout/refused от ошибки PostgreSQL. Если TCP не открыт, на DB проверяют ss -lntp, listen_addresses и firewall. Если соединение устанавливается, анализируют точный ответ и logs PostgreSQL, pg_hba.conf, TLS и credentials. Успешный ICMP ping не проверяет TCP port."
   },
   {
     "id": 292,
@@ -4091,13 +4091,13 @@
     "category": "scenario",
     "q": "Внутренний DNS не резолвит имя сервиса. nslookup example.internal 8.8.8.8 тоже не работает. Что это значит?",
     "options": [
-      "Проблема с интернетом",
-      "Нужно перезапустить NetworkManager",
-      "Неверный /etc/hosts",
-      "Зона .internal — приватная, она не существует в публичном DNS. Нужно проверить внутренний DNS сервер (corp resolver)"
+      "Public resolver должен получить record через recursive query к internal DNS",
+      "NetworkManager публикует .internal record после restart connection",
+      "/etc/hosts блокирует DNS-запросы для имён с тем же domain suffix",
+      ".internal зарезервирован для private use; нужен corporate resolver"
     ],
     "answer": 3,
-    "explanation": "8.8.8.8 не знает о приватных зонах .internal, .corp, .local. Нужно: 1) проверить /etc/resolv.conf — указан ли корпоративный DNS; 2) nslookup example.internal <corp_dns_ip>; 3) dig @corp_dns example.internal. Если corp DNS не отвечает — проблема в DNS сервере или firewall на порту 53."
+    "explanation": "Домен верхнего уровня .internal зарезервирован для private-use applications и не должен делегироваться в public DNS. Поэтому ответ 8.8.8.8 не диагностирует corporate zone. Нужно проверить выбранный system resolver, split-DNS routing и запрос напрямую к authoritative или corporate resolver по UDP/TCP 53."
   },
   {
     "id": 293,
@@ -4106,13 +4106,13 @@
     "category": "scenario",
     "q": "Между двумя хостами периодические потери пакетов. mtr показывает потери на 3-м хопе (промежуточный роутер), но дальше всё ок. Что это означает?",
     "options": [
-      "Роутер депроритизирует/дропает ICMP для себя (rate limiting), но транзитный трафик проходит нормально — это ложное срабатывание",
-      "Проблема именно на 3-м хопе, нужно его чинить",
-      "Потери реальные, нужно менять маршрут",
-      "Проблема в MTU"
+      "Intermediate router rate-limits ICMP replies к себе; end-to-end loss не видна",
+      "Этот hop теряет transit packets, но следующий router восстанавливает их",
+      "Path меняется после третьего hop, поэтому mtr смешивает независимые routes",
+      "Возникает PMTUD black hole: hop отвечает не на каждый диагностический probe"
     ],
     "answer": 0,
-    "explanation": "Многие роутеры имеют низкий приоритет для ICMP на свои интерфейсы (rate limiting, policing). Транзитный трафик (UDP/TCP) при этом проходит без потерь. Чтобы проверить реальные потери — использовать iperf3, netperf или hping3 с TCP/UDP до конечного хоста."
+    "explanation": "Если loss появляется на одном intermediate hop, но не продолжается на последующих hops и destination, это не доказывает потерю forwarding traffic. Router может ограничивать control-plane ICMP replies к себе. Проверку повторяют подходящим TCP/UDP mode и оценивают loss и latency именно на destination."
   },
   {
     "id": 294,
@@ -4121,13 +4121,13 @@
     "category": "scenario",
     "q": "TCP сессии обрываются примерно через 4 минуты простоя между двумя датацентрами. При активном трафике всё работает. Что скорее всего происходит?",
     "options": [
-      "Проблема с BGP сессией",
-      "Промежуточный stateful firewall/NAT сбрасывает записи из таблицы состояний по timeout. Нужно настроить TCP keepalive или увеличить timeout на firewall.",
-      "Нужно увеличить MTU",
-      "Проблема с DNS TTL"
+      "BGP hold timer удаляет established route через одинаковый idle interval",
+      "Stateful firewall/NAT expires idle flow; нужен heartbeat/keepalive или новый timeout",
+      "PMTUD периодически выбирает MTU, несовместимый с текущим packet size",
+      "DNS TTL истекает и закрывает established TCP connection на client"
     ],
     "answer": 1,
-    "explanation": "Stateful firewall/NAT держит записи ограниченное время. При простое 4 мин запись удаляется, следующий пакет воспринимается как новая сессия без SYN и дропается. Решения: 1) TCP keepalive на уровне приложения или ОС (net.ipv4.tcp_keepalive_time); 2) увеличить idle timeout на firewall; 3) application-level heartbeat."
+    "explanation": "Повторяемый разрыв лишь после idle указывает на state timeout промежуточного firewall, load balancer или NAT. Сверяют device logs и timeout, затем выбирают application heartbeat, TCP keepalive с интервалом меньше timeout либо изменение сетевой политики. DNS TTL не закрывает уже установленный socket."
   },
   {
     "id": 295,
@@ -4136,28 +4136,28 @@
     "category": "scenario",
     "q": "BGP сессия с upstream провайдером установлена (Established), но маршрутов от него не приходит. Что проверить?",
     "options": [
-      "Перезапустить BGP демон",
-      "Увеличить MTU",
-      "Проверить route-map и prefix-list на входящую фильтрацию, проверить максимальный prefix limit, запросить у провайдера show bgp neighbor <ip> на его стороне",
-      "Проверить AS-path"
+      "Перезапустить BGP daemon, не сохраняя counters и состояние neighbor",
+      "Изменить interface MTU: Established не подтверждает получение UPDATE",
+      "Сверить received/accepted prefixes, inbound policy и advertisements peer",
+      "Удалить outbound AS-path filters, не проверяя локальную import policy"
     ],
     "answer": 2,
-    "explanation": "Established означает BGP handshake прошёл. Нет маршрутов означает: 1) входящий route-map/prefix-list блокирует все маршруты; 2) достигнут maximum-prefix limit (сессия работает, но маршруты дропаются); 3) провайдер не отправляет (их политика, неверный peer AS, prefix-list на их стороне). show bgp neighbors <ip> received-routes покажет что пришло до фильтрации."
+    "explanation": "Established подтверждает BGP session, но не наличие принятых NLRI. Сначала сравнивают counters received и accepted, затем inbound route-map/prefix-list, address family и policy. Если received равно нулю, peer должен подтвердить advertisements. Maximum-prefix и команды просмотра зависят от vendor и могут также завершать session."
   },
   {
     "id": 296,
     "topic": "Ansible",
     "level": "Middle",
     "category": "scenario",
-    "q": "Ansible выдаёт UNREACHABLE для всех хостов, хотя SSH вручную работает. Что проверить первым?",
+    "q": "Все хосты дают UNREACHABLE, хотя ручной SSH проходит. Какой первый шаг?",
     "options": [
-      "Переустановить Ansible",
-      "Отключить firewall",
-      "Перезапустить SSH демон на хостах",
-      "ansible -m ping all -vvv — посмотреть детали подключения. Проверить inventory (hostname/IP), ansible_user, SSH ключ, known_hosts"
+      "Переустановить ansible-core и заново создать inventory из SSH config",
+      "Отключить firewall на managed hosts, не проверяя destination port",
+      "Restart sshd на hosts, хотя direct SSH уже проходит с controller",
+      "Запустить ansible all -m ping -vvv и проверить host vars, user, key и port"
     ],
     "answer": 3,
-    "explanation": "-vvv покажет точную причину: неверный пользователь, ключ не принят, unknown host (known_hosts), неверный порт. Частые причины: ansible_user не указан (пытается подключиться как root), ключ не добавлен в ~/.ssh/authorized_keys нужного пользователя, host не в known_hosts (StrictHostKeyChecking)."
+    "explanation": "Ansible ping проверяет transport и Python/module execution, а не ICMP. Вывод -vvv показывает фактический hostname, user, key, port, proxy/jump и host-key error. Их нужно сравнить с успешной ручной SSH-командой и переменными inventory: ansible_host, ansible_user, ansible_port и ansible_ssh_private_key_file."
   },
   {
     "id": 297,
@@ -4166,13 +4166,13 @@
     "category": "scenario",
     "q": "Playbook выполняется успешно (changed=0) но конфигурация на сервере не изменилась, хотя вы точно меняли шаблон. Что не так?",
     "options": [
-      "Скорее всего template или файл кэширован. Проверить: правильный ли путь к template, не перекрывает ли vars из другого места, запустить с --diff чтобы увидеть diff",
-      "Баг в Ansible",
-      "Добавить force: yes",
-      "Перезапустить хост"
+      "Проверить выполнение task, её src/dest и итоговые vars через --diff и -vv",
+      "Template module caches source между runs; нужно очистить controller cache",
+      "Добавить force: true к template, чтобы обойти сравнение checksum",
+      "Restart managed host: Jinja2 render повторится автоматически при boot"
     ],
     "answer": 0,
-    "explanation": "changed=0 при template означает что Jinja2 результат совпал с тем что на сервере. Причины: 1) переменная имеет другое значение (vars precedence); 2) неверный путь к src; 3) шаблон изменился, но переменная не та. --diff покажет разницу между ожидаемым и текущим файлом."
+    "explanation": "Template сообщает changed, когда rendered content отличается от destination. Нужно убедиться, что task не пропущена из-за when, tags или limit, используется ожидаемый template из нужной role, vars дают другой render и dest верен. --diff и verbose output помогают увидеть выбранные пути и результат сравнения; штатного force для template нет."
   },
   {
     "id": 298,
@@ -4181,13 +4181,13 @@
     "category": "scenario",
     "q": "Handler должен перезапустить nginx после изменения конфига, но не запускается. В чём может быть причина?",
     "options": [
-      "Handlers не работают в Ansible",
-      "Несовпадение имени в notify и handlers (регистр, пробелы). Или задача не вернула changed (идемпотентность). Или используется --check mode.",
-      "Добавить always: true",
-      "Перенести restart в tasks"
+      "Handler из role имеет приоритет, поэтому handlers section play не читается",
+      "Проверить changed у notifying task, имя handler/listen, failure и flush point",
+      "Добавить always к handler: после этого notify не потребуется для запуска",
+      "Перенести restart в tasks: handler не поддерживает service modules"
     ],
     "answer": 1,
-    "explanation": "Самые частые причины: 1) notify: 'Restart Nginx' ≠ name: 'restart nginx' (case-sensitive); 2) задача вернула ok вместо changed (файл не изменился); 3) --check режим не выполняет handlers; 4) handler в другом play. Проверить: --diff чтобы убедиться что задача changed, и точное совпадение имён."
+    "explanation": "Task уведомляет handler лишь при changed и по точному name либо listen topic. Notified handlers выполняются в соответствующей flush point; failure хоста до неё может помешать запуску, если не настроен force_handlers. meta: flush_handlers помогает диагностировать момент выполнения. Check mode сам по себе не означает безусловный пропуск handlers."
   },
   {
     "id": 299,
@@ -4196,13 +4196,13 @@
     "category": "scenario",
     "q": "Playbook падает с 'Missing sudo password'. Как правильно передать sudo пароль?",
     "options": [
-      "Добавить пароль в plaintext в inventory",
-      "Запустить от root",
-      "Использовать ansible-vault для шифрования пароля и передать через --ask-become-pass или переменную ansible_become_password в vault",
-      "Добавить NOPASSWD в sudoers"
+      "Сохранить password в inventory рядом с ansible_user и ограничить права file",
+      "Запустить playbook от root, чтобы become plugin не запрашивал password",
+      "Ввести --ask-become-pass или взять ansible_become_password из Vault",
+      "Выдать account полный NOPASSWD без ограничения списка sudo commands"
     ],
     "answer": 2,
-    "explanation": "Варианты по безопасности: 1) --ask-become-pass (интерактивно); 2) ansible_become_password в зашифрованном vault файле; 3) NOPASSWD в sudoers для ansible пользователя (самый удобный для CI). Plaintext в inventory — нельзя. Запуск от root — нарушение принципа минимальных привилегий."
+    "explanation": "Для интерактивного запуска подходит --ask-become-pass. В automation ansible_become_password хранят в Ansible Vault или получают из внешнего secret source, а не оставляют plaintext в inventory. Альтернатива — минимально scoped sudoers rule для service account; широкий NOPASSWD увеличивает привилегии."
   },
   {
     "id": 300,
@@ -4211,13 +4211,13 @@
     "category": "scenario",
     "q": "Playbook на 50 хостах выполняется 40 минут. Как оптимизировать?",
     "options": [
-      "Купить более быстрые серверы",
-      "Использовать serial: 1",
-      "Разбить на несколько playbook",
-      "Увеличить forks (по умолчанию 5), включить pipelining, использовать async для независимых задач, проверить gather_facts (отключить если не нужно)"
+      "Ускорить managed servers: connection settings не влияют на длительность run",
+      "Установить serial: 1, чтобы task быстрее переходили между host groups",
+      "Разделить playbook на files: число SSH operations автоматически снизится",
+      "Измерить slow tasks; настроить forks, pipelining, facts, strategy и async"
     ],
     "answer": 3,
-    "explanation": "forks=5 — главный bottleneck, поставить 20-50. pipelining=True убирает лишние SSH сессии. gather_facts: false если факты не нужны (экономит 2-5 сек/хост). async+poll=0 для длинных независимых задач. strategy: free вместо linear. SSH multiplexing (ControlMaster)."
+    "explanation": "Сначала профилируют tasks и controller/target load. Затем экспериментально подбирают forks, включают поддерживаемый connection plugin pipelining, кешируют или ограничивают facts, оценивают strategy и применяют async к долгим независимым операциям. Каждый параметр влияет на нагрузку, порядок или failure semantics, поэтому универсального числа нет."
   },
   {
     "id": 301,
