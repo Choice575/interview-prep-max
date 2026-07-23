@@ -3362,211 +3362,211 @@
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что такое playbook в Ansible?",
+    "q": "Что описывает Ansible playbook?",
     "options": [
-      "YAML-файл, описывающий набор задач для выполнения на хостах",
-      "Конфиг инвентаря",
-      "Шаблон Jinja2",
-      "Плагин модуля"
+      "Один или несколько plays с целями и задачами",
+      "Список адресов и групп управляемых узлов",
+      "Параметры одного module без выбора hosts",
+      "Шаблон конфигурации на языке Jinja"
     ],
     "answer": 0,
-    "explanation": "Playbook состоит из plays. Каждый play задаёт hosts, become, vars и список tasks. Запуск: ansible-playbook site.yml.",
+    "explanation": "Playbook — YAML-документ с одним или несколькими plays. Каждый play сопоставляет host pattern с упорядоченными tasks, roles и другими настройками автоматизации. Для исполнения используется ansible-playbook.",
     "id": 241
   },
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что такое task в Ansible?",
+    "q": "Что представляет собой task в playbook?",
     "options": [
-      "Файл конфигурации",
-      "Вызов модуля с параметрами — атомарное действие в playbook",
-      "Переменная",
-      "Группа хостов"
+      "Описание группы hosts и её variables",
+      "Вызов action или module с аргументами",
+      "Конфигурацию подключения control node",
+      "Шаблон для генерации текстового файла"
     ],
     "answer": 1,
-    "explanation": "Каждая task вызывает модуль (apt, copy, template, service) с аргументами. Tasks выполняются последовательно по умолчанию.",
+    "explanation": "Task описывает действие: обычно action plugin вызывает module с заданными аргументами для выбранных hosts. Выполнение возвращает состояние вроде ok, changed, failed или skipped; на порядок и параллелизм влияют strategy и другие keywords.",
     "id": 242
   },
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что такое inventory в Ansible?",
+    "q": "Что задаёт inventory в Ansible?",
     "options": [
-      "Список задач",
-      "Конфиг модулей",
-      "Список хостов и групп, которыми управляет Ansible",
-      "Файл переменных"
+      "Порядок выполнения tasks внутри play",
+      "Шаблоны файлов для managed nodes",
+      "Управляемые hosts, groups и variables",
+      "Плагины вывода результатов playbook"
     ],
     "answer": 2,
-    "explanation": "Inventory может быть статическим (INI, YAML) или динамическим (плагин/скрипт). Переменные задаются в host_vars/ и group_vars/.",
+    "explanation": "Inventory описывает managed nodes, объединяет их в groups и может задавать host/group variables. Источником бывает статический INI/YAML-файл или inventory plugin, получающий актуальные данные из внешней системы.",
     "id": 243
   },
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что такое handler в Ansible?",
+    "q": "Когда Ansible ставит handler на выполнение?",
     "options": [
-      "Плагин callback",
-      "Обработчик ошибок",
-      "Тип модуля",
-      "Задача, выполняемая только при уведомлении (notify) от другой задачи"
+      "При чтении playbook с разделом handlers",
+      "После каждой task независимо от её результата",
+      "При ошибке task внутри раздела rescue",
+      "Когда изменившая состояние task вызывает notify"
     ],
     "answer": 3,
-    "explanation": "Handler запускается один раз в конце play, даже если notify сработал несколько раз. Используется для перезапуска сервисов после изменения конфига.",
+    "explanation": "Notify ставит handler в очередь лишь когда notifying task сообщает changed. Повторные уведомления до одной flush-точки дедуплицируются. Handlers обычно выполняются в конце соответствующего раздела play, но meta: flush_handlers может запустить очередь раньше; после этого handler можно уведомить снова.",
     "id": 244
   },
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Для чего используется when в Ansible?",
+    "q": "Что контролирует условие when?",
     "options": [
-      "Условное выполнение задачи на основе переменной или факта",
-      "Цикл по элементам",
-      "Уведомление handler",
-      "Блок обработки ошибок"
+      "Запуск task или block на основе выражения",
+      "Число hosts в очередном serial-batch",
+      "Порядок поиска файла конфигурации",
+      "Шифрование variables через Ansible Vault"
     ],
     "answer": 0,
-    "explanation": "when: ansible_os_family == 'Debian' выполняет задачу только на Debian. Поддерживает and, or, not и Jinja2 выражения.",
+    "explanation": "When вычисляет условие отдельно для каждого подходящего host и запускает либо пропускает task, block или reusable content. В выражении доступны variables, facts и зарегистрированные результаты; условие записывают как Jinja expression без фигурных скобок {{ }}.",
     "id": 245
   },
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что такое loop в Ansible?",
+    "q": "Как Ansible использует keyword loop?",
     "options": [
-      "Тип задачи",
-      "Повторяет задачу для каждого элемента списка через {{ item }}",
-      "Условие выполнения",
-      "Модуль итерации"
+      "Повторяет весь play для каждой inventory group",
+      "Выполняет task для каждого элемента входного списка",
+      "Перезапускает handler при каждом уведомлении",
+      "Ожидает успеха команды с заданным интервалом"
     ],
     "answer": 1,
-    "explanation": "loop: ['nginx', 'redis'] с {{ item }} выполняет задачу для каждого элемента. Заменил with_items начиная с Ansible 2.5.",
+    "explanation": "Loop выполняет task для каждого элемента и по умолчанию предоставляет текущий элемент как item; loop_control позволяет сменить имя переменной. Конструкции with_* по-прежнему существуют, а переход с with_items иногда требует flatten(1), поэтому loop не является механически идентичной заменой.",
     "id": 246
   },
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что делает notify в Ansible?",
+    "q": "Что делает notify в task Ansible?",
     "options": [
-      "Логирует событие",
-      "Отправляет email",
-      "Ставит handler в очередь для запуска в конце play",
-      "Запускает задачу немедленно"
+      "Отправляет событие в configured callback",
+      "Запускает указанную task в текущей позиции",
+      "Уведомляет handler, если task дала changed",
+      "Переводит failed result в ignored status"
     ],
     "answer": 2,
-    "explanation": "notify: restart nginx ставит handler в очередь. Handler запустится если task изменила состояние (changed). Несколько notify — один запуск.",
+    "explanation": "Notify ссылается на имя handler или его listen topic. Уведомление создаётся при результате changed, а одинаковые уведомления до выполнения handler объединяются. Порядок запуска определяется порядком handlers, а не порядком имён в notify.",
     "id": 247
   },
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что такое ansible-vault?",
+    "q": "Для чего предназначен ansible-vault?",
     "options": [
-      "Менеджер ролей",
-      "Хранилище модулей",
-      "Инвентарный плагин",
-      "Инструмент шифрования чувствительных данных (паролей, ключей) в файлах Ansible"
+      "Для установки roles и collections из Galaxy",
+      "Для проверки синтаксиса playbook без запуска",
+      "Для хранения SSH-сессий к managed nodes",
+      "Для шифрования файлов и отдельных variables"
     ],
     "answer": 3,
-    "explanation": "ansible-vault encrypt vars/secrets.yml шифрует AES-256. При запуске: --vault-password-file или --ask-vault-pass. Можно шифровать строки.",
+    "explanation": "Ansible Vault шифрует целые data-файлы или отдельные YAML variables для хранения зашифрованного содержимого. При выполнении нужен vault password или vault ID из prompt, файла либо скрипта. После расшифрования секрет доступен процессу, поэтому Vault не заменяет runtime secret manager и защиту вывода.",
     "id": 248
   },
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что такое tags в Ansible?",
+    "q": "Как применяются tags при запуске playbook?",
     "options": [
-      "Метки для избирательного запуска задач или ролей",
-      "Версии playbook",
-      "Теги Docker",
-      "Метки инвентаря"
+      "Выбирают или исключают помеченные tasks",
+      "Меняют variable precedence для выбранных hosts",
+      "Задают batch size для rolling update",
+      "Шифруют результаты отмеченных modules"
     ],
     "answer": 0,
-    "explanation": "ansible-playbook site.yml --tags deploy запустит только задачи с тегом deploy. --skip-tags исключит задачи. Ускоряет частичный деплой.",
+    "explanation": "Командные параметры --tags и --skip-tags выбирают помеченные tasks. Tags наследуются через plays, blocks, roles и static imports. Dynamic includes по умолчанию не передают tag вложенным tasks: для наследования используют apply или помечают сами tasks.",
     "id": 249
   },
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что делает register в Ansible?",
+    "q": "Что создаёт keyword register?",
     "options": [
-      "Регистрирует модуль",
-      "Сохраняет результат задачи в переменную для последующего использования",
-      "Создаёт handler",
-      "Логирует задачу"
+      "Новую запись в dynamic inventory",
+      "Variable с результатом выполненной task",
+      "Handler для обработки failed status",
+      "Callback для форматирования console output"
     ],
     "answer": 1,
-    "explanation": "register: result сохраняет stdout, stderr, rc, changed. Используется: when: result.rc == 0 или debug: msg: '{{ result.stdout }}'.",
+    "explanation": "Register сохраняет для текущего host структуру результата task. Общие поля включают changed, failed и skipped, а stdout или rc появляются только у подходящих modules. При loop зарегистрированная variable содержит список результатов в поле results.",
     "id": 250
   },
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что такое defaults в роли Ansible?",
+    "q": "Какую роль играет defaults/main.yml?",
     "options": [
-      "Конфиг playbook",
-      "Значения по умолчанию для ОС",
-      "Переменные с наименьшим приоритетом — легко переопределяются",
-      "Глобальные переменные"
+      "Задаёт параметры подключения к managed hosts",
+      "Переопределяет extra vars из командной строки",
+      "Объявляет низкоприоритетные variables роли",
+      "Хранит tasks, выполняемые после handlers"
     ],
     "answer": 2,
-    "explanation": "defaults/main.yml задаёт переменные с минимальным приоритетом. Любая переменная из inventory или playbook их перезапишет.",
+    "explanation": "Role defaults — один из самых низких уровней variable precedence, поэтому пользователь роли может переопределять такие значения через inventory, play vars и другие более приоритетные источники. Extra vars имеют наивысший приоритет среди variables.",
     "id": 251
   },
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что такое ansible.cfg?",
+    "q": "Что настраивается через ansible.cfg?",
     "options": [
-      "Список задач",
-      "Конфиг модулей",
-      "Файл переменных",
-      "Конфигурационный файл Ansible: inventory, remote_user, forks, callback и другие параметры"
+      "Состав hosts и groups для одного inventory",
+      "Последовательность tasks внутри конкретной role",
+      "Зашифрованные значения для Ansible Vault",
+      "Поведение control node, plugins и connections"
     ],
     "answer": 3,
-    "explanation": "Ansible ищет ansible.cfg: ANSIBLE_CONFIG → ./ansible.cfg → ~/.ansible.cfg → /etc/ansible/ansible.cfg. Задаёт forks, timeout, retry.",
+    "explanation": "Ansible использует первый найденный config: ANSIBLE_CONFIG, ./ansible.cfg, ~/.ansible.cfg или /etc/ansible/ansible.cfg. В нём задают defaults, plugin paths, connection settings и callbacks; environment variables, CLI options, playbook keywords и variables могут иметь больший приоритет.",
     "id": 252
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое Ansible Galaxy?",
+    "q": "Что объединяет Ansible Galaxy?",
     "options": [
-      "Репозиторий и CLI для скачивания ролей и collections сообщества",
-      "Облако для playbook",
-      "Система мониторинга",
-      "Инвентарный плагин"
+      "Онлайн-каталог content и CLI для его установки",
+      "Сервис исполнения playbook на managed nodes",
+      "Хранилище runtime facts с разных hosts",
+      "Протокол подключения вместо SSH и WinRM"
     ],
     "answer": 0,
-    "explanation": "ansible-galaxy install geerlingguy.nginx устанавливает роль. ansible-galaxy collection install community.general — коллекцию. requirements.yml — зависимости.",
+    "explanation": "Galaxy публикует Ansible roles и collections, а ansible-galaxy управляет их созданием и установкой. Для явного типа используют ansible-galaxy role install или ansible-galaxy collection install; набор зависимостей можно описать в requirements.yml.",
     "id": 253
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что делает delegate_to в Ansible?",
+    "q": "Как действует keyword delegate_to?",
     "options": [
-      "Делегирует права",
-      "Выполняет задачу на другом хосте вместо текущего целевого",
-      "Передаёт переменные",
-      "Запускает роль на группе"
+      "Передаёт variable precedence выбранной group",
+      "Запускает task на указанном host вместо текущего",
+      "Переносит role между разными collections",
+      "Меняет strategy plugin для следующего play"
     ],
     "answer": 1,
-    "explanation": "delegate_to: localhost выполняет задачу локально (регистрация в service discovery). delegate_to: db-server — выполняет на другом сервере.",
+    "explanation": "Delegate_to меняет host, где исполняется конкретная task, например на localhost или узел балансировщика, пока inventory_hostname продолжает обозначать исходный host. Некоторые actions не создают remote connection и потому не поддерживают делегирование.",
     "id": 254
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое block/rescue/always в Ansible?",
+    "q": "Как связаны block, rescue и always?",
     "options": [
-      "Тип модуля",
-      "Тип цикла",
-      "Группировка задач с обработкой ошибок (try/catch/finally)",
-      "Группа хостов"
+      "Block создаёт loop, rescue меняет loop_var",
+      "Rescue выбирает hosts, always задаёт serial",
+      "Rescue реагирует на failed, always выполняется после",
+      "Block импортирует role, always наследует tags"
     ],
     "answer": 2,
-    "explanation": "block: задачи. rescue: при ошибке в block (как catch). always: всегда. Позволяет писать идемпотентную обработку ошибок.",
+    "explanation": "Tasks из rescue запускаются, когда task в block возвращает failed; затем выполняется секция always независимо от успеха block или rescue. Ошибки определения task и unreachable hosts не запускают rescue или always, поэтому аналогия с try/catch/finally не является полной.",
     "id": 255
   },
   {
@@ -3574,153 +3574,153 @@
     "level": "Middle",
     "q": "Чем include_tasks отличается от import_tasks?",
     "options": [
-      "include_tasks не поддерживает переменные",
-      "Они идентичны",
-      "import_tasks только для ролей",
-      "include_tasks динамический (runtime), import_tasks статический (при парсинге)"
+      "Первый загружает role, второй — collection",
+      "Первый работает локально, второй — удалённо",
+      "Первый требует JSON, второй читает YAML",
+      "Первый обрабатывается runtime, второй — при parsing"
     ],
     "answer": 3,
-    "explanation": "import_tasks: статический — задачи видны с начала, теги работают корректно. include_tasks: динамический — имя файла может быть переменной.",
+    "explanation": "Import_tasks статически раскрывается при parsing playbook, а include_tasks загружает файл во время выполнения. Поэтому dynamic include допускает loops и вычисляемые имена файлов, но отличается видимостью для --list-tasks и правилами применения conditions и tags.",
     "id": 256
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Как работает serial в Ansible?",
+    "q": "Что ограничивает keyword serial?",
     "options": [
-      "Ограничивает число хостов в одновременной обработке для rolling update",
-      "Последовательный запуск задач",
-      "Тип цикла",
-      "Порядок ролей"
+      "Размер очередной партии hosts внутри play",
+      "Число итераций task с loop_control",
+      "Количество retries для failed module",
+      "Порядок определения variable precedence"
     ],
     "answer": 0,
-    "explanation": "serial: 2 обрабатывает по 2 хоста. serial: '25%' — по 25%. Позволяет rolling deployment: деплоить часть и проверять перед продолжением.",
+    "explanation": "Serial делит hosts play на batches заданного размера, процента или последовательности размеров. Ansible завершает play для текущей партии перед следующей; фактический параллелизм внутри неё дополнительно ограничивают forks, throttle и strategy. Область расчёта failures также сужается до batch.",
     "id": 257
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое ansible-pull?",
+    "q": "Как работает ansible-pull?",
     "options": [
-      "Получение ролей из Galaxy",
-      "Режим где хосты сами забирают playbook из Git и применяют",
-      "Инвентарный плагин",
-      "Синхронизация конфигов"
+      "Загружает collections из Galaxy на control node",
+      "Получает repository и локально применяет playbook",
+      "Копирует facts с одного host на другой",
+      "Синхронизирует inventory с external API"
     ],
     "answer": 1,
-    "explanation": "ansible-pull -U repo_url запускается через cron/systemd timer. Инвертирует push→pull. Полезен для больших fleet без центрального control node.",
+    "explanation": "Ansible-pull получает playbook из VCS repository и запускает ansible-playbook локально на managed node, инвертируя обычную push-модель. Периодичность обеспечивает внешний scheduler, например systemd timer; параллельные запуски на одном host нужно предотвращать отдельно.",
     "id": 258
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Как работают фильтры Jinja2 в Ansible?",
+    "q": "Что делают Jinja filters в Ansible?",
     "options": [
-      "Фильтруют задачи",
-      "Фильтруют хосты",
-      "Преобразуют переменные: {{ var | default('x') }}, {{ list | join(',') }}, {{ dict | dict2items }}",
-      "Тип условия when"
+      "Ограничивают hosts по inventory pattern",
+      "Прерывают tasks на основе failed status",
+      "Преобразуют значения внутри expressions",
+      "Выбирают strategy для выполнения play"
     ],
     "answer": 2,
-    "explanation": "Ansible добавляет кастомные фильтры: to_json, to_yaml, ipaddr, regex_replace, select, map. Используются в template, conditions, debug.",
+    "explanation": "Filters передают значение через оператор | и преобразуют либо отбирают данные, например default, map, select, dict2items, regex_replace и to_json. Набор зависит от Jinja, ansible-core и установленных collections; например ipaddr поставляется collection ansible.utils.",
     "id": 259
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое lookup plugin?",
+    "q": "Где lookup plugin получает данные?",
     "options": [
-      "Способ подключения",
-      "Тип модуля",
-      "Инвентарный плагин",
-      "Получает данные из внешних источников (файлы, env, Vault, БД) во время выполнения"
+      "Из facts на managed node через setup module",
+      "Из пакетов в сети после XDP processing",
+      "Из output предыдущего handler на remote host",
+      "Из внешнего источника со стороны control node"
     ],
     "answer": 3,
-    "explanation": "{{ lookup('file', '/etc/passwd') }}, {{ lookup('env', 'HOME') }}, {{ lookup('hashi_vault', 'secret/myapp') }} — данные из внешних источников.",
+    "explanation": "Lookup plugins выполняются на control node и читают данные из файлов, environment, password stores, APIs и других внешних источников. Query обычно возвращает list, а lookup по умолчанию — строковое представление; чувствительный результат всё равно требует защиты от логирования.",
     "id": 260
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое custom module в Ansible?",
+    "q": "Что представляет собой custom Ansible module?",
     "options": [
-      "Python-скрипт в library/ для расширения возможностей Ansible",
-      "Модификация core модуля",
-      "Плагин callback",
-      "Тип роли"
+      "Исполняемый компонент с arguments и JSON-результатом",
+      "Inventory source для поиска managed nodes",
+      "Callback hook для событий выполнения playbook",
+      "Jinja filter для преобразования variable"
     ],
     "answer": 0,
-    "explanation": "Модуль в library/my_module.py принимает JSON на stdin, возвращает JSON с changed, msg. AnsibleModule класс упрощает разработку.",
+    "explanation": "Custom module реализует самостоятельное действие с определённым интерфейсом аргументов и возвращает Ansible JSON через stdout. Локальный module можно положить в library, а распространяемый — в collection. Python modules обычно используют AnsibleModule, exit_json и fail_json.",
     "id": 261
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что делает check mode (--check)?",
+    "q": "Что гарантирует запуск ansible-playbook --check?",
     "options": [
-      "Проверяет синтаксис",
-      "Dry run: показывает что изменится, без реального применения",
-      "Проверяет подключение",
-      "Валидирует переменные"
+      "Точный результат последующего обычного запуска",
+      "Симуляцию для tasks с поддержкой check mode",
+      "Проверку YAML без соединения с managed nodes",
+      "Автоматический rollback после применения changes"
     ],
     "answer": 1,
-    "explanation": "--check — dry run. Не все модули поддерживают. check_mode: yes/no на уровне задачи управляет поведением. Полезен перед prod.",
+    "explanation": "В check mode modules с соответствующей поддержкой прогнозируют changes, не применяя их. Неподдерживающие modules ничего не делают и могут не дать результата; зависимости от registered variables также ограничивают точность. Keyword check_mode: true или false принудительно меняет режим конкретной task.",
     "id": 262
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое strategy в Ansible?",
+    "q": "Что определяет strategy plugin?",
     "options": [
-      "Тип подключения",
-      "Стратегия деплоя",
-      "Порядок выполнения задач на хостах: linear, free, host_pinned",
-      "Метод управления ролями"
+      "Источник inventory и порядок разбора groups",
+      "Формат вывода результата каждого module",
+      "Планирование tasks между hosts одного play",
+      "Приоритет variables из roles и extra vars"
     ],
     "answer": 2,
-    "explanation": "linear: все хосты выполняют task N перед N+1. free: каждый хост движется в своём темпе. host_pinned: все задачи хоста до перехода к следующему.",
+    "explanation": "Strategy plugin планирует выполнение tasks по hosts. Linear ждёт завершения текущей task на затронутых hosts перед следующей, free позволяет каждому host продвигаться независимо, а host_pinned удерживает worker за host до конца play. Forks, serial и throttle задают отдельные ограничения.",
     "id": 263
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое callback plugin в Ansible?",
+    "q": "Для чего используется callback plugin?",
     "options": [
-      "Метод подключения",
-      "Обработчик ошибок",
-      "Тип inventory",
-      "Расширяет вывод и обработку событий playbook (json, yaml, ara, slack)"
+      "Для доставки modules на managed nodes",
+      "Для вычисления inventory host patterns",
+      "Для шифрования variables перед template",
+      "Для реакции на события и формирования output"
     ],
     "answer": 3,
-    "explanation": "stdout_callback = yaml для красивого вывода. Callback plugins: ara (запись в БД), slack (нотификации), профилирование времени задач.",
+    "explanation": "Callback plugins получают события выполнения, формируют CLI output, отправляют уведомления или сохраняют результаты во внешнюю систему. Активен один stdout callback, но дополнительные aggregate и notification callbacks можно включить отдельно. В современном default callback YAML-представление задаётся result_format=yaml.",
     "id": 264
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Как работает set_fact?",
+    "q": "Какое состояние создаёт set_fact?",
     "options": [
-      "Создаёт/обновляет переменную хоста во время выполнения playbook",
-      "Собирает системные факты",
-      "Задаёт дефолт",
-      "Создаёт глобальную переменную"
+      "Host variable на время текущего запуска",
+      "Global setting в ansible.cfg для всех runs",
+      "Inventory group с динамическим membership",
+      "Encrypted value внутри vault file"
     ],
     "answer": 0,
-    "explanation": "set_fact: my_var: '{{ some_value }}' создаёт переменную с host scope. cacheable: yes сохраняет в fact cache между запусками.",
+    "explanation": "Set_fact создаёт высокоприоритетную host variable для текущего run. При cacheable: true дополнительно появляется более низкоприоритетный ansible_fact, который сохранится между запусками лишь при включённом fact cache. Meta: clear_facts удаляет cached fact, но не текущую host variable.",
     "id": 265
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое ansible_facts?",
+    "q": "Что содержится в ansible_facts?",
     "options": [
-      "Конфиг Ansible",
-      "Информация о хосте собранная setup: OS, IP, RAM, диски",
-      "Переменные из inventory",
-      "Список задач"
+      "Значения из role defaults и vars_prompt",
+      "Данные о managed host, собранные fact modules",
+      "Список tasks, пропущенных по condition when",
+      "Настройки plugins, прочитанные из ansible.cfg"
     ],
     "answer": 1,
-    "explanation": "Ansible автоматически запускает gather_facts. Доступ: ansible_facts['os_family'] или ansible_os_family. gather_facts: no ускоряет если факты не нужны.",
+    "explanation": "В начале play gather_facts по умолчанию вызывает setup и помещает сведения об OS, interfaces, memory и других свойствах host в ansible_facts. Инъекцию части facts как верхнеуровневых ansible_* variables можно отключить; долговременное хранение требует настроенного fact cache.",
     "id": 266
   },
   {
@@ -3728,55 +3728,55 @@
     "level": "Middle",
     "q": "Что такое async и poll в Ansible?",
     "options": [
-      "Тип стратегии",
-      "Параллельное выполнение",
-      "Запускает задачу асинхронно (async: 300) и проверяет статус с интервалом (poll: 10)",
-      "Обработка ошибок"
+      "Первый задаёт retries, второй — delay между ними",
+      "Первый выбирает forks, второй — strategy plugin",
+      "Первый задаёт лимит времени, второй — интервал опроса",
+      "Первый включает check mode, второй — diff output"
     ],
     "answer": 2,
-    "explanation": "async: 3600, poll: 0 — fire-and-forget. Позже: async_status: jid={{ result.ansible_job_id }} проверяет результат.",
+    "explanation": "Async задаёт максимальное время фоновой работы task. При poll > 0 Ansible периодически проверяет статус и блокирует следующую task до завершения или timeout; poll: 0 сразу продолжает play, а результат затем получают через async_status по ansible_job_id.",
     "id": 267
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое vars_prompt в Ansible?",
+    "q": "Когда применяется vars_prompt?",
     "options": [
-      "Тип inventory",
-      "Задаёт переменные в playbook",
-      "Подсказка для команды",
-      "Запрашивает значение переменной у пользователя интерактивно"
+      "Когда inventory plugin обновляет список hosts",
+      "Когда module возвращает changed result",
+      "Когда callback форматирует stdout playbook",
+      "Когда play интерактивно запрашивает variable"
     ],
     "answer": 3,
-    "explanation": "vars_prompt: - name: username, prompt: Enter username. private: yes — скрывает ввод (пароли). Не работает в CI без --extra-vars.",
+    "explanation": "Vars_prompt объявляет interactive prompts на уровне play; private: true скрывает ввод. Prompt пропускается, если variable уже задана, например через --extra-vars, а в non-interactive запуске вроде cron или automation controller нужное значение следует передать другим источником.",
     "id": 268
   },
   {
     "topic": "Ansible",
     "level": "Senior",
-    "q": "Что такое Ansible Tower / AWX?",
+    "q": "Что дают AWX и automation controller?",
     "options": [
-      "Web UI и API: RBAC, расписания, логирование, credential store для Ansible",
-      "Коммерческий Ansible",
-      "Репозиторий ролей",
-      "Инвентарный сервис"
+      "Централизованные jobs, API, RBAC и credentials",
+      "Новый transport вместо SSH для managed nodes",
+      "Repository для публикации roles и collections",
+      "Локальный CLI для шифрования variables"
     ],
     "answer": 0,
-    "explanation": "AWX — open source версия Tower. Предоставляет: job templates, workflow, dynamic inventory, notifications, RBAC. AAP — enterprise.",
+    "explanation": "AWX — upstream community project для web-управления Ansible automation. Automation controller — поддерживаемый компонент Red Hat Ansible Automation Platform, исторически называвшийся Ansible Tower. Оба используют job templates, inventories, credentials, schedules, workflows, API и RBAC.",
     "id": 269
   },
   {
     "topic": "Ansible",
     "level": "Senior",
-    "q": "Что такое molecule для Ansible?",
+    "q": "Для чего используют Ansible Molecule?",
     "options": [
-      "Пакетный менеджер ролей",
-      "Фреймворк тестирования ролей в Docker/Vagrant с проверкой через testinfra/goss",
-      "Утилита дебага",
-      "Тип инвентаря"
+      "Для установки content из Galaxy по requirements",
+      "Для сценарного тестирования Ansible content",
+      "Для хранения inventory и runtime facts",
+      "Для управления production jobs через RBAC"
     ],
     "answer": 1,
-    "explanation": "molecule test: create → converge → verify → destroy. Тесты на pytest/testinfra. Интегрируется с CI для автоматической проверки ролей.",
+    "explanation": "Molecule строит сценарии тестирования roles и collections на стандартных inventory и playbooks Ansible. Target может быть container, VM, cloud service, API или другое доступное окружение. Последовательность molecule test настраивается и обычно создаёт среду, применяет content, проверяет результат и удаляет ресурсы.",
     "id": 270
   },
   {
