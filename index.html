@@ -58,9 +58,9 @@
       <h1 id="page-title">Загрузка...</h1>
     </div>
     <div class="topbar-right">
-      <button class="btn btn-outline btn-sm" onclick="openCheatSheet()" title="Шпаргалки (клавиша ?)">📋 Шпаргалки</button>
+      <button class="btn btn-outline btn-sm" data-modal-trigger="cheatsheet-modal" onclick="openCheatSheet()" title="Шпаргалки (клавиша ?)">📋 Шпаргалки</button>
       <span class="score-display" id="streak-display">🔥 0</span>
-      <button class="btn btn-outline btn-sm" onclick="openCustomModal()">+ Свой вопрос</button>
+      <button class="btn btn-outline btn-sm" data-modal-trigger="custom-modal" onclick="openCustomModal()">+ Свой вопрос</button>
     </div>
   </div>
   <div id="update-banner" style="display:none;background:var(--primary-dim);color:var(--primary-h);text-align:center;padding:8px;font-size:13px;font-weight:600;cursor:pointer" onclick="applyAppUpdate()">
@@ -237,9 +237,9 @@
 </div>
 
 <!-- CUSTOM MODAL -->
-<div class="modal-overlay" id="custom-modal">
-  <div class="modal">
-    <h3>➕ Добавить свой вопрос</h3>
+<div class="modal-overlay" id="custom-modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="custom-modal-title" tabindex="-1">
+    <h3 id="custom-modal-title">➕ Добавить свой вопрос</h3>
     <div class="form-group"><label>Тема</label><select class="form-input" id="cq-topic"></select></div>
     <div class="form-group"><label>Уровень</label><select class="form-input" id="cq-level"><option>Junior</option><option>Middle</option><option>Senior</option></select></div>
     <div class="form-group"><label>Категория</label><select class="form-input" id="cq-category"><option value="definition">Определение</option><option value="scenario">Сценарий</option><option value="tradeoff">Trade-off</option></select></div>
@@ -258,10 +258,10 @@
 </div>
 
 <!-- CHEAT SHEET MODAL -->
-<div class="modal-overlay" id="cheatsheet-modal">
-  <div class="modal" style="max-width:700px;max-height:85vh">
+<div class="modal-overlay" id="cheatsheet-modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cheatsheet-modal-title" tabindex="-1" style="max-width:700px;max-height:85vh">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <h3 style="margin:0">📋 Шпаргалки</h3>
+      <h3 id="cheatsheet-modal-title" style="margin:0">📋 Шпаргалки</h3>
       <button class="btn-icon" onclick="closeCheatSheet()" style="font-size:18px" aria-label="Закрыть шпаргалки">✕</button>
     </div>
     <div class="filter-row" id="cheat-tabs" style="margin-bottom:12px;flex-wrap:wrap"></div>
@@ -270,9 +270,9 @@
 </div>
 
 <!-- ONBOARDING MODAL -->
-<div class="modal-overlay" id="onboarding-modal">
-  <div class="modal" style="max-width:420px">
-    <h3>🚀 Добро пожаловать в Interview Prep Max</h3>
+<div class="modal-overlay" id="onboarding-modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="onboarding-modal-title" tabindex="-1" style="max-width:420px">
+    <h3 id="onboarding-modal-title">🚀 Добро пожаловать в Interview Prep Max</h3>
     <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Ответьте на 3 вопроса, чтобы приложение построило ваш персональный план подготовки.</p>
     <div class="form-group"><label>🎯 Целевая роль</label>
       <select class="form-input" id="onb-role"><option value="DevOps">DevOps Engineer</option><option value="SRE">SRE</option><option value="Platform">Platform Engineer</option><option value="Cloud">Cloud Engineer</option></select></div>

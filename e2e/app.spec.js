@@ -9,6 +9,14 @@ async function setProgress(page, values) {
   }, values);
 }
 
+async function installManualClock(page) {
+  await page.addInitScript(() => {
+    window.__testNow = Date.now();
+    Date.now = () => window.__testNow;
+    window.__advanceNow = milliseconds => { window.__testNow += milliseconds; };
+  });
+}
+
 test('builds a focused session from onboarding', async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
   await page.goto('/');
@@ -45,6 +53,43 @@ test('records a Mock Interview rating in the skill-event journal', async ({ page
   await page.locator('#mock-next-btn').click();
   const events = await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_skill_events')));
   expect(events.some(event => event.source === 'mock' && event.score === 1)).toBeTruthy();
+});
+
+test('keeps focus inside dialogs and restores it after Escape', async ({ page }) => {
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+
+  const trigger = page.locator('[data-modal-trigger="custom-modal"]');
+  await trigger.click();
+  const dialog = page.getByRole('dialog', { name: '➕ Добавить свой вопрос' });
+  await expect(dialog).toBeVisible();
+  await expect(page.locator('#cq-topic')).toBeFocused();
+
+  await dialog.getByRole('button', { name: 'Сохранить' }).focus();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#cq-topic')).toBeFocused();
+
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+});
+
+test('uses wall-clock deadlines for Blitz and Mock Interview', async ({ page }) => {
+  await installManualClock(page);
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+
+  await page.locator('#blitz-btn').click();
+  await expect(page.locator('#blitz-timer')).toHaveText('5:00');
+  await page.evaluate(() => window.__advanceNow(240000));
+  await expect(page.locator('#blitz-timer')).toHaveText('1:00', { timeout: 2000 });
+
+  await page.locator('[data-page="home"]').click();
+  await page.locator('#mock-btn').click();
+  await expect(page.locator('#mock-timer')).toHaveText('30:00');
+  await page.evaluate(() => window.__advanceNow(125000));
+  await expect(page.locator('#questions-container')).toContainText('Вопрос 2/12', { timeout: 2000 });
+  await expect(page.locator('#mock-timer')).toHaveText('27:55');
 });
 
 test('imports a validated personal profile through the file control', async ({ page }) => {
