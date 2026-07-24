@@ -31,3 +31,20 @@ test('keeps the roadmap v5.1 assessment rules explicit', () => {
   assert.equal(studyTests.grading.weeklyTest.maxScore, 100);
   assert.equal(studyTests.grading.weeklyTest.passScore, 70);
 });
+
+test('exposes measurable V5.1 fields without changing stable week numbers', () => {
+  const studyMap = readTask('study_map.json');
+  const prerequisiteWeeks = studyMap.weeks.filter(week => week.prerequisites).map(week => week.week);
+  const lifecycleWeeks = studyMap.weeks.filter(week => week.technologyStatus).map(week => week.week);
+
+  assert.deepEqual(studyMap.weeks.map(week => week.week), Array.from({ length: 32 }, (_, index) => index + 1));
+  studyMap.weeks.forEach(week => {
+    assert.equal(week.curriculumVersion, studyMap.version);
+    assert.equal(week.completionCriteria.length, 4);
+    assert.equal(week.aiTrack.optional, true);
+    assert.ok(week.aiTrack.title);
+    assert.ok(week.aiTrack.result);
+  });
+  assert.deepEqual(prerequisiteWeeks, [6, 11, 15, 17, 25]);
+  assert.deepEqual(lifecycleWeeks, [11, 18, 19, 20, 21, 22]);
+});
