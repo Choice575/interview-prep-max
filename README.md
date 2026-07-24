@@ -27,6 +27,7 @@ ai-coach.js         — приватный клиентский контракт
 coach-ui.js         — UI персонального тренера, weekly review, журнал и AI-разбор
 progress.js         — единый SRS и журнал попыток по всем форматам тренировки
 progress-io.js      — безопасный экспорт, проверка и транзакционный импорт прогресса
+analytics-ui.js     — UI аналитики, готовности и рекомендованных вопросов
 server.js           — статический Node-сервер и same-origin API-прокси для внешнего AI
 server/ai-service.js — адаптер OpenAI-compatible провайдера; секреты остаются на сервере
 styles.css          — стили (тёмная/светлая тема, responsive)

@@ -933,127 +933,23 @@ function renderMasteryCards(){
 }
 
 // ═══ ANALYTICS ═══
-function renderAnalytics(){
-  const stats=lsGet('stats',{total:0,correct:0});const qprog=getQProg(),allQ=getAllQ(),mistakes=getMistakes();
-  if(!stats.total){
-    document.getElementById('stat-cards').innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="icon">📊</div><p>Статистика появится после первых ответов</p><button class="btn btn-primary btn-sm" onclick="nav(\'exam\')">⚡ Начать экзамен</button><button class="btn btn-outline btn-sm" onclick="startDiagnostic()" style="margin-left:8px">🔬 Пройти диагностику</button></div>';
-    return;
-  }
-  const pct=stats.total?Math.round(stats.correct/stats.total*100):0;
-  let totalTime=0,totalCount=0;
-  Object.values(qprog).forEach(p=>{if(p.times){p.times.forEach(t=>{totalTime+=t;totalCount++;});}});
-  const avgTime=totalCount?Math.round(totalTime/totalCount):0;
-  document.getElementById('stat-cards').innerHTML=[
-    {v:stats.total,l:'Всего ответов',c:'var(--primary)'},{v:stats.correct,l:'Правильных',c:'var(--green)'},
-    {v:stats.total-stats.correct,l:'Неправильных',c:'var(--red)'},{v:pct+'%',l:'Точность',c:'var(--yellow)'},
-    {v:Object.keys(mistakes).length,l:'В ошибках',c:'var(--red)'},{v:lsGet('streak_best',0),l:'Лучшая серия',c:'var(--orange)'},
-    {v:avgTime+'с',l:'Среднее время ответа',c:'var(--primary-h)'}
-  ].map(s=>'<div class="stat-card"><div class="stat-val" style="color:'+s.c+'">'+s.v+'</div><div class="stat-label">'+s.l+'</div></div>').join('');
-  const hist=lsGet('history',[]);
-  document.getElementById('history-list').innerHTML=hist.length?hist.map(h=>'<div class="history-item"><span style="color:var(--text3);font-size:11px">'+esc(h.date)+'</span><span class="tag '+(TAG_MAP[h.topic]?'tag-'+(TAG_MAP[h.topic]):'tag-tf')+'">'+esc(h.topic||'')+'</span><span style="color:'+(h.correct?'var(--green)':'var(--red)')+'">'+(h.correct?'✅':'❌')+'</span></div>').join(''):'<p style="color:var(--text3);font-size:13px;padding:10px">Нет данных</p>';
-  let ok=0,err=0;const tot=allQ.length;
-  allQ.forEach(q=>{const p=qprog[q.id];if(p){if(p.correct>p.wrong)ok++;else if(p.wrong>0)err++;}});
-  document.getElementById('analytics-seg-bar').innerHTML='<div class="seg-ok" style="width:'+(ok/tot*100)+'%"></div><div class="seg-err" style="width:'+(err/tot*100)+'%"></div><div class="seg-none" style="width:'+((tot-ok-err)/tot*100)+'%"></div>';
-  document.getElementById('analytics-seg-label').textContent='✅ Изучено: '+ok+' | ❌ Ошибки: '+err+' | ⭕ Не отвечено: '+(tot-ok-err)+' из '+tot;
-  drawRadar();renderTimeChart();renderCategoryStats();renderWeakSpots();renderGradeReadiness();renderReadinessScore();renderNextQuestions();
+const analyticsUI=typeof IPMaxAnalyticsUI!=='undefined'?IPMaxAnalyticsUI.create({
+  get:(key,fallback)=>lsGet(key,fallback),getQuestionProgress:getQProg,getQuestions:getAllQ,getMistakes,getTopics:getAllTopics,
+  escape:esc,tagMap:TAG_MAP,localDateKey:timestamp=>IPMaxDate.localDateKey(timestamp),
+  startExam:()=>nav('exam'),startDiagnostic,
+  startQuestion:question=>startAnalyticsQuestions([question]),
+  startQuestions:startAnalyticsQuestions
+}):null;
+function requireAnalyticsUI(){if(!analyticsUI) throw new Error('Модуль аналитики не загружен.');return analyticsUI;}
+function startAnalyticsQuestions(questions){
+  const ids=(Array.isArray(questions)?questions:[]).map(question=>question&&question.id).filter(id=>id!==undefined&&id!==null);
+  if(!ids.length) return;
+  resetCoachSelection();coachQuestionIds=ids;
+  currentTopic='all';currentLevel='all';currentCategory='all';currentMode='all';currentView='standard';interviewMode=false;cameFromStudy=false;
+  nav('exam');
 }
-function drawRadar(){
-  const canvas=document.getElementById('radarCanvas');if(!canvas) return;const ctx=canvas.getContext('2d');
-  const qprog=getQProg(),allQ=getAllQ();const topics=getAllTopics().slice(0,8);const N=topics.length;
-  const scores=topics.map(t=>{const tqs=allQ.filter(q=>q.topic===t);if(!tqs.length) return 0;return tqs.filter(q=>{const p=qprog[q.id];return p&&p.correct>p.wrong;}).length/tqs.length;});
-  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,R=Math.min(W,H)/2-36;
-  const dark=document.documentElement.getAttribute('data-theme')!=='light';
-  ctx.clearRect(0,0,W,H);
-  const ang=i=>i*2*Math.PI/N-Math.PI/2;
-  for(let r=1;r<=5;r++){ctx.beginPath();for(let i=0;i<N;i++){const a=ang(i),rv=r*R/5;i===0?ctx.moveTo(cx+Math.cos(a)*rv,cy+Math.sin(a)*rv):ctx.lineTo(cx+Math.cos(a)*rv,cy+Math.sin(a)*rv);}ctx.closePath();ctx.strokeStyle=dark?'#2e3348':'#e2e8f0';ctx.lineWidth=1;ctx.stroke();}
-  for(let i=0;i<N;i++){ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(ang(i))*R,cy+Math.sin(ang(i))*R);ctx.strokeStyle=dark?'#2e3348':'#e2e8f0';ctx.stroke();}
-  ctx.beginPath();scores.forEach((s,i)=>{const a=ang(i),r=s*R;i===0?ctx.moveTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r):ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);});ctx.closePath();ctx.fillStyle='rgba(99,102,241,.25)';ctx.fill();ctx.strokeStyle='#6366f1';ctx.lineWidth=2;ctx.stroke();
-  ctx.textAlign='center';ctx.font='bold 10px Inter';ctx.fillStyle=dark?'#94a3b8':'#475569';
-  topics.forEach((t,i)=>{const a=ang(i);ctx.fillText(t,cx+Math.cos(a)*(R+28),cy+Math.sin(a)*(R+28)+4);});
-  scores.forEach((s,i)=>{const a=ang(i),r=s*R;ctx.beginPath();ctx.arc(cx+Math.cos(a)*r,cy+Math.sin(a)*r,4,0,Math.PI*2);ctx.fillStyle='#6366f1';ctx.fill();});
-}
-function renderTimeChart(){
-  const daily=lsGet('daily',{});const bars=document.getElementById('act-bars');const totalEl=document.getElementById('act-total');if(!bars) return;
-  const days=14;const today=new Date();let maxVal=1,total=0;const data=[];
-  for(let i=days-1;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);const key=IPMaxDate.localDateKey(d.getTime());const cnt=daily[key]||0;data.push({key,cnt,label:d.toLocaleDateString('ru',{day:'numeric',month:'numeric'})});if(cnt>maxVal)maxVal=cnt;total+=cnt;}
-  bars.innerHTML=data.map(d=>{const h=Math.max(2,Math.round(d.cnt/maxVal*68));return '<div class="ab-wrap"><div class="ab-cnt">'+(d.cnt||'')+'</div><div class="ab-fill" style="height:'+h+'px"></div><div class="ab-lbl">'+d.label+'</div></div>';}).join('');
-  if(totalEl) totalEl.textContent='Всего за 14 дней: '+total+' ответов';
-}
-function renderCategoryStats(){
-  const el=document.getElementById('cat-stat-rows');if(!el) return;const qprog=getQProg(),allQ=getAllQ();
-  const cats=[{id:'definition',label:'Определение'},{id:'scenario',label:'Сценарий'},{id:'tradeoff',label:'Trade-off'}];
-  el.innerHTML=cats.map(c=>{const qs=allQ.filter(q=>(q.category||'definition')===c.id);if(!qs.length) return '';const ok=qs.filter(q=>{const p=qprog[q.id];return p&&p.correct>p.wrong;}).length;const pct=Math.round(ok/qs.length*100);return '<div class="cat-row"><div class="cat-row-lbl">'+c.label+' ('+qs.length+')</div><div class="cat-row-bar"><div class="cat-row-fill" style="width:'+pct+'%"></div></div><div class="cat-row-pct">'+pct+'%</div></div>';}).join('');
-}
-function renderWeakSpots(){
-  const el=document.getElementById('weak-spots-list');if(!el) return;const qprog=getQProg(),allQ=getAllQ();
-  const weak=allQ.map(q=>{const p=qprog[q.id];if(!p||p.wrong===0) return null;const total=p.correct+p.wrong;if(total<2) return null;return {q,wrong:p.wrong,total,pct:Math.round(p.wrong/total*100)};}).filter(Boolean).sort((a,b)=>b.pct-a.pct).slice(0,5);
-  if(!weak.length){el.innerHTML='<p style="font-size:12px;color:var(--text3)">Ответьте хотя бы на 2 вопроса, чтобы увидеть слабые места.</p>';return;}
-  el.innerHTML=weak.map(w=>'<div class="weak-item"><span class="weak-pct">'+w.pct+'%</span><span class="weak-txt" title="'+esc(w.q.q)+'">'+esc(w.q.q.slice(0,60))+(w.q.q.length>60?'…':'')+'</span><span style="font-size:10px;color:var(--text3)">'+w.wrong+'/'+w.total+'</span></div>').join('');
-}
-
-// ═══ GRADE READINESS ═══
-function renderGradeReadiness(){
-  const el=document.getElementById('weak-spots-list');if(!el) return;
-  const qprog=getQProg(),allQ=getAllQ();
-  const grades={Junior:{qs:[],ok:0},Middle:{qs:[],ok:0},Senior:{qs:[],ok:0}};
-  allQ.forEach(q=>{const lvl=q.level||'Junior';if(grades[lvl]){grades[lvl].qs.push(q);const p=qprog[q.id];if(p&&p.correct>p.wrong)grades[lvl].ok++;}});
-  // Добавляем карточку после weak-spots
-  const card=document.getElementById('grade-readiness-card');
-  const container=document.getElementById('analytics-three');
-  if(!container||card) return;
-  const div=document.createElement('div');div.className='card';div.id='grade-readiness-card';
-  div.innerHTML='<div class="card-title">🎯 Готовность по грейдам</div>'+
-    Object.entries(grades).map(([g,d])=>{
-      const pct=d.qs.length?Math.round(d.ok/d.qs.length*100):0;
-      const barClr=pct>=70?'var(--green)':pct>=40?'var(--yellow)':'var(--red)';
-      return '<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">'+g+'</span><span style="color:var(--text2)">'+d.ok+'/'+d.qs.length+' ('+pct+'%)</span></div><div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+barClr+';border-radius:3px"></div></div></div>';
-    }).join('')+
-    '<div style="font-size:11px;color:var(--text3);margin-top:8px">Оценка: ≥70% Junior → готов к Middle, ≥70% Middle → готов к Senior</div>';
-  container.appendChild(div);
-}
-
-function renderReadinessScore(){
-  const el=document.getElementById('readiness-content');if(!el) return;
-  const qprog=getQProg(),allQ=getAllQ();
-  const answered=allQ.filter(q=>{const p=qprog[q.id];return p&&(p.correct+p.wrong)>0;});
-  if(!answered.length){el.innerHTML='<p style="color:var(--text3);font-size:13px">Ответьте хотя бы на 10 вопросов для оценки готовности.</p>';return;}
-  const ok=answered.filter(q=>{const p=qprog[q.id];return p&&p.correct>p.wrong;});
-  const score=Math.round(ok.length/answered.length*100);
-  const tier=score>=80?'🟢 Высокая':score>=50?'🟡 Средняя':'🔴 Низкая';
-  const tip=score>=80?'Можно пробовать собеседование Middle':score>=50?'Закройте слабые темы и повторите ошибки':'Сосредоточьтесь на базовых темах и регулярной практике';
-  el.innerHTML='<div style="font-size:48px;font-weight:800;color:var(--primary-h);margin-bottom:6px">'+score+'%</div>'+
-    '<div style="font-size:16px;font-weight:700;margin-bottom:8px">'+tier+'</div>'+
-    '<div style="font-size:12px;color:var(--text2);max-width:300px;margin:0 auto">'+tip+'</div>'+
-    '<div style="font-size:11px;color:var(--text3);margin-top:8px">'+ok.length+'/'+answered.length+' вопросов освоено</div>';
-}
-
-function renderNextQuestions(){
-  const el=document.getElementById('next-questions-list');if(!el) return;
-  const qprog=getQProg(),allQ=getAllQ();
-  const weak=allQ.filter(q=>{const p=qprog[q.id];return !p||p.wrong>=p.correct;});
-  if(!weak.length){
-    el.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 0">Все вопросы освоены! Пройдите Senior Simulator.</p>';
-    return;
-  }
-  const byTopic={};weak.forEach(q=>{byTopic[q.topic]=(byTopic[q.topic]||[]);byTopic[q.topic].push(q);});
-  const pick=[];const topics=Object.keys(byTopic).sort((a,b)=>byTopic[a].length-byTopic[b].length);
-  for(const t of topics){
-    const qs=byTopic[t];pick.push(qs[Math.floor(Math.random()*qs.length)]);
-    if(pick.length>=10) break;
-  }
-  el.innerHTML=pick.map((q,i)=>'<button type="button" class="weak-item" data-next-question="'+i+'" style="width:100%;cursor:pointer;border:0">'+
-    '<span style="font-size:11px;color:var(--text3);min-width:20px">#'+(i+1)+'</span>'+
-    '<span class="weak-txt" title="'+esc(q.q)+'" style="text-align:left">'+esc(q.q.slice(0,70))+(q.q.length>70?'…':'')+'</span>'+
-    '<span style="font-size:10px;color:var(--primary-h)">'+esc(q.topic)+'</span></button>').join('')+
-    '<div style="text-align:center;margin-top:8px"><button class="btn btn-primary btn-sm" onclick="currentMode=\'mix10\';nav(\'exam\')">⚡ Пройти эти 10</button></div>';
-  el.querySelectorAll('[data-next-question]').forEach(button=>{
-    const question=pick[Number(button.dataset.nextQuestion)];
-    button.addEventListener('click',()=>{
-      currentTopic=question.topic;currentLevel='all';currentMode='all';nav('exam');
-    });
-  });
-}
-
+function renderAnalytics(){return requireAnalyticsUI().renderAnalytics();}
+function renderReadinessHome(){return requireAnalyticsUI().renderReadinessHome();}
 // ═══ SUBNET ═══
 let subnetDone={};
 function calcSubnet(ip,prefix){
@@ -1543,7 +1439,7 @@ document.addEventListener('keydown',function(e){
 
 // ═══ OFFLINE READINESS CHECK ═══
 async function checkOfflineReady(){
-  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./analytics-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','labs','tips','incidents','study_map','study_tests','senior_cases','best_practices'];
   tasks.forEach(t=>files.push('./tasks/'+t+'.json'));
   let ok=0,fail=0;const results=[];
@@ -1577,21 +1473,6 @@ function applyAppUpdate(){
 // Запуск
 initApp();
 
-function renderReadinessHome(){
-  const el=document.getElementById('daily-plan-card');if(!el) return;
-  const qprog=getQProg(),allQ=getAllQ();
-  const answered=allQ.filter(q=>{const p=qprog[q.id];return p&&(p.correct+p.wrong)>0;});
-  if(!answered.length) return;
-  const ok=answered.filter(q=>{const p=qprog[q.id];return p&&p.correct>p.wrong;});
-  const score=Math.round(ok.length/answered.length*100);
-  const tier=score>=80?'🟢':score>=50?'🟡':'🔴';
-  const c=document.getElementById('daily-plan-content');
-  if(!document.getElementById('home-readiness')){
-    const div=document.createElement('div');div.id='home-readiness';div.className='home-readiness-row';
-    div.innerHTML='<span>🎯 Готовность</span><span class="home-readiness-score">'+tier+' '+score+'%</span>';
-    c.appendChild(div);
-  }
-}
 function toggleMasteryGrid(){
   const grid=document.getElementById('mastery-cards');
   const btn=document.getElementById('toggle-mastery-btn');

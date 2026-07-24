@@ -181,7 +181,7 @@ test('exports a versioned progress backup through the extracted module', async (
   const backup = JSON.parse(Buffer.concat(chunks).toString('utf8'));
 
   expect(download.suggestedFilename()).toMatch(/^ipmax_\d{4}-\d{2}-\d{2}\.json$/);
-  expect(backup.version).toBe('12.9.0');
+  expect(backup.version).toBe('12.10.0');
   expect(backup.qprog['1']).toEqual({ correct: 2, wrong: 1 });
   expect(backup.onboarding.role).toBe(profile.role);
 });
@@ -264,6 +264,26 @@ test('does not execute imported question data as an inline handler', async ({ pa
   await recommendation.click();
   expect(await page.evaluate(() => window.__importXss)).toBeUndefined();
   await expect(page.locator('#questions-container .q-card')).toHaveCount(1);
+});
+
+test('opens exactly the questions shown in analytics recommendations', async ({ page }) => {
+  await setProgress(page, {
+    ipmax_onboarding: profile,
+    ipmax_onboarding_complete: true,
+    ipmax_stats: { total: 1, correct: 0 },
+    ipmax_qprog: { 1: { correct: 0, wrong: 1 } }
+  });
+  await page.goto('/');
+  await page.locator('[data-page="analytics"]').click();
+  await expect(page.locator('#grade-readiness-card')).toBeVisible();
+  const recommendations = page.locator('[data-next-question]');
+  await expect(recommendations).toHaveCount(10);
+  const expectedIds = (await recommendations.evaluateAll(buttons => buttons.map(button => button.dataset.questionId))).sort();
+
+  await page.locator('[data-analytics-action="start-recommended"]').click();
+  await expect(page.locator('#questions-container .q-card')).toHaveCount(10);
+  const actualIds = (await page.locator('#questions-container .q-card').evaluateAll(cards => cards.map(card => card.id.replace('qcard-', '')))).sort();
+  expect(actualIds).toEqual(expectedIds);
 });
 
 test('defers exam cards and renders the full list in batches', async ({ page }) => {

@@ -9,7 +9,7 @@ const contentTypes = {
   '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json', '.png': 'image/png'
 };
 const publicFiles = new Set([
-  'index.html', 'styles.css', 'version.js', 'date.js', 'storage.js', 'progress.js', 'coach.js', 'ai-coach.js', 'progress-io.js', 'sw.js',
+  'index.html', 'styles.css', 'version.js', 'date.js', 'storage.js', 'progress.js', 'coach.js', 'ai-coach.js', 'progress-io.js', 'analytics-ui.js', 'sw.js',
   'coach-ui.js', 'app.js', 'interview-prep-max.webmanifest', 'assets/icon-192.png', 'assets/icon-512.png',
   'tasks/base_questions.json', 'tasks/subnet.json', 'tasks/ts.json', 'tasks/cmd.json', 'tasks/code.json',
   'tasks/git.json', 'tasks/regex.json', 'tasks/ansible_pb.json', 'tasks/dockerfile.json', 'tasks/k8s.json',

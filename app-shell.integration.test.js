@@ -26,7 +26,7 @@ test('serves the complete app shell and personal-coach modules', async () => {
   }).on('error', reject));
 
   try {
-    const [html, dates, tracker, coach, aiCoach, progressIo, coachUi, app, questions, practices] = await Promise.all(['/', '/date.js', '/progress.js', '/coach.js', '/ai-coach.js', '/progress-io.js', '/coach-ui.js', '/app.js', '/tasks/base_questions.json', '/tasks/best_practices.json'].map(request));
+    const [html, dates, tracker, coach, aiCoach, progressIo, analyticsUi, coachUi, app, questions, practices] = await Promise.all(['/', '/date.js', '/progress.js', '/coach.js', '/ai-coach.js', '/progress-io.js', '/analytics-ui.js', '/coach-ui.js', '/app.js', '/tasks/base_questions.json', '/tasks/best_practices.json'].map(request));
     assert.ok(html.indexOf('./date.js') < html.indexOf('./coach.js'));
     assert.match(dates, /localDateKey/);
     assert.ok(html.indexOf('./progress.js') < html.indexOf('./coach.js'));
@@ -34,9 +34,11 @@ test('serves the complete app shell and personal-coach modules', async () => {
     assert.match(coach, /skillEvents/);
     assert.ok(html.indexOf('./coach.js') < html.indexOf('./ai-coach.js'));
     assert.ok(html.indexOf('./ai-coach.js') < html.indexOf('./progress-io.js'));
-    assert.ok(html.indexOf('./progress-io.js') < html.indexOf('./coach-ui.js'));
+    assert.ok(html.indexOf('./progress-io.js') < html.indexOf('./analytics-ui.js'));
+    assert.ok(html.indexOf('./analytics-ui.js') < html.indexOf('./coach-ui.js'));
     assert.match(aiCoach, /buildReviewPayload/);
     assert.match(progressIo, /validateProgressImport/);
+    assert.match(analyticsUi, /selectNextQuestions/);
     assert.ok(html.indexOf('./coach-ui.js') < html.indexOf('./app.js'));
     assert.match(coachUi, /data-coach-action="start-control"/);
     assert.match(app, /recordQuestionResult/);

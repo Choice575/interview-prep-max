@@ -164,7 +164,7 @@
     <div class="analytics-grid" id="stat-cards"></div>
     <div class="analytics-two"><div class="card"><div class="card-title">Охват по темам</div><canvas id="radarCanvas" width="300" height="300"></canvas></div><div class="card"><div class="card-title">История ответов</div><div id="history-list" style="max-height:240px;overflow-y:auto"></div></div></div>
     <div class="card"><div class="card-title">Прогресс по вопросам</div><div class="prog-bar" id="analytics-seg-bar" style="height:12px"></div><div style="font-size:12px;color:var(--text2);margin-top:7px" id="analytics-seg-label"></div></div>
-    <div class="analytics-three"><div class="card"><div class="card-title">📅 Активность за 14 дней</div><div class="activity-bars" id="act-bars"></div><div style="font-size:11px;color:var(--text3);margin-top:4px;text-align:center" id="act-total"></div></div><div class="card"><div class="card-title">🏷 Прогресс по категориям</div><div id="cat-stat-rows"></div></div><div class="card"><div class="card-title">⚠️ Топ-5 слабых мест</div><div id="weak-spots-list"></div></div></div>
+    <div class="analytics-three" id="analytics-three"><div class="card"><div class="card-title">📅 Активность за 14 дней</div><div class="activity-bars" id="act-bars"></div><div style="font-size:11px;color:var(--text3);margin-top:4px;text-align:center" id="act-total"></div></div><div class="card"><div class="card-title">🏷 Прогресс по категориям</div><div id="cat-stat-rows"></div></div><div class="card"><div class="card-title">⚠️ Топ-5 слабых мест</div><div id="weak-spots-list"></div></div></div>
     <div class="sep"></div>
     <div class="analytics-two" id="analytics-actionable">
       <div class="card" id="readiness-card"><div class="card-title">🎯 Готовность к собеседованию</div><div style="text-align:center;padding:10px 0" id="readiness-content"></div></div>
@@ -347,6 +347,7 @@
 <script src="./coach.js"></script>
 <script src="./ai-coach.js"></script>
 <script src="./progress-io.js"></script>
+<script src="./analytics-ui.js"></script>
 <script src="./coach-ui.js"></script>
 <script src="./app.js"></script>
 </body>
