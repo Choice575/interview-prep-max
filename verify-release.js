@@ -24,9 +24,28 @@ const dateScriptIndex = html.indexOf('<script src="./date.js"></script>');
 const storageScriptIndex = html.indexOf('<script src="./storage.js"></script>');
 const progressScriptIndex = html.indexOf('<script src="./progress.js"></script>');
 const coachScriptIndex = html.indexOf('<script src="./coach.js"></script>');
+const coachUiScriptIndex = html.indexOf('<script src="./coach-ui.js"></script>');
 const appScriptIndex = html.indexOf('<script src="./app.js"></script>');
-expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && appScriptIndex > coachScriptIndex, 'index.html должен загружать version.js, date.js, storage.js, progress.js, coach.js и app.js в этом порядке');
+expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && coachUiScriptIndex > coachScriptIndex && appScriptIndex > coachUiScriptIndex, 'index.html должен загружать version.js, date.js, storage.js, progress.js, coach.js, coach-ui.js и app.js в этом порядке');
 expect(manifest.start_url === './' && manifest.scope === './', 'manifest должен использовать относительные start_url и scope');
+
+const requiredIcons = [
+  { src: './assets/icon-192.png', size: 192, sizes: '192x192', purpose: 'any' },
+  { src: './assets/icon-512.png', size: 512, sizes: '512x512', purpose: 'any maskable' }
+];
+requiredIcons.forEach(icon => {
+  const declared = manifest.icons.find(candidate => candidate.src === icon.src && candidate.sizes === icon.sizes && candidate.type === 'image/png' && candidate.purpose === icon.purpose);
+  const target = path.join(root, icon.src.slice(2));
+  expect(!!declared, `manifest не содержит ${icon.sizes} PNG-иконку`);
+  expect(fs.existsSync(target), `отсутствует ${icon.src}`);
+  if (fs.existsSync(target)) {
+    const image = fs.readFileSync(target);
+    expect(image.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])), `${icon.src} не является PNG`);
+    expect(image.readUInt32BE(16) === icon.size && image.readUInt32BE(20) === icon.size, `${icon.src} должен быть ${icon.sizes}`);
+  }
+});
+expect(html.includes('<link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png">'), 'index.html должен использовать физическую PNG-иконку');
+expect(html.includes('<link rel="apple-touch-icon" href="./assets/icon-192.png">'), 'index.html должен содержать apple-touch-icon');
 
 const dataFilesBlock = app.match(/const DATA_FILES = \{([\s\S]*?)\n\};/);
 expect(!!dataFilesBlock, 'не найден DATA_FILES в app.js');
@@ -37,7 +56,7 @@ dataFiles.forEach(file => expect(fs.existsSync(path.join(root, file)), `отсу
 const assetsBlock = sw.match(/const ASSETS = \[([\s\S]*?)\];/);
 expect(!!assetsBlock, 'не найден ASSETS в sw.js');
 const assets = assetsBlock ? [...assetsBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
-['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './app.js', './interview-prep-max.webmanifest'].forEach(file => {
+['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
   expect(assets.includes(file), `offline-кеш не содержит ${file}`);
 });
 dataFiles.forEach(file => expect(assets.includes('./' + file), `offline-кеш не содержит ./${file}`));

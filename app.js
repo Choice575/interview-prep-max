@@ -174,18 +174,25 @@ function getCoachPlan(){
   if(!profile||typeof InterviewCoach==='undefined'||typeof InterviewCoach.buildPlan!=='function') return null;
   return InterviewCoach.buildPlan({questions:getAllQ(),progress:getQProg(),skillEvents:getSkillEvents(),profile,now:Date.now()});
 }
-function pluralDays(value){
-  const lastTwo=value%100,last=value%10;
-  if(lastTwo>10&&lastTwo<20) return 'дней';
-  if(last===1) return 'день';
-  if(last>1&&last<5) return 'дня';
-  return 'дней';
+function getCoachJournal(){
+  const notes=lsGet('coach_journal',[]);
+  return Array.isArray(notes)&&typeof InterviewCoach!=='undefined'?notes.filter(InterviewCoach.isJournalEntry):[];
 }
-function formatInterviewTiming(daysUntil){
-  if(daysUntil===null) return 'Дата интервью не задана';
-  if(daysUntil<0) return 'Дата интервью уже прошла';
-  if(daysUntil===0) return 'Интервью сегодня';
-  return 'Интервью через '+daysUntil+' '+pluralDays(daysUntil);
+function setCoachProfile(profile){
+  if(!appStorage||typeof appStorage.setMany!=='function') return false;
+  return appStorage.setMany({onboarding:profile,onboarding_complete:true}).ok;
+}
+function configureCoachUI(){
+  if(typeof InterviewCoachUI==='undefined'||typeof InterviewCoach==='undefined') return false;
+  InterviewCoachUI.configure({
+    coach:InterviewCoach,escape:esc,getPlan:getCoachPlan,getProfile:getOnboardingProfile,
+    normaliseProfile:normalizeOnboardingProfile,setProfile:setCoachProfile,
+    getJournal:getCoachJournal,setJournal:notes=>lsSet('coach_journal',notes),getTopics:getAllTopics,
+    openModal:openAccessibleModal,closeModal:closeAccessibleModal,refresh:renderHome,
+    startFocus:startCoachFocus,startReview:startCoachReviewMode,startControl:startCoachControlMode,
+    now:()=>Date.now(),alert:message=>alert(message),confirm:message=>confirm(message)
+  });
+  return true;
 }
 
 // Динамический список тем (из данных, а не захардкожен)
@@ -202,6 +209,7 @@ let interviewMode=false;
 let cameFromStudy=false;
 let updateReloadPending=false;
 let coachSessionLimit=0;
+let coachQuestionIds=null;
 let currentPracticeTopic='';
 const QUESTION_BATCH_SIZE=60;
 let questionRenderLimit=QUESTION_BATCH_SIZE;
@@ -214,6 +222,7 @@ const PAGE_TITLES={home:'Главная',study:'Учёба',practices:'Best Prac
   git:'Git-тренажёр',regex:'Regex-тренажёр',tips:'Советы'};
 function nav(page){
   stopActiveSessions();
+  if(page!=='exam') coachQuestionIds=null;
   if(page!=='exam'&&page!=='study'){cameFromStudy=false;interviewMode=false;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i=>{i.classList.remove('active');i.removeAttribute('aria-current');});
@@ -241,7 +250,8 @@ function nav(page){
   if(page==='git') renderGit();
   if(page==='regex') renderRegex();
 }
-function startMode(m){coachSessionLimit=0;currentMode=m;document.querySelectorAll('#mode-chips .chip').forEach(c=>c.classList.remove('active'));nav('exam');}
+function resetCoachSelection(){coachSessionLimit=0;coachQuestionIds=null;}
+function startMode(m){resetCoachSelection();currentMode=m;document.querySelectorAll('#mode-chips .chip').forEach(c=>c.classList.remove('active'));nav('exam');}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebar-overlay').classList.toggle('open');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');}
 document.getElementById('sidebar-overlay').onclick=closeSidebar;
@@ -337,11 +347,11 @@ function highlightHCL(code){return esc(code).replace(/(resource|data|variable|ou
 
 // ═══ EXAM ═══
 function resetQuestionRenderLimit(){questionRenderLimit=QUESTION_BATCH_SIZE;}
-function setMode(m,el){coachSessionLimit=0;currentMode=m;resetQuestionRenderLimit();setChip('mode-chips',el);clearTInterval();renderQuestions();}
+function setMode(m,el){resetCoachSelection();currentMode=m;resetQuestionRenderLimit();setChip('mode-chips',el);clearTInterval();renderQuestions();}
 function setView(v,el){currentView=v;resetQuestionRenderLimit();setChip('view-chips',el);clearTInterval();renderQuestions();}
-function setTopic(t,el){coachSessionLimit=0;currentTopic=t;resetQuestionRenderLimit();setChip('topic-chips',el);renderQuestions();}
-function setLevel(l,el){coachSessionLimit=0;currentLevel=l;resetQuestionRenderLimit();setChip('level-chips',el);renderQuestions();}
-function setCategory(c,el){coachSessionLimit=0;currentCategory=c;resetQuestionRenderLimit();setChip('cat-chips',el);renderQuestions();}
+function setTopic(t,el){resetCoachSelection();currentTopic=t;resetQuestionRenderLimit();setChip('topic-chips',el);renderQuestions();}
+function setLevel(l,el){resetCoachSelection();currentLevel=l;resetQuestionRenderLimit();setChip('level-chips',el);renderQuestions();}
+function setCategory(c,el){resetCoachSelection();currentCategory=c;resetQuestionRenderLimit();setChip('cat-chips',el);renderQuestions();}
 function setTimer(s,el){timerSecs=s;setChip('timer-chips',el);}
 function setChip(groupId,el){document.querySelectorAll('#'+groupId+' .chip').forEach(c=>{c.classList.remove('active');c.removeAttribute('aria-pressed');});if(el){el.classList.add('active');el.setAttribute('aria-pressed','true');}}
 function clearMistakes(){if(confirm('Сбросить все ошибки?')){lsSet('mistakes',{});resetQuestionRenderLimit();renderQuestions();}}
@@ -357,6 +367,7 @@ function toggleInterviewMode(){
 
 function filterQs(){
   let qs=getAllQ();
+  if(Array.isArray(coachQuestionIds)&&coachQuestionIds.length){const ids=new Set(coachQuestionIds.map(String));qs=qs.filter(q=>ids.has(String(q.id)));}
   if(currentTopic!=='all') qs=qs.filter(q=>q.topic===currentTopic);
   if(currentLevel!=='all') qs=qs.filter(q=>q.level===currentLevel);
   if(currentCategory!=='all') qs=qs.filter(q=>(q.category||'definition')===currentCategory);
@@ -828,7 +839,7 @@ function markSeniorCaseDone(id){const p=lsGet('senior_case_prog',{});p[id]={stat
 // ═══ HOME ═══
 function updateStreakDisplay(){const sd=document.getElementById('streak-display');if(sd)sd.textContent='🔥 '+streak;}
 function renderHome(){
-  renderDailyPlan();
+  if(typeof InterviewCoachUI!=='undefined') InterviewCoachUI.render();
   renderReadinessHome();
   renderMasteryCards();
   const s=streak,best=lsGet('streak_best',0);
@@ -858,40 +869,28 @@ function renderHome(){
     }
   },100);
 }
-function renderDailyPlan(){
-  const el=document.getElementById('daily-plan-card');const c=document.getElementById('daily-plan-content');
-  if(!el||!c) return;
-  el.style.display='block';
-  const plan=getCoachPlan();
-  if(!plan){
-    c.innerHTML='<div class="coach-empty"><span>Укажите цель подготовки, чтобы получить персональный план.</span><button type="button" class="btn btn-primary btn-sm" data-modal-trigger="onboarding-modal" onclick="editOnboarding()">Настроить цель</button></div>';
-    return;
-  }
-  const focus=plan.focus;
-  const focusName=focus?esc(focus.topic):'Общий повтор';
-  const focusDetail=focus?(focus.practiceCount?focus.practiceScore+'% практика · '+focus.accuracy+'% тесты':focus.accuracy+'% точность · '+focus.coverage+'% охват'):'Начните с базового микса вопросов';
-  const focusAction=focus?' data-coach-topic="'+escAttr(focus.topic)+'" data-coach-page="'+escAttr(focus.action?.page||'')+'" onclick="startCoachSession(this.dataset.coachTopic,this.dataset.coachPage)"':'';
-  c.innerHTML='<div class="coach-head"><div><div class="coach-role">'+esc(plan.roleLabel)+' · '+esc(plan.level)+'</div><div class="coach-date">'+formatInterviewTiming(plan.daysUntil)+'</div></div>'+
-    '<button type="button" class="btn-icon" title="Изменить цель подготовки" aria-label="Изменить цель подготовки" data-modal-trigger="onboarding-modal" onclick="editOnboarding()">⚙</button></div>'+
-    '<div class="coach-metrics"><div class="coach-metric"><b>'+plan.sessionSize+'</b><span>вопросов сегодня</span></div><div class="coach-metric"><b>'+plan.dueCount+'</b><span>SRS к повторению</span></div><div class="coach-metric"><b>'+plan.targetAccuracy+'%</b><span>целевая точность</span></div></div>'+
-    '<div class="coach-focus"><span class="coach-focus-kicker">Главный фокус</span><strong>'+focusName+'</strong><span>'+focusDetail+'</span></div>'+
-    '<div class="coach-actions"><button type="button" class="btn btn-primary btn-sm"'+focusAction+'>Начать фокус</button>'+
-    '<button type="button" class="btn btn-outline btn-sm" onclick="startCoachReview()"'+(plan.dueCount?'':' disabled title="Нет повторений на сегодня"')+'>Повторить SRS ('+plan.dueCount+')</button></div>';
-}
-function startCoachSession(topic,trainerPage){
-  const plan=getCoachPlan();
+function startCoachFocus(topic,trainerPage,plan){
   if(!plan) return;
-  if(trainerPage){coachSessionLimit=0;nav(trainerPage);return;}
+  resetCoachSelection();
+  if(trainerPage){nav(trainerPage);return;}
   if(!getAllQ().some(q=>q.topic===topic)){alert('Для выбранной темы пока нет вопросов.');return;}
   coachSessionLimit=plan.sessionSize;
   currentTopic=topic;currentLevel='all';currentCategory='all';currentMode='smart';currentView='standard';interviewMode=false;cameFromStudy=false;
   nav('exam');
 }
-function startCoachReview(){
-  const plan=getCoachPlan();
+function startCoachReviewMode(plan){
   if(!plan||!plan.dueCount){alert('На сегодня нет запланированных повторений.');return;}
+  resetCoachSelection();
   coachSessionLimit=Math.min(plan.sessionSize,plan.dueCount);
   currentTopic='all';currentLevel='all';currentCategory='all';currentMode='srs';currentView='standard';interviewMode=false;cameFromStudy=false;
+  nav('exam');
+}
+function startCoachControlMode(plan){
+  const ids=plan?.controlSession?.questionIds;
+  if(!Array.isArray(ids)||!ids.length){alert('Пока недостаточно вопросов для контрольной сессии.');return;}
+  resetCoachSelection();
+  coachQuestionIds=ids;
+  currentTopic='all';currentLevel='all';currentCategory='all';currentMode='all';currentView='standard';interviewMode=true;cameFromStudy=false;
   nav('exam');
 }
 
@@ -1150,32 +1149,6 @@ function renderPortQ(){const undone=PORTS_TASKS.filter(p=>!ptDone[p.id]);if(!und
 function checkPort(){const inp=document.getElementById('pt-inp');const fb=document.getElementById('pt-feedback');const val=parseInt(inp.value);const correct=ptCurrent.port;const ok=val===correct;recordTrainerResult('ports','Сети',ok,'Ports');if(ok){ptDone[ptCurrent.id]=1;lsSet('pt_prog',ptDone);fb.style.display='block';fb.innerHTML='<span style="color:var(--green);font-weight:700">✅ Верно! '+correct+'</span>';updatePtProg();setTimeout(renderPortQ,800);}else{fb.style.display='block';fb.innerHTML='<span style="color:var(--red);font-weight:700">❌ '+ptCurrent.service+' → порт <b>'+correct+'</b>, не '+val+'</span>';inp.value='';inp.focus();}}
 function skipPort(){const fb=document.getElementById('pt-feedback');fb.style.display='block';fb.innerHTML='<span style="color:var(--yellow)">💡 '+ptCurrent.service+' → порт <b>'+ptCurrent.port+'</b></span>';setTimeout(renderPortQ,1200);}
 function updatePtProg(){const done=Object.keys(ptDone).length;document.getElementById('pt-pb').style.width=(done/PORTS_TASKS.length*100)+'%';document.getElementById('pt-score-lbl').textContent=done+' / '+PORTS_TASKS.length+' портов';}
-
-// ═══ ONBOARDING ═══
-function saveOnboarding(){
-  const role=document.getElementById('onb-role').value;
-  const level=document.getElementById('onb-level').value;
-  const date=document.getElementById('onb-date').value;
-  const profile=normalizeOnboardingProfile({role,level,date,completedAt:new Date().toISOString()});
-  if(!profile){alert('Проверьте дату интервью.');return;}
-  lsSet('onboarding',profile);
-  lsSet('onboarding_complete',true);
-  closeAccessibleModal('onboarding-modal');
-  renderHome();
-}
-function skipOnboarding(){
-  if(!getOnboardingProfile()) lsSet('onboarding',{role:'DevOps',level:'Middle',date:'',completedAt:new Date().toISOString()});
-  lsSet('onboarding_complete',true);
-  closeAccessibleModal('onboarding-modal');
-  renderHome();
-}
-function editOnboarding(){
-  const profile=getOnboardingProfile()||{role:'DevOps',level:'Middle',date:''};
-  document.getElementById('onb-role').value=profile.role;
-  document.getElementById('onb-level').value=profile.level;
-  document.getElementById('onb-date').value=profile.date;
-  openAccessibleModal('onboarding-modal','#onb-role');
-}
 
 // ═══ GIT TRAINER ═══
 let gitDone={};
@@ -1451,7 +1424,7 @@ const IMPORT_MAX_BYTES=2*1024*1024;
 const IMPORT_MAX_DEPTH=10;
 const IMPORT_MAX_NODES=50000;
 const IMPORT_RECORD_KEYS=['mistakes','stats','qprog','ts_scores','cmd_prog','code_prog','subnet_prog','git_prog','regex_prog','ans_prog','df_prog','k8s_prog','pt_prog','labs_prog','daily','study_progress','study_answers','senior_case_prog'];
-const IMPORT_ARRAY_KEYS=['history','custom','skill_events'];
+const IMPORT_ARRAY_KEYS=['history','custom','skill_events','coach_journal'];
 function exportProgress(){
   const onboarding=getOnboardingProfile();
   const data={
@@ -1462,7 +1435,7 @@ function exportProgress(){
     subnet_prog:lsGet('subnet_prog',{}),git_prog:lsGet('git_prog',{}),regex_prog:lsGet('regex_prog',{}),
     ans_prog:lsGet('ans_prog',{}),df_prog:lsGet('df_prog',{}),k8s_prog:lsGet('k8s_prog',{}),pt_prog:lsGet('pt_prog',{}),labs_prog:lsGet('labs_prog',{}),
     daily:lsGet('daily',{}),study_progress:lsGet('study_progress',{}),study_position:lsGet('study_position',{week:1,day:1}),
-    study_answers:lsGet('study_answers',{}),senior_case_prog:lsGet('senior_case_prog',{}),skill_events:getSkillEvents(),
+    study_answers:lsGet('study_answers',{}),senior_case_prog:lsGet('senior_case_prog',{}),skill_events:getSkillEvents(),coach_journal:getCoachJournal(),
     onboarding:onboarding||undefined,onboarding_complete:!!onboarding
   };
   const text=JSON.stringify(data,null,2);
@@ -1553,6 +1526,7 @@ function validateProgressImport(data){
   if('onboarding_complete' in data&&typeof data.onboarding_complete!=='boolean') invalid.push('onboarding_complete');
   if(Array.isArray(data.custom)&&!validateCustomQuestions(data.custom)) invalid.push('custom');
   if(Array.isArray(data.skill_events)&&typeof ProgressTracker!=='undefined'&&!data.skill_events.every(ProgressTracker.isSkillEvent)) invalid.push('skill_events');
+  if(Array.isArray(data.coach_journal)&&(typeof InterviewCoach==='undefined'||!data.coach_journal.every(InterviewCoach.isJournalEntry))) invalid.push('coach_journal');
   if(invalid.length) throw new Error('Некорректные поля: '+[...new Set(invalid)].join(', ')+'.');
   return data;
 }
@@ -1561,7 +1535,12 @@ function importProgressData(rawData){
   if(!data.version){alert('⚠️ Старый формат без версии. Импортированы только проверенные поля.');}
   const entries={};
   IMPORT_RECORD_KEYS.forEach(key=>{if(key in data) entries[key]=data[key];});
-  IMPORT_ARRAY_KEYS.forEach(key=>{if(key in data) entries[key]=key==='skill_events'&&typeof ProgressTracker!=='undefined'?data[key].slice(-ProgressTracker.EVENT_LIMIT):data[key];});
+  IMPORT_ARRAY_KEYS.forEach(key=>{
+    if(!(key in data)) return;
+    if(key==='skill_events'&&typeof ProgressTracker!=='undefined') entries[key]=data[key].slice(-ProgressTracker.EVENT_LIMIT);
+    else if(key==='coach_journal'&&typeof InterviewCoach!=='undefined') entries[key]=data[key].slice(-InterviewCoach.JOURNAL_LIMIT);
+    else entries[key]=data[key];
+  });
   if('streak_best' in data) entries.streak_best=data.streak_best;
   if('study_position' in data) entries.study_position=data.study_position;
   if('onboarding' in data) entries.onboarding=normalizeOnboardingProfile(data.onboarding);
@@ -1582,6 +1561,8 @@ function importProgressData(rawData){
 // ═══ INIT ═══
 async function initApp(){
   await loadAllData();
+
+  configureCoachUI();
 
   // Обновляем счётчик вопросов динамически
   document.getElementById('sb-counter').textContent = 'DevOps Edition · '+getAllQ().length+' вопросов';
@@ -1657,7 +1638,7 @@ document.addEventListener('keydown',function(e){
 
 // ═══ OFFLINE READINESS CHECK ═══
 async function checkOfflineReady(){
-  const files=['./','./index.html','./styles.css','./version.js','./storage.js','./progress.js','./coach.js','./app.js','./interview-prep-max.webmanifest'];
+  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','labs','tips','incidents','study_map','study_tests','senior_cases','best_practices'];
   tasks.forEach(t=>files.push('./tasks/'+t+'.json'));
   let ok=0,fail=0;const results=[];

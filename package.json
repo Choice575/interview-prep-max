@@ -7,7 +7,8 @@
     "quality:questions:report": "node question-quality.js",
     "quality:questions:baseline": "node question-quality.js --write-baseline",
     "quality:questions:fix": "node question-quality.js --fix-positions --write-baseline",
-    "test:e2e": "node scripts/run-e2e.js"
+    "test:e2e": "node scripts/run-e2e.js",
+    "generate:pwa-icons": "node scripts/generate-pwa-icons.js"
   },
   "devDependencies": {
     "@playwright/test": "1.54.1"

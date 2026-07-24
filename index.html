@@ -10,7 +10,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IPMax">
 <link rel="manifest" href="./interview-prep-max.webmanifest">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+<link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png">
+<link rel="apple-touch-icon" href="./assets/icon-192.png">
 
 <link rel="stylesheet" href="./styles.css">
 </head>
@@ -304,9 +305,26 @@
     <div class="form-group"><label>📅 Дата интервью (опционально)</label>
       <input class="form-input" id="onb-date" type="date"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
-      <button class="btn btn-outline btn-sm" onclick="skipOnboarding()">Пропустить</button>
-      <button class="btn btn-primary" onclick="saveOnboarding()">Начать подготовку →</button>
+      <button type="button" class="btn btn-outline btn-sm" data-coach-action="skip-goal">Пропустить</button>
+      <button type="button" class="btn btn-primary" data-coach-action="save-goal">Начать подготовку →</button>
     </div>
+  </div>
+</div>
+
+<!-- SKILL JOURNAL MODAL -->
+<div class="modal-overlay" id="coach-journal-modal" aria-hidden="true">
+  <div class="modal coach-journal-modal" role="dialog" aria-modal="true" aria-labelledby="coach-journal-title" tabindex="-1">
+    <div class="coach-journal-title-row">
+      <div><span class="coach-focus-kicker">Персональный тренер</span><h3 id="coach-journal-title">Журнал навыков</h3></div>
+      <button type="button" class="btn-icon" aria-label="Закрыть журнал навыков" data-coach-action="close-journal">✕</button>
+    </div>
+    <p class="coach-journal-lead">Фиксируйте выводы после практики — они сохраняются локально вместе с прогрессом.</p>
+    <div class="coach-journal-form">
+      <div class="form-group"><label for="coach-journal-topic">Навык или тема</label><select class="form-input" id="coach-journal-topic"></select></div>
+      <div class="form-group"><label for="coach-journal-note">Что закрепить в следующей сессии</label><textarea class="form-input" id="coach-journal-note" rows="3" maxlength="2000" placeholder="Например: повторить порядок диагностики DNS и объяснить выбор dig +trace"></textarea></div>
+      <button type="button" class="btn btn-primary" data-coach-action="save-journal">Сохранить заметку</button>
+    </div>
+    <div class="coach-journal-list" id="coach-journal-list"></div>
   </div>
 </div>
 
@@ -315,6 +333,7 @@
 <script src="./storage.js"></script>
 <script src="./progress.js"></script>
 <script src="./coach.js"></script>
+<script src="./coach-ui.js"></script>
 <script src="./app.js"></script>
 </body>
 </html>

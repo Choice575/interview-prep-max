@@ -38,9 +38,46 @@ test('opens only due repetitions from the coach plan', async ({ page }) => {
     ipmax_qprog: { 1: { correct: 0, wrong: 1, nextReviewAt: Date.now() - 1 } }
   });
   await page.goto('/');
-  await page.locator('#daily-plan-content .btn-outline').click();
+  await page.locator('[data-coach-action="start-review"]').click();
   await expect(page.locator('#page-exam')).toHaveClass(/active/);
   await expect(page.locator('#questions-container .q-card')).toHaveCount(1);
+});
+
+test('shows a weekly review and starts an adaptive control session', async ({ page }) => {
+  const now = Date.now();
+  await setProgress(page, {
+    ipmax_onboarding: { ...profile, date: new Date(now + 5 * 86400000).toISOString().slice(0, 10) },
+    ipmax_onboarding_complete: true,
+    ipmax_skill_events: [
+      { source: 'exam', topic: 'Linux', skill: 'Linux', score: 0, possible: 1, at: now - 86400000 },
+      { source: 'exam', topic: 'Terraform', skill: 'Terraform', score: 1, possible: 1, at: now - 2 * 86400000 }
+    ]
+  });
+  await page.goto('/');
+  await expect(page.locator('.coach-review')).toBeVisible();
+  await expect(page.locator('.coach-status')).toContainText('Нужна коррекция');
+  await page.getByRole('button', { name: /Контрольная/ }).click();
+  await expect(page.locator('#page-exam')).toHaveClass(/active/);
+  const count = await page.locator('#questions-container .q-card').count();
+  expect(count).toBeGreaterThan(0);
+  expect(count).toBeLessThanOrEqual(15);
+});
+
+test('stores and removes a skill-journal note', async ({ page }) => {
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+  await page.getByRole('button', { name: /Журнал навыков/ }).click();
+  await expect(page.locator('#coach-journal-modal')).toHaveClass(/open/);
+  await page.locator('#coach-journal-topic').selectOption('Linux');
+  await page.locator('#coach-journal-note').fill('Повторить порядок диагностики DNS');
+  await page.getByRole('button', { name: 'Сохранить заметку' }).click();
+  await expect(page.locator('.coach-journal-item')).toContainText('Повторить порядок диагностики DNS');
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_coach_journal')).length)).toBe(1);
+
+  page.once('dialog', dialog => dialog.accept());
+  await page.getByRole('button', { name: 'Удалить заметку' }).click();
+  await expect(page.locator('.coach-journal-empty')).toBeVisible();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_coach_journal')).length)).toBe(0);
 });
 
 test('records a Mock Interview rating in the skill-event journal', async ({ page }) => {
