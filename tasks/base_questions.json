@@ -4226,13 +4226,13 @@
     "category": "tradeoff",
     "q": "Когда использовать count вместо for_each в Terraform?",
     "options": [
-      "for_each предпочтителен почти всегда; count уместен только для простого включения/выключения ресурса (count = var.enabled ? 1 : 0)",
-      "Всегда использовать count — он проще",
-      "count для списков, for_each для map",
-      "Они взаимозаменяемы"
+      "count удобен для одинаковых instances с индексами или условного создания 0/1",
+      "count выбирают для sets с ключами, чтобы addresses не зависели от порядка",
+      "for_each принимает lists напрямую, а count работает лишь с maps и sets",
+      "Оба аргумента равнозначны: порядок не влияет на resource addresses"
     ],
     "answer": 0,
-    "explanation": "for_each привязывает ресурс к ключу (строке), что стабильно при изменении набора. count привязывает к индексу — добавление в середину списка вызывает destroy/recreate всего, что после. count = var.create ? 1 : 0 — классический паттерн условного создания ресурса."
+    "explanation": "count адресует instances числовыми индексами и подходит для фиксированного числа однородных объектов или условного 0/1. for_each адресует их устойчивыми string keys и удобнее, когда у элементов есть собственная идентичность. Изменение порядка списка с count может сдвинуть соответствия, но не означает автоматическую замену каждого объекта."
   },
   {
     "id": 302,
@@ -4241,13 +4241,13 @@
     "category": "tradeoff",
     "q": "Terraform workspaces vs отдельные директории для разных окружений (dev/stage/prod). Что выбрать?",
     "options": [
-      "Workspaces всегда лучше",
-      "Отдельные директории (или Terragrunt) предпочтительны для prod окружений: изолированный state, разные backend конфиги, невозможно случайно применить prod plan в stage",
-      "Workspaces для prod, директории для dev",
-      "Нет разницы"
+      "CLI workspaces дают отдельные credentials и backend каждому environment",
+      "Workspaces подходят для variants одного config; separate roots — для access/backend isolation",
+      "Directories нужны для dev, а prod безопаснее держать в default workspace",
+      "Оба подхода изолируют code, credentials и state одинаковым образом"
     ],
     "answer": 1,
-    "explanation": "Workspaces разделяют state, но делят backend config и код. Риск: terraform workspace select prod && apply — можно ошибиться. Директории дают полную изоляцию. Workspaces хороши для ephemeral окружений (feature branches, PR previews). Prod требует максимальной изоляции."
+    "explanation": "CLI workspaces создают отдельные state instances для одной configuration и одного backend, но не являются границей credentials или access control. Для окружений с разными backends, permissions и lifecycle используют отдельные root modules/directories. Workspaces уместны для нескольких параллельных экземпляров одной конфигурации."
   },
   {
     "id": 303,
@@ -4256,13 +4256,13 @@
     "category": "tradeoff",
     "q": "Pull-модель (ansible-pull) vs Push-модель (обычный ansible-playbook). Когда что применять?",
     "options": [
-      "Pull всегда безопаснее",
-      "Pull только для Windows",
-      "Push удобен для централизованного управления и дебага; Pull лучше для масштабирования (1000+ хостов), auto-remediation и когда хосты за NAT без входящего SSH",
-      "Push для prod, Pull для dev"
+      "Pull centralizes execution на controller и даёт общий orchestration status",
+      "Pull требует inbound SSH, а push работает за NAT через outbound fetch",
+      "Push подходит для coordinated runs; pull — для self-converging hosts с outbound access",
+      "Push и pull различаются inventory format, но не scheduling и trust model"
     ],
     "answer": 2,
-    "explanation": "Push: control node инициирует SSH — просто, удобно для отладки, подходит для большинства сценариев. Pull: каждый хост сам забирает и применяет playbook по cron — масштабируется без нагрузки на control node, работает для хостов без входящего SSH (облачные auto-scaling группы)."
+    "explanation": "При push controller координирует запуск и получает общий результат. ansible-pull запускается на managed host, получает repository и применяет локальный playbook по внешнему scheduler, поэтому inbound SSH не требуется. Pull требует отдельно продумать проверку источника, блокировку параллельных runs, rollout и сбор результатов; фиксированного порога числа hosts нет."
   },
   {
     "id": 304,
@@ -4271,13 +4271,13 @@
     "category": "tradeoff",
     "q": "Ansible Roles vs Collections. В чём ключевое различие и когда что использовать?",
     "options": [
-      "Collections — это новые Roles",
-      "Collection только для модулей",
-      "Roles устарели",
-      "Role — единица переиспользования кода для одного сервиса/компонента. Collection — пакет для дистрибуции (содержит roles, modules, plugins, playbooks). Collection публикуют на Galaxy/Automation Hub."
+      "Collection — переименованная role с тем же layout и installation scope",
+      "Collection пакует modules, а role не может содержать tasks и templates",
+      "Roles считаются deprecated content и исключены из текущих releases",
+      "Role структурирует automation; collection распространяет roles, plugins, modules и docs"
     ],
     "answer": 3,
-    "explanation": "Role: tasks/handlers/templates/vars для конкретного компонента (nginx, postgresql). Collection: namespace.collection содержит несколько roles, кастомные модули, plugins — публикуется как единый артефакт. Для внутреннего использования достаточно roles. Collection нужен когда хотите публиковать или распространять комплексный функционал."
+    "explanation": "Role организует tasks, handlers, templates, defaults и другие файлы для переиспользования automation. Collection — версионируемый namespace.collection package, который может объединять несколько roles, modules, plugins, playbooks и docs. Role можно использовать отдельно или распространять внутри collection."
   },
   {
     "id": 305,
@@ -4286,13 +4286,13 @@
     "category": "tradeoff",
     "q": "TCP vs UDP: когда выбирать UDP несмотря на отсутствие гарантий доставки?",
     "options": [
-      "UDP выбирают когда задержка важнее надёжности: VoIP, video streaming, online games, DNS, QUIC/HTTP3. Потеря пакета лучше, чем ретрансмиссия и задержка.",
-      "UDP никогда не стоит использовать в prod",
-      "UDP быстрее всегда",
-      "TCP для серверов, UDP для клиентов"
+      "UDP выбирают, когда важны latency/message boundaries, а app управляет loss/reliability",
+      "UDP подходит для ordered transfer, где каждый byte должен прибыть один раз",
+      "UDP выбирают при снижении TCP throughput, не меняя protocol semantics",
+      "Protocol зависит от роли: clients используют UDP, а servers используют TCP"
     ],
     "answer": 0,
-    "explanation": "UDP подходит для: real-time (VoIP, игры — устаревший пакет лучше выбросить чем ждать ретрансмиссии), DNS (короткие запросы/ответы), multicast, TFTP. Приложения сами реализуют нужную надёжность (QUIC добавляет надёжность поверх UDP). Streaming видео — лучше пропустить кадр, чем буферизовать."
+    "explanation": "UDP сохраняет datagram boundaries и не предоставляет delivery, ordering или congestion control. Он подходит для real-time media, multicast и протоколов, которые реализуют нужные свойства сами. QUIC использует UDP как substrate, но добавляет надёжность и congestion control; DNS при необходимости также работает по TCP."
   },
   {
     "id": 306,
@@ -4301,13 +4301,13 @@
     "category": "tradeoff",
     "q": "Terraform provisioner (remote-exec/local-exec) vs Ansible для настройки ВМ после создания. Что предпочесть?",
     "options": [
-      "Provisioner всегда лучше — встроен в Terraform",
-      "Ansible предпочтителен: idempotent, богатые модули, легко дебажить. Provisioner — крайняя мера: runs once, не idempotent, нет retry логики, усложняет terraform plan",
-      "Без разницы",
-      "Provisioner для Linux, Ansible для Windows"
+      "Provisioner — основной config tool, потому что Terraform tracks каждый command",
+      "Предпочесть image/cloud-init или config manager; provisioner оставить last resort",
+      "Подходы дают одинаковую idempotence: provisioner повторяется на каждом plan",
+      "remote-exec нужен для Linux, а Ansible — для Windows из-за transports"
     ],
     "answer": 1,
-    "explanation": "Provisioner нарушает декларативность Terraform: запускается только при создании (не при update), нет idempotency, ошибка оставляет ресурс в tainted состоянии. HashiCorp официально рекомендует избегать provisioner. Лучше: cloud-init для базовой конфигурации, Ansible/Chef/Puppet для полной настройки после создания ВМ."
+    "explanation": "HashiCorp рекомендует provisioners как last resort: их действия плохо представлены в plan и требуют connectivity/credentials во время apply. Для bootstrap лучше image metadata или cloud-init, для повторяемого desired state — подходящий configuration manager. Creation-time provisioner обычно не запускается при обычном update ресурса."
   },
   {
     "id": 307,
@@ -4316,13 +4316,13 @@
     "category": "tradeoff",
     "q": "Hard link vs Symbolic link (symlink). Когда использовать каждый?",
     "options": [
-      "Symlink всегда лучше",
-      "Hardlink для директорий",
-      "Hardlink: тот же inode, не сломается если оригинал переименован/перемещён, работает только в одной ФС, нельзя на директории. Symlink: другой inode, ссылка на путь, работает между ФС, ломается при удалении оригинала.",
-      "Нет разницы на ext4"
+      "Symlink разделяет inode с target и сохраняется после удаления target path",
+      "Hard link пересекает filesystems и обычно ссылается на directories",
+      "Hard link — имя того же inode; symlink хранит path и может пересекать filesystems",
+      "На ext4 обе ссылки хранят target path и различаются своими permissions"
     ],
     "answer": 2,
-    "explanation": "Hardlink: несколько имён для одного inode. Файл удаляется когда нет ни одного hardlink. Применение: backup инструменты (rsync --link-dest), versioned configs. Symlink: гибкость, кросс-ФС, для директорий. Применение: /usr/bin/python → python3.11, config управление (dotfiles, /etc/nginx/sites-enabled/). ln создаёт hardlink, ln -s — symlink."
+    "explanation": "Hard links — равноправные directory entries одного inode, поэтому rename или unlink другого имени не ломает их; они не пересекают filesystem boundaries, а hard links на directories обычно запрещены. Symlink содержит pathname, может ссылаться на directory или другой filesystem и становится dangling, если target path исчез."
   },
   {
     "id": 308,
@@ -4331,28 +4331,28 @@
     "category": "tradeoff",
     "q": "iptables vs nftables. Почему переходят на nftables и в чём преимущества?",
     "options": [
-      "iptables лучше из-за большей поддержки",
-      "nftables только для IPv6",
-      "Они идентичны по функционалу",
-      "nftables: единый фреймворк (заменяет iptables/ip6tables/arptables/ebtables), более производительный (sets, maps — O(1) lookup), лучший синтаксис, нет разделения на таблицы-цепочки под каждый протокол. iptables — legacy."
+      "iptables даёт atomic multi-family transactions, nftables меняет rules отдельно",
+      "nftables обрабатывает IPv6, а IPv4 rules должны оставаться в iptables",
+      "Оба синтаксиса совпадают, включая sets, maps и atomic transactions",
+      "nftables объединяет families, поддерживает atomic rulesets и expressive sets/maps"
     ],
     "answer": 3,
-    "explanation": "nftables с Linux 3.13 (2014), дефолт в Debian 10+, RHEL 8+. Главное: sets и maps для O(1) lookups вместо O(n) правил — критично при 10000+ IP. Атомарные обновления правил. Один инструмент вместо четырёх. iptables в современных дистрибутивах — обёртка над nftables."
+    "explanation": "nftables предоставляет единый userspace interface для нескольких protocol families, sets/maps/concatenations и атомарную замену ruleset. Это упрощает крупные политики без обещания конкретной сложности lookup для любой структуры. iptables-nft может служить compatibility frontend, но его syntax не раскрывает все возможности nftables."
   },
   {
     "id": 309,
     "topic": "Terraform",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Remote backend (S3+DynamoDB) vs Local backend. Когда local backend допустим?",
+    "q": "Remote backend vs local backend. Когда local state допустим?",
     "options": [
-      "Local допустим только для: личного pet-проекта, обучения, одноразовых скриптов. Для любой команды или prod — только remote: совместный доступ, state locking, версионирование, без risk потери файла.",
-      "Local backend никогда не использовать",
-      "Remote только для AWS",
-      "Local для dev, Remote для prod"
+      "Local подходит для single-user disposable work; команде нужны sharing, locking и recovery",
+      "Local удобнее команде: filesystem lock координирует state между laptops",
+      "Remote backend полезен главным образом для infrastructure в том же cloud",
+      "Local и remote дают одинаковое recovery, если tfstate хранить в Git"
     ],
     "answer": 0,
-    "explanation": "Local backend: state в terraform.tfstate рядом с кодом. Проблемы: git commit с секретами в state, нет locking (race conditions в команде), нет versioning, потеря ноутбука = потеря state. Remote (S3, Terraform Cloud, GCS) решает все эти проблемы. Правило: если больше одного человека или prod — remote обязателен."
+    "explanation": "Local backend хранит state на одной машине и применяет локальную filesystem locking, которая не координирует разные рабочие станции. Remote backend нужен для общего authoritative state; поддержка locking, versioning и recovery зависит от выбранного backend. State может содержать sensitive data, поэтому помещать его в Git не следует."
   },
   {
     "id": 310,
@@ -4361,13 +4361,13 @@
     "category": "tradeoff",
     "q": "systemd timer vs cron. Когда предпочесть systemd timer?",
     "options": [
-      "cron всегда проще",
-      "systemd timer предпочтителен когда нужны: зависимости от других units, логирование через journald, точное управление окружением, OnBootSec/OnActiveSec, catchup при пропуске, мониторинг через systemctl list-timers.",
-      "cron для системы, systemd для приложений",
-      "Нет разницы"
+      "cron выбирают, когда нужны unit dependencies и service-level status",
+      "systemd timer удобен для unit dependencies, journal/status и Persistent catch-up",
+      "timer переносим на non-systemd hosts и заменяет user crontab без daemon",
+      "Schedulers одинаково обрабатывают missed runs, environment и dependencies"
     ],
     "answer": 1,
-    "explanation": "cron: прост, universal, EMAIL при ошибке. systemd timer: вывод в journal (journalctl -u myservice.service), зависимости (After=network.target), точные интервалы (OnCalendar=daily), Status виден через systemctl. Для новых сервисов на systemd-системах — timer предпочтителен. Cron незаменим для пользовательских crontab."
+    "explanation": "Timer активирует service unit, поэтому получает dependencies, sandboxing, status и journal integration systemd. Persistent=true позволяет calendar timer выполнить пропущенный run после downtime; без него catch-up не гарантирован. cron остаётся простым и переносимым выбором, особенно для пользовательских schedules."
   },
   {
     "id": 311,
@@ -4376,13 +4376,13 @@
     "category": "tradeoff",
     "q": "include_tasks vs import_tasks: в чём ключевое различие для работы с тегами?",
     "options": [
-      "Они одинаковы",
-      "include_tasks лучше для тегов",
-      "import_tasks — статический (обрабатывается при парсинге): теги на import распространяются на все включённые задачи. include_tasks — динамический (в runtime): теги работают только на саму директиву include, но не на задачи внутри.",
-      "import_tasks не поддерживает теги"
+      "Оба загружают task file при parsing, поэтому tags ведут себя одинаково",
+      "include_tasks автоматически копирует свои tags каждой nested task",
+      "import_tasks раскрывается статически и наследует tags; include_tasks выполняется динамически",
+      "import_tasks отклоняет tags, тогда как include_tasks требует tag на directive"
     ],
     "answer": 2,
-    "explanation": "Критично при --tags deploy: с import_tasks всё работает предсказуемо. С include_tasks нужно явно тегировать задачи внутри или использовать apply: tags. import_tasks не поддерживает loop и when с переменными runtime. include_tasks поддерживает динамические имена файлов (with_items). Выбор зависит от задачи."
+    "explanation": "import_tasks статически добавляет tasks при parsing, поэтому tag на import наследуется импортированными tasks. Tag на dynamic include_tasks выбирает сам include, но не назначается содержимому; для этого используют tags внутри файла или apply: tags. Dynamic include также позволяет выбирать файл по runtime data."
   },
   {
     "id": 312,
@@ -4391,13 +4391,13 @@
     "category": "tradeoff",
     "q": "VXLAN vs VLAN для сегментации в датацентре. Когда нужен VXLAN?",
     "options": [
-      "VLAN всегда достаточно",
-      "VLAN для prod, VXLAN для dev",
-      "VXLAN только для облаков",
-      "VXLAN нужен когда: нужно более 4094 сегментов (VNI 24-bit = 16M), требуется L2 overlay поверх L3 сети (multi-DC, IP fabric), нужна мобильность ВМ между стойками без изменения L2 топологии."
+      "VLAN выбирают, если overlay должен проходить поверх routed underlay",
+      "VXLAN убирает encapsulation overhead из небольших single-switch networks",
+      "VXLAN работает в cloud control plane, но physical switches не бывают VTEP",
+      "VXLAN нужен для множества L2 segments или overlay поверх routed IP fabric"
     ],
     "answer": 3,
-    "explanation": "VLAN ограничен 4094 сегментами (12-bit) и требует L2 связности (STP проблемы на больших масштабах). VXLAN (RFC 7348): MAC-in-UDP инкапсуляция, VNI 24-bit (16M сегментов), работает поверх любой IP сети, поддерживает ECMP. Используется в OpenStack Neutron, VMware NSX, Kubernetes CNI (Flannel, Calico VXLAN mode)."
+    "explanation": "VXLAN encapsulates Layer 2 frames in UDP over an IP underlay and uses a 24-bit VNI, тогда как VLAN ID имеет 12 bits. Это масштабирует segments и позволяет routed fabric переносить overlay traffic. Цена — encapsulation overhead, MTU planning и необходимость control plane или другого способа распространения reachability."
   },
   {
     "id": 313,
@@ -4406,13 +4406,13 @@
     "category": "tradeoff",
     "q": "BGP ECMP vs LACP (LAG) для балансировки трафика. В чём разница применения?",
     "options": [
-      "LACP (Link Aggregation): объединяет физические линки между двумя устройствами в один логический — балансировка на L2/L3. BGP ECMP: несколько маршрутов через разные next-hop (разные устройства/пути) — балансировка на L3, нет зависимости от физической топологии.",
-      "LACP всегда лучше",
-      "BGP ECMP только для WAN",
-      "LACP для серверов, BGP для роутеров"
+      "LACP bundles links между logical peers; BGP ECMP использует несколько routed next hops",
+      "LACP балансирует arbitrary routed paths, ECMP объединяет ports в interface",
+      "BGP ECMP применим к WAN, а leaf-spine требует LACP между каждым hop",
+      "Endpoint определяет выбор: servers требуют LACP, routers требуют BGP ECMP"
     ],
     "answer": 0,
-    "explanation": "LACP: два устройства, несколько кабелей → один логический линк. Балансировка по flow hash (src/dst IP+port). Нет при отказе одного устройства. BGP ECMP: несколько физических путей через разные роутеры → балансировка трафика через разные next-hop. В Clos/Spine-Leaf архитектуре используют BGP ECMP для горизонтального масштабирования."
+    "explanation": "LACP negotiates member links одного logical aggregate между peers; forwarding обычно распределяется per-flow hash. BGP ECMP устанавливает несколько равнозначных Layer 3 next hops и может использовать разные routed paths. MLAG меняет topology failure domain, но не превращает LACP в routing protocol."
   },
   {
     "id": 314,
@@ -4421,13 +4421,13 @@
     "category": "tradeoff",
     "q": "data source vs input variable для получения ID существующего ресурса. Что предпочесть?",
     "options": [
-      "Всегда variable",
-      "data source предпочтителен: автоматически находит актуальный ID из облака, не требует ручного обновления. variable подходит для cross-state значений через terraform_remote_state или когда ресурс вне Terraform.",
-      "Нет разницы",
-      "output + remote state всегда лучше"
+      "Передать input variable, даже если provider имеет однозначный lookup объекта",
+      "Использовать data source для надёжного lookup; variable — для explicit decoupled contract",
+      "Оба способа refresh-ят cloud state и проверяют identity одинаковым образом",
+      "Читать весь remote state: он раскрывает меньше данных, чем provider data source"
     ],
     "answer": 1,
-    "explanation": "data \"aws_vpc\" \"main\" { tags = { Name = \"prod\" } } — автоматически найдёт VPC по тегу, всегда актуально. var.vpc_id — нужно передавать вручную, риск устаревания. Исключение: значения из другого Terraform state (terraform_remote_state или SSM Parameter Store как промежуточный слой)."
+    "explanation": "Data source делает provider lookup во время refresh/plan и удобен, если selector однозначен и API dependency приемлема. Input variable задаёт явный contract между configurations и снижает coupling к поиску, но значение должен передать caller. terraform_remote_state открывает consumer доступ ко всему state snapshot, даже если output публикует часть значений."
   },
   {
     "id": 315,
@@ -4436,13 +4436,13 @@
     "category": "tradeoff",
     "q": "В каком порядке Ansible применяет приоритет переменных (от низшего к высшему)?",
     "options": [
-      "role defaults → inventory vars → playbook vars → extra-vars",
-      "inventory → roles → playbook",
-      "role defaults → inventory group_vars → inventory host_vars → playbook vars → role vars → set_fact → extra-vars (-e)",
-      "extra-vars всегда перекрывает всё, остальные одинаковы"
+      "task vars → play vars → inventory vars → role defaults → extra vars",
+      "inventory vars → role defaults → registered vars → command options",
+      "role defaults → inventory vars → play vars → task/include vars → extra vars",
+      "extra vars → role defaults → host vars → block vars → config settings"
     ],
     "answer": 2,
-    "explanation": "Полный порядок (упрощённо, от низшего): role defaults → inventory group_vars/all → inventory group_vars → host_vars → playbook group_vars → playbook host_vars → host facts → play vars → vars_files → vars_prompt → task vars (include_vars) → set_fact/register → role/include vars → block/task vars → extra vars. extra-vars (-e) — наивысший приоритет."
+    "explanation": "Это корректное упрощение variable precedence: role defaults находятся низко, затем идут inventory и play-level sources, выше — task/include/role parameters и связанные runtime values, а extra vars имеют наивысший приоритет среди variables. Полная таблица различает group_vars, host_vars, role vars, set_fact/register и include parameters, поэтому при споре проверяют конкретные sources."
   },
   {
     "id": 316,
@@ -4451,13 +4451,13 @@
     "category": "output",
     "q": "terraform plan показывает символ '-/+' рядом с ресурсом. Что это означает?",
     "options": [
-      "Ресурс будет изменён in-place",
-      "Символ означает ошибку",
-      "Ресурс будет только создан",
-      "Ресурс будет УДАЛЁН и СОЗДАН заново (replace). Это деструктивная операция — нужно внимательно проверить причину (обычно изменение force_new атрибута)"
+      "Provider обновит attributes через API, сохранив тот же remote object",
+      "Plan содержит syntax error и apply остановится до provider call",
+      "Terraform создаст дополнительный object и сохранит старый без удаления",
+      "Terraform планирует replacement: destroy, затем create; нужно проверить trigger и downtime"
     ],
     "answer": 3,
-    "explanation": "-/+ означает destroy then create. Причина: изменён атрибут с ForceNew=true (например, AMI ID для EC2, availability_zone). '+' — только create, '-' — только destroy, '~' — update in-place. '-/+' — самое опасное изменение, требует подтверждения что downtime приемлем или использования create_before_destroy."
+    "explanation": "-/+ означает destroy-and-create replacement, обычно потому что изменён attribute, который provider не может обновить in place. Нужно проверить пояснение plan, dependencies и допустимый downtime. lifecycle.create_before_destroy может изменить порядок на create-then-destroy, если API constraints и capacity это позволяют."
   },
   {
     "id": 317,
@@ -4466,13 +4466,13 @@
     "category": "output",
     "q": "ss -tlnp показывает '0.0.0.0:8080'. Что это означает для безопасности?",
     "options": [
-      "Сервис слушает на ВСЕХ сетевых интерфейсах на порту 8080 — доступен извне. Если сервис должен быть внутренним — нужно изменить на 127.0.0.1:8080",
-      "Сервис слушает только localhost",
-      "Это нормально для всех сервисов",
-      "Порт 8080 зарезервирован"
+      "Socket привязан ко всем local IPv4 addresses; exposure ещё зависит от routes/firewall",
+      "Socket принимает loopback traffic; remote addresses исключены kernel",
+      "Binding доказывает internet reachability, даже если firewall дропает traffic",
+      "Port 8080 зарезервирован kernel и требует специальной capability"
     ],
     "answer": 0,
-    "explanation": "0.0.0.0 = INADDR_ANY = все интерфейсы. Если сервис слушает 0.0.0.0 — он доступен через любой IP сервера, включая публичный. 127.0.0.1 — только loopback (localhost). ::: (IPv6) с IPV6_V6ONLY=0 — все интерфейсы IPv4+IPv6. Для внутренних сервисов (БД, метрики) — обязательно ограничить."
+    "explanation": "0.0.0.0 обозначает INADDR_ANY: process принимает IPv4 connections на любом local address, которому соответствует socket. Это шире, чем 127.0.0.1, но само по себе не доказывает внешнюю доступность — её ограничивают routing, host/cloud firewall и network policy. IPv6 listener нужно проверять отдельно."
   },
   {
     "id": 318,
@@ -4481,13 +4481,13 @@
     "category": "output",
     "q": "journalctl показывает: 'nginx.service: Start request repeated too quickly'. Что произошло и как диагностировать?",
     "options": [
-      "nginx успешно перезапущен",
-      "systemd убил сервис из-за слишком частых перезапусков за короткое время (StartLimitBurst). Команда: journalctl -u nginx --since '5 min ago' чтобы найти причину краша",
-      "Нужно увеличить StartLimitBurst",
-      "Это информационное сообщение"
+      "nginx достиг active state, а systemd подтвердил успешную restart policy",
+      "Restarts достигли systemd start-rate limit; нужны прежние logs и exit status",
+      "Увеличение StartLimitBurst устраняет root cause до следующего start",
+      "Сообщение означает normal daemon reload и не требует unit diagnostics"
     ],
     "answer": 1,
-    "explanation": "systemd отслеживает: если сервис падает больше StartLimitBurst раз за StartLimitInterval — помечает как failed и прекращает перезапуски. Диагностика: journalctl -u nginx -n 50 (последние логи до краша), systemctl status nginx (exit code). Частые причины: ошибка конфига (nginx -t), занятый порт, нехватка прав."
+    "explanation": "Unit превысил StartLimitBurst в пределах StartLimitIntervalSec, поэтому systemd перестал запускать его. Сначала смотрят systemctl status и более ранние journalctl -u nginx записи, затем проверяют config, port и permissions. После устранения причины rate-limit state можно сбросить systemctl reset-failed и повторить start."
   },
   {
     "id": 319,
@@ -4496,13 +4496,13 @@
     "category": "output",
     "q": "dmesg показывает: 'Out of memory: Kill process 1234 (java) score 892 out of 1000'. Что это означает и что делать?",
     "options": [
-      "Это предупреждение, можно игнорировать",
-      "Перезагрузить сервер",
-      "OOM killer убил java процесс из-за нехватки RAM. Score 892/1000 — он был главным кандидатом на убийство. Нужно: увеличить RAM/swap, уменьшить Xmx, добавить memory limits, настроить oom_score_adj.",
-      "Увеличить ulimit"
+      "Kernel записал memory pressure, но оставил process работать без изменений",
+      "Reboot обязателен: OOM victim не освобождает memory после завершения",
+      "OOM killer выбрал process; нужно проверить pressure, limits и workload sizing",
+      "Повышение ulimit исключит process из дальнейшего OOM victim selection"
     ],
     "answer": 2,
-    "explanation": "OOM killer активируется когда ядро не может выделить память и swap исчерпан. Score рассчитывается из размера процесса, привилегий, oom_adj. Score 892 — процесс занимал много памяти. Решения: 1) анализ через -Xmx/-Xms для JVM; 2) oom_score_adj = -1000 для критических процессов (защита от OOM); 3) cgroups memory limits; 4) мониторинг/alerting на /proc/meminfo."
+    "explanation": "OOM killer выбрал victim после неудачного allocation в system или cgroup memory domain. Score отражает badness для выбора в тот момент, а не точную долю RAM. Нужно исследовать kernel/cgroup logs, MemAvailable, swap и workload growth, затем исправить leak или sizing, JVM limits и cgroup policy. oom_score_adj меняют осторожно: защита одного process переносит риск на другие."
   },
   {
     "id": 320,
@@ -4511,13 +4511,13 @@
     "category": "output",
     "q": "Ansible выдаёт: 'FAILED! => {\"msg\": \"Missing sudo password\", \"rc\": 1}'. Задача требует become: yes. Что нужно сделать?",
     "options": [
-      "Запустить playbook от root",
-      "Добавить become_method: su",
-      "Убрать become: yes",
-      "Передать пароль через --ask-become-pass или настроить NOPASSWD в sudoers для ansible пользователя, или использовать ansible_become_password в vault"
+      "Запустить controller от root, чтобы remote sudo не спрашивал password",
+      "Переключить become_method на su: это автоматически передаст credential",
+      "Убрать become, хотя task всё ещё требует privileged remote operation",
+      "Использовать --ask-become-pass или Vault/secret; либо scoped sudoers rule"
     ],
     "answer": 3,
-    "explanation": "become: yes без пароля работает только если в sudoers есть NOPASSWD. Варианты: 1) --ask-become-pass (интерактивно); 2) ansible_become_password: '{{ vault_sudo_pass }}' в host_vars; 3) echo 'ansibleuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/ansible. Вариант 3 — самый удобный для автоматизации при условии правильных ACL."
+    "explanation": "Для interactive run используют --ask-become-pass. В automation ansible_become_password получают из Ansible Vault или external secret source. Если выбран passwordless sudo, правило ограничивают нужными commands и service account вместо широкого NOPASSWD:ALL. Root на controller не предоставляет credential удалённому become plugin."
   },
   {
     "id": 321,
@@ -4526,13 +4526,13 @@
     "category": "output",
     "q": "terraform state list показывает: 'aws_instance.web[0]', 'aws_instance.web[1]', 'aws_instance.web[2]'. Вы хотите перейти на for_each. Каков правильный подход?",
     "options": [
-      "Добавить moved блок в Terraform 1.1+",
-      "terraform state mv 'aws_instance.web[0]' 'aws_instance.web[\"server1\"]' для каждого ресурса, затем обновить код с for_each",
-      "Использовать terraform import",
-      "Удалить state и пересоздать"
+      "Добавить moved block для каждого index→key, обновить for_each и проверить plan",
+      "Выполнить state mv для первого instance: остальные mappings Terraform выведет сам",
+      "Добавить import blocks после apply, который заменит прежние resource addresses",
+      "Удалить state entries: provider обнаружит существующие instances при refresh"
     ],
     "answer": 0,
-    "explanation": "В Terraform 1.1+ появился блок moved { from = aws_instance.web[0]; to = aws_instance.web[\"server1\"] } — декларативный способ переименования без CLI. terraform state mv — императивный способ (работает в старых версиях). Оба позволяют мигрировать без destroy/recreate. Удаление state — деструктивно."
+    "explanation": "Каждый old address нужно явно сопоставить новому key через moved block, после чего plan должен показывать moves без replacement. terraform state mv остаётся procedural alternative, но требует координации state mutation. Refresh не угадывает identity удалённых state entries, а import решает другую задачу."
   },
   {
     "id": 322,
@@ -4541,13 +4541,13 @@
     "category": "output",
     "q": "cat /proc/loadavg показывает: '4.50 3.20 2.10 3/450 12345'. Ядер на сервере 4. Как интерпретировать?",
     "options": [
-      "Сервер перегружен критически",
-      "LA 4.50 за последнюю минуту = 112% загрузки (4 ядра). Небольшая перегрузка, но тренд снижающийся (3.20 за 5 мин, 2.10 за 15 мин) — пиковая нагрузка спадает. 3/450: 3 из 450 процессов активны.",
-      "Сервер в норме",
-      "LA считается только по CPU"
+      "1-minute load ниже CPU capacity и снижается после недавнего peak",
+      "1-minute load чуть выше четырёх cores и вырос относительно 5/15-minute values",
+      "Значения — CPU percentages, поэтому 4.50 означает 4.5 percent utilization",
+      "Поле 3/450 означает три online CPU из 450 configured cores"
     ],
     "answer": 1,
-    "explanation": "LA/CPU_count: 4.50/4=1.125 — 12.5% очередь. Критично при LA > 2-3 * кол-во ядер. Тренд: 4.50 → 3.20 → 2.10 показывает что нагрузка была выше и снижается. Если тренд растущий (2.10 → 3.20 → 4.50) — ситуация ухудшается. Числа: 1 мин / 5 мин / 15 мин / running/total / last_pid."
+    "explanation": "Первые три числа — load averages за 1, 5 и 15 minutes. Поскольку recent value 4.50 выше 3.20 и 2.10, load растёт; значение около числа cores означает примерно одну runnable или uninterruptible task на core в среднем, но это не CPU utilization. 3/450 — runnable scheduling entities и их общее число, 12345 — последний PID."
   },
   {
     "id": 323,
@@ -4556,28 +4556,28 @@
     "category": "output",
     "q": "ping показывает RTT: 'min/avg/max/mdev = 1.2/45.3/120.5/38.1 ms'. Что означает высокий mdev?",
     "options": [
-      "Пинг работает нормально",
-      "mdev не важен",
-      "mdev (mean deviation) 38ms при avg 45ms — огромная нестабильность (джиттер). Пакеты приходят очень неравномерно. Для VoIP/игр это критично. Причины: буферизация, QoS проблемы, перегруженный канал.",
-      "Нужно увеличить MTU"
+      "RTT стабилен, потому что average находится между minimum и maximum",
+      "mdev показывает packet-loss percentage и не связан с variation RTT",
+      "RTT dispersion велика относительно average; нужно исследовать jitter и outliers",
+      "Большой mdev доказывает fragmentation из-за MTU на network path"
     ],
     "answer": 2,
-    "explanation": "mdev — среднее отклонение RTT. В норме должен быть < 10% от avg. mdev 38ms при avg 45ms (84%) = джиттер огромный. Причины: bufferbloat (большие буферы на промежуточных роутерах), перегрузка канала, QoS/policing, Wi-Fi. Инструменты: mtr для локализации, tc qdisc для анализа буферов. Для real-time трафика критично."
+    "explanation": "В iputils ping mdev — population standard deviation samples RTT, а не mean deviation или packet loss. 38.1 ms рядом со средним 45.3 ms указывает на сильный разброс задержки, но сам по себе не называет причину. Проверяют sample size, loss, time series и path/load; универсального порога в процентах нет."
   },
   {
     "id": 324,
     "topic": "Сети",
     "level": "Senior",
     "category": "output",
-    "q": "tcpdump показывает SYN пакеты от клиента, но SYN-ACK от сервера нет. Соединение не устанавливается. Что это означает?",
+    "q": "На клиенте tcpdump показывает исходящие SYN, но ответ не возвращается. Как локализовать проблему?",
     "options": [
-      "Клиент не отправляет пакеты",
-      "MTU проблема",
-      "Проблема с DNS",
-      "SYN доходит до сервера (или нет), но сервер не отвечает: 1) firewall дропает SYN; 2) сервис не слушает на этом порту; 3) SYN-ACK теряется на обратном пути. Проверить tcpdump на сервере."
+      "Server получил SYN и application уже приняло connection успешно",
+      "Client MTU слишком мал, поэтому captured SYN не покидает interface",
+      "DNS завершился ошибкой после выбора destination IP для packet",
+      "Client capture недостаточен: сравнить server capture, listener, filters и return path"
     ],
     "answer": 3,
-    "explanation": "Нужно запустить tcpdump на стороне сервера: если SYN виден — сервер получает, но не отвечает (нет сервиса, RST вместо SYN-ACK, фильтрация на сервере). Если SYN не виден — пакет теряется по дороге (промежуточный firewall, маршрутизация). SYN-ACK есть на сервере но нет на клиенте — проблема на обратном пути (asymmetric routing)."
+    "explanation": "Capture на client подтверждает отправку, но не место потери. Если SYN отсутствует на server, проверяют forward path и filters. Если виден SYN и RST — обычно нет listener или соединение отвергнуто; если нет ответа — local filtering или stack state. Если server отправляет SYN-ACK, которого нет на client, исследуют return path и asymmetric routing."
   },
   {
     "id": 325,
@@ -4586,13 +4586,13 @@
     "category": "output",
     "q": "Ansible fact показывает: ansible_memory_mb.real.free: 128 на хосте с 16GB RAM. Что это означает?",
     "options": [
-      "В Linux 'free' память не включает page cache и buffers. Реально доступная память = free + buffers + cached. Проверить ansible_memory_mb.real.available или выполнить free -m на хосте.",
-      "Сервер заканчивает память",
-      "Нужно добавить swap",
-      "Это ошибка сбора facts"
+      "free — unused RAM, не MemAvailable; проверить ansible_memavailable_mb, swap и pressure",
+      "128 MB доказывает immediate OOM независимо от cache и workload",
+      "Добавление swap требуется при free ниже одного percent physical RAM",
+      "Fact неверен: Linux сообщает memory лишь через cgroup metrics"
     ],
     "answer": 0,
-    "explanation": "Linux активно использует свободную RAM для page cache (кэш файловой системы). free показывает только незанятую RAM. Реально доступно = available (free + reclaimable cache). ansible_memory_mb.real.available > ansible_memory_mb.real.free. Паниковать стоит только если available < 200-500MB. Это классическое заблуждение о памяти Linux."
+    "explanation": "real.free отражает незанятую RAM, но Linux использует память для reclaimable page cache. Для оценки headroom смотрят ansible_memavailable_mb или MemAvailable, swap activity, PSI и cgroup limits. MemAvailable оценивается kernel и не равен простому free + buffers + cached; фиксированный аварийный порог без workload context некорректен."
   },
   {
     "id": 326,
@@ -4601,13 +4601,13 @@
     "category": "output",
     "q": "terraform plan показывает '~' (тильда) рядом с атрибутом ресурса. Что это означает?",
     "options": [
-      "Ресурс будет удалён",
-      "In-place update: атрибут изменится без пересоздания ресурса. Это безопасное изменение в отличие от -/+",
-      "Ресурс будет создан",
-      "Ошибка в конфигурации"
+      "Terraform удалит remote object и освободит его state address",
+      "Terraform планирует in-place update; всё равно нужно проверить API effects и downtime",
+      "Terraform создаст отдельный object и не затронет существующий",
+      "Parser обнаружил invalid attribute expression в configuration"
     ],
     "answer": 1,
-    "explanation": "Символы terraform plan: '+' создание, '-' удаление, '~' изменение in-place (update), '-/+' пересоздание (destroy+create), '<=>' import, '<=' data source чтение. Тильда ~ — самое безопасное изменение: ресурс не пересоздаётся, просто обновляется атрибут через API. Например, изменение тегов EC2 инстанса."
+    "explanation": "~ означает update in place: address остаётся тем же и plan не предлагает replacement. Это не гарантирует отсутствие restart, краткого downtime или другого side effect — поведение определяет provider API и изменяемый attribute. Поэтому diff и provider documentation всё равно нужно проверить."
   },
   {
     "id": 327,
@@ -4616,13 +4616,13 @@
     "category": "output",
     "q": "ip route show показывает: '10.0.0.0/8 via 192.168.1.1 dev eth0'. Что означает 'via 192.168.1.1'?",
     "options": [
-      "Адрес назначения",
-      "Адрес источника",
-      "Next-hop: следующий маршрутизатор (gateway) для сетей 10.0.0.0/8. Трафик в подсети 10.x.x.x отправляется на 192.168.1.1, который должен быть в той же сети что и eth0.",
-      "Broadcast адрес"
+      "Destination IP, которым kernel заменит address перед route lookup",
+      "Source address, выбранный для application socket на outgoing host",
+      "Next-hop gateway для matching traffic; kernel отправляет packet через eth0",
+      "Broadcast address для обращения ко всем devices в destination prefix"
     ],
     "answer": 2,
-    "explanation": "Маршрут: для трафика в 10.0.0.0/8 — выйти через интерфейс eth0 и передать пакет роутеру 192.168.1.1 (next-hop). Роутер 192.168.1.1 должен быть доступен напрямую (L2) через eth0. ip route get 10.1.2.3 покажет какой именно маршрут будет использован. Longest prefix match — если есть 10.1.0.0/16 и 10.0.0.0/8, выберется более специфичный."
+    "explanation": "Для destination внутри 10.0.0.0/8 kernel выбирает этот route и передаёт packet gateway 192.168.1.1 через eth0. Gateway обычно должен разрешаться как on-link neighbor, если route явно не использует специальную recursive/onlink configuration. ip route get 10.1.2.3 показывает итог с учётом longest-prefix match и policy routing."
   },
   {
     "id": 328,
@@ -4631,13 +4631,13 @@
     "category": "output",
     "q": "systemctl status myservice показывает: 'Active: activating (auto-restart) since...'. Что происходит?",
     "options": [
-      "Сервис успешно запускается",
-      "Сервис ждёт зависимости",
-      "Нужно перезагрузить систему",
-      "Сервис упал и systemd пытается его перезапустить согласно Restart= политике. Это цикл краша. Нужно: journalctl -u myservice -n 50 чтобы найти причину краша."
+      "Unit уже active и ready; auto-restart относится к previous boot",
+      "Unit ждёт dependency и ещё не выполнял свой service process",
+      "System reboot поставлен в очередь параметром Restart= service unit",
+      "Предыдущая попытка завершилась, unit ждёт или повторяет start по Restart= policy"
     ],
     "answer": 3,
-    "explanation": "'activating (auto-restart)' — systemd выполняет RestartSec задержку перед следующей попыткой. Сервис в петле краш-перезапуск. Диагностика: journalctl -u myservice --since '10 min ago', обратить внимание на exit code и ошибки. Частые причины: ошибка конфига, отсутствующий файл, нехватка прав, занятый порт."
+    "explanation": "activating (auto-restart) означает промежуточное состояние после завершения process, когда Restart= policy и RestartSec ведут к новой попытке. Один restart ещё не доказывает loop. Проверяют Result/ExecMainStatus, NRestarts и journalctl -u myservice, затем устраняют причину перед изменением restart limits."
   },
   {
     "id": 329,
@@ -4646,13 +4646,13 @@
     "category": "output",
     "q": "Ansible выводит: '[WARNING]: Could not match supplied host pattern, ignoring: webservers'. Что это означает?",
     "options": [
-      "В inventory нет группы 'webservers' (или хостов с таким именем). Проверить имя группы в inventory, убедиться что inventory файл передан правильно (-i inventory).",
-      "Ошибка подключения к хостам",
-      "Ansible не может подключиться",
-      "Нужно обновить Ansible"
+      "Current inventory не содержит matching host/group; проверить -i и inventory graph",
+      "Matched hosts отклонили SSH authentication после inventory parsing",
+      "Controller разрешил group, но не достигает members через transport",
+      "Installed ansible-core version не умеет parsing group names"
     ],
     "answer": 0,
-    "explanation": "Это WARNING, не ERROR. Ansible не нашёл паттерн 'webservers' в inventory — возможно опечатка в имени группы, или используется другой inventory файл. Проверить: ansible-inventory -i inventory --list | grep webservers. Playbook продолжит выполнение но с пустым списком хостов — tasks не выполнятся. Добавить hosts: webservers в inventory."
+    "explanation": "Ansible не сопоставил pattern webservers ни с host, ни с group в загруженном inventory. Проверяют фактический -i/ANSIBLE_INVENTORY, ansible-inventory --graph и spelling. Это происходит до connection attempt; play с пустым host set будет пропущен, поэтому изменение SSH settings проблему не решит."
   },
   {
     "id": 330,
@@ -4661,13 +4661,13 @@
     "category": "output",
     "q": "df -h показывает /var 90% использования, но du -sh /var/* даёт сумму только 40%. В чём причина?",
     "options": [
-      "df показывает неверные данные",
-      "Файл удалён, но остался открытым работающим процессом (deleted open file). Дескриптор удержит inode и блоки пока процесс не закроет файл. Найти: lsof | grep deleted | sort -k7 -n",
-      "du и df считают по-разному",
-      "Нужно проверить filesystem"
+      "df рекурсивно читает filenames и поэтому пропустил sparse files под /var",
+      "Deleted file может оставаться open и держать blocks; проверить lsof +L1",
+      "du включает reserved blocks, а df их исключает, создавая такой direction gap",
+      "Разница доказывает corruption и требует немедленного fsck на mounted filesystem"
     ],
     "answer": 1,
-    "explanation": "Classic Linux gotcha: rm удаляет имя файла (dentry), но блоки освобождаются только когда счётчик ссылок inode = 0. Если процесс держит файловый дескриптор — блоки заняты, du не видит файл, df видит занятые блоки. lsof | grep '(deleted)' покажет виновников. Решения: перезапустить процесс, или truncate через /proc/<pid>/fd/<fd>."
+    "explanation": "Одна частая причина: unlink убрал directory entry, но process держит file descriptor, поэтому df учитывает blocks, а du не видит pathname. lsof +L1 /var помогает найти open files с link count меньше 1; после безопасного restart/reopen owner blocks освобождаются. Также проверяют mount boundaries, permissions и reserved space — gap не доказывает одну причину автоматически."
   },
   {
     "id": 331,
