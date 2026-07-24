@@ -1122,71 +1122,71 @@
   {
     "topic": "Сети",
     "level": "Senior",
-    "q": "Что такое reverse proxy?",
+    "q": "Какую роль выполняет reverse proxy?",
     "options": [
-      "Прокси перед backend-сервисами",
-      "Тип RAID",
-      "Сетевой драйвер",
-      "Сервис systemd"
+      "Принимает запросы клиентов и направляет их к backend, скрывая внутреннюю топологию сервисов",
+      "Объединяет block devices в RAID и распределяет blocks по дискам выбранного уровня",
+      "Загружает kernel network driver и создаёт интерфейс для каждого прикладного процесса",
+      "Запускает systemd units по dependency graph и перезапускает завершившиеся службы"
     ],
     "answer": 0,
-    "explanation": "Reverse proxy принимает клиентские запросы и направляет их дальше.",
+    "explanation": "Reverse proxy расположен со стороны сервера: он маршрутизирует запросы к backends и может завершать TLS, применять auth, limits, кеширование и observability. Конкретный набор функций зависит от продукта и конфигурации.",
     "id": 81
   },
   {
     "topic": "Сети",
     "level": "Senior",
-    "q": "Что делает load balancer?",
+    "q": "Что делает load balancer при обработке трафика?",
     "options": [
-      "Меняет inode",
-      "Распределяет нагрузку между несколькими узлами",
-      "Собирает логи",
-      "Меняет права"
+      "Изменяет inode открытых sockets, чтобы несколько процессов разделяли один file descriptor",
+      "Выбирает backend из набора целей по алгоритму и результатам health checks",
+      "Собирает application logs с узлов и хранит их в полнотекстовом поисковом индексе",
+      "Изменяет filesystem permissions процесса перед созданием каждого сетевого соединения"
     ],
     "answer": 1,
-    "explanation": "Балансировщик повышает отказоустойчивость и масштабируемость.",
+    "explanation": "Load balancer распределяет connections или requests между доступными targets. Он помогает масштабированию и переключению при отказах, но итоговая устойчивость зависит от корректных health checks и состояния shared dependencies.",
     "id": 82
   },
   {
     "topic": "Сети",
     "level": "Senior",
-    "q": "Что такое firewall?",
+    "q": "Какую задачу решает network firewall?",
     "options": [
-      "Тип DNS",
-      "Только антивирус",
-      "Механизм фильтрации сетевого трафика",
-      "Файловая система"
+      "Разрешает DNS names через recursive lookup и подписывает ответы ключом обслуживаемой zone",
+      "Ищет вредоносный код внутри файлов по сигнатурам и удаляет заражённые filesystem blocks",
+      "Разрешает или отклоняет network traffic по правилам о направлении, адресах, protocols и state",
+      "Создаёт filesystem для packets и хранит каждое соединение как отдельный regular file"
     ],
     "answer": 2,
-    "explanation": "Firewall ограничивает разрешённые соединения и направления.",
+    "explanation": "Firewall реализует policy на сетевом уровне, часто с отслеживанием состояния соединений. Он не заменяет application authorization, безопасную конфигурацию сервиса и анализ содержимого там, где это требуется.",
     "id": 83
   },
   {
     "topic": "Сети",
     "level": "Senior",
-    "q": "Какие порты относят к well-known?",
+    "q": "Какой диапазон IANA называет well-known service ports?",
     "options": [
-      "Только 80 и 443",
-      "1024–49151",
-      "49152–65535",
-      "0–1023"
+      "80–443, потому что этот интервал зарезервирован для HTTP, HTTPS и инфраструктурных protocols",
+      "1024–49151, который относится к user или registered ports для приложений и vendors",
+      "49152–65535, который обычно используется как dynamic или private port range",
+      "0–1023, где стандартные сервисы используют назначенные номера по registry"
     ],
     "answer": 3,
-    "explanation": "Это общеизвестный диапазон системных портов.",
+    "explanation": "Диапазон System Ports, традиционно называемый well-known, — 0–1023. Наличие зарегистрированного номера не доказывает, какой процесс фактически слушает port, поэтому диагностика проверяет socket и protocol.",
     "id": 84
   },
   {
     "topic": "Сети",
     "level": "Senior",
-    "q": "С чего начать диагностику, если сервис в контейнере не видит БД?",
+    "q": "Как последовательно искать причину недоступности БД из контейнера?",
     "options": [
-      "DNS, reachability, порт, firewall, policy",
-      "Сразу reinstall Docker",
-      "Сменить chmod",
-      "Удалить route"
+      "Проверить имя и адрес, route, TCP connect, listener, firewall/policy, credentials и server logs",
+      "Переустановить container runtime, не проверяя endpoint и доступность других network services",
+      "Изменить permissions файлов приложения, поскольку chmod управляет исходящими TCP connections",
+      "Удалить default route контейнера и ожидать, что runtime построит отдельный путь к database"
     ],
     "answer": 0,
-    "explanation": "Это правильный порядок базового troubleshooting.",
+    "explanation": "Диагностика идёт снизу вверх и фиксирует точку отказа: resolution, routing, transport, policy, TLS/auth и ответ приложения. Команды запускают из того же network namespace и с теми же параметрами, что workload.",
     "id": 85
   },
   {
@@ -1206,43 +1206,43 @@
   {
     "topic": "Сети",
     "level": "Senior",
-    "q": "Для чего нужен nmap?",
+    "q": "Для какой задачи используют nmap?",
     "options": [
-      "Проверка inode",
-      "Управление systemd",
-      "Сканирование портов и сервисов",
-      "Монтирование томов"
+      "Для проверки заполнения inode и поиска каталогов, занимающих место на mounted filesystem",
+      "Для управления systemd units и построения dependency graph загрузки операционной системы",
+      "Для исследования доступных hosts, ports и признаков services в разрешённых границах сети",
+      "Для подключения block volume и выбора filesystem options перед выполнением mount"
     ],
     "answer": 2,
-    "explanation": "nmap помогает понять поверхность доступных сервисов.",
+    "explanation": "nmap отправляет probes и классифицирует доступность ports, hosts и иногда версии services или ОС. Результат зависит от scan type, privileges, firewall и rate limits; сканирование выполняют только с разрешением владельца.",
     "id": 87
   },
   {
     "topic": "Сети",
     "level": "Senior",
-    "q": "Для чего нужен mtr?",
+    "q": "Какую диагностику даёт mtr?",
     "options": [
-      "Настройка VLAN",
-      "Изменение маршрута",
-      "TLS handshake",
-      "Комбинированный traceroute/ping для анализа пути"
+      "Назначает VLAN interfaces и проверяет распространение tags между access и trunk ports",
+      "Изменяет kernel route по результатам каждого probe и сохраняет самый быстрый next hop",
+      "Выполняет TLS handshake с каждым router и проверяет цепочку его X.509 certificates",
+      "Повторяет probes по маршруту и показывает latency и ответы hops во времени"
     ],
     "answer": 3,
-    "explanation": "mtr удобен для диагностики потерь и задержек по пути.",
+    "explanation": "mtr сочетает идеи traceroute и повторных probes. Потери ответов на промежуточном hop не означают потерю транзитного трафика, если следующие hops отвечают нормально: устройство может ограничивать ICMP control plane.",
     "id": 88
   },
   {
     "topic": "Сети",
     "level": "Senior",
-    "q": "Почему ping может не проходить, а TCP-сервис быть доступным?",
+    "q": "Почему успешность ping не определяет доступность TCP endpoint?",
     "options": [
-      "ICMP может быть заблокирован, TCP разрешён",
-      "Так невозможно",
-      "Из-за tfstate",
-      "Из-за playbook"
+      "ICMP echo и TCP фильтруются разными правилами, поэтому один protocol может работать без другого",
+      "Оба используют одну session, но ping закрывает её раньше завершения TCP three-way handshake",
+      "TCP endpoint хранится в Terraform state, а ping читает адрес из Ansible inventory",
+      "ICMP работает на application port сервиса и зависит от того же listener process"
     ],
     "answer": 0,
-    "explanation": "Нельзя делать вывод только по ping.",
+    "explanation": "ping проверяет ответы ICMP echo, а приложение — конкретный address, port и transport path. Firewall или host могут не отвечать на echo и при этом разрешать TCP, либо ситуация может быть обратной.",
     "id": 89
   },
   {
@@ -1262,29 +1262,29 @@
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что такое Ansible?",
+    "q": "Для чего применяют Ansible?",
     "options": [
-      "Тип ядра Linux",
-      "Только планировщик задач",
-      "Инструмент автоматизации и управления конфигурацией",
-      "СУБД"
+      "Для планирования kernel threads и распределения CPU time между процессами Linux",
+      "Для хранения relational data и выполнения транзакционных SQL-запросов приложений",
+      "Для автоматизации конфигурации, deployment и оркестрации через modules и playbooks",
+      "Для коммутации Ethernet frames и построения MAC address table сетевого устройства"
     ],
     "answer": 2,
-    "explanation": "Ansible используют для автоматизации настройки и оркестрации.",
+    "explanation": "Ansible выполняет declarative modules и при необходимости orchestration steps по inventory. Обычно он подключается к managed nodes по SSH или другим transports и не требует постоянного agent на Linux-хосте.",
     "id": 91
   },
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Чем Ansible отличается от Terraform в общем смысле?",
+    "q": "Как обычно разделяют задачи Ansible и Terraform?",
     "options": [
-      "Ansible только для DNS",
-      "Ничем",
-      "Terraform только для Linux",
-      "Ansible чаще про конфигурацию, Terraform про инфраструктуру"
+      "Ansible управляет DNS, а Terraform применяется для всех остальных infrastructure services",
+      "Инструменты выполняют одинаковую модель state и отличаются главным образом форматом файлов",
+      "Terraform настраивает приложения внутри Linux, а Ansible создаёт cloud resources через plan",
+      "Terraform управляет lifecycle инфраструктуры через state, Ansible чаще конфигурирует и оркестрирует"
     ],
     "answer": 3,
-    "explanation": "На интервью ждут именно это базовое различие.",
+    "explanation": "Граница не абсолютна: оба инструмента имеют пересекающиеся integrations. На практике Terraform удобен для resource graph и lifecycle инфраструктуры, Ansible — для настройки ОС, приложений и процедурных orchestration steps.",
     "id": 92
   },
   {
