@@ -200,7 +200,7 @@ test('exports a versioned progress backup through the extracted module', async (
   const backup = JSON.parse(Buffer.concat(chunks).toString('utf8'));
 
   expect(download.suggestedFilename()).toMatch(/^ipmax_\d{4}-\d{2}-\d{2}\.json$/);
-  expect(backup.version).toBe('12.11.0');
+  expect(backup.version).toBe('12.12.0');
   expect(backup.qprog['1']).toEqual({ correct: 2, wrong: 1 });
   expect(backup.onboarding.role).toBe(profile.role);
 });
@@ -314,6 +314,40 @@ test('defers exam cards and renders the full list in batches', async ({ page }) 
   await expect(page.locator('#questions-load-more')).toContainText('60/746');
   await page.locator('#questions-load-more button').click();
   await expect(page.locator('#questions-container .q-card')).toHaveCount(120);
+});
+
+test('routes exam answers and keyboard flashcards through the extracted UI module', async ({ page }) => {
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+  await page.locator('[data-page="exam"]').click();
+
+  const firstCard = page.locator('#questions-container .q-card').first();
+  await expect(firstCard).toBeVisible();
+  expect(await firstCard.locator('[onclick]').count()).toBe(0);
+  const correctIndex = await firstCard.locator('.q-opt').first().getAttribute('data-answer');
+  await firstCard.locator(`.q-opt[data-orig-idx="${correctIndex}"]`).click();
+  await expect(firstCard).toHaveClass(/correct/);
+  await expect(page.locator('#progress-info')).toContainText('✅ 1');
+
+  await page.getByRole('button', { name: 'Карточки', exact: true }).click();
+  const flashcard = page.locator('.flashcard').first();
+  await flashcard.focus();
+  await flashcard.press('Enter');
+  await expect(flashcard).toHaveClass(/flipped/);
+});
+
+test('offers a bound recovery action when there are no mistakes', async ({ page }) => {
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+  await page.locator('[data-page="exam"]').click();
+  await page.getByRole('button', { name: 'Ошибки', exact: true }).click();
+
+  const recovery = page.getByRole('button', { name: 'Показать все вопросы' });
+  await expect(recovery).toBeVisible();
+  expect(await recovery.getAttribute('onclick')).toBeNull();
+  await recovery.click();
+  await expect(page.locator('#questions-container .q-card')).toHaveCount(60);
+  await expect(page.locator('#mode-chips .chip').first()).toHaveClass(/active/);
 });
 
 test('keeps the focused daily plan usable on a compact viewport', async ({ page }) => {

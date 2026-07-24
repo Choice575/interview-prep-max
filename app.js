@@ -230,8 +230,6 @@ let updateReloadPending=false;
 let coachSessionLimit=0;
 let coachQuestionIds=null;
 let currentPracticeTopic='';
-const QUESTION_BATCH_SIZE=60;
-let questionRenderLimit=QUESTION_BATCH_SIZE;
 
 // ═══ NAV ═══
 const PAGE_TITLES={home:'Главная',study:'Учёба',practices:'Best Practices',exam:'Экзамен',analytics:'Аналитика',
@@ -354,10 +352,10 @@ document.addEventListener('keydown',function(e){
 });
 
 // ═══ TAGS ═══
-const TAG_MAP={Terraform:'tf',Linux:'lx','Сети':'net',Ansible:'ans',Docker:'docker',Kubernetes:'k8s','CI/CD':'cicd',Git:'git',Regex:'rx',Monitoring:'mon',Cloud:'cloud',Security:'sec'};
-function ttag(t){return '<span class="tag tag-'+(TAG_MAP[t]||'tf')+'">'+esc(t)+'</span>';}
-function ltag(l){const m={Junior:'jr',Middle:'md',Senior:'sr'};return '<span class="tag tag-'+(m[l]||'jr')+'">'+esc(l)+'</span>';}
-function ctag(c){if(!c||c==='definition') return '';const lbl={scenario:'Сценарий',tradeoff:'Trade-off',output:'Анализ вывода'};const cls={scenario:'sc',tradeoff:'tr',output:'out'};return '<span class="tag tag-'+(cls[c]||'sc')+'">'+esc(lbl[c]||c)+'</span>';}
+function requireExamUIModule(){if(typeof IPMaxExamUI==='undefined') throw new Error('Модуль экзамена не загружен.');return IPMaxExamUI;}
+function ttag(t){return requireExamUIModule().topicTag(t);}
+function ltag(l){return requireExamUIModule().levelTag(l);}
+function ctag(c){return requireExamUIModule().categoryTag(c);}
 
 // ═══ SYNTAX HIGHLIGHTING ═══
 function highlightDockerfile(code){return esc(code).replace(/^(FROM\s+.+)$/gm,'<span style="color:#c084fc">$1</span>').replace(/^(RUN\s+.+)$/gm,'<span style="color:#fbbf24">$1</span>').replace(/^(COPY|ADD)\s+(.+)$/gm,'<span style="color:#38bdf8">$1</span> <span style="color:#a5b4fc">$2</span>').replace(/^(CMD|ENTRYPOINT)\s+(.+)$/gm,'<span style="color:#4ade80">$1</span> <span style="color:#fde68a">$2</span>').replace(/^(WORKDIR|EXPOSE|ENV|USER|HEALTHCHECK)\s+(.+)$/gm,'<span style="color:#fb923c">$1</span> <span style="color:#cbd5e1">$2</span>').replace(/^(#.+)$/gm,'<span style="color:#64748b">$1</span>').replace(/--([a-z-]+)/g,'<span style="color:#f59e0b">--$1</span>');}
@@ -365,7 +363,7 @@ function highlightYAML(code){return esc(code).replace(/^(\s*)([a-z_][a-z_0-9]*):
 function highlightHCL(code){return esc(code).replace(/(resource|data|variable|output|provider|module|terraform)\s+"([^"]+)"/g,'<span style="color:#c084fc">$1</span> <span style="color:#4ade80">"$2"</span>').replace(/(resource|data|variable|output|provider|module|terraform)\s+/g,'<span style="color:#c084fc">$1</span> ').replace(/=\s*(true|false)/g,'= <span style="color:#f59e0b">$1</span>').replace(/(#.+)$/gm,'<span style="color:#64748b">$1</span>').replace(/"([^"]*)"/g,'<span style="color:#4ade80">"$1"</span>');}
 
 // ═══ EXAM ═══
-function resetQuestionRenderLimit(){questionRenderLimit=QUESTION_BATCH_SIZE;}
+function resetQuestionRenderLimit(){requireExamUI().resetRenderLimit();}
 function setMode(m,el){resetCoachSelection();currentMode=m;resetQuestionRenderLimit();setChip('mode-chips',el);clearTInterval();renderQuestions();}
 function setView(v,el){currentView=v;resetQuestionRenderLimit();setChip('view-chips',el);clearTInterval();renderQuestions();}
 function setTopic(t,el){resetCoachSelection();currentTopic=t;resetQuestionRenderLimit();setChip('topic-chips',el);renderQuestions();}
@@ -384,129 +382,37 @@ function toggleInterviewMode(){
   resetQuestionRenderLimit();renderQuestions();
 }
 
-function filterQs(){
-  let qs=getAllQ();
-  if(Array.isArray(coachQuestionIds)&&coachQuestionIds.length){const ids=new Set(coachQuestionIds.map(String));qs=qs.filter(q=>ids.has(String(q.id)));}
-  if(currentTopic!=='all') qs=qs.filter(q=>q.topic===currentTopic);
-  if(currentLevel!=='all') qs=qs.filter(q=>q.level===currentLevel);
-  if(currentCategory!=='all') qs=qs.filter(q=>(q.category||'definition')===currentCategory);
-  const s=document.getElementById('exam-search')?.value?.toLowerCase()||'';
-  if(s) qs=qs.filter(q=>q.q.toLowerCase().includes(s)||(q.options||[]).some(o=>o.toLowerCase().includes(s)));
-  const mistakes=getMistakes();const qprog=getQProg();
-  if(currentMode==='mistakes'){
-    qs=qs.filter(q=>mistakes[q.id]);
-    if(!qs.length){document.getElementById('questions-container').innerHTML='<div class="empty-state"><div class="icon">✅</div><p>Ошибок нет — отличная работа!</p><button class="btn btn-primary btn-sm" onclick="currentMode=\'all\';renderQuestions()">Показать все вопросы</button></div>';return qs;}
+const examUI=requireExamUIModule().create({
+  getQuestions:getAllQ,getQuestionProgress:getQProg,getMistakes,
+  getFilters:()=>({
+    coachQuestionIds,topic:currentTopic,level:currentLevel,category:currentCategory,mode:currentMode,
+    search:document.getElementById('exam-search')?.value||'',coachSessionLimit
+  }),
+  getView:()=>currentView,getTimerSeconds:()=>timerSecs,
+  getStudyMode:()=>document.getElementById('study-mode-cb')?.checked||cameFromStudy,
+  getInterviewMode:()=>interviewMode&&!cameFromStudy,
+  getActiveQuestions:()=>activeQuestions,setActiveQuestions:questions=>{activeQuestions=questions;},
+  getSingleIndex:()=>singleIdx,resetSingleIndex:()=>{singleIdx=0;},
+  randomize:shuffle,clearTimer:clearTInterval,renderFreeform,startTimer,
+  markQuestionStarted:(id,at)=>{questionStartTime[id]=at;},answer:pick,now:()=>Date.now(),
+  resetMistakesMode:()=>{
+    currentMode='all';
+    setChip('mode-chips',document.querySelector('#mode-chips .chip'));
+    resetQuestionRenderLimit();renderQuestions();
   }
-  if(currentMode==='smart'||currentMode==='srs'){
-    const now=Date.now();
-    if(currentMode==='srs'){
-      // Только вопросы, которые пора повторить
-      qs=qs.filter(q=>{const p=qprog[q.id];return p&&p.nextReviewAt&&p.nextReviewAt<=now;});
-    } else {
-      // Умный: ошибки + давно не видел + низкий процент
-      qs=qs.filter(q=>{const p=qprog[q.id];if(!p) return true;const r=p.correct/(p.correct+p.wrong);const age=(now-(p.lastSeen||0))/3600000;return r<0.7||age>24;});
-    }
-  }
-  if(coachSessionLimit>0&&(currentMode==='smart'||currentMode==='srs')) qs=shuffle(qs).slice(0,coachSessionLimit);
-  if(['mix10','mix20','mix30'].includes(currentMode)){
-    const n={mix10:10,mix20:20,mix30:30}[currentMode];
-    qs=shuffle(qs).slice(0,n);
-  }
-  return qs;
-}
-
-function renderQuestions(){
-  clearTInterval();
-  const qs=filterQs();activeQuestions=qs;
-  const cont=document.getElementById('questions-container');
-  const sc=document.getElementById('single-controls');
-  const pi=document.getElementById('progress-info');
-  const sb=document.getElementById('seg-bar');
-  if(!qs.length){cont.innerHTML='<div class="empty-state"><div class="icon">🔍</div><p>Нет вопросов для выбранных фильтров</p></div>';sc.style.display='none';sb.style.display='none';pi.innerHTML='';return;}
-  const qprog=getQProg();const total=qs.length;
-  let ok=0,err=0;
-  qs.forEach(q=>{const p=qprog[q.id];if(p){if(p.correct>p.wrong)ok++;else if(p.wrong>0)err++;}});
-  sb.style.display='flex';
-  sb.innerHTML='<div class="seg-ok" style="width:'+(ok/total*100)+'%"></div><div class="seg-err" style="width:'+(err/total*100)+'%"></div><div class="seg-none" style="width:'+((total-ok-err)/total*100)+'%"></div>';
-  pi.innerHTML='<span style="font-size:12px;color:var(--text2)">Показано: <b>'+total+'</b> | ✅ '+ok+' | ❌ '+err+' | ⭕ '+(total-ok-err)+'</span>';
-  if(currentView==='flashcard'){renderFlashcards(qs);sc.style.display='none';return;}
-  if(currentView==='freeform'){renderFreeform();sc.style.display='none';return;}
-  if(currentView==='single'){singleIdx=0;renderSingle();sc.style.display='block';return;}
-  sc.style.display='none';
-  const visible=qs.slice(0,questionRenderLimit);
-  questionRenderLimit=visible.length;
-  cont.innerHTML=visible.map(q=>renderQCard(q,false)).join('')+renderLoadMoreQuestions(qs.length);
-  bindLoadMoreQuestions();
-}
-
-function renderLoadMoreQuestions(total){
-  if(questionRenderLimit>=total) return '';
-  return '<div id="questions-load-more" style="text-align:center;padding:18px"><button type="button" class="btn btn-outline">Показать ещё '+Math.min(QUESTION_BATCH_SIZE,total-questionRenderLimit)+' · '+questionRenderLimit+'/'+total+'</button></div>';
-}
-function bindLoadMoreQuestions(){
-  document.querySelector('#questions-load-more button')?.addEventListener('click',loadMoreQuestions);
-}
-function loadMoreQuestions(){
-  const cont=document.getElementById('questions-container');
-  if(!cont) return;
-  document.getElementById('questions-load-more')?.remove();
-  const start=questionRenderLimit;
-  const end=Math.min(start+QUESTION_BATCH_SIZE,activeQuestions.length);
-  const questions=activeQuestions.slice(start,end);
-  questionRenderLimit=end;
-  const html=currentView==='flashcard'?renderFlashcardMarkup(questions):questions.map(q=>renderQCard(q,false)).join('');
-  cont.insertAdjacentHTML('beforeend',html+renderLoadMoreQuestions(activeQuestions.length));
-  bindLoadMoreQuestions();
-}
-
-function updateQuestionProgressSummary(){
-  const pi=document.getElementById('progress-info');
-  const sb=document.getElementById('seg-bar');
-  if(!pi||!sb||!activeQuestions.length||sb.style.display==='none') return;
-  const qprog=getQProg();const total=activeQuestions.length;
-  let ok=0,err=0;
-  activeQuestions.forEach(q=>{const p=qprog[q.id];if(p){if(p.correct>p.wrong)ok++;else if(p.wrong>0)err++;}});
-  sb.innerHTML='<div class="seg-ok" style="width:'+(ok/total*100)+'%"></div><div class="seg-err" style="width:'+(err/total*100)+'%"></div><div class="seg-none" style="width:'+((total-ok-err)/total*100)+'%"></div>';
-  pi.innerHTML='<span style="font-size:12px;color:var(--text2)">Показано: <b>'+total+'</b> | ✅ '+ok+' | ❌ '+err+' | ⭕ '+(total-ok-err)+'</span>';
-}
-
-function renderQCard(q,sMode){
-  const mistakes=getMistakes();const qprog=getQProg();const qp=qprog[q.id]||{correct:0,wrong:0};
-  const L=['A','B','C','D','E'];const opts=(q.options||[]);
-  const order=[...Array(opts.length).keys()];
-  for(let i=order.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[order[i],order[j]]=[order[j],order[i]];}
-  const studyMode=document.getElementById('study-mode-cb')?.checked||cameFromStudy;
-  const isInterview=interviewMode&&!studyMode&&!cameFromStudy;
-  questionStartTime[q.id]=Date.now();
-  return '<div class="q-card" id="qcard-'+q.id+'">'+
-    '<div class="q-meta">'+ttag(q.topic)+ltag(q.level)+ctag(q.category)+
-    '<span class="q-num">#'+q.id+(mistakes[q.id]?' ❌':'')+
-    ' <span style="color:var(--text3)">✅'+qp.correct+' ❌'+qp.wrong+'</span></span>'+
-    (sMode&&timerSecs?'<span class="q-timer" id="timer-'+q.id+'">'+timerSecs+'с</span>':'')+
-    '</div>'+
-    '<div class="q-text">'+esc(q.q)+'</div>'+
-    '<div class="q-options">'+
-    order.map((origIdx,visPos)=>'<button type="button" class="q-opt" id="opt-'+q.id+'-'+visPos+'" data-orig-idx="'+origIdx+'" data-answer="'+q.answer+'" onclick="pick('+q.id+','+origIdx+','+q.answer+')"><span class="opt-letter">'+L[visPos]+'</span><span>'+esc(opts[origIdx])+'</span></button>').join('')+
-    '</div>'+
-    (q.explanation&&studyMode?'<div class="q-explanation">💡 '+esc(q.explanation)+buildWhyWrong(q,opts)+'</div>':'')+
-    '<div id="qexpl-'+q.id+'" style="display:none" class="q-explanation"></div>'+
-    (isInterview?'<div class="q-interview-note">🎤 Режим собеседования — отвечайте развёрнуто, без подсказок</div>':'')+
-    '</div>';
-}
-
-function buildWhyWrong(q,opts){
-  if(!q.explanation||!opts) return '';
-  const correctIdx=q.answer;
-  const wrongOpts=opts.filter((_,i)=>i!==correctIdx);
-  if(!wrongOpts.length) return '';
-  return '<div class="q-why-wrong"><div style="font-size:11px;font-weight:700;color:var(--text3);margin-top:8px;margin-bottom:4px">❓ Почему остальные варианты неверны:</div>'+
-    wrongOpts.map(o=>'<div style="font-size:12px;color:var(--text2);margin-bottom:2px">• '+esc(o.slice(0,80))+(o.length>80?'…':'')+'</div>').join('')+'</div>';
-}
+});
+function requireExamUI(){if(!examUI) throw new Error('Модуль экзамена не инициализирован.');return examUI;}
+function filterQs(){return requireExamUI().filterCurrentQuestions();}
+function renderQuestions(){return requireExamUI().renderQuestions();}
+function loadMoreQuestions(){return requireExamUI().loadMoreQuestions();}
+function updateQuestionProgressSummary(){return requireExamUI().updateProgressSummary();}
+function renderQCard(q,sMode){return requireExamUI().renderQuestionCard(q,sMode);}
 
 function pick(qid,chosen,correct){
   const card=document.getElementById('qcard-'+qid);
   if(!card||card.querySelector('.q-opt.correct-opt')) return;
-  const q=getAllQ().find(x=>x.id===qid);
+  const q=getAllQ().find(x=>String(x.id)===String(qid));
+  if(!q) return;
   const opts=card.querySelectorAll('.q-opt');
   opts.forEach(o=>{o.classList.add('disabled');const oi=parseInt(o.getAttribute('data-orig-idx'));if(oi===correct)o.classList.add('correct-opt');else if(oi===chosen)o.classList.add('wrong-opt');});
   const ok=chosen===correct;
@@ -524,10 +430,7 @@ function pick(qid,chosen,correct){
 function pageActive(p){return document.getElementById('page-'+p)?.classList.contains('active');}
 
 function renderSingle(){
-  const q=activeQuestions[singleIdx];if(!q) return;
-  document.getElementById('questions-container').innerHTML=renderQCard(q,true);
-  document.getElementById('single-counter').textContent=(singleIdx+1)+' / '+activeQuestions.length;
-  if(timerSecs>0) startTimer(q.id,timerSecs);
+  return requireExamUI().renderSingle();
 }
 function singleNext(){clearTInterval();if(singleIdx<activeQuestions.length-1){singleIdx++;renderSingle();}}
 function singlePrev(){clearTInterval();if(singleIdx>0){singleIdx--;renderSingle();}}
@@ -540,22 +443,7 @@ function startTimer(qid,secs){
   };
   tick();timerInterval=setInterval(tick,1000);
 }
-function autoFail(qid){const q=getAllQ().find(x=>x.id===qid);if(!q) return;const c=document.getElementById('qcard-'+qid);if(!c||c.querySelector('.q-opt.correct-opt')) return;pick(qid,-1,q.answer);}
-
-function renderFlashcardMarkup(qs){
-  return qs.map(q=>
-    '<div class="flashcard" id="fc-'+q.id+'" onclick="flipCard('+q.id+')"><div class="flashcard-inner"><div class="fc-front"><div class="q-meta" style="justify-content:center;margin-bottom:10px">'+ttag(q.topic)+ltag(q.level)+'</div><p>'+esc(q.q)+'</p><div style="margin-top:10px;font-size:11px;color:var(--text3)">Нажмите для ответа</div></div>'+
-    '<div class="fc-back"><div style="font-weight:700;color:var(--primary-h);margin-bottom:8px">✅ '+esc((q.options||[])[q.answer]||'')+'</div>'+(q.explanation?'<p style="font-size:13px;color:var(--text2)">'+esc(q.explanation)+'</p>':'')+
-    '</div></div></div>'
-  ).join('');
-}
-function renderFlashcards(qs){
-  const visible=qs.slice(0,questionRenderLimit);
-  questionRenderLimit=visible.length;
-  document.getElementById('questions-container').innerHTML=renderFlashcardMarkup(visible)+renderLoadMoreQuestions(qs.length);
-  bindLoadMoreQuestions();
-}
-function flipCard(id){document.getElementById('fc-'+id)?.classList.toggle('flipped');}
+function autoFail(qid){const q=getAllQ().find(x=>String(x.id)===String(qid));if(!q) return;const c=document.getElementById('qcard-'+qid);if(!c||c.querySelector('.q-opt.correct-opt')) return;pick(qid,-1,q.answer);}
 
 // ═══ FREEFORM MODE (ответ без вариантов) ═══
 let freeformIdx=0, freeformQs=[], freeformAnswers={};
@@ -900,7 +788,7 @@ function startCoachControlMode(plan){
 // ═══ ANALYTICS ═══
 const analyticsUI=typeof IPMaxAnalyticsUI!=='undefined'?IPMaxAnalyticsUI.create({
   get:(key,fallback)=>lsGet(key,fallback),getQuestionProgress:getQProg,getQuestions:getAllQ,getMistakes,getTopics:getAllTopics,
-  escape:esc,tagMap:TAG_MAP,localDateKey:timestamp=>IPMaxDate.localDateKey(timestamp),
+  escape:esc,tagMap:requireExamUIModule().TOPIC_CLASSES,localDateKey:timestamp=>IPMaxDate.localDateKey(timestamp),
   startExam:()=>nav('exam'),startDiagnostic,
   startQuestion:question=>startAnalyticsQuestions([question]),
   startQuestions:startAnalyticsQuestions
@@ -1404,7 +1292,7 @@ document.addEventListener('keydown',function(e){
 
 // ═══ OFFLINE READINESS CHECK ═══
 async function checkOfflineReady(){
-  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./analytics-ui.js','./home-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','labs','tips','incidents','study_map','study_tests','senior_cases','best_practices'];
   tasks.forEach(t=>files.push('./tasks/'+t+'.json'));
   let ok=0,fail=0;const results=[];

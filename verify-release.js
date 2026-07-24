@@ -28,9 +28,10 @@ const aiCoachScriptIndex = html.indexOf('<script src="./ai-coach.js"></script>')
 const progressIoScriptIndex = html.indexOf('<script src="./progress-io.js"></script>');
 const analyticsUiScriptIndex = html.indexOf('<script src="./analytics-ui.js"></script>');
 const homeUiScriptIndex = html.indexOf('<script src="./home-ui.js"></script>');
+const examUiScriptIndex = html.indexOf('<script src="./exam-ui.js"></script>');
 const coachUiScriptIndex = html.indexOf('<script src="./coach-ui.js"></script>');
 const appScriptIndex = html.indexOf('<script src="./app.js"></script>');
-expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && aiCoachScriptIndex > coachScriptIndex && progressIoScriptIndex > aiCoachScriptIndex && analyticsUiScriptIndex > progressIoScriptIndex && homeUiScriptIndex > analyticsUiScriptIndex && coachUiScriptIndex > homeUiScriptIndex && appScriptIndex > coachUiScriptIndex, 'index.html должен загружать browser-модули до app.js в установленном порядке');
+expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && aiCoachScriptIndex > coachScriptIndex && progressIoScriptIndex > aiCoachScriptIndex && analyticsUiScriptIndex > progressIoScriptIndex && homeUiScriptIndex > analyticsUiScriptIndex && examUiScriptIndex > homeUiScriptIndex && coachUiScriptIndex > examUiScriptIndex && appScriptIndex > coachUiScriptIndex, 'index.html должен загружать browser-модули до app.js в установленном порядке');
 expect(manifest.start_url === './' && manifest.scope === './', 'manifest должен использовать относительные start_url и scope');
 
 const requiredIcons = [
@@ -60,7 +61,7 @@ dataFiles.forEach(file => expect(fs.existsSync(path.join(root, file)), `отсу
 const assetsBlock = sw.match(/const ASSETS = \[([\s\S]*?)\];/);
 expect(!!assetsBlock, 'не найден ASSETS в sw.js');
 const assets = assetsBlock ? [...assetsBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
-['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './analytics-ui.js', './home-ui.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
+['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './analytics-ui.js', './home-ui.js', './exam-ui.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
   expect(assets.includes(file), `offline-кеш не содержит ${file}`);
 });
 dataFiles.forEach(file => expect(assets.includes('./' + file), `offline-кеш не содержит ./${file}`));
