@@ -954,15 +954,15 @@
   {
     "topic": "Сети",
     "level": "Middle",
-    "q": "Что такое default gateway?",
+    "q": "Когда хост использует default gateway?",
     "options": [
-      "Шлюз для выхода в другие сети",
-      "Локальный DNS",
-      "Сетевой лог",
-      "TLS-сертификат"
+      "Когда таблица маршрутизации не содержит более специфичного route для адреса назначения",
+      "Когда локальный DNS не получил ответ и передаёт имя следующему authoritative server",
+      "Когда приложение не выбрало transport port и просит ядро назначить ephemeral значение",
+      "Когда TLS-клиент не доверяет сертификату и направляет handshake через другой endpoint"
     ],
     "answer": 0,
-    "explanation": "Через него хост отправляет трафик вне своей подсети.",
+    "explanation": "Default route — наименее специфичный маршрут, обычно 0.0.0.0/0 или ::/0. Хост выбирает route по longest-prefix match; gateway должен быть достижим через подходящий link или связанный маршрут.",
     "id": 69
   },
   {
@@ -982,29 +982,29 @@
   {
     "topic": "Сети",
     "level": "Middle",
-    "q": "Зачем видеозвонкам часто нужен UDP?",
+    "q": "Почему real-time медиатрафик часто передают поверх UDP?",
     "options": [
-      "Потому что TCP нельзя в интернете",
-      "Потому что UDP надёжнее TCP",
-      "Из-за минимальной задержки и терпимости к потерям",
-      "Из-за inode"
+      "UDP восстанавливает потерянные packets на transport layer и сохраняет порядок доставки frames",
+      "UDP резервирует полосу на каждом router и тем самым ограничивает network jitter",
+      "Приложение само управляет потерями и timing, не ожидая поздних transport retransmissions",
+      "UDP согласует media codec при handshake и выбирает частоту кадров между участниками"
     ],
     "answer": 2,
-    "explanation": "Для real-time коммуникации важна низкая задержка.",
+    "explanation": "Для интерактивного аудио и видео поздний пакет может быть бесполезнее потерянного. UDP позволяет RTP, QUIC или приложению выбирать retransmission, congestion control и компенсацию jitter под конкретный поток.",
     "id": 71
   },
   {
     "topic": "Сети",
     "level": "Middle",
-    "q": "Почему веб-страницы обычно грузятся по TCP?",
+    "q": "Чем транспорт HTTP/2 обычно отличается от HTTP/3?",
     "options": [
-      "Потому что UDP запрещён",
-      "Из-за broadcast",
-      "Из-за меньшей задержки любой ценой",
-      "Из-за надёжной доставки"
+      "HTTP/2 передаёт datagrams без соединения, а HTTP/3 создаёт отдельный TCP stream для запроса",
+      "HTTP/2 использует broadcast Ethernet, а HTTP/3 доставляет frames через multicast routing",
+      "HTTP/2 работает без шифрования transport, а HTTP/3 переносит обычный TLS поверх TCP",
+      "HTTP/2 обычно работает поверх TCP и TLS, а HTTP/3 — поверх QUIC, использующего UDP"
     ],
     "answer": 3,
-    "explanation": "Для HTTP/HTTPS важно корректно доставить данные.",
+    "explanation": "HTTP/3 использует QUIC: TLS интегрирован в protocol, а независимые streams уменьшают transport head-of-line blocking между запросами. HTTP semantics сохраняются, меняется нижележащий transport.",
     "id": 72
   },
   {
@@ -1024,99 +1024,99 @@
   {
     "topic": "Сети",
     "level": "Middle",
-    "q": "Что такое TTL в DNS?",
+    "q": "Что задаёт TTL в DNS resource record?",
     "options": [
-      "Тип TLS",
-      "Время жизни записи в кэше",
-      "Размер пакета",
-      "Номер VLAN"
+      "Версию TLS, которую resolver должен использовать при подключении к authoritative server",
+      "Срок, в течение которого cache может использовать ответ до повторного разрешения имени",
+      "Максимальный размер UDP packet, после которого DNS обязан перейти на другой transport",
+      "Идентификатор VLAN, через который клиент отправляет запрос к локальному resolver"
     ],
     "answer": 1,
-    "explanation": "TTL влияет на кэширование и скорость обновления записи.",
+    "explanation": "TTL управляет временем кеширования положительных записей. Малое значение ускоряет распространение последующих изменений ценой большего числа запросов; уже кешированный ответ живёт до окончания полученного TTL.",
     "id": 74
   },
   {
     "topic": "Сети",
     "level": "Middle",
-    "q": "Что делает рекурсивный DNS-сервер?",
+    "q": "Что делает recursive DNS resolver для клиента?",
     "options": [
-      "Маршрутизирует трафик",
-      "Хранит только зону root",
-      "Ищет ответ от имени клиента",
-      "Открывает порт 53"
+      "Маршрутизирует IP packets к authoritative server и изменяет destination address через NAT",
+      "Хранит zone file корневой зоны и публикует её как authoritative источник для интернета",
+      "Находит или пересылает запрос к нужным DNS-серверам, кеширует результат и возвращает ответ",
+      "Открывает transport port приложения и поддерживает TCP session до завершения HTTP-запроса"
     ],
     "answer": 2,
-    "explanation": "Он сам проходит цепочку запросов до ответа.",
+    "explanation": "Recursive resolver принимает запрос клиента, использует cache, выполняет iterative lookup по DNS hierarchy или обращается к upstream resolver. Он возвращает итоговый ответ, negative response или ошибку.",
     "id": 75
   },
   {
     "topic": "Сети",
     "level": "Middle",
-    "q": "Что делает авторитативный DNS-сервер?",
+    "q": "Как отвечает authoritative DNS server?",
     "options": [
-      "Шифрует HTTP",
-      "Заменяет traceroute",
-      "Балансирует трафик",
-      "Отвечает за конкретную зону как источник истины"
+      "Завершает TLS для веб-приложения и выбирает backend по значению DNS query name",
+      "Строит IP route до клиента и возвращает адрес ближайшего gateway для его подсети",
+      "Выполняет recursive lookup по чужим зонам и кеширует найденные records для пользователей",
+      "Возвращает данные обслуживаемой zone или authoritative отрицательный ответ без recursion"
     ],
     "answer": 3,
-    "explanation": "Он хранит и отдаёт финальные данные по своей зоне.",
+    "explanation": "Authoritative server обслуживает делегированную ему zone по загруженным данным и отвечает с authoritative признаком. Primary и secondary могут получать zone разными способами, но оба являются authoritative для запросов.",
     "id": 76
   },
   {
     "topic": "Сети",
     "level": "Middle",
-    "q": "Какие записи DNS часто спрашивают на собеседовании?",
+    "q": "Какое сопоставление распространённых DNS record types корректно?",
     "options": [
-      "A, AAAA, CNAME, MX, TXT, SRV, NS",
-      "chmod, chown",
-      "GET, POST",
-      "PV, VG, LV"
+      "A/AAAA — адреса, CNAME — alias, MX — почта, NS — servers зоны, TXT — текстовые данные",
+      "A/AAAA — transport ports, CNAME — certificate, MX — route, NS — subnet, TXT — binary payload",
+      "A/AAAA — users, CNAME — VLAN, MX — filesystem, NS — process, TXT — memory mapping",
+      "A/AAAA — HTTP methods, CNAME — status code, MX — cookie, NS — header, TXT — request body"
     ],
     "answer": 0,
-    "explanation": "Это базовые типы записей, которые полезно знать.",
+    "explanation": "A и AAAA связывают имя с IPv4/IPv6, CNAME задаёт canonical alias, MX — mail exchangers, NS — authoritative servers зоны. TXT хранит текстовые значения, SRV описывает service endpoint с port и priority.",
     "id": 77
   },
   {
     "topic": "Сети",
     "level": "Middle",
-    "q": "Чем HTTP отличается от HTTPS?",
+    "q": "Что добавляет HTTPS по сравнению с HTTP?",
     "options": [
-      "HTTPS только быстрее",
-      "HTTPS использует TLS/SSL",
-      "HTTP всегда шифруется",
-      "Разницы нет"
+      "Обязательное кеширование ответов proxy и автоматическое уменьшение latency каждого запроса",
+      "TLS-защиту канала: конфиденциальность, целостность и аутентификацию peer по сертификату",
+      "Встроенную проверку бизнес-логики приложения и подтверждение отсутствия уязвимостей сервера",
+      "Сокрытие IP-адресов участников и DNS-имён от сетевой инфраструктуры на всём пути"
     ],
     "answer": 1,
-    "explanation": "HTTPS добавляет защищённый канал.",
+    "explanation": "HTTPS — HTTP поверх TLS. Обычно сертификат аутентифицирует server, а mTLS может аутентифицировать client; TLS не исправляет уязвимости приложения и не скрывает все сетевые metadata.",
     "id": 78
   },
   {
     "topic": "Сети",
     "level": "Middle",
-    "q": "Какие группы HTTP-кодов нужно знать?",
+    "q": "Как интерпретируются классы HTTP status codes?",
     "options": [
-      "Только 404 и 500",
-      "Только 200",
-      "1xx–5xx",
-      "10–99"
+      "1xx и 2xx обозначают client errors, 3xx — server errors, 4xx и 5xx — успешные ответы",
+      "Класс определяет transport protocol: 1xx — UDP, 2xx — TCP, 3xx–5xx — QUIC",
+      "1xx — информация, 2xx — успех, 3xx — redirect, 4xx — client error, 5xx — server error",
+      "Первая цифра задаёт priority запроса, а последующие две — время кеширования ответа"
     ],
     "answer": 2,
-    "explanation": "Обычно ожидают понимание классов ответов.",
+    "explanation": "Класс даёт общую категорию результата, а конкретный code уточняет semantics. Например, не каждый 4xx означает ошибку пользователя и не каждый 5xx допускает безопасный retry без учёта метода и контекста.",
     "id": 79
   },
   {
     "topic": "Сети",
     "level": "Middle",
-    "q": "Чем POST отличается от PUT/PATCH в общем смысле?",
+    "q": "Как в общем случае различаются POST, PUT и PATCH?",
     "options": [
-      "PATCH удаляет DNS",
-      "Ничем",
-      "PUT только читает",
-      "POST чаще создаёт, PUT заменяет, PATCH частично изменяет"
+      "PATCH удаляет DNS record ресурса, а POST и PUT меняют transport route до endpoint",
+      "Методы имеют одинаковую semantics, а различие определяется порядком headers в запросе",
+      "PUT читает представление ресурса, POST проверяет cache, а PATCH выполняет redirect клиента",
+      "POST передаёт данные на обработку, PUT задаёт состояние target, PATCH описывает частичное изменение"
     ],
     "answer": 3,
-    "explanation": "Это типовой теоретический вопрос на backend/network интервью.",
+    "explanation": "POST имеет resource-specific processing и часто создаёт подресурс. PUT обычно идемпотентно создаёт или заменяет состояние по известному URI, PATCH применяет частичное изменение; точная semantics зависит от API и media type.",
     "id": 80
   },
   {

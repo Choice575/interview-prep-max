@@ -8,16 +8,16 @@
     186
   ],
   "issueBudget": {
-    "length-cue": 35,
+    "length-cue": 29,
     "question-echo": 1,
-    "absolute-distractor": 41,
+    "absolute-distractor": 36,
     "duplicate-question": 2
   },
   "topics": {
     "Сети": {
-      "length-cue": 13,
+      "length-cue": 7,
       "question-echo": 1,
-      "absolute-distractor": 8,
+      "absolute-distractor": 3,
       "duplicate-question": 0
     },
     "Ansible": {
@@ -46,12 +46,6 @@
     }
   },
   "levels": {
-    "Middle": {
-      "length-cue": 15,
-      "question-echo": 0,
-      "absolute-distractor": 11,
-      "duplicate-question": 0
-    },
     "Senior": {
       "length-cue": 16,
       "question-echo": 1,
@@ -63,6 +57,12 @@
       "question-echo": 0,
       "absolute-distractor": 4,
       "duplicate-question": 1
+    },
+    "Middle": {
+      "length-cue": 9,
+      "question-echo": 0,
+      "absolute-distractor": 6,
+      "duplicate-question": 0
     }
   }
 }
