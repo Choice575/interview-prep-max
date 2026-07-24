@@ -8,9 +8,9 @@
     186
   ],
   "issueBudget": {
-    "length-cue": 204,
-    "question-echo": 5,
-    "absolute-distractor": 96,
+    "length-cue": 175,
+    "question-echo": 4,
+    "absolute-distractor": 82,
     "duplicate-question": 4
   },
   "topics": {
@@ -33,28 +33,28 @@
       "duplicate-question": 0
     },
     "Ansible": {
-      "length-cue": 36,
+      "length-cue": 26,
       "question-echo": 0,
-      "absolute-distractor": 23,
-      "duplicate-question": 0
-    },
-    "Docker": {
-      "length-cue": 10,
-      "question-echo": 1,
-      "absolute-distractor": 3,
+      "absolute-distractor": 14,
       "duplicate-question": 0
     },
     "Kubernetes": {
-      "length-cue": 16,
+      "length-cue": 11,
       "question-echo": 0,
       "absolute-distractor": 3,
       "duplicate-question": 0
     },
     "CI/CD": {
-      "length-cue": 18,
+      "length-cue": 13,
       "question-echo": 1,
-      "absolute-distractor": 3,
+      "absolute-distractor": 1,
       "duplicate-question": 1
+    },
+    "Docker": {
+      "length-cue": 1,
+      "question-echo": 0,
+      "absolute-distractor": 0,
+      "duplicate-question": 0
     },
     "Monitoring": {
       "length-cue": 24,
@@ -77,21 +77,21 @@
   },
   "levels": {
     "Middle": {
-      "length-cue": 95,
+      "length-cue": 82,
       "question-echo": 0,
-      "absolute-distractor": 37,
+      "absolute-distractor": 30,
       "duplicate-question": 2
     },
     "Senior": {
-      "length-cue": 54,
+      "length-cue": 50,
       "question-echo": 3,
-      "absolute-distractor": 45,
+      "absolute-distractor": 41,
       "duplicate-question": 1
     },
     "Junior": {
-      "length-cue": 55,
-      "question-echo": 2,
-      "absolute-distractor": 14,
+      "length-cue": 43,
+      "question-echo": 1,
+      "absolute-distractor": 11,
       "duplicate-question": 1
     }
   }

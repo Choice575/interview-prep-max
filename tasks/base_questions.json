@@ -8724,191 +8724,191 @@
     "topic": "Ansible",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Ansible vs Terraform для configuration management: когда использовать каждый?",
+    "q": "Как разделить ответственность Terraform и Ansible в одном delivery-процессе?",
     "options": [
-      "Terraform: infrastructure provisioning (создание ресурсов, state management, идемпотентность через state); Ansible: configuration management (установка ПО, управление файлами, orchestration); часто используются вместе: Terraform создаёт, Ansible настраивает",
-      "Ansible полностью заменяет Terraform для любых задач",
-      "Terraform умеет управлять конфигурацией приложений лучше Ansible",
-      "Ansible имеет встроенный state management как Terraform"
+      "Terraform управляет desired infrastructure и state/plan, Ansible — конфигурацией и orchestration; зоны могут пересекаться",
+      "Terraform настраивает packages через provider state, Ansible создаёт cloud resources без проверки текущего состояния",
+      "Ansible хранит resource graph между runs, Terraform обнаруживает OS drift запуском remote modules по SSH",
+      "Terraform применяют после Ansible: playbook создаёт network, а Terraform копирует configs и перезапускает services"
     ],
     "answer": 0,
-    "explanation": "Terraform: декларативная модель, state file, plan/apply workflow, сильная экосистема провайдеров для cloud. Ansible: процедурная/декларативная смесь, без state (каждый раз проверяет), agentless, хорош для OS-level tasks. Паттерн: Terraform (VM, network, DB) → Ansible (install nginx, deploy app, manage users). Пересечение: Ansible cloud modules vs Terraform — Terraform рекомендуется для infra."
+    "explanation": "Terraform силён в жизненном цикле инфраструктурных ресурсов, dependency graph, plan и persistent state. Ansible выполняет agentless configuration и orchestration, вычисляя изменения во время run без общего state-файла желаемой инфраструктуры. Инструменты пересекаются, поэтому границу выбирают по ownership и избегают управления одним объектом из двух мест."
   },
   {
     "id": 602,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работают AWX webhook triggers и как интегрировать с GitLab CI?",
+    "q": "Как безопасно связать GitLab webhook с запуском AWX Job Template?",
     "options": [
-      "AWX не поддерживает webhook интеграцию",
-      "AWX Webhook: Job Template → Enable Webhook → GitHub/GitLab type → получаем URL + key; GitLab: Settings → Integrations → webhook URL; AWX верифицирует подпись; можно передавать переменные через webhook payload",
-      "Webhook в AWX работает только с GitHub",
-      "Webhook trigger запускает только один раз и не повторяется"
+      "Разрешить anonymous launch шаблона и передавать inventory, credentials и become password полями каждого GitLab event",
+      "Включить GitLab webhook у template, настроить выданные URL/key в GitLab и ограничить branch/rules внутри automation",
+      "Добавить AWX database credentials в GitLab runner, который вставит job напрямую в таблицу unified_jobs после push",
+      "Публиковать webhook key как project variable в playbook, чтобы managed hosts сверяли token перед каждой task"
     ],
     "answer": 1,
-    "explanation": "AWX webhook: POST /api/v2/job_templates/<id>/github/ или /gitlab/. GitLab webhook: URL + Secret Token (совпадает с AWX webhook key). Events: Push, Tag push, Merge request. Payload: AWX извлекает branch/commit/repo. extra_vars из webhook body через webhook_payload. Для безопасности: whitelist IP GitLab в AWX. Альтернатива: GitLab CI stage → curl AWX API."
+    "explanation": "AWX/Automation Controller выдаёт webhook URL и key для поддерживаемого service, а GitLab отправляет событие с secret token. Job получает сведения о событии, включая payload в awx_webhook_payload, поэтому branch и тип события нужно валидировать до опасных действий. Для сложного gate GitLab CI также может вызывать authenticated launch API с минимальным credential."
   },
   {
     "id": 603,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как реализовать сложную логику в Ansible с использованием Jinja2 tests?",
+    "q": "Чем Jinja test отличается от filter в Ansible conditionals?",
     "options": [
-      "Jinja2 tests в Ansible — это то же самое что filters",
-      "Jinja2 tests доступны только в template файлах",
-      "Tests (is/is not): value is defined, is string, is number, is iterable, is mapping, is version('2.0', '>='); custom tests в test_plugins/; используются в when: и selectattr(); возвращают bool",
-      "Tests не поддерживают сравнение версий"
+      "Test преобразует value и передаёт строку дальше, filter завершает templating булевым result для when и assert",
+      "Test выполняется на managed host после module, filter — на controller до inventory и variable precedence",
+      "Test вызывается через is и возвращает truth value; custom TestModule экспортирует predicates для when/selectattr",
+      "Test задаёт failure policy task, filter меняет changed status зарегистрированного result перед handler notification"
     ],
     "answer": 2,
-    "explanation": "Встроенные tests: defined/undefined, string/integer/float/boolean, list/dict/mapping, iterable, number, equalto, version. when: ansible_version.full is version('2.12', '>='). when: myvar is defined and myvar is string. selectattr('status', 'equalto', 'active'). custom test plugin: class TestModule: def tests(self): return {'my_test': self.my_test} def my_test(self, value): return bool."
+    "explanation": "Tests отвечают на вопрос о значении: defined, mapping, version и custom predicates используются через is/is not. Filters преобразуют данные через вертикальную черту, хотя результат фильтра тоже может участвовать в условии. Custom test plugin выполняется на control side и экспортирует mapping name→callable из TestModule.tests()."
   },
   {
     "id": 604,
     "topic": "Ansible",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое ansible-lint и как его интегрировать в CI/CD?",
+    "q": "Какую роль ansible-lint должен играть в CI?",
     "options": [
-      "ansible-lint проверяет только синтаксис YAML файлов",
-      "Все ansible-lint предупреждения блокируют выполнение",
-      "ansible-lint работает только локально, не в CI",
-      "ansible-lint: статический анализ playbooks/roles/collections; правила: best practices, deprecated, FQCN, yaml formatting; .ansible-lint конфиг; интеграция в pre-commit, GitHub Actions, GitLab CI"
+      "Он запускает playbook в check mode на production inventory и подтверждает функциональное состояние всех managed hosts",
+      "Он форматирует каждую YAML-ошибку автоматически, а оставшиеся warnings ansible-core игнорирует при runtime",
+      "Он заменяет integration tests, потому что rules анализируют итоговый package state и handler side effects",
+      "Он статически проверяет syntax и rules; CI фиксирует версии/profile и дополняет lint Molecule/functional tests"
     ],
     "answer": 3,
-    "explanation": ".ansible-lint: warn_list (предупреждения), skip_list (игнорировать), exclude_paths. CI: ansible-lint playbook.yml --profile production (strict) или --profile min. exit code: 0 (ok), 1 (error found), 2 (lint error). pre-commit: repo: https://github.com/ansible/ansible-lint hooks: id: ansible-lint. GitHub Actions: ansible/ansible-lint-action. Profile: min < basic < moderate < safety < shared < production."
+    "explanation": "ansible-lint обнаруживает syntax и набор поддерживаемых rule violations, включая FQCN, risky permissions и command без changed_when. Profile, tags, skip/warn и version влияют на результат, поэтому их фиксируют в config и dependency lock. Lint даёт быстрый gate, но не запускает реальную инфраструктуру и не доказывает корректность состояния."
   },
   {
     "id": 605,
     "topic": "Ansible",
     "level": "Middle",
     "category": "definition",
-    "q": "Как управлять версиями ролей и коллекций через requirements.yml?",
+    "q": "Как один requirements.yml описывает зависимости roles и Collections?",
     "options": [
-      "requirements.yml: roles (galaxy/git source, version) и collections (name, version, source); ansible-galaxy install -r requirements.yml; ansible-galaxy collection install -r requirements.yml; поддерживает git refs и URL",
-      "requirements.yml поддерживает только Galaxy роли",
-      "Версии в requirements.yml нельзя закрепить",
-      "requirements.yml устарел в Ansible 2.10+"
+      "Top-level roles и collections содержат source/version; ansible-galaxy install -r ставит обе секции при стандартных путях",
+      "Roles перечисляют FQCN modules, collections — Python wheels; версии разрешает pip из текущего virtual environment",
+      "Обе зависимости записывают единым списком name/image, а тип определяется наличием galaxy.yml после скачивания",
+      "Файл служит lockfile с hash каждого artifact, и ansible-galaxy отклоняет version ranges и Git references"
     ],
     "answer": 0,
-    "explanation": "roles: - name: geerlingguy.nginx; version: 3.1.0. collections: - name: community.general; version: '>=5.0.0,<6.0.0'. git source: - src: https://github.com/org/role.git; scm: git; version: main. Приватные Galaxy: - name: my_ns.my_role; source: https://my-hub.example.com. ansible-galaxy collection install -r requirements.yml -p ./collections для локальной установки в проект."
+    "explanation": "Requirements file может иметь отдельные roles: и collections: с Galaxy, Automation Hub, URL или Git sources и version constraints. ansible-galaxy install -r обрабатывает обе секции; role install и collection install — лишь соответствующую. Совместная установка имеет ограничения при custom install path, а ranges не дают полной воспроизводимости без закреплённых версий и проверок artifacts."
   },
   {
     "id": 606,
     "topic": "Ansible",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое Ansible handlers и как они вызываются?",
+    "q": "Когда Ansible запускает handler после notify?",
     "options": [
-      "Handlers — это задачи, выполняющиеся перед каждой основной задачей",
-      "Handlers: задачи, вызываемые через notify только при changed=True; выполняются один раз в конце play; flush_handlers для досрочного запуска; listen для группировки нескольких notify на один handler",
-      "Handlers выполняются каждый раз независимо от changed",
-      "Notify в handlers работает только с service модулем"
+      "Сразу после task независимо от changed, а повторные notify создают отдельный запуск для каждого inventory host",
+      "При changed handler ставится в очередь и дедуплицируется; implicit flush идёт после sections, meta может запустить раньше",
+      "После завершения всего playbook на controller, включая все plays, даже если host уже исключён из active set из-за failure",
+      "Перед следующей task того же role, если handler использует listen и его name совпадает с именем notify topic"
     ],
     "answer": 1,
-    "explanation": "Задача с notify: copy: ... notify: restart nginx. Handler: - name: restart nginx; service: name=nginx state=restarted. Даже если 10 задач нотифицируют handler, он выполнится один раз. flush_handlers: meta: flush_handlers — досрочно запускает накопленные. listen: несколько задач notify 'restart web' → handler с listen: restart web. Порядок: задачи play → handlers → следующий play."
+    "explanation": "notify действует, когда task сообщает changed. Handler с тем же name или listen topic ставится в очередь и обычно выполняется один раз на flush point, даже после нескольких уведомлений. Автоматические flush происходят после pre_tasks, roles/tasks и post_tasks; meta: flush_handlers запускает накопленные handlers раньше. Позднее handler можно уведомить снова."
   },
   {
     "id": 607,
     "topic": "Ansible",
     "level": "Middle",
     "category": "scenario",
-    "q": "Нужно деплоить приложение только на серверы с версией OS Ubuntu 22.04. Как фильтровать?",
+    "q": "Как после сбора facts выполнить deployment на Ubuntu 22.04?",
     "options": [
-      "Вручную поддерживать отдельный inventory для Ubuntu 22.04",
-      "Использовать только отдельный playbook для каждой версии OS",
-      "when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '22.04'; или group_vars с условием; hosts с add_host после проверки; limit через --limit group_ubuntu22",
-      "ansible_os_family включает номер версии"
+      "Сравнить ansible_os_family с Ubuntu_22_04, потому что family включает distribution и minor version в одном значении",
+      "Передать --limit Ubuntu_22 до создания такой inventory group и ожидать, что limit вычислит group из gathered facts",
+      "Проверить ansible_distribution и distribution_version/major_version в when, при необходимости сначала выполнить assert",
+      "Использовать package_facts и сравнить версию пакета ubuntu-release, не включая gather_facts и distribution facts"
     ],
     "answer": 2,
-    "explanation": "when: ansible_distribution == 'Ubuntu' and ansible_distribution_major_version == '22'. Факты: ansible_distribution, ansible_distribution_version (22.04), ansible_distribution_major_version (22), ansible_os_family (Debian), ansible_kernel. Динамический inventory group: keyed_groups: key: ansible_distribution~'_'~ansible_distribution_major_version → группа Ubuntu_22. Затем: hosts: Ubuntu_22."
+    "explanation": "Gathered facts дают ansible_distribution=Ubuntu, ansible_distribution_version=22.04 и major version 22. when может ограничить tasks, а assert — остановить play с ясной причиной. --limit фильтрует уже известный inventory до выполнения play, поэтому не создаёт группу из будущих facts; динамическую группу формируют заранее из cloud metadata или отдельным первым play."
   },
   {
     "id": 608,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает Ansible psrp connection для управления Windows?",
+    "q": "Как connection: psrp выполняет Ansible tasks на Windows?",
     "options": [
-      "Ansible не поддерживает Windows серверы",
-      "WinRM доступен только в Windows Server 2019+",
-      "PSRP требует установки Python на Windows серверах",
-      "psrp (PowerShell Remoting Protocol): WinRM over HTTP/HTTPS; ansible_connection=psrp; ansible_psrp_protocol=https; ansible_psrp_auth=kerberos/ntlm/credssp; win_* модули для Windows задач"
+      "Копирует Python module через SMB, запускает CPython service и возвращает JSON по отдельному WinRM event channel",
+      "Открывает RDP session для каждого task и вводит PowerShell script через UI automation с credentials controller",
+      "Использует SSH shell как network_cli, а PSRP преобразует stdout в CLIXML после завершения обычной cmd.exe команды",
+      "Controller через pypsrp использует PowerShell Remoting/WinRM transport; remote Python не нужен, важны auth и TLS"
     ],
     "answer": 3,
-    "explanation": "ansible_connection: psrp (или winrm). ansible_port: 5985 (HTTP) / 5986 (HTTPS). ansible_psrp_auth: basic, certificate, ntlm, kerberos, credssp. Настройка Windows: winrm quickconfig / Enable-PSRemoting. Модули: ansible.windows.win_service, win_file, win_copy, win_command, win_shell, win_package, win_feature. win_ping для проверки. Kerberos: pip install pypsrp[kerberos]."
+    "explanation": "ansible.builtin.psrp выполняет PowerShell commands и transfer через PSRP поверх WinRM transport; pypsrp требуется на controller. Windows modules используют PowerShell, поэтому Python на managed Windows host не требуется. На практике настраивают HTTPS, certificate validation и подходящую auth — negotiate/Kerberos/NTLM или другую поддерживаемую — вместо отключения проверок."
   },
   {
     "id": 609,
     "topic": "Ansible",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое переменные в Ansible и каков порядок их приоритетов?",
+    "q": "Как проектировать Ansible variables с учётом precedence?",
     "options": [
-      "Приоритет (от низкого к высокому): role defaults → inventory group_vars → inventory host_vars → playbook group_vars → playbook host_vars → task vars → extra-vars (-e) (наивысший)",
-      "Все переменные в Ansible имеют одинаковый приоритет",
-      "host_vars всегда имеют наивысший приоритет",
-      "extra-vars (командная строка) нельзя переопределить в playbook"
+      "Переопределяемые параметры класть в role defaults, environment data — в inventory; extra vars имеют высокий приоритет",
+      "Класть параметры в role vars как публичные defaults, потому что inventory и play vars гарантированно перекрывают их",
+      "Дублировать значение в group_vars и host_vars: Ansible объединит scalars в list по порядку чтения файлов inventory",
+      "Использовать set_fact для глобальной настройки repository, потому что cached fact перекрывает extra vars в следующих runs"
     ],
     "answer": 0,
-    "explanation": "Полный порядок (22 уровня): role defaults (самый низкий) → inventory → group_vars/all → group_vars/* → host_vars → facts → play vars → role vars → block vars → task vars → registered vars → set_fact → extra_vars (наивысший). Практическое правило: role defaults для настраиваемых параметров, role vars для жёстких значений, extra-vars для override в CI."
+    "explanation": "Variable precedence состоит из многих уровней и зависит от source и scope. Role defaults специально имеют низкий приоритет, inventory обычно хранит environment/host data, а -e extra vars перекрывают другие variable values. Role vars имеют высокий приоритет и хуже подходят для публичных настроек; cached set_fact в следующем run понижается до precedence cached fact."
   },
   {
     "id": 610,
     "topic": "Ansible",
     "level": "Middle",
     "category": "definition",
-    "q": "Как использовать register и conditionals для построения сложной логики в Ansible?",
+    "q": "Что сохраняет register и как безопасно использовать result в условии?",
     "options": [
-      "register сохраняет только stdout результата команды",
-      "register: result сохраняет полный return value модуля (stdout, stderr, rc, changed, failed, stdout_lines); when: result.rc == 0 or result.stdout | regex_search('pattern'); failed_when: result.rc not in [0, 2]",
-      "register работает только с command и shell модулями",
-      "when условие нельзя использовать с зарегистрированными переменными из предыдущего хоста"
+      "Он сохраняет stdout одной command-like task глобально, поэтому все hosts читают один result после завершения текущего play",
+      "Он сохраняет per-host return dict с module-specific fields; when/failed_when проверяют существующие поля и status tests",
+      "Он превращает failed result в success и переносит exception в stderr, чтобы следующая task могла решить судьбу host",
+      "Он записывает result в fact cache между runs, а changed_when изменяет прошлое значение перед повторным запуском module"
     ],
     "answer": 1,
-    "explanation": "register: сохраняет dict с полями зависимыми от модуля. command/shell: rc, stdout, stderr, stdout_lines. stat: stat (exists, size, mode). find: files (list), matched. Условия: when: not result.failed. when: result.stdout_lines | length > 0. hostvars[other_host]['result'] для доступа к результатам другого хоста. ignore_errors: yes + when: result is failed для обработки ошибок."
+    "explanation": "register создаёт переменную результата отдельно для каждого host. Общие поля могут включать changed, failed и msg, но rc/stdout есть у command-like modules, stat и другие modules имеют собственную схему. Условия проверяют определённость и подходящий status test; failed_when/changed_when переопределяют status текущей task, а ignore_errors не делает ошибку успешной."
   },
   {
     "topic": "Docker",
     "level": "Junior",
-    "q": "Что такое Docker?",
+    "q": "Какую функцию выполняет Docker Engine?",
     "options": [
-      "Гипервизор для виртуальных машин",
-      "Язык программирования",
-      "Платформа для контейнеризации приложений",
-      "Облачный сервис"
+      "Эмулирует hardware каждой VM и загружает отдельное guest kernel для изоляции процессов приложения",
+      "Оркестрирует replicas между несколькими clusters и хранит desired state workloads в распределённой базе",
+      "Собирает images и запускает containers с namespaces/cgroups через daemon API и container runtime",
+      "Компилирует source code в один portable binary без filesystem, metadata и runtime dependencies"
     ],
     "answer": 2,
-    "explanation": "Docker упаковывает приложение и его зависимости в изолированный контейнер, который работает одинаково в любом окружении.",
+    "explanation": "Docker предоставляет client/API и Engine для сборки images, управления networks/volumes и жизненным циклом containers. Container разделяет kernel хоста и изолируется механизмами ОС, поэтому это не VM с guest kernel. Оркестрация кластера — отдельная функция Swarm/Kubernetes, а registry хранит и раздаёт images.",
     "id": 10001
   },
   {
     "topic": "Docker",
     "level": "Junior",
-    "q": "Что такое Dockerfile?",
+    "q": "Что описывает Dockerfile?",
     "options": [
-      "Файл с логами контейнера",
-      "Файл состояния контейнера",
-      "Конфиг Docker daemon",
-      "Текстовый файл с инструкциями для сборки образа"
+      "Runtime-состояние одного container: PID, network namespace, writable layer и текущие значения environment",
+      "Настройки daemon: storage driver, registry mirrors, authorization plugins и default address pools",
+      "Compose application: services, dependencies, named volumes, networks и replicas для нескольких containers",
+      "Последовательность build instructions, которая из context создаёт image с filesystem и metadata"
     ],
     "answer": 3,
-    "explanation": "Dockerfile — это рецепт: каждая инструкция (FROM, RUN, COPY, CMD) создаёт новый слой образа.",
+    "explanation": "Dockerfile содержит FROM, RUN, COPY, ENV, ENTRYPOINT, CMD и другие instructions для reproducible image build. Точка или иной аргумент команды build задаёт context, доступный COPY/ADD, а Dockerfile можно выбрать флагом -f. Runtime container state и Compose-модель хранятся в других сущностях.",
     "id": 10002
   },
   {
     "topic": "Docker",
     "level": "Junior",
-    "q": "Что делает команда docker build -t myapp:latest .?",
+    "q": "Что произойдёт при docker build -t myapp:latest .?",
     "options": [
-      "Собирает образ с тегом myapp:latest из текущей директории",
-      "Запускает контейнер",
-      "Удаляет образ",
-      "Проверяет синтаксис Dockerfile"
+      "Текущий каталог станет build context, default Dockerfile задаст build, а результат получит tag myapp:latest",
+      "Существующий image запустится с working directory точка, а latest будет именем нового writable container layer",
+      "CLI загрузит image myapp из registry и сравнит его layers с локальным Dockerfile без создания результата",
+      "Команда проверит syntax Dockerfile и отправит context daemon, но image появится после отдельного docker commit"
     ],
     "answer": 0,
-    "explanation": "-t задаёт тег (имя:версия), точка указывает сборочный контекст (где Dockerfile).",
+    "explanation": "Аргумент . задаёт build context, а без -f builder ищет Dockerfile по стандартному имени в context. -t назначает результирующему image reference myapp:latest. Tag latest — обычная изменяемая метка, а не гарантия самой новой версии; для deployment надёжнее immutable digest.",
     "id": 10003
   },
   {
@@ -8916,69 +8916,69 @@
     "level": "Junior",
     "q": "Чем docker run отличается от docker start?",
     "options": [
-      "Ничем, это алиасы",
-      "run создаёт и запускает новый контейнер; start запускает остановленный",
-      "run только для Linux, start для Windows",
-      "start собирает образ перед запуском"
+      "run возобновляет paused process с прежним writable layer, start создаёт новый container из обновлённого image tag",
+      "run создаёт container из image и запускает его, start повторно запускает уже созданный остановленный container",
+      "run исполняет process внутри running container, start запускает дополнительный process с отдельными environment values",
+      "run собирает image перед запуском, start скачивает missing layers из registry и регистрирует новый image manifest"
     ],
     "answer": 1,
-    "explanation": "docker run = docker create + docker start. Если контейнер уже существует — используйте start.",
+    "explanation": "docker run сочетает создание container с заданными ports, mounts, environment и command и его запуск. docker start сохраняет конфигурацию и writable layer существующего stopped container и снова запускает основной process. Для команды в работающем container используют docker exec.",
     "id": 10004
   },
   {
     "topic": "Docker",
     "level": "Junior",
-    "q": "Как посмотреть запущенные контейнеры?",
+    "q": "Какая команда перечисляет работающие containers?",
     "options": [
-      "docker list",
-      "docker ls",
-      "docker ps",
-      "docker show"
+      "docker images --running; флаг -a добавляет dangling image layers, связанные с остановленными processes",
+      "docker inspect --list; команда печатает краткую таблицу вместо полного JSON для каждого runtime object",
+      "docker ps или docker container ls; флаг -a добавляет stopped и другие созданные containers",
+      "docker top --all; без имени container команда объединяет process lists всех namespaces на Docker host"
     ],
     "answer": 2,
-    "explanation": "docker ps — аналог ps в Linux. С флагом -a показывает все, включая остановленные.",
+    "explanation": "docker ps и docker container ls эквивалентно показывают running containers. -a/--all включает stopped и created entries, а --filter и --format помогают автоматизации. docker images перечисляет images, inspect выдаёт подробный JSON объекта, top — процессы конкретного container.",
     "id": 10005
   },
   {
     "topic": "Docker",
     "level": "Junior",
-    "q": "Для чего нужен docker-compose?",
+    "q": "Для чего используют docker compose?",
     "options": [
-      "Для мониторинга контейнеров",
-      "Для подключения к удалённому Docker-хосту",
-      "Для сжатия образов",
-      "Для описания и запуска многоконтейнерных приложений"
+      "Для сборки одного image из Dockerfile с автоматическим выбором multi-stage target по имени Compose project",
+      "Для управления cluster scheduler, который переносит containers между Docker hosts при отказе daemon",
+      "Для публикации image manifests в registry и подписи каждого platform digest ключом локального daemon",
+      "Для описания services, networks, volumes и их конфигурации и запуска multi-container application"
     ],
     "answer": 3,
-    "explanation": "docker-compose.yml описывает сервисы, сети, тома. docker-compose up поднимает всё одной командой.",
+    "explanation": "Compose model в YAML описывает несколько services и связанные networks, volumes, configs и environment. Современная CLI-команда — docker compose up/down; старый отдельный docker-compose встречается в прежних установках. Compose удобен для одного Docker endpoint и разработки, но не является сам по себе кластерным scheduler.",
     "id": 10006
   },
   {
     "topic": "Docker",
     "level": "Middle",
-    "q": "Что такое volume и зачем он нужен?",
+    "q": "Что даёт Docker named volume?",
     "options": [
-      "Механизм для сохранения данных вне жизненного цикла контейнера",
-      "Тип сети в Docker",
-      "Способ сжатия образов",
-      "Инструмент оркестрации"
+      "Управляемое Docker storage, которое монтируется в container и живёт независимо от его удаления до удаления volume",
+      "Копию read-only image layer, которую daemon переносит в registry при каждом изменении файла приложением",
+      "Memory limit cgroup, измеренный в байтах и разделяемый между containers одного Compose service",
+      "Overlay network segment с собственным DNS, где volume name используется как alias container endpoint"
     ],
     "answer": 0,
-    "explanation": "Без volume все данные теряются при удалении контейнера. Volume монтирует директорию хоста или создаёт управляемое Docker-хранилище.",
+    "explanation": "Named volume управляется Docker и монтируется в указанный путь container. Он не исчезает при обычном удалении container, поэтому подходит для persistent application data и повторного подключения. Bind mount, в отличие от volume, прямо связывает путь host filesystem; backup и lifecycle обоих нужно проектировать явно.",
     "id": 10007
   },
   {
     "topic": "Docker",
     "level": "Middle",
-    "q": "В чём разница между CMD и ENTRYPOINT в Dockerfile?",
+    "q": "Как взаимодействуют ENTRYPOINT и CMD в exec form?",
     "options": [
-      "Никакой разницы",
-      "CMD задаёт аргументы по умолчанию; ENTRYPOINT — исполняемый файл",
-      "CMD только для shell, ENTRYPOINT для exec",
-      "ENTRYPOINT нельзя переопределить"
+      "CMD запускается перед ENTRYPOINT и записывает stdout в файл, который становится stdin основного process container",
+      "ENTRYPOINT задаёт executable, CMD — default arguments; command переопределяет CMD, --entrypoint меняет executable",
+      "ENTRYPOINT выполняется при image build, CMD сохраняется как RUN instruction для первого старта нового container",
+      "CMD создаёт init process, ENTRYPOINT становится child process и получает signal после завершения shell wrapper"
     ],
     "answer": 1,
-    "explanation": "ENTRYPOINT ['python'] + CMD ['app.py'] = python app.py. Пользователь может переопределить CMD: docker run myimg test.py → python test.py.",
+    "explanation": "При exec-form ENTRYPOINT [\"python\"] и CMD [\"app.py\"] итоговая команда — python app.py. Аргументы после image в docker run заменяют CMD; --entrypoint заменяет ENTRYPOINT. Shell form добавляет shell semantics и может иначе обрабатывать arguments/signals, поэтому различие формы тоже важно.",
     "id": 10008
   },
   {
@@ -8986,167 +8986,167 @@
     "level": "Middle",
     "q": "Что означает docker run -p 8080:80 myapp?",
     "options": [
-      "Запустить 8080 копий контейнера",
-      "Ограничить контейнер 80% CPU",
-      "Пробросить порт 8080 хоста на порт 80 контейнера",
-      "Открыть порты 8080 и 80"
+      "Container получает IP 8080 и слушает host port 80, а daemon преобразует оба числа в адреса bridge network",
+      "Process получает CPU share 8080 и memory limit 80 MiB, после чего image myapp запускается без network mapping",
+      "TCP port 8080 host публикуется на port 80 container; host address можно ограничить отдельной частью syntax",
+      "Daemon разрешает outbound connections с container ports 8080–80 и добавляет EXPOSE metadata в image myapp"
     ],
     "answer": 2,
-    "explanation": "-p host_port:container_port. Трафик с localhost:8080 попадает в порт 80 внутри контейнера.",
+    "explanation": "-p HOST_PORT:CONTAINER_PORT публикует TCP 8080 хоста на TCP 80 container по умолчанию. Без явного host IP binding обычно доступен на адресах хоста согласно daemon/network settings, а не гарантированно лишь на localhost. Протокол задают /udp или /sctp, address — например 127.0.0.1:8080:80.",
     "id": 10009
   },
   {
     "topic": "Docker",
     "level": "Middle",
-    "q": "Как работают слои в Docker-образе?",
+    "q": "Как image layers связаны с Dockerfile и runtime container?",
     "options": [
-      "Docker не использует слои",
-      "Слои — это логи, хранящиеся отдельно",
-      "Слои существуют только во время сборки",
-      "Каждая инструкция Dockerfile создаёт неизменяемый слой"
+      "Каждый Dockerfile token создаёт layer, включая comments, и daemon объединяет их в один mutable файл при push",
+      "Layers являются snapshots RAM build process и исчезают после export, оставляя в registry tar готового filesystem",
+      "Runtime меняет верхний image layer in place, поэтому запуск двух containers из image разделяет записи файлов",
+      "Filesystem changes build steps образуют immutable content layers; container добавляет свой writable layer сверху"
     ],
     "answer": 3,
-    "explanation": "Каждый RUN/COPY/ADD создаёт слой. Слои кэшируются — если инструкция не изменилась, Docker переиспользует готовый слой. Порядок инструкций влияет на скорость сборки.",
+    "explanation": "Image manifest ссылается на content-addressed filesystem layers, которые могут кэшироваться и разделяться. Build instructions, меняющие filesystem, формируют соответствующие diffs; metadata instructions не обязаны добавлять filesystem layer, хотя остаются в config/history. Container использует read-only image layers и отдельный writable layer.",
     "id": 10010
   },
   {
     "topic": "Kubernetes",
     "level": "Junior",
-    "q": "Что такое Kubernetes (K8s)?",
+    "q": "Какую задачу решает Kubernetes?",
     "options": [
-      "Система оркестрации контейнеров",
-      "База данных",
-      "Язык программирования",
-      "Облачное хранилище"
+      "Поддерживает desired state containerized workloads: scheduling, rollout, service discovery и self-healing controllers",
+      "Собирает OCI images из Dockerfile и хранит layers внутри etcd как встроенный cluster registry для каждой namespace",
+      "Предоставляет guest kernel каждому Pod и мигрирует его memory между Nodes при изменении replica count",
+      "Заменяет application database распределённым key-value API, доступным containers через Kubernetes Service"
     ],
     "answer": 0,
-    "explanation": "K8s автоматизирует развёртывание, масштабирование и управление контейнерами. Разработан Google, поддерживается CNCF.",
+    "explanation": "Kubernetes API хранит желаемое состояние, а controllers и scheduler размещают Pods, восстанавливают replicas, выполняют rollouts и предоставляют networking/storage abstractions. Container runtime на Node запускает containers, registry хранит images отдельно, etcd содержит cluster state, а не image layers или пользовательскую базу.",
     "id": 10011
   },
   {
     "topic": "Kubernetes",
     "level": "Junior",
-    "q": "Что такое Pod в Kubernetes?",
+    "q": "Что представляет собой Pod?",
     "options": [
-      "Физический сервер",
-      "Минимальная развёртываемая единица — группа контейнеров с общим сетевым namespace",
-      "Тип хранилища",
-      "Команда kubectl"
+      "Физический Node, зарегистрированный kubelet и разделённый на containers с отдельными cluster IP addresses",
+      "Минимальную schedulable единицу из одного или нескольких containers с общей network identity и volumes по spec",
+      "ReplicaSet без selector, который создаёт один process на каждом Node и обновляется через rolling strategy",
+      "Service endpoint, содержащий virtual IP, DNS name и список ready Nodes для внешнего load balancer"
     ],
     "answer": 1,
-    "explanation": "Pod — один или несколько контейнеров, которые делят сеть и storage. Обычно 1 pod = 1 контейнер, но sidecar-паттерн использует несколько.",
+    "explanation": "Scheduler размещает Pod на одном Node. Containers Pod совместно используют network namespace/IP и localhost, а declared volumes могут монтироваться в несколько containers; container filesystems остаются отдельными. Pod эфемерен, поэтому controllers создают replacements вместо восстановления прежнего объекта.",
     "id": 10012
   },
   {
     "topic": "Kubernetes",
     "level": "Junior",
-    "q": "Что делает kubectl get pods?",
+    "q": "Что выводит kubectl get pods без дополнительных флагов?",
     "options": [
-      "Удаляет все поды",
-      "Создаёт новый под",
-      "Показывает список подов в текущем namespace",
-      "Перезапускает поды"
+      "Pods всех namespaces с полным PodSpec и decoded Secret values, доступными текущему service account пользователя",
+      "Events текущего Node, сгруппированные по Pod UID, включая logs завершившихся containers и kubelet journal",
+      "Список Pods текущего namespace в табличном виде; -A меняет scope, -o yaml/json — формат представления",
+      "ReplicaSets текущего namespace и вычисленный список Pods, которые будут созданы после следующего reconcile"
     ],
     "answer": 2,
-    "explanation": "kubectl get pods — основная команда для проверки статуса. -A покажет поды во всех namespace'ах.",
+    "explanation": "kubectl get pods обращается к API и перечисляет Pod resources текущего namespace из kubeconfig context. -n выбирает другой namespace, -A — все доступные namespaces, -o wide/yaml/json меняет вывод. Команда не изменяет объекты и не включает logs; для них применяют kubectl logs.",
     "id": 10013
   },
   {
     "topic": "Kubernetes",
     "level": "Middle",
-    "q": "Что такое Deployment?",
+    "q": "Как Deployment управляет Pods?",
     "options": [
-      "Способ удаления подов",
-      "Команда для деплоя",
-      "Тип базы данных",
-      "Объект, управляющий ReplicaSet и обеспечивающий декларативное обновление подов"
+      "Назначает один Pod каждому Node напрямую и обновляет его image без ReplicaSet, сохраняя UID между revisions",
+      "Создаёт Service и EndpointSlice для Pod template, а число endpoints определяет желаемое количество replicas",
+      "Запускает imperative kubectl commands из spec и хранит stdout каждой revision в status.conditions",
+      "Декларативно управляет ReplicaSets по Pod template и replicas, поддерживая rollout, rollback и scaling"
     ],
     "answer": 3,
-    "explanation": "Deployment описывает желаемое состояние (replicas: 3). K8s поддерживает rolling update — постепенную замену старых подов новыми без downtime.",
+    "explanation": "Deployment controller создаёт и масштабирует ReplicaSets, которые поддерживают число Pods по selector и template. Изменение Pod template создаёт новую revision и обычно rolling rollout согласно strategy; rollback меняет активную revision. Stateful identity и storage semantics решает StatefulSet, one-per-node — DaemonSet.",
     "id": 10014
   },
   {
     "topic": "Kubernetes",
     "level": "Middle",
-    "q": "Что такое Service в K8s?",
+    "q": "Что предоставляет Kubernetes Service?",
     "options": [
-      "Стабильная точка доступа к набору подов (IP + DNS)",
-      "Демон-процесс",
-      "Способ хранения данных",
-      "Инструмент мониторинга"
+      "Стабильную сетевую абстракцию и discovery для набора endpoints, даже когда адреса backing Pods меняются",
+      "Persistent volume для каждого selected Pod и автоматический snapshot перед удалением или rollout workload",
+      "Container health controller, который перезапускает process после failed liveness probe без участия kubelet",
+      "Image registry proxy с одним ClusterIP, который кэширует layers на Nodes и проверяет signatures при pull"
     ],
     "answer": 0,
-    "explanation": "Поды создаются и умирают — IP меняются. Service даёт постоянный IP и DNS-имя (ClusterIP, NodePort, LoadBalancer). kube-proxy маршрутизирует трафик.",
+    "explanation": "Service задаёт stable virtual address/DNS и порты поверх динамического набора EndpointSlices, часто выбранного selector. Типы ClusterIP, NodePort и LoadBalancer определяют способ публикации. Реализацию dataplane выполняет kube-proxy или альтернативный network component; Service без selector может указывать на внешние endpoints.",
     "id": 10015
   },
   {
     "topic": "CI/CD",
     "level": "Junior",
-    "q": "Что такое CI (Continuous Integration)?",
+    "q": "Что означает Continuous Integration на практике?",
     "options": [
-      "Ручное тестирование перед релизом",
-      "Практика автоматической сборки и тестирования изменений при каждом коммите",
-      "Резервное копирование кода",
-      "Процесс удаления старого кода"
+      "Редкие объединения feature branches перед release с ручной сборкой, чтобы CI не выполнялся на промежуточных commits",
+      "Частое объединение небольших изменений с автоматическими build/checks, быстро выявляющими integration defects",
+      "Автоматический rollout каждого успешного commit в production без approval, feature flags и progressive delivery",
+      "Хранение release artifacts в registry и восстановление production из backup при падении post-deploy checks"
     ],
     "answer": 1,
-    "explanation": "CI — разработчики сливают код в общую ветку, система автоматически собирает и прогоняет тесты. Цель: быстро находить проблемы.",
+    "explanation": "CI поощряет небольшие частые интеграции в общую линию разработки. Pipeline автоматически собирает, тестирует и выполняет быстрые quality/security checks, чтобы дефект обнаруживался рядом с изменением. Production deployment относится к CD и может иметь отдельные approvals и стратегии риска.",
     "id": 10016
   },
   {
     "topic": "CI/CD",
     "level": "Junior",
-    "q": "Что такое CD (Continuous Delivery/Deployment)?",
+    "q": "Чем Continuous Delivery отличается от Continuous Deployment?",
     "options": [
-      "Только ручной деплой",
-      "Создание документации",
-      "Автоматическая доставка изменений до staging/production",
-      "Форматирование кода"
+      "Delivery собирает source, Deployment запускает unit tests; оба процесса заканчиваются до создания release artifact",
+      "Delivery относится к staging branch, Deployment — к main branch, а способ выпуска определяется именем Git ref",
+      "Delivery держит изменение готовым к release с решением о выпуске, Deployment автоматически выпускает прошедшее pipeline",
+      "Delivery отправляет binaries в registry, Deployment хранит source archive; production rollout выполняется вручную в обоих"
     ],
     "answer": 2,
-    "explanation": "Continuous Delivery: код готов к деплою, но релиз — ручной. Continuous Deployment: каждый успешный билд автоматически идёт в production.",
+    "explanation": "Continuous Delivery автоматизирует путь до deployable, проверенного изменения, но production release может требовать бизнес-решения или approval. Continuous Deployment автоматически выпускает каждое изменение, прошедшее policy и pipeline. Термины описывают release flow, а не конкретную ветку или среду.",
     "id": 10017
   },
   {
     "topic": "CI/CD",
     "level": "Middle",
-    "q": "Что такое GitLab CI/CD пайплайн?",
+    "q": "Из чего состоит GitLab CI/CD pipeline?",
     "options": [
-      "Файл docker-compose.yml",
-      "Настройка Git",
-      "Скрипт на Python",
-      "Последовательность стадий (build, test, deploy) описанная в .gitlab-ci.yml"
+      "Из Docker Compose services, которые GitLab превращает в постоянные runners и удаляет после закрытия merge request",
+      "Из Git hooks repository, выполняемых на workstation автора до push и записывающих status напрямую в commit object",
+      "Из одного shell script на coordinator, который последовательно выполняет sections .gitlab-ci.yml без isolation jobs",
+      "Из jobs с scripts/rules/artifacts, организованных stages или needs DAG; подходящие runners исполняют jobs"
     ],
     "answer": 3,
-    "explanation": "В .gitlab-ci.yml определяются stages, jobs, scripts. Каждый job запускается в отдельном runner'е. Можно указать when (on_merge, manual), artifacts, environment.",
+    "explanation": ".gitlab-ci.yml определяет jobs и их images/services, scripts, variables, rules, artifacts и environments. Stages задают базовый порядок, а needs может построить DAG и начать job раньше завершения всей предыдущей stage. GitLab coordinator планирует, подходящий Runner получает job и возвращает status/artifacts.",
     "id": 10018
   },
   {
     "topic": "CI/CD",
     "level": "Middle",
-    "q": "Что делает stage 'test' в CI/CD пайплайне?",
+    "q": "Что разумно размещать в test stage pipeline?",
     "options": [
-      "Запускает юнит-тесты, линтеры, проверки безопасности",
-      "Удаляет базу данных",
-      "Деплоит на production",
-      "Создаёт Git-ветку"
+      "Повторяемые проверки вроде unit/integration tests, lint и security scans; конкретные jobs и failure policy задаёт config",
+      "Production database migrations и irreversible cleanup, поскольку test stage автоматически создаёт backup перед job",
+      "Создание Git branches и merge commits, так как stage получает write token repository независимо от job permissions",
+      "Настройку shared Runner host и установку global dependencies, сохраняющихся для pipelines всех проектов"
     ],
     "answer": 0,
-    "explanation": "Test stage проверяет качество кода: unit-тесты, интеграционные тесты, SAST (статический анализ), линтеры. Падение на этом этапе блокирует деплой.",
+    "explanation": "Имя stage не имеет встроенной семантики: поведение определяют jobs. Обычно test stage запускает unit/integration tests, lint, SAST и другие воспроизводимые проверки и блокирует дальнейший flow при обязательном failure. Опасные production mutations отделяют permissions, environment и approval controls.",
     "id": 10019
   },
   {
     "topic": "CI/CD",
     "level": "Middle",
-    "q": "Что такое артефакты в CI/CD?",
+    "q": "Что такое job artifacts в CI/CD?",
     "options": [
-      "Только исходный код",
-      "Файлы, сохраняемые между стадиями пайплайна (скомпилированные бинарники, отчёты)",
-      "Логи сервера",
-      "Настройки runner'а"
+      "Mutable dependency cache, который jobs изменяют совместно и который считается authoritative release storage без retention",
+      "Файлы, загруженные job по заданным paths/reports, сохраняемые с retention и доступные downstream согласно config",
+      "Runner logs, которые становятся filesystem layer job image и автоматически публикуются в container registry",
+      "Repository files после checkout, включая полный Git history, которые coordinator передаёт следующей stage как Secret"
     ],
     "answer": 1,
-    "explanation": "Артефакты передают результаты между стадиями: build создаёт .jar, test использует его. Также сохраняются для скачивания (отчёты о тестах).",
+    "explanation": "Artifacts — явные outputs job: binaries, packages, test reports, coverage и другие файлы. CI-система загружает их, хранит по retention policy и передаёт или открывает downstream jobs согласно dependencies/needs. Cache оптимизирует повторное получение зависимостей и имеет другие гарантии; production artifacts часто дополнительно публикуют в package registry.",
     "id": 10020
   },
   {
