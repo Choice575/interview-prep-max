@@ -8,16 +8,16 @@
     186
   ],
   "issueBudget": {
-    "length-cue": 354,
-    "question-echo": 10,
-    "absolute-distractor": 180,
+    "length-cue": 324,
+    "question-echo": 9,
+    "absolute-distractor": 162,
     "duplicate-question": 4
   },
   "topics": {
     "Terraform": {
-      "length-cue": 45,
-      "question-echo": 1,
-      "absolute-distractor": 33,
+      "length-cue": 15,
+      "question-echo": 0,
+      "absolute-distractor": 15,
       "duplicate-question": 3
     },
     "Linux": {
@@ -83,9 +83,9 @@
       "duplicate-question": 2
     },
     "Senior": {
-      "length-cue": 173,
-      "question-echo": 6,
-      "absolute-distractor": 109,
+      "length-cue": 143,
+      "question-echo": 5,
+      "absolute-distractor": 91,
       "duplicate-question": 1
     },
     "Junior": {

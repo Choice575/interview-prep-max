@@ -6474,450 +6474,450 @@
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает moved block в Terraform и когда его использовать?",
+    "q": "Что даёт moved block при рефакторинге Terraform?",
     "options": [
-      "moved block перемещает файлы между директориями модулей",
-      "moved block работает только при рефакторинге провайдеров",
-      "Декларирует переименование/перемещение ресурса в state без его пересоздания: moved { from = aws_instance.old to = aws_instance.new }",
-      "Аналогичен terraform state mv, но автоматически выполняется при apply"
+      "Переносит source files модуля в новую directory и автоматически обновляет относительные module sources",
+      "Меняет backend key и копирует state snapshot между workspaces во время следующего terraform init",
+      "Связывает старый и новый resource address, чтобы plan изменил state без destroy/create; правило хранится в коде",
+      "Запускает terraform state mv между независимыми backends при apply и удаляет исходный state после проверки"
     ],
     "answer": 2,
-    "explanation": "moved block (Terraform 1.1+) декларирует перемещение в конфигурации: from → to. При plan/apply Terraform обновляет state без пересоздания ресурса. Преимущество над terraform state mv: изменение в коде, версионируется, делится с командой. Работает для ресурсов и модулей."
+    "explanation": "moved block декларативно описывает смену адреса resource или module. Terraform учитывает его в plan и переносит binding в state без пересоздания remote object; правило можно версионировать и сохранить для пользователей старых версий модуля."
   },
   {
     "id": 452,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое terraform import block (новый синтаксис Terraform 1.5+) и чем он лучше CLI?",
+    "q": "Чем configuration-driven import отличается от terraform import CLI?",
     "options": [
-      "import block аналогичен terraform import CLI без изменений",
-      "Новый синтаксис поддерживает только AWS провайдер",
-      "import block работает только с Terraform Cloud",
-      "import { to = aws_instance.main, id = 'i-123' } позволяет генерировать конфигурацию (terraform plan -generate-config-out), версионируется в коде"
+      "Import block создаёт новый remote object с указанным id, а CLI подключает существующий object к state",
+      "Import block загружает весь cloud account и формирует по module для каждого обнаруженного resource type",
+      "CLI import записывает готовую configuration в .tf, а import block меняет state без участия plan operation",
+      "Import block задаёт to и id в коде, виден в plan; generate-config-out может подготовить resource configuration"
     ],
     "answer": 3,
-    "explanation": "import block в .tf файле: import { to = module.vpc.aws_vpc.main id = 'vpc-123456' }. terraform plan -generate-config-out=generated.tf создаёт конфигурацию для существующего ресурса. В отличие от CLI terraform import: декларативный, версионируется, не требует написания конфигурации до import."
+    "explanation": "Import block делает намерение импорта декларативным и проверяемым через plan. Для отсутствующей resource configuration команда plan с -generate-config-out может создать заготовку, которую нужно просмотреть и привести к стандартам проекта."
   },
   {
     "id": 453,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает dynamic block в Terraform и где его применять?",
+    "q": "Для чего предназначен dynamic block в Terraform?",
     "options": [
-      "Генерирует повторяющиеся вложенные блоки (ingress, egress, policy) из коллекций: dynamic \"ingress\" { for_each = var.rules content { ... } }",
-      "dynamic block — это блок с динамически вычисляемым провайдером",
-      "dynamic block используется для условного включения ресурсов",
-      "dynamic работает только с list, не с map"
+      "Он генерирует повторяющиеся nested blocks из collection через for_each и content, но не создаёт resource blocks",
+      "Он выбирает provider configuration во время apply по значению, которое cloud API вернул после создания",
+      "Он клонирует resource block для каждого элемента collection и присваивает экземплярам stable addresses",
+      "Он выполняет произвольный HCL code после plan и добавляет новые meta-arguments в schema провайдера"
     ],
     "answer": 0,
-    "explanation": "dynamic block генерирует несколько вложенных блоков одного типа из коллекции. dynamic \"ingress\" { for_each = var.ingress_rules content { from_port = ingress.value.port } }. Имя итератора по умолчанию = имя dynamic блока. iterator = 'rule' переименовывает. Избегать для простых случаев — усложняет читаемость."
+    "explanation": "dynamic генерирует вложенные блоки, например ingress, из коллекции. Он не может генерировать resource, provider или lifecycle blocks; чрезмерное применение ухудшает читаемость, поэтому явные blocks часто лучше."
   },
   {
     "id": 454,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "В чём разница между for_each с map и set? Каковы edge cases?",
+    "q": "Как for_each ведёт себя с map и set(string)?",
     "options": [
-      "Разницы нет, Terraform автоматически конвертирует типы",
-      "Map: ключ — stable resource address; Set: ключ = значение. Set не может содержать null/объекты. При изменении элемента set — ресурс пересоздаётся, у map — только конкретный по ключу",
-      "for_each работает только с map типами",
-      "Set гарантирует порядок создания ресурсов, map — нет"
+      "Map создаёт числовые addresses по порядку ключей, а set сохраняет исходный порядок элементов из input list",
+      "Map даёт each.key/value, set использует строку как key и value; смена ключа меняет instance address",
+      "Set принимает objects и выводит ключ из их hash, поэтому изменение attribute обновляет instance на месте",
+      "List автоматически преобразуется в set, а duplicate values получают suffix для уникального resource address"
     ],
     "answer": 1,
-    "explanation": "for_each с map: each.key = ключ, each.value = значение. Адрес ресурса: aws_instance.this['key']. Преимущество: ключ стабилен. for_each с set(string): each.key = each.value. Проблема: set не может содержать dynamic значения (неизвестные до apply). Решение: toset([...]) или explicit map."
+    "explanation": "for_each принимает map или set строк с известными и несекретными ключами. Map отделяет стабильный key от value; в set each.key равен each.value, поэтому изменение строки означает другой instance address. List нужно преобразовать явно."
   },
   {
     "id": 455,
     "topic": "Terraform",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как исправить ситуацию когда terraform state содержит 'orphaned' ресурсы после ручного удаления в облаке?",
+    "q": "Remote object удалили вручную, но его resource остаётся в configuration. Что произойдёт?",
     "options": [
-      "Запустить terraform apply --auto-approve для восстановления ресурсов",
-      "Удалить весь state файл и пересоздать инфраструктуру",
-      "terraform plan покажет ресурсы к созданию; terraform state rm для удаления из state без восстановления; или использовать -refresh-only для синхронизации",
-      "Orphaned ресурсы игнорируются Terraform автоматически"
+      "Terraform сохранит старый binding в state и пропустит resource, пока оператор не выполнит state rm вручную",
+      "Refresh-only apply восстановит remote object с прежним id, не создавая create action в обычном plan",
+      "Refresh обнаружит отсутствие, и обычный plan предложит create; если object больше не нужен, меняют configuration",
+      "Provider пометит весь state повреждённым, после чего потребуется удалить snapshot и импортировать остальные objects"
     ],
     "answer": 2,
-    "explanation": "terraform plan -refresh-only обновляет state до реального состояния облака. terraform apply -refresh-only применяет обновления state. terraform state rm удаляет ресурс из state без его уничтожения. Если нужно удалить из конфигурации — убрать код + terraform apply удалит из state."
+    "explanation": "По умолчанию plan refreshes state и замечает, что remote object исчез. Пока resource остаётся в configuration, желаемое состояние требует создать его снова. Если Terraform больше не должен им управлять, это отражают в configuration, например removed block, а не маскируют drift."
   },
   {
     "id": 456,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое preconditions и postconditions в Terraform и чем они лучше validation?",
+    "q": "Когда выбирать variable validation, precondition и postcondition?",
     "options": [
-      "preconditions и postconditions — синонимы validation правил в variables",
-      "preconditions заменяют terraform plan для проверки конфигурации",
-      "Они работают только в Terraform Cloud",
-      "lifecycle { precondition { condition = ... error_message = ... } } — проверка до создания ресурса на основе данных; postcondition — после создания. Validation — для переменных только"
+      "Variable validation проверяет remote API после apply, а precondition и postcondition меняют текст generated plan",
+      "Precondition выдаёт warning в конце run, postcondition продолжает downstream actions, validation создаёт check",
+      "Все три выполняются на одном этапе и отличаются местом записи, поэтому выбор не влияет на порядок operations",
+      "Validation проверяет inputs, precondition — assumption до action, postcondition — guarantee после plan/read/apply"
     ],
     "answer": 3,
-    "explanation": "Precondition проверяет условие перед операцией с ресурсом (can use data sources, другие ресурсы). Postcondition — после: гарантирует выходные значения. Validation в variable {} — только для самой переменной, без доступа к другим ресурсам. Вместе обеспечивают контракты между модулями."
+    "explanation": "Input validation останавливает operation при недопустимых параметрах. Preconditions проверяют предпосылки resource, data source или output до действия; postconditions проверяют результат и блокируют зависимые actions, но не откатывают уже выполненные изменения."
   },
   {
     "id": 457,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает partial backend configuration в Terraform и зачем она нужна?",
+    "q": "Как безопасно использовать partial backend configuration?",
     "options": [
-      "Хранение чувствительных параметров backend (bucket, key, region) вне кода: terraform init -backend-config='bucket=my-bucket' или файл backend.hcl",
-      "Partial backend — это использование нескольких backend одновременно",
-      "Partial backend используется когда state файл превышает 100MB",
-      "Это функция только Terraform Enterprise"
+      "Оставить часть backend arguments пустыми и передать их в init, а credentials брать из environment или credential chain",
+      "Разделить один state между несколькими backends и выбирать актуальный snapshot по времени последней записи",
+      "Передать access key через -backend-config, потому что Terraform исключает CLI arguments из .terraform и plan files",
+      "Сохранить backend password в committed backend.hcl, а sensitive flag зашифрует его перед terraform init"
     ],
     "answer": 0,
-    "explanation": "backend 'S3' {} в коде без параметров. terraform init -backend-config=backend.hcl или -backend-config='key=value'. backend.hcl не коммитится в Git (содержит endpoint/credentials). Позволяет один код для разных окружений с разными state backend'ами. CI использует environment-specific backend config."
+    "explanation": "Partial configuration позволяет задавать environment-specific bucket, key или endpoint при init. Credentials и другие secrets передают стандартным credential file или environment mechanism: backend-config сохраняется в .terraform и plan files и может утечь."
   },
   {
     "id": 458,
     "topic": "Terraform",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Какие компромиссы между terraform workspaces и directory-based separation для multiple environments?",
+    "q": "Когда CLI workspaces хуже отдельных root configurations?",
     "options": [
-      "Workspaces всегда лучше, directory-based — устаревший подход",
-      "Workspaces: одна конфигурация, разные state; минус: нет изоляции конфигурации, риск apply в неверное окружение. Directories: явная изоляция, разная конфигурация per env; минус: дублирование",
-      "Workspaces не поддерживают S3 backend",
-      "Directory separation невозможна без Terragrunt"
+      "Workspaces создают независимый backend и IAM identity для каждого environment, что усложняет общий module source",
+      "Они разделяют state в одном backend, но не credentials и access controls; сильные boundaries требуют разных roots",
+      "Отдельные roots используют общий state и различаются var-files, поэтому ошибочный apply затрагивает все environments",
+      "CLI workspaces подходят для system decomposition, поскольку автоматически строят dependencies между states"
     ],
     "answer": 1,
-    "explanation": "Workspaces: terraform workspace select prod, один codebase, разные state. Проблема: переменные не изолированы, легко перепутать окружение. Directories (envs/dev, envs/prod): полная изоляция, разные var файлы, но дублирование кода. Terragrunt решает дублирование (DRY) при directory approach."
+    "explanation": "CLI workspaces удобны для нескольких экземпляров одной configuration с общим backend и access model. Они не обеспечивают сильную изоляцию credentials или архитектурных компонентов; для таких границ применяют отдельные root configurations и backends."
   },
   {
     "id": 459,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое terraform test framework (Terraform 1.6+)?",
+    "q": "Что проверяет native terraform test?",
     "options": [
-      "Инструмент для нагрузочного тестирования провайдеров",
-      "terraform test — это команда для валидации синтаксиса",
-      "Нативный фреймворк для написания unit/integration тестов Terraform кода в .tftest.hcl файлах с assertions и mock providers",
-      "Test framework доступен только через Terraform Cloud"
+      "Команда выполняет provider acceptance suite из Go source и публикует результаты совместимости в Registry",
+      "Команда расширяет terraform validate нагрузочными запросами к cloud API без создания test state и resources",
+      "Файлы .tftest.hcl задают plan/apply runs и assertions; mocks доступны, а real apply может создать infrastructure",
+      "HCP Terraform запускает speculative plan для pull request, а локальный CLI загружает готовый report по run id"
     ],
     "answer": 2,
-    "explanation": "terraform test читает .tftest.hcl: run blocks с command (plan/apply), variables, assert блоки с условиями. mock_provider позволяет тестировать без реального облака. Альтернативы: Terratest (Go), Kitchen-Terraform. Нативный тест framework снижает порог входа для тестирования IaC."
+    "explanation": "terraform test читает .tftest.hcl/.tftest.json, выполняет run blocks с plan или apply и проверяет assertions. Можно использовать alternate test modules и mock providers; apply tests могут создать реальные ресурсы, которые Terraform затем пытается очистить."
   },
   {
     "id": 460,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает Terragrunt и какие проблемы он решает?",
+    "q": "Какие задачи решает Terragrunt и какой trade-off добавляет?",
     "options": [
-      "Terragrunt — это форк Terraform с дополнительными провайдерами",
-      "Terragrunt работает только с AWS провайдером",
-      "Terragrunt заменяет Terraform workspaces",
-      "Wrapper над Terraform: DRY конфигурация через terragrunt.hcl, автоматическая инициализация backend, dependency graph между модулями, run_all для групповых операций"
+      "Он заменяет Terraform engine, state format и provider protocol собственными реализациями для multi-cloud",
+      "Он выступает remote backend и выдаёт state locks, encryption keys и temporary credentials каждому module",
+      "Он компилирует HCL в provider code и устраняет необходимость в modules, registry и dependency lock file",
+      "Он добавляет DRY-конфигурацию и orchestration зависимых units, но вводит ещё один CLI layer и upgrade surface"
     ],
     "answer": 3,
-    "explanation": "Terragrunt решает: дублирование backend конфигурации (generate blocks), управление зависимостями между state (dependency {}), иерархические переменные (find_in_parent_folders()), run-all apply (топологический порядок). Популярен для крупных multi-account инфраструктур."
+    "explanation": "Terragrunt помогает генерировать общую configuration, подключать зависимости и выполнять операции над группой Terraform units. Это уменьшает повторение в крупных layouts, но добавляет собственную семантику, версию и отладку поверх Terraform/OpenTofu."
   },
   {
     "id": 461,
     "topic": "Terraform",
     "level": "Senior",
     "category": "scenario",
-    "q": "Terraform plan показывает неожиданные изменения ресурса, который не менялся. Как диагностировать?",
+    "q": "Как диагностировать неожиданный diff в Terraform plan?",
     "options": [
-      "terraform plan -refresh=false (без refresh) vs с refresh для определения drift; TF_LOG=TRACE для детального логирования; проверить ignore_changes lifecycle",
-      "Запустить terraform apply --auto-approve для устранения diff",
-      "Удалить и пересоздать ресурс через terraform taint",
-      "Откатить версию провайдера"
+      "Изучить saved plan по attributes, сравнить refresh behavior, lock/provider changes и remote drift; trace включать точечно",
+      "Применить plan с auto-approve, чтобы provider записал актуальные defaults, а затем проверить оставшийся diff",
+      "Добавить ignore_changes = all до выяснения причины и вернуть lifecycle rule после следующего provider upgrade",
+      "Пометить resource через terraform taint, потому что replacement показывает источник каждого computed attribute"
     ],
     "answer": 0,
-    "explanation": "TF_LOG=DEBUG/TRACE показывает API-вызовы и причины diff. terraform plan -refresh=false — если diff исчезает, проблема в drift (ресурс изменён вне Terraform). lifecycle { ignore_changes = [tags] } игнорирует конкретные поля. Также проверить: изменение версии провайдера может менять defaults."
+    "explanation": "Сначала локализуют attributes и action в plan, проверяют external changes, provider schema/defaults и lock-file update. Сравнение с -refresh=false помогает отделить drift от configuration/provider diff; TF_LOG используют с защитой секретов и лишь при необходимости."
   },
   {
     "id": 462,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как организовать версионирование Terraform-модулей для команды?",
+    "q": "Как версионировать Terraform modules для командного использования?",
     "options": [
-      "Все модули должны храниться в одном репозитории с Terraform кодом",
-      "Отдельные репозитории с git tags (v1.2.0); source = \"git::https://...?ref=v1.2.0\"; или Terraform Registry; semantic versioning для обратной совместимости",
-      "Версионирование модулей не поддерживается в Terraform",
-      "Модули должны обновляться синхронно с основным кодом"
+      "Подключать default branch Git repository, а совместимость определять по версии Terraform CLI у consumer",
+      "Публиковать SemVer releases, использовать Registry version или immutable Git ref и проверять upgrade в CI",
+      "Полагаться на .terraform.lock.hcl: он фиксирует remote modules вместе с providers и обновляется через init",
+      "Копировать module source в каждый root, чтобы release приложения одновременно задавал module compatibility"
     ],
     "answer": 1,
-    "explanation": "Terraform Registry (public или Terraform Cloud private): module source со встроенным версионированием. Git sources: ref=v1.0.0 для tag, ref=commit-sha для pinning. Semantic versioning: MINOR/PATCH — backward compatible, MAJOR — breaking changes. terraform.lock.hcl фиксирует версии провайдеров."
+    "explanation": "Registry modules поддерживают version constraint, а Git source — ?ref= с tag или commit SHA. Release notes, SemVer contract и automated tests делают upgrades управляемыми. Dependency lock file фиксирует providers, но не remote module versions."
   },
   {
     "id": 463,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое check block в Terraform (1.5+) и чем отличается от precondition?",
+    "q": "Чем check block отличается от blocking conditions?",
     "options": [
-      "check block — синоним precondition с другим синтаксисом",
-      "check block доступен только с Sentinel политиками",
-      "check block: непрерывная проверка assertion после apply, не блокирует; precondition блокирует apply при провале. Используется для мониторинга compliance требований",
-      "check block работает только в Terraform Cloud"
+      "Check выполняется до graph planning и останавливает run, а precondition сообщает warning после apply",
+      "Check является Sentinel policy и доступен в configuration после подключения HCP policy set к workspace",
+      "Check выполняется в конце plan/apply и при failure даёт warning; регулярный запуск требует HCP health assessments",
+      "Check запускает data source по расписанию локального CLI и отменяет уже применённые actions при failed assertion"
     ],
     "answer": 2,
-    "explanation": "check block с assert { condition = ... error_message = ... } выполняется после apply как warning (не блокирует). Позволяет проверять post-apply состояние (URL доступен, сертификат валиден). Precondition/postcondition — блокирующие проверки контракта. check — для непрерывного compliance мониторинга."
+    "explanation": "check block проверяет инфраструктуру без блокировки текущей operation: failed assertion становится warning. В CLI он выполняется как часть plan/apply; continuous validation появляется в HCP Terraform, когда для workspace включены health assessments."
   },
   {
     "id": 464,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как реализовать cross-account data sources в Terraform для AWS?",
+    "q": "Как читать и создавать AWS resources в нескольких accounts?",
     "options": [
-      "Cross-account data sources невозможны без Terraform Enterprise",
-      "Cross-account доступ настраивается через AWS Resource Access Manager",
-      "Использовать terraform_remote_state для чтения данных другого аккаунта",
-      "Multiple provider aliases с assume_role: provider \"aws\" { alias = \"prod\", assume_role { role_arn = \"arn:...:role/TerraformCrossAccount\" } }; data source использует provider = aws.prod"
+      "Подключить terraform_remote_state каждого account: backend credentials автоматически станут credentials provider",
+      "Создать AWS RAM share для provider configuration, после чего data sources выберут account по resource ARN",
+      "Менять AWS_PROFILE внутри resource blocks и сохранять выбранный profile как attribute каждого state object",
+      "Настроить aliased AWS providers с assume_role и явно назначать provider resource/module; роли ограничить trust policy"
     ],
     "answer": 3,
-    "explanation": "Multiple providers с alias и assume_role позволяют читать/создавать ресурсы в разных AWS аккаунтах. data \"aws_vpc\" \"prod\" { provider = aws.prod }. Роль TerraformCrossAccount в целевом аккаунте должна доверять (trust policy) аккаунту CI. Альтернатива: terraform_remote_state для output из другого state."
+    "explanation": "Каждая aliased provider configuration может assume роль в целевом account. Resource, data source или module выбирает alias явно; IAM trust policy, audience/subject или external ID и permissions ограничивают, кто может получить роль."
   },
   {
     "id": 465,
     "topic": "Terraform",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Каковы недостатки использования -target при terraform plan/apply?",
+    "q": "Почему -target не подходит для обычного deployment workflow?",
     "options": [
-      "-target нарушает целостность state, пропускает зависимые ресурсы, может создать drift; приемлем только для аварийных ситуаций, не для регулярного использования",
-      "-target ускоряет apply и рекомендуется для production",
-      "-target работает только с module адресами",
-      "-target не поддерживается в Terraform Cloud"
+      "Он планирует target и его dependencies, но пропускает остальной graph; это может скрыть pending changes и drift",
+      "Он планирует target без dependencies, поэтому provider создаёт resource раньше network и IAM prerequisites",
+      "Он необратимо повреждает state metadata при каждом plan, даже если пользователь не выполняет apply operation",
+      "Он предназначен для независимого deployment компонентов и заменяет разделение больших roots на smaller states"
     ],
     "answer": 0,
-    "explanation": "-target применяет изменения к конкретному ресурсу, игнорируя зависимости. Проблемы: другие ресурсы, зависящие от него, не обновятся; state становится неконсистентным; следующий apply без -target может дать неожиданный результат. Документация: 'exceptional situations only'."
+    "explanation": "Resource targeting включает выбранные instances и объекты, от которых они зависят, но не формирует полный plan. HashiCorp рекомендует его для exceptional recovery; после применения нужно запустить обычный plan и устранить оставшиеся изменения."
   },
   {
     "id": 466,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое CDKTF (Cloud Development Kit for Terraform) и в чём его преимущества?",
+    "q": "Что важно учитывать при использовании CDK for Terraform в 2026 году?",
     "options": [
-      "CDKTF — это UI для визуального построения Terraform конфигураций",
-      "Позволяет писать Terraform конфигурацию на TypeScript/Python/Java/Go; генерирует HCL JSON; полная мощь языка программирования (циклы, абстракции, тесты)",
-      "CDKTF заменяет провайдеры Terraform собственными SDK",
-      "CDKTF поддерживается только с AWS CDK конфигурациями"
+      "CDKTF находится в active LTS и получает compatibility updates для новых Terraform providers до 2030 года",
+      "Проект архивирован 10 декабря 2025 года и не поддерживается; продолжение несёт риск, рекомендована migration",
+      "CDKTF передан OpenTofu как provider plugin и теперь синтезирует state без стандартного Terraform CLI",
+      "AWS CDK выпускает официальные CDKTF fixes, поэтому TypeScript applications сохраняют поддержку HashiCorp"
     ],
     "answer": 1,
-    "explanation": "CDKTF: код на TypeScript/Python синтезируется в terraform.json (JSON HCL). Преимущества: типизация, IDE автодополнение, unit-тесты (Jest, pytest), знакомый язык для разработчиков. Недостатки: абстракция над Terraform усложняет отладку, дополнительный compile step."
+    "explanation": "HashiCorp завершил развитие и архивировал CDKTF 10 декабря 2025 года; fixes и compatibility updates больше не выпускаются. Существующий код работает на риск владельца, а cdktf synth --hcl может помочь начать миграцию к поддерживаемому Terraform HCL."
   },
   {
     "id": 467,
     "topic": "Terraform",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как безопасно выполнить state surgery: перенести ресурс из одного state в другой?",
+    "q": "Как безопасно перенести remote object между двумя Terraform states?",
     "options": [
-      "Скопировать terraform.tfstate файл напрямую",
-      "Использовать terraform workspace для переноса",
-      "terraform state pull > state.json; редактирование; terraform state push — или: terraform state mv (для одного state); terraform state rm + import для межstate переноса",
-      "Сделать backup state, затем terraform destroy + apply"
+      "Отредактировать serial и lineage в JSON snapshot, затем выполнить state push -force одновременно в оба backends",
+      "Скопировать source state в target backend и удалить из копии остальные resources после первого successful plan",
+      "Заморозить runs, сделать backups, убрать binding из source и импортировать тот же id в target, затем проверить plans",
+      "Уничтожить object из source configuration и сразу применить target, рассчитывая получить прежний cloud identifier"
     ],
     "answer": 2,
-    "explanation": "Межstate перенос: 1) terraform state rm <source> из source state (ресурс 'orphaned' в облаке). 2) terraform import <target> <id> в target state. Или: terraform state pull / редактирование JSON / terraform state push --force (опасно!). moved block не работает между разными state. Всегда backup перед state surgery."
+    "explanation": "Нужно исключить concurrent applies и двойное управление. После backups binding удаляют через reviewed removed block/state rm и импортируют точный remote ID в target; порядок выбирают с коротким контролируемым окном, затем проверяют оба полных plan."
   },
   {
     "id": 468,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает terraform providers lock и .terraform.lock.hcl?",
+    "q": "Что фиксирует .terraform.lock.hcl и зачем нужен terraform providers lock?",
     "options": [
-      "lock.hcl блокирует параллельное выполнение terraform",
-      "lock.hcl хранит состояние terraform init",
-      "lock файл генерируется только в Terraform Cloud",
-      ".terraform.lock.hcl фиксирует версии и хэши провайдеров; terraform providers lock генерирует хэши для разных платформ (linux/darwin/windows)"
+      "Lock file хранит lease remote state и блокирует параллельные apply до завершения timeout backend operation",
+      "Lock file фиксирует versions remote modules и Git refs, а providers lock обновляет module source cache",
+      "Lock file является копией installed plugins из .terraform и не предназначен для commit в source control",
+      "Lock file записывает provider selections и checksums; providers lock добавляет проверяемые hashes для platforms"
     ],
     "answer": 3,
-    "explanation": ".terraform.lock.hcl: коммитится в Git, фиксирует версию провайдера и SHA-хэши для верификации. terraform providers lock -platform=linux_amd64 -platform=darwin_arm64 добавляет хэши для нескольких платформ (нужно если команда использует разные ОС). terraform init -upgrade обновляет lock файл."
+    "explanation": ".terraform.lock.hcl коммитят, чтобы повторять provider selection и проверять package checksums. terraform providers lock может заранее получить hashes для CI и developer platforms; init -upgrade пересматривает selection в рамках constraints."
   },
   {
     "id": 469,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как настроить drift detection в Terraform без применения изменений?",
+    "q": "Как обнаруживать infrastructure drift без изменения remote objects?",
     "options": [
-      "terraform plan -refresh-only: обнаруживает изменения реального состояния vs state; в CI: регулярный запуск plan, оповещение при ненулевом diff",
-      "Drift detection возможен только в Terraform Cloud",
-      "terraform validate выявляет drift",
-      "Drift detection настраивается через backend конфигурацию"
+      "Запускать plan -refresh-only -detailed-exitcode по расписанию: exit 2 означает proposed state changes, но plan их не применяет",
+      "Запускать validate -detailed-exitcode: provider сравнит state с APIs, не требуя backend access и cloud credentials",
+      "Выполнять apply -refresh-only: команда создаст report, но не запишет refreshed values в remote state snapshot",
+      "Настроить drift flag в backend block: backend отправит alert, когда serial state не совпадёт с cloud API versions"
     ],
     "answer": 0,
-    "explanation": "terraform plan -refresh-only обновляет только state (не применяет изменения конфигурации). Exit code 2 = есть изменения. В CI: cron job с terraform plan -refresh-only -detailed-exitcode; при exit code != 0 — alert. Terraform Cloud: drift detection как встроенная фича с уведомлениями."
+    "explanation": "Refresh-only plan показывает, как Terraform предлагает обновить state в ответ на external changes, не изменяя remote objects и не записывая state. С -detailed-exitcode код 2 означает непустой diff; credentials, locking и защита plan output остаются важны."
   },
   {
     "id": 470,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое flatten и zipmap функции Terraform и как их применять?",
+    "q": "Как различаются функции flatten и zipmap?",
     "options": [
-      "flatten и zipmap — функции шифрования для секретов",
-      "flatten([[1,2],[3,4]]) → [1,2,3,4]: убирает вложенность; zipmap(['a','b'],[1,2]) → {a=1,b=2}: создаёт map из двух list",
-      "Эти функции работают только в for_each",
-      "zipmap и merge выполняют одинаковую функцию"
+      "flatten объединяет strings по delimiter, а zipmap разбивает map на независимые lists ключей и значений",
+      "flatten превращает nested lists в flat sequence, а zipmap строит map из одинаковых по длине lists keys/values",
+      "Обе функции меняют type collection для for_each: flatten создаёт set, а zipmap — tuple с stable indexes",
+      "flatten рекурсивно раскрывает values внутри maps, а zipmap объединяет несколько maps с приоритетом последнего"
     ],
     "answer": 1,
-    "explanation": "flatten используется для сглаживания вложенных структур, часто из for-expressions: flatten([for vpc in var.vpcs: [for subnet in vpc.subnets: {...}]]). zipmap создаёт map для for_each из двух списков. merge({a=1},{b=2}) объединяет maps. concat([a,b],[c,d]) объединяет списки."
+    "explanation": "flatten заменяет вложенные list elements их содержимым, но не раскрывает lists, косвенно вложенные через map. zipmap сопоставляет список строк-ключей со списком значений той же длины и возвращает map."
   },
   {
     "id": 471,
     "topic": "Terraform",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как написать Terraform-модуль с поддержкой conditional resources (создавать ресурс или нет)?",
+    "q": "Как условно создать resource или module instance?",
     "options": [
-      "Использовать if-else синтаксис в resource блоке",
-      "Conditional ресурсы требуют dynamic block",
-      "count = var.create_resource ? 1 : 0 или for_each = var.enabled ? toset(['this']) : toset([]); referencing через resource.name[0] или try(resource.name['this'], null)",
-      "Использовать terraform_data resource для условных операций"
+      "Добавить if block внутрь resource: Terraform исключит block из graph, когда condition станет false",
+      "Обернуть resource в dynamic block: пустой content удалит instance, сохранив прежний unindexed address",
+      "Использовать count с 0/1 или for_each с пустой/непустой map и обращаться к instance по index либо key",
+      "Связать creation с depends_on: отсутствие dependency удалит resource из plan без изменения configuration"
     ],
     "answer": 2,
-    "explanation": "count = var.enable ? 1 : 0 — классический подход. Ресурс: resource.name[0] (список с 0 или 1 элементом). for_each подход для модулей предпочтительней (стабильный адрес). Проблема count: при изменении порядка ресурсы пересоздаются. Модуль: переменная create_xxx как флаг."
+    "explanation": "Terraform условно создаёт instances через count или for_each. Singleton count получает address [0], а for_each — key; outputs должны учитывать отсутствие instance. Смена способа адресации требует moved block или контролируемой state migration."
   },
   {
     "id": 472,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает terraform_remote_state data source и когда его использовать с осторожностью?",
+    "q": "Почему terraform_remote_state следует применять осторожно?",
     "options": [
-      "terraform_remote_state автоматически синхронизирует два state файла",
-      "terraform_remote_state полностью заменяет data sources провайдеров",
-      "remote_state работает только с local backend",
-      "Читает outputs другого Terraform state; создаёт tight coupling между state; альтернатива — параметризация через SSM Parameter Store/Consul"
+      "Он двусторонне синхронизирует snapshots, поэтому consumer apply может менять resources source configuration",
+      "Он импортирует nested resources в consumer state и создаёт duplicate ownership каждого опубликованного output",
+      "Sensitive output передаётся в зашифрованном expression, поэтому consumer не может использовать его в provider",
+      "Он показывает root outputs, но требует доступа ко всему snapshot и связывает schemas; данные лучше публиковать явно"
     ],
     "answer": 3,
-    "explanation": "terraform_remote_state: backend { config } читает output другого state. Проблемы: жёсткая зависимость между state, изменение outputs в source ломает consumer. Альтернатива: хранить shared данные в SSM/Consul/AWS Parameter Store — looser coupling, независимые обновления."
+    "explanation": "Data source exposes root outputs, однако его principal должен уметь читать весь state snapshot, который может содержать secrets. Для меньшей связанности и отдельного ACL данные публикуют через tfe_outputs, DNS, SSM, Consul или другой явный interface."
   },
   {
     "id": 473,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое removed block в Terraform 1.7+?",
+    "q": "Как removed block прекращает управление resource без его destruction?",
     "options": [
-      "Декларирует удаление ресурса из state без удаления из облака: removed { from = aws_instance.old lifecycle { destroy = false } }",
-      "removed block удаляет ресурс из state и из облака",
-      "removed block — это lifecycle правило для предотвращения удаления",
-      "Аналогичен terraform state rm, выполняется только вручную"
+      "Resource block заменяют на removed с тем же address и lifecycle destroy=false; plan показывает removal из state",
+      "Removed без lifecycle сохраняет remote object по умолчанию, а destroy=true оставляет binding в state как data",
+      "Removed добавляют рядом с resource и prevent_destroy=true; оба blocks продолжают совместно управлять object",
+      "Removed принимает instance key вроде resource.name[0] и перемещает выбранный instance в отдельный local state"
     ],
     "answer": 0,
-    "explanation": "removed block (1.7+): когда ресурс убирается из конфигурации, но его не нужно удалять из облака. lifecycle { destroy = false } — убрать из state, сохранить ресурс. destroy = true — удалить из облака. Аналог terraform state rm, но декларативный и версионируемый в коде."
+    "explanation": "Декларативный removed block можно просмотреть в plan и версионировать. destroy=false удаляет binding из state, не уничтожая remote object; ссылки на него нужно убрать. HashiCorp рекомендует этот путь вместо немедленного state rm."
   },
   {
     "id": 474,
     "topic": "Terraform",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как настроить Terraform в CI/CD для безопасной работы с AWS без долгосрочных credentials?",
+    "q": "Как Terraform CI получает AWS credentials через OIDC federation?",
     "options": [
-      "Хранить AWS_ACCESS_KEY_ID/SECRET_ACCESS_KEY в CI переменных",
-      "OIDC: CI провайдер (GitHub Actions/GitLab) получает JWT → AWS assume role через OIDC → временные credentials; Terraform использует AWS provider без явных credentials",
-      "Использовать EC2 instance profile на self-hosted runner",
-      "Terraform Cloud встроенно работает с AWS без credentials"
+      "CI хранит IAM access key как masked variable и меняет его перед каждым run через AWS Organizations API",
+      "CI identity token обменивается через STS AssumeRoleWithWebIdentity на short-lived role credentials для provider",
+      "Self-hosted runner передаёт instance profile всем repositories, а OIDC шифрует profile id в Terraform plan",
+      "S3 backend автоматически выдаёт AWS provider session после init, используя permissions state bucket policy"
     ],
     "answer": 1,
-    "explanation": "OIDC federation: AWS IAM OIDC provider для GitHub Actions (token.actions.githubusercontent.com). IAM Role с trust policy для конкретного repo/branch. actions/configure-aws-credentials получает temporary credentials через AssumeRoleWithWebIdentity. Нет долгосрочных credentials в CI. GitLab: аналогично с JWT CI/CD."
+    "explanation": "CI выпускает подписанный OIDC/JWT token, а AWS STS проверяет provider, audience и trust-policy claims и возвращает временную role session. Subject ограничивают repository/branch/environment; постоянные access keys Terraform не нужны."
   },
   {
     "id": 475,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает параллелизм в Terraform и каковы риски изменения -parallelism?",
+    "q": "Как параметр -parallelism влияет на Terraform operations?",
     "options": [
-      "Terraform всегда создаёт ресурсы последовательно для безопасности",
-      "-parallelism работает только для destroy операций",
-      "По умолчанию parallelism=10 (10 параллельных операций); зависимости в графе определяют порядок. Увеличение parallelism может превысить API rate limits провайдера",
-      "Параллелизм определяется автоматически на основе CPU"
+      "Terraform выполняет graph последовательно, а parallelism задаёт число threads для вычисления HCL expressions",
+      "Terraform выбирает concurrency по CPU и игнорирует flag, когда provider поддерживает API request batching",
+      "Graph сохраняет dependencies, а flag ограничивает concurrent operations; default 10, рост может вызвать throttling",
+      "Flag меняет dependencies и разрешает dependent resources стартовать до получения computed values от provider"
     ],
     "answer": 2,
-    "explanation": "Terraform строит dependency graph (DAG), независимые ресурсы создаются параллельно (до 10 одновременно). terraform apply -parallelism=20 может ускорить apply, но AWS API rate limiting приведёт к throttling/ошибкам. Уменьшение parallelism помогает при throttling ошибках."
+    "explanation": "Terraform параллельно обходит dependency graph и по умолчанию ограничивает число concurrent graph operations десятью. Повышение может ускорить независимые resources, но усилить API throttling; снижение помогает нестабильным или rate-limited APIs."
   },
   {
     "id": 476,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как разрабатывать кастомный Terraform провайдер?",
+    "q": "Из каких частей состоит разработка custom Terraform provider?",
     "options": [
-      "Кастомные провайдеры пишутся на Python с использованием terraform-sdk",
-      "Разработка провайдеров доступна только партнёрам HashiCorp",
-      "Кастомные провайдеры могут быть только обёртками над существующими",
-      "Go + Terraform Plugin Framework (предпочтительно) или Plugin SDK v2; реализация CRUD для каждого ресурса; публикация в Terraform Registry"
+      "Provider пишут на Python через terraform-sdk, а schema генерируется из OpenAPI при каждом terraform init",
+      "Provider описывают YAML manifest с REST endpoints, после чего Terraform Core реализует CRUD и state upgrades",
+      "Registry принимает provider от verified partner, а internal provider нельзя устанавливать из filesystem mirror",
+      "Go Plugin Framework задаёт schemas и resource/data source behavior; tests и signed releases проверяют lifecycle"
     ],
     "answer": 3,
-    "explanation": "Terraform провайдеры — Go программы, взаимодействующие с Terraform через gRPC. Plugin Framework (новый) vs SDK v2 (legacy). Каждый ресурс: Schema (атрибуты), CRUD functions. terraform-plugin-testing для acceptance tests. Публикация: GitHub Actions + Terraform Registry (GPG подпись)."
+    "explanation": "Современный рекомендуемый SDK — Terraform Plugin Framework для Go. Provider реализует configuration, schemas и Create/Read/Update/Delete либо соответствующее behavior, обрабатывает state upgrades и проходит unit/acceptance tests; publication требует корректных releases и signing."
   },
   {
     "id": 477,
     "topic": "Terraform",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Сравните подходы к организации Terraform state: monolithic vs split по сервисам/окружениям.",
+    "q": "Как выбрать границы Terraform state?",
     "options": [
-      "Monolithic: один apply всё меняет, проще зависимости; Split: независимые деплои, меньше blast radius, параллельная работа команд; Split предпочтительнее для production",
-      "Monolithic state всегда проще, рекомендуется для всех проектов",
-      "Split state невозможен без Terragrunt",
-      "Monolithic state невозможен для multi-region инфраструктуры"
+      "Делить по lifecycle, ownership, permissions и blast radius; monolith проще, split добавляет interfaces и coordination",
+      "Хранить production в одном state независимо от размера, поскольку backend lock устраняет team contention и risk",
+      "Создать state на каждый resource, чтобы provider API failures не влияли на соседние objects и plans",
+      "Разделить по provider regions: remote_state автоматически синхронизирует dependencies и применяет changes по DAG"
     ],
     "answer": 0,
-    "explanation": "Monolithic: легко старт, сложно с ростом. Split по слоям (network/compute/k8s) или окружениям: меньше blast radius (ошибка в app не ломает network), независимые план/apply, разные права (network team vs app team). Рекомендуемое разделение: networking, DNS, IAM, stateful services, applications."
+    "explanation": "Универсального размера state нет. Monolith упрощает references и atomic plan, но увеличивает contention и blast radius; split даёт независимые permissions и releases, но требует явных contracts и coordination между states."
   },
   {
     "id": 478,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает Terraform Cloud VCS-driven workflow?",
+    "q": "Как выглядит VCS-driven workflow в HCP Terraform?",
     "options": [
-      "Terraform Cloud требует ручного запуска plan/apply через UI",
-      "Webhook от VCS (GitHub/GitLab) → Terraform Cloud запускает speculative plan на PR, apply после merge в default branch; state, variables и RBAC в облаке",
-      "VCS-driven workflow поддерживает только Bitbucket",
-      "VCS-driven работает только с terraform workspaces"
+      "Developer запускает local apply и загружает state в HCP, а VCS webhook добавляет run result в pull request",
+      "Webhook запускает speculative plan для change request и normal run после merge; apply бывает manual или automatic",
+      "VCS integration работает с default workspace CLI, но variables, policies и state остаются на developer machine",
+      "HCP клонирует repository на постоянный customer runner, где каждый merge выполняет apply вне workspace run queue"
     ],
     "answer": 1,
-    "explanation": "Terraform Cloud VCS integration: PR → speculative plan (только чтение, результат в PR комментарии). Merge → apply queue. Variables (sensitive/non-sensitive) в workspace. Run triggers для зависимостей между workspace. Team access control. Аudit log всех операций. Sentinel policy enforcement."
+    "explanation": "Pull/merge request обычно вызывает speculative plan без apply. Изменение tracked branch создаёт normal run; workspace setting определяет manual confirmation или auto-apply. HCP хранит state, variables, run history, access controls и policy checks."
   },
   {
     "id": 479,
     "topic": "Terraform",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как обновить версию провайдера Terraform в production без пересоздания ресурсов?",
+    "q": "Как проводить upgrade provider version в рабочей инфраструктуре?",
     "options": [
-      "Просто обновить версию провайдера в required_providers — ресурсы не изменятся",
-      "Обновление провайдера всегда требует пересоздания всех ресурсов",
-      "Обновить версию в required_providers → terraform init -upgrade → terraform plan (проверить изменения) → если только refresh изменения — apply; протестировать в dev/staging сначала",
-      "Версию провайдера нельзя менять без нового terraform state"
+      "Изменить constraint и выполнить apply: provider protocol гарантирует отсутствие diff между minor и major versions",
+      "Удалить dependency lock file и .terraform, затем импортировать resources новой schema без предварительного plan",
+      "Изучить changelog, обновить constraint и lock через init -upgrade, проверить plan в lower environments и production",
+      "Скопировать новый provider binary поверх cached version, сохранив прежние checksums для совместимости CI runners"
     ],
     "answer": 2,
-    "explanation": "Обновление провайдера: изменить version constraint → init -upgrade → ОБЯЗАТЕЛЬНО сделать plan. Новая версия может изменить дефолты полей, добавить обязательные атрибуты, изменить API. Проверить CHANGELOG провайдера на breaking changes. Staging-first стратегия критична для production."
+    "explanation": "Provider SemVer не заменяет review release notes и plan: defaults, validation или state schema могут измениться. Upgrade фиксируют в lock file, тестируют на representative lower environment и внимательно проверяют production plan, особенно replacement actions."
   },
   {
     "id": 480,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое ephemeral values (эфемерные значения) в Terraform 1.10+?",
+    "q": "Чем ephemeral value отличается от sensitive value?",
     "options": [
-      "Ресурсы с коротким TTL, автоматически удаляемые",
-      "Значения, доступные без ограничений всем resources и outputs root module",
-      "Значения, которые записываются в state в зашифрованном виде и удаляются после apply",
-      "Значения времени выполнения, которые Terraform полностью исключает из state и plan; для маскирования вывода отдельно используют sensitive"
+      "Ephemeral задаёт TTL managed resource и уничтожает его после apply, а sensitive переносит destruction на destroy run",
+      "Sensitive исключает value из state и plan, а ephemeral добавляет encryption metadata для remote backend",
+      "Ephemeral сохраняется как encrypted state attribute и доступен outputs, пока provider session остаётся active",
+      "Ephemeral доступен runtime и не хранится в state/plan; sensitive redacts display, но само значение может храниться"
     ],
     "answer": 3,
-    "explanation": "Ephemeral variables, child module outputs и поддерживаемые provider blocks доступны во время операции, но не записываются в state/plan. sensitive решает другую задачу — маскирует значение в интерфейсе и CLI."
+    "explanation": "Terraform 1.10+ поддерживает ephemeral variables, child outputs и provider-defined ephemeral resources в ограниченных contexts. Они не сохраняются в plan/state. sensitive скрывает отображение, но не предотвращает storage; flags можно сочетать."
   },
   {
     "id": 481,
