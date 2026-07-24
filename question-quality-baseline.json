@@ -8,28 +8,16 @@
     186
   ],
   "issueBudget": {
-    "length-cue": 3,
+    "length-cue": 0,
     "question-echo": 0,
-    "absolute-distractor": 22,
-    "duplicate-question": 2
+    "absolute-distractor": 14,
+    "duplicate-question": 1
   },
   "topics": {
-    "Ansible": {
-      "length-cue": 3,
-      "question-echo": 0,
-      "absolute-distractor": 2,
-      "duplicate-question": 0
-    },
-    "Terraform": {
-      "length-cue": 0,
-      "question-echo": 0,
-      "absolute-distractor": 5,
-      "duplicate-question": 1
-    },
     "Linux": {
       "length-cue": 0,
       "question-echo": 0,
-      "absolute-distractor": 15,
+      "absolute-distractor": 14,
       "duplicate-question": 0
     },
     "CI/CD": {
@@ -41,10 +29,10 @@
   },
   "levels": {
     "Senior": {
-      "length-cue": 3,
+      "length-cue": 0,
       "question-echo": 0,
-      "absolute-distractor": 22,
-      "duplicate-question": 1
+      "absolute-distractor": 14,
+      "duplicate-question": 0
     },
     "Junior": {
       "length-cue": 0,

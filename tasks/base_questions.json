@@ -1640,43 +1640,43 @@
   {
     "topic": "Ansible",
     "level": "Senior",
-    "q": "Почему не стоит ставить Ansible как попало через pip в system Python?",
+    "q": "Почему Ansible лучше устанавливать в изолированное Python-окружение?",
     "options": [
-      "Потому что pip запрещён",
-      "Из-за конфликтов зависимостей и поддержки окружения",
-      "Потому что YAML не работает",
-      "Из-за chmod"
+      "Чтобы controller читал inventory без connection plugins и SSH credentials",
+      "Чтобы зафиксировать зависимости и не конфликтовать с пакетами system Python",
+      "Чтобы managed hosts получали копию Python из окружения controller",
+      "Чтобы YAML playbook компилировался в binary до подключения к managed hosts"
     ],
     "answer": 1,
-    "explanation": "Лучше использовать управляемые способы установки и изоляцию окружений.",
+    "explanation": "venv, pipx или execution environment изолируют Ansible Core и collections от system Python, упрощают фиксацию версий и воспроизводимость. Способ установки выбирают с учётом поддержки дистрибутива и процесса обновления.",
     "id": 118
   },
   {
     "topic": "Ansible",
     "level": "Senior",
-    "q": "Как оптимизировать медленные playbook?",
+    "q": "Как системно ускорять медленный Ansible playbook?",
     "options": [
-      "Только shell",
-      "Только reboot",
-      "Отключать ненужные facts, уменьшать лишние шаги, использовать подходящие модули/асинхронность",
-      "Только увеличить таймаут"
+      "Увеличить forks без измерений и отключить timeouts для connection plugins",
+      "Заменить modules на shell commands, чтобы controller не собирал results",
+      "Профилировать tasks, убрать лишние facts и loops, настроить concurrency по рискам",
+      "Объединить plays в одну длинную task и выполнять её с высокой verbosity"
     ],
     "answer": 2,
-    "explanation": "Это частый практический вопрос на опыт.",
+    "explanation": "Сначала измеряют длительность tasks и connection overhead, затем сокращают сбор facts и повторные loops, выбирают эффективные modules, caching, pipelining или async там, где это безопасно. forks и strategy настраивают с учётом нагрузки и допустимого параллелизма.",
     "id": 119
   },
   {
     "topic": "Ansible",
     "level": "Senior",
-    "q": "Какую идею нужно показать, рассказывая про сложную роль на собеседовании?",
+    "q": "Что важно раскрыть на собеседовании в примере сложной Ansible role?",
     "options": [
-      "Только цвет IDE",
-      "Только количество строк",
-      "Только имя файла",
-      "Какую проблему решала, как была устроена и как обеспечивали безопасность/идемпотентность"
+      "Количество YAML-файлов и имена tasks без связи с эксплуатационным результатом",
+      "Набор дистрибутивов без описания проверок и границ совместимости",
+      "Список использованных modules без объяснения решений и failure modes",
+      "Исходную проблему, интерфейс role, идемпотентность, security и проверку результата"
     ],
     "answer": 3,
-    "explanation": "Интервьюеру важнее архитектура и мышление, чем объём кода.",
+    "explanation": "Сильный пример связывает требования с архитектурой role: inputs, dependencies, handlers, secrets, идемпотентность, тесты и наблюдаемое поведение при сбое. Масштаб кода сам по себе не показывает качество инженерного решения.",
     "id": 120
   },
   {
@@ -2144,15 +2144,15 @@
   {
     "topic": "Terraform",
     "level": "Senior",
-    "q": "Что такое Terragrunt?",
+    "q": "Как Terragrunt помогает управлять несколькими Terraform или OpenTofu units?",
     "options": [
-      "Форк Terraform с собственным форматом state",
-      "Оркестратор для OpenTofu/Terraform и DRY-конфигураций",
-      "Фреймворк для тестирования Terraform-провайдеров",
-      "Провайдер для управления сервисами AWS"
+      "Объединяет states всех units в один файл и применяет resources в порядке каталогов",
+      "Генерирует общую конфигурацию и оркестрирует units с явными dependencies",
+      "Заменяет provider plugins и реализует cloud APIs внутри собственного runtime",
+      "Компилирует HCL в Kubernetes manifests и передаёт их controller через GitOps"
     ],
     "answer": 1,
-    "explanation": "Terragrunt запускает команды OpenTofu или Terraform, помогает переиспользовать общую конфигурацию и оркестрировать несколько независимых units с зависимостями.",
+    "explanation": "Terragrunt оборачивает OpenTofu или Terraform, помогает переиспользовать backend и provider configuration и координировать отдельные units по dependency graph. State и lifecycle ресурсов при этом остаются в ответственности запускаемого IaC engine и его providers.",
     "id": 154
   },
   {
@@ -6956,10 +6956,10 @@
     "category": "definition",
     "q": "Как Terraform определяет порядок операций над ресурсами?",
     "options": [
-      "Читает .tf файлы по имени и выполняет resource blocks сверху вниз, сохраняя этот порядок между запусками",
-      "Сортирует ресурсы по provider и type, а depends_on меняет порядок только внутри одного исходного файла",
-      "Строит dependency graph из ссылок и явных depends_on, затем параллельно обрабатывает независимые вершины",
-      "Использует порядок объектов в state; новые ресурсы добавляет в конец и применяет после уже известных объектов"
+      "Читает .tf файлы по имени и выполняет resource blocks сверху вниз между запусками",
+      "Сортирует ресурсы по provider и type, а depends_on действует в пределах файла",
+      "Строит dependency graph из ссылок и depends_on, параллельно обрабатывая независимые вершины",
+      "Использует порядок объектов в state и добавляет новые ресурсы в конец очереди"
     ],
     "answer": 2,
     "explanation": "Terraform строит граф из ссылок в expressions, provider dependencies, явных depends_on и других lifecycle-связей. Топологический порядок соблюдает зависимости, а независимые вершины могут выполняться параллельно. Положение блока в файле не задаёт порядок создания."
@@ -6971,13 +6971,13 @@
     "category": "tradeoff",
     "q": "Как сравнить S3 backend с lock-файлом и HCP Terraform?",
     "options": [
-      "S3 backend выполняет планы удалённо и предоставляет deployment UI, если включены bucket versioning и use_lockfile",
-      "HCP Terraform хранит только state, поэтому runs, права доступа и policy workflow остаются такими же, как с S3",
-      "HCP Terraform требует DynamoDB для блокировки, а S3 lock-файл одновременно заменяет IAM и шифрование state",
-      "S3 оставляет IAM, CI и эксплуатацию команде; HCP может добавить managed runs, UI, RBAC и policy по выбранному плану"
+      "S3 выполняет планы удалённо и добавляет deployment UI при включённом bucket versioning",
+      "HCP хранит state, но оставляет runs, права доступа и policy workflow внешнему CI",
+      "HCP требует DynamoDB для locking, а S3 lock-файл заменяет IAM и encryption state",
+      "S3 оставляет IAM, CI и эксплуатацию команде; HCP может добавить managed runs, RBAC и policy"
     ],
     "answer": 3,
-    "explanation": "Для S3 команда сама настраивает IAM, encryption, versioning, CI и use_lockfile; DynamoDB locking устарел. HCP Terraform управляет state и locking и может выполнять remote runs с UI, RBAC и policy-функциями, доступность которых зависит от тарифа. Выбор определяют контроль, compliance, интеграции и стоимость."
+    "explanation": "Для S3 команда настраивает IAM, encryption, versioning, CI и lock-файл. HCP Terraform управляет state и locking и может выполнять remote runs с UI, RBAC и policy-функциями, доступность которых зависит от выбранного плана. Решение учитывает контроль, compliance, интеграции и стоимость."
   },
   {
     "id": 485,
@@ -6986,13 +6986,13 @@
     "category": "scenario",
     "q": "Как прекратить управление ресурсом Terraform, не удаляя remote object?",
     "options": [
-      "Удалить binding через terraform state rm либо removed block с destroy = false и согласованно убрать resource block",
-      "Добавить prevent_destroy и удалить resource block: lifecycle останется в state и автоматически отменит destroy",
-      "Перенести resource в moved block без адреса to: Terraform воспримет пустую цель как отказ от управления",
-      "Оставить resource block и добавить import с тем же адресом: после apply объект исчезнет только из Terraform state"
+      "Удалить binding через terraform state rm или removed block с destroy = false и убрать resource block",
+      "Добавить prevent_destroy и убрать resource block: lifecycle сохранится в state и отменит удаление",
+      "Создать moved block без адреса to: пустая цель будет означать отказ от управления",
+      "Оставить resource block и повторить import: после apply binding исчезнет из state"
     ],
     "answer": 0,
-    "explanation": "terraform state rm делает операцию императивно; декларативный removed block с lifecycle { destroy = false } фиксирует намерение в коде. После state rm старый resource block также убирают до следующего plan, иначе Terraform предложит создать объект заново. Сначала сохраняют state backup и проверяют адрес экземпляра."
+    "explanation": "terraform state rm делает операцию императивно; декларативный removed block с lifecycle { destroy = false } фиксирует намерение в коде. После state rm старый resource block также убирают до следующего plan, иначе Terraform предложит создать объект заново. Перед изменением сохраняют backup state и проверяют адрес экземпляра."
   },
   {
     "id": 486,
@@ -7016,13 +7016,13 @@
     "category": "definition",
     "q": "Как state locking работает в актуальном Terraform S3 backend?",
     "options": [
-      "Bucket versioning автоматически блокирует state на время plan, поэтому отдельные lock permissions не требуются",
-      "Lock хранится только в локальном .terraform, а S3 отклоняет конкурирующие записи по совпадению serial в state",
-      "use_lockfile создаёт объект .tflock; осиротевший lock снимают force-unlock лишь после проверки активных runs",
-      "Для S3 по-прежнему обязательна DynamoDB table, а встроенный lock-файл применяется только к local backend"
+      "Bucket versioning создаёт lock во время plan, поэтому lock permissions можно не выдавать",
+      "Lock хранится в local .terraform, а S3 отклоняет concurrent writes по serial state",
+      "use_lockfile создаёт объект .tflock; осиротевший lock снимают после проверки активных runs",
+      "Блокировку предоставляет DynamoDB table, а S3 lock-файл применяется к local backend"
     ],
     "answer": 2,
-    "explanation": "use_lockfile = true включает блокировку объектом <key>.tflock и требует GetObject, PutObject и DeleteObject для него. DynamoDB locking объявлен устаревшим. force-unlock используют с lock ID только убедившись, что операция-владелец завершилась, иначе параллельная запись может повредить state."
+    "explanation": "use_lockfile = true включает блокировку объектом <key>.tflock и требует GetObject, PutObject и DeleteObject для него. DynamoDB locking объявлен устаревшим. force-unlock используют с lock ID, убедившись, что операция-владелец завершилась; иначе параллельная запись может повредить state."
   },
   {
     "id": 488,
@@ -7046,13 +7046,13 @@
     "category": "definition",
     "q": "Как передать секрет через Terraform, не сохраняя его значение в state?",
     "options": [
-      "Использовать ephemeral source и поддерживаемый provider write-only argument; sensitive добавить для сокрытия вывода",
-      "Пометить обычную variable как sensitive: Terraform заменит значение маркером и в plan, и в сохранённом state",
-      "Передать значение через TF_VAR в environment: переменные окружения никогда не сериализуются в resource state",
-      "Прочитать секрет обычным data source: результаты data blocks автоматически существуют только во время apply"
+      "Использовать ephemeral source и write-only argument; sensitive добавить для сокрытия вывода",
+      "Пометить variable как sensitive: backend зашифрует её значение внутри state",
+      "Передать значение через TF_VAR: provider не сможет записать его в resource state",
+      "Прочитать секрет data source: результат останется в памяти лишь на время apply"
     ],
     "answer": 0,
-    "explanation": "sensitive скрывает значение в интерфейсе, но само по себе не исключает его из state. Ephemeral values/resources не сохраняются, а write-only arguments позволяют provider принять значение без записи в plan и state. Это работает лишь там, где конкретная версия Terraform и provider поддерживают такой поток; иначе state нужно считать секретным."
+    "explanation": "sensitive скрывает значение в интерфейсе, но само по себе не исключает его из state. Ephemeral values или resources не сохраняются, а write-only arguments позволяют provider принять значение без записи в plan и state. Это работает там, где версии Terraform и provider поддерживают такой поток; иначе state нужно считать секретным."
   },
   {
     "id": 490,
@@ -7076,13 +7076,13 @@
     "category": "definition",
     "q": "Чем cgroups v2 отличается от cgroups v1?",
     "options": [
-      "v2 сохраняет отдельную hierarchy для каждого controller, но переименовывает cpuacct и blkio в новые namespaces",
-      "v2 управляет только memory и pids, а CPU и I/O limits по-прежнему требуют параллельного mount cgroups v1",
-      "v2 использует unified hierarchy и согласованную delegation; memory.high throttles, memory.max задаёт hard limit",
-      "v2 автоматически распределяет ресурсы поровну между containers и не требует настройки controller files"
+      "v2 сохраняет hierarchy для каждого controller, переименовав cpuacct и blkio namespaces",
+      "v2 объединяет memory и pids, а CPU и I/O оставляет в параллельном mount cgroups v1",
+      "v2 использует unified hierarchy и delegation; memory.high throttles, memory.max задаёт hard limit",
+      "v2 распределяет ресурсы поровну между containers и обходится без controller files"
     ],
     "answer": 2,
-    "explanation": "cgroups v2 объединяет controllers в одну hierarchy и задаёт более строгую модель membership и delegation. memory.high создаёт reclaim pressure и throttling без OOM, а memory.max служит жёстким пределом и при невозможности reclaim вызывает cgroup OOM. CPU, memory и I/O pressure доступны через PSI-файлы."
+    "explanation": "cgroups v2 объединяет controllers в одну hierarchy и задаёт более строгую модель membership и delegation. memory.high создаёт reclaim pressure и throttling без немедленного OOM, а memory.max служит жёстким пределом и при невозможности reclaim вызывает cgroup OOM."
   },
   {
     "id": 492,
