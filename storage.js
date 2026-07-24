@@ -11,7 +11,7 @@
     k8s_prog: 'ipmax_k8s_prog', pt_prog: 'ipmax_pt_prog', labs_prog: 'ipmax_labs_prog', daily: 'ipmax_daily',
     study_progress: 'ipmax_study_progress', study_position: 'ipmax_study_position', study_answers: 'ipmax_study_answers',
     senior_case_prog: 'ipmax_senior_case_prog', onboarding: 'ipmax_onboarding', onboarding_complete: 'ipmax_onboarding_complete',
-    skill_events: 'ipmax_skill_events', coach_journal: 'ipmax_coach_journal'
+    skill_events: 'ipmax_skill_events', coach_journal: 'ipmax_coach_journal', coach_control: 'ipmax_coach_control'
   };
 
   function create(adapter, keys) {

@@ -68,7 +68,8 @@ function stopServer(server) {
 async function main() {
   const server = spawn(process.execPath, ['test-server.js'], {
     cwd: projectRoot,
-    stdio: 'inherit'
+    stdio: 'inherit',
+    env: { ...process.env, IPMAX_AI_PROVIDER: 'mock' }
   });
 
   try {

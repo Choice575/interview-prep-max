@@ -328,11 +328,24 @@
   </div>
 </div>
 
+<!-- AI REVIEW MODAL -->
+<div class="modal-overlay" id="coach-ai-modal" aria-hidden="true">
+  <div class="modal coach-ai-modal" role="dialog" aria-modal="true" aria-labelledby="coach-ai-title" tabindex="-1">
+    <div class="coach-journal-title-row">
+      <div><span class="coach-focus-kicker">Персональный тренер</span><h3 id="coach-ai-title">Разбор контрольной</h3></div>
+      <button type="button" class="btn-icon" id="coach-ai-close" aria-label="Закрыть AI-разбор" data-coach-action="close-ai-review">✕</button>
+    </div>
+    <p class="coach-journal-lead">Рекомендации строятся по агрегатам сессии. Тексты вопросов, ответы и заметки в запрос не входят.</p>
+    <div id="coach-ai-content"></div>
+  </div>
+</div>
+
 <script src="./version.js"></script>
 <script src="./date.js"></script>
 <script src="./storage.js"></script>
 <script src="./progress.js"></script>
 <script src="./coach.js"></script>
+<script src="./ai-coach.js"></script>
 <script src="./coach-ui.js"></script>
 <script src="./app.js"></script>
 </body>

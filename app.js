@@ -140,6 +140,7 @@ function recordQuestionResult(question,input){
   }
   if(input?.daily!==false){const today=IPMaxDate.localDateKey(now);const daily=lsGet('daily',{});daily[today]=(daily[today]||0)+1;lsSet('daily',daily);}
   recordSkillEvent({source:input?.source||'exam',topic:question.topic,skill:question.topic,score:result.score,possible:1,durationSeconds:input?.responseSeconds,at:now});
+  recordCoachControlAttempt(question,result,input,now);
   return result;
 }
 function recordTrainerResult(source,topic,correct,skill){recordSkillEvent({source,topic,skill:skill||topic,score:correct?1:0,possible:1});}
@@ -178,6 +179,23 @@ function getCoachJournal(){
   const notes=lsGet('coach_journal',[]);
   return Array.isArray(notes)&&typeof InterviewCoach!=='undefined'?notes.filter(InterviewCoach.isJournalEntry):[];
 }
+function getCoachControlSession(){
+  if(typeof IPMaxAICoach==='undefined'||typeof IPMaxAICoach.normaliseControlSession!=='function') return null;
+  return IPMaxAICoach.normaliseControlSession(lsGet('coach_control',null));
+}
+function recordCoachControlAttempt(question,result,input,now){
+  if(input?.source!=='exam'||!Array.isArray(coachQuestionIds)||!coachQuestionIds.map(String).includes(String(question.id))) return;
+  const session=getCoachControlSession();
+  if(!session||session.attempts.some(attempt=>attempt.questionId===String(question.id))) return;
+  session.attempts.push({questionId:String(question.id),topic:question.topic,score:result.score,responseSeconds:input?.responseSeconds||0,at:now});
+  if(session.attempts.length>=session.questionIds.length) session.completedAt=now;
+  lsSet('coach_control',session);
+}
+function requestCoachAIReview(){
+  if(typeof IPMaxAICoach==='undefined') return Promise.reject(new Error('Модуль AI-разбора не загружен.'));
+  const payload=IPMaxAICoach.buildReviewPayload({plan:getCoachPlan(),profile:getOnboardingProfile(),session:getCoachControlSession()});
+  return IPMaxAICoach.review(payload,{url:'./api/ai/review',timeoutMs:15000});
+}
 function setCoachProfile(profile){
   if(!appStorage||typeof appStorage.setMany!=='function') return false;
   return appStorage.setMany({onboarding:profile,onboarding_complete:true}).ok;
@@ -188,6 +206,7 @@ function configureCoachUI(){
     coach:InterviewCoach,escape:esc,getPlan:getCoachPlan,getProfile:getOnboardingProfile,
     normaliseProfile:normalizeOnboardingProfile,setProfile:setCoachProfile,
     getJournal:getCoachJournal,setJournal:notes=>lsSet('coach_journal',notes),getTopics:getAllTopics,
+    getControlSession:getCoachControlSession,requestAiReview:requestCoachAIReview,
     openModal:openAccessibleModal,closeModal:closeAccessibleModal,refresh:renderHome,
     startFocus:startCoachFocus,startReview:startCoachReviewMode,startControl:startCoachControlMode,
     now:()=>Date.now(),alert:message=>alert(message),confirm:message=>confirm(message)
@@ -890,6 +909,10 @@ function startCoachControlMode(plan){
   if(!Array.isArray(ids)||!ids.length){alert('Пока недостаточно вопросов для контрольной сессии.');return;}
   resetCoachSelection();
   coachQuestionIds=ids;
+  lsSet('coach_control',{
+    id:'control-'+Date.now(),startedAt:Date.now(),completedAt:null,
+    questionIds:ids.map(String),topics:Array.isArray(plan.controlSession.topics)?plan.controlSession.topics:[],attempts:[]
+  });
   currentTopic='all';currentLevel='all';currentCategory='all';currentMode='all';currentView='standard';interviewMode=true;cameFromStudy=false;
   nav('exam');
 }
@@ -1423,7 +1446,7 @@ function endDiagnostic(){
 const IMPORT_MAX_BYTES=2*1024*1024;
 const IMPORT_MAX_DEPTH=10;
 const IMPORT_MAX_NODES=50000;
-const IMPORT_RECORD_KEYS=['mistakes','stats','qprog','ts_scores','cmd_prog','code_prog','subnet_prog','git_prog','regex_prog','ans_prog','df_prog','k8s_prog','pt_prog','labs_prog','daily','study_progress','study_answers','senior_case_prog'];
+const IMPORT_RECORD_KEYS=['mistakes','stats','qprog','ts_scores','cmd_prog','code_prog','subnet_prog','git_prog','regex_prog','ans_prog','df_prog','k8s_prog','pt_prog','labs_prog','daily','study_progress','study_answers','senior_case_prog','coach_control'];
 const IMPORT_ARRAY_KEYS=['history','custom','skill_events','coach_journal'];
 function exportProgress(){
   const onboarding=getOnboardingProfile();
@@ -1435,7 +1458,7 @@ function exportProgress(){
     subnet_prog:lsGet('subnet_prog',{}),git_prog:lsGet('git_prog',{}),regex_prog:lsGet('regex_prog',{}),
     ans_prog:lsGet('ans_prog',{}),df_prog:lsGet('df_prog',{}),k8s_prog:lsGet('k8s_prog',{}),pt_prog:lsGet('pt_prog',{}),labs_prog:lsGet('labs_prog',{}),
     daily:lsGet('daily',{}),study_progress:lsGet('study_progress',{}),study_position:lsGet('study_position',{week:1,day:1}),
-    study_answers:lsGet('study_answers',{}),senior_case_prog:lsGet('senior_case_prog',{}),skill_events:getSkillEvents(),coach_journal:getCoachJournal(),
+    study_answers:lsGet('study_answers',{}),senior_case_prog:lsGet('senior_case_prog',{}),skill_events:getSkillEvents(),coach_journal:getCoachJournal(),coach_control:getCoachControlSession()||undefined,
     onboarding:onboarding||undefined,onboarding_complete:!!onboarding
   };
   const text=JSON.stringify(data,null,2);
@@ -1527,6 +1550,7 @@ function validateProgressImport(data){
   if(Array.isArray(data.custom)&&!validateCustomQuestions(data.custom)) invalid.push('custom');
   if(Array.isArray(data.skill_events)&&typeof ProgressTracker!=='undefined'&&!data.skill_events.every(ProgressTracker.isSkillEvent)) invalid.push('skill_events');
   if(Array.isArray(data.coach_journal)&&(typeof InterviewCoach==='undefined'||!data.coach_journal.every(InterviewCoach.isJournalEntry))) invalid.push('coach_journal');
+  if('coach_control' in data&&(typeof IPMaxAICoach==='undefined'||!IPMaxAICoach.normaliseControlSession(data.coach_control))) invalid.push('coach_control');
   if(invalid.length) throw new Error('Некорректные поля: '+[...new Set(invalid)].join(', ')+'.');
   return data;
 }
@@ -1535,6 +1559,7 @@ function importProgressData(rawData){
   if(!data.version){alert('⚠️ Старый формат без версии. Импортированы только проверенные поля.');}
   const entries={};
   IMPORT_RECORD_KEYS.forEach(key=>{if(key in data) entries[key]=data[key];});
+  if('coach_control' in data&&typeof IPMaxAICoach!=='undefined') entries.coach_control=IPMaxAICoach.normaliseControlSession(data.coach_control);
   IMPORT_ARRAY_KEYS.forEach(key=>{
     if(!(key in data)) return;
     if(key==='skill_events'&&typeof ProgressTracker!=='undefined') entries[key]=data[key].slice(-ProgressTracker.EVENT_LIMIT);
@@ -1638,7 +1663,7 @@ document.addEventListener('keydown',function(e){
 
 // ═══ OFFLINE READINESS CHECK ═══
 async function checkOfflineReady(){
-  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','labs','tips','incidents','study_map','study_tests','senior_cases','best_practices'];
   tasks.forEach(t=>files.push('./tasks/'+t+'.json'));
   let ok=0,fail=0;const results=[];

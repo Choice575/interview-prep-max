@@ -5,6 +5,7 @@
 })(typeof self !== 'undefined' ? self : globalThis, function() {
   let services = null;
   let bound = false;
+  let reviewRequest = 0;
 
   function escapeHtml(value) {
     if (services && typeof services.escape === 'function') return services.escape(value);
@@ -68,6 +69,9 @@
     const status = reviewStatus(review);
     const control = plan.controlSession || { size: 0, topics: [] };
     const noteCount = services.getJournal().length;
+    const controlResult = services.getControlSession ? services.getControlSession() : null;
+    const controlAttempts = controlResult ? controlResult.attempts.length : 0;
+    const controlTotal = controlResult ? controlResult.questionIds.length : 0;
     const focusAction = focus ? ' data-topic="' + escapeAttr(focus.topic) + '" data-page="' + escapeAttr(focus.action && focus.action.page || '') + '"' : ' disabled';
     const adjustment = review.extraQuestions ? '<div class="coach-adjustment">План скорректирован: +' + review.extraQuestions + ' вопросов в сессию, пока недельный темп ниже цели.</div>' : '';
     const controlTopics = control.topics && control.topics.length ? ' · ' + control.topics.map(escapeHtml).join(', ') : '';
@@ -81,6 +85,7 @@
       '<div class="coach-actions"><button type="button" class="btn btn-primary btn-sm" data-coach-action="start-focus"' + focusAction + '>Начать фокус</button>' +
       '<button type="button" class="btn btn-outline btn-sm" data-coach-action="start-review"' + (plan.dueCount ? '' : ' disabled title="Нет повторений на сегодня"') + '>Повторить SRS (' + plan.dueCount + ')</button>' +
       '<button type="button" class="btn btn-outline btn-sm" data-coach-action="start-control"' + (control.size ? '' : ' disabled') + '>Контрольная · ' + control.size + controlTopics + '</button>' +
+      '<button type="button" class="btn btn-ai btn-sm" data-coach-action="open-ai-review"' + (controlAttempts ? '' : ' disabled title="Сначала ответьте на вопросы контрольной"') + '>AI-разбор' + (controlAttempts ? ' · ' + controlAttempts + '/' + controlTotal : '') + '</button>' +
       '<button type="button" class="btn btn-quiet btn-sm" data-coach-action="open-journal">Журнал навыков' + (noteCount ? ' · ' + noteCount : '') + '</button></div>';
   }
 
@@ -146,6 +151,32 @@
     if (services.setJournal(next)) { renderJournal(); render(); }
   }
 
+  function renderAIReview(result) {
+    const target = document.getElementById('coach-ai-content');
+    if (!target) return;
+    const badge = result.source === 'ai' ? 'Внешний AI' : 'Локальный разбор';
+    const section = (title, items, className) => items && items.length
+      ? '<section class="coach-ai-section ' + className + '"><h4>' + title + '</h4><ul>' + items.map(item => '<li>' + escapeHtml(item) + '</li>').join('') + '</ul></section>'
+      : '';
+    target.innerHTML = '<div class="coach-ai-result-head"><span class="coach-ai-badge">' + badge + '</span>' +
+      (result.source === 'local' ? '<span>Backend недоступен — данные не покидали браузер.</span>' : '<span>Переданы только агрегаты контрольной.</span>') + '</div>' +
+      '<p class="coach-ai-summary">' + escapeHtml(result.summary) + '</p>' +
+      '<div class="coach-ai-grid">' + section('Сильные стороны', result.strengths, 'coach-ai-strengths') + section('Пробелы', result.gaps, 'coach-ai-gaps') + '</div>' +
+      section('Следующие шаги', result.nextSteps, 'coach-ai-next') +
+      (result.caution ? '<p class="coach-ai-caution">' + escapeHtml(result.caution) + '</p>' : '') +
+      '<button type="button" class="btn btn-outline btn-sm" data-coach-action="retry-ai-review">Обновить разбор</button>';
+  }
+
+  async function openAIReview() {
+    if (!services.getControlSession || !services.getControlSession()) return;
+    const requestId = ++reviewRequest;
+    const target = document.getElementById('coach-ai-content');
+    target.innerHTML = '<div class="coach-ai-loading"><span></span><strong>Анализирую контрольную…</strong><small>Отправляются только темы, точность и время ответа.</small></div>';
+    services.openModal('coach-ai-modal', '#coach-ai-close');
+    const result = await services.requestAiReview();
+    if (requestId === reviewRequest) renderAIReview(result);
+  }
+
   function handleAction(event) {
     if (!services || !event.target || typeof event.target.closest !== 'function') return;
     const trigger = event.target.closest('[data-coach-action]');
@@ -157,6 +188,9 @@
     else if (action === 'start-focus') services.startFocus(trigger.dataset.topic, trigger.dataset.page, services.getPlan());
     else if (action === 'start-review') services.startReview(services.getPlan());
     else if (action === 'start-control') services.startControl(services.getPlan());
+    else if (action === 'open-ai-review') openAIReview();
+    else if (action === 'retry-ai-review') { openAIReview(); document.getElementById('coach-ai-close')?.focus(); }
+    else if (action === 'close-ai-review') { reviewRequest++; services.closeModal('coach-ai-modal'); }
     else if (action === 'open-journal') openJournal();
     else if (action === 'close-journal') services.closeModal('coach-journal-modal');
     else if (action === 'save-journal') saveJournal();

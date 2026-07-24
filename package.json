@@ -2,7 +2,8 @@
   "name": "interview-prep-max",
   "private": true,
   "scripts": {
-    "test": "node --test date.test.js progress.test.js storage.test.js coach.test.js coach-flow.integration.test.js app-shell.integration.test.js question-quality.test.js best-practices.test.js",
+    "start": "node server.js",
+    "test": "node --test date.test.js progress.test.js storage.test.js coach.test.js ai-coach.test.js server.test.js coach-flow.integration.test.js app-shell.integration.test.js question-quality.test.js best-practices.test.js",
     "quality:questions": "node question-quality.js --check",
     "quality:questions:report": "node question-quality.js",
     "quality:questions:baseline": "node question-quality.js --write-baseline",

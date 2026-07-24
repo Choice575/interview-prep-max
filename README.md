@@ -23,7 +23,11 @@ app.js              — логика приложения (UI, state, SRS, train
 date.js             — локальные календарные даты без UTC/DST-сдвигов
 storage.js          — контракт localStorage и безопасная JSON-сериализация
 coach.js            — чистая логика персонального плана: роль, уровень, дата интервью, приоритет тем
+ai-coach.js         — приватный клиентский контракт AI-разбора и локальный fallback
+coach-ui.js         — UI персонального тренера, weekly review, журнал и AI-разбор
 progress.js         — единый SRS и журнал попыток по всем форматам тренировки
+server.js           — статический Node-сервер и same-origin API-прокси для внешнего AI
+server/ai-service.js — адаптер OpenAI-compatible провайдера; секреты остаются на сервере
 styles.css          — стили (тёмная/светлая тема, responsive)
 sw.js               — Service Worker (PWA, offline cache)
 validate.js         — валидатор JSON-данных
@@ -52,12 +56,11 @@ tasks/              — данные
 git clone https://github.com/Choice575/interview-prep-max.git
 cd interview-prep-max
 
-# Запустить локально
-python -m http.server 8080
-# Открыть http://localhost:8080
+npm ci
+npm start
+# Открыть http://127.0.0.1:4173
 
 # Проверить данные
-npm ci
 npm test
 node validate.js
 node verify-release.js
@@ -67,6 +70,22 @@ npm run test:e2e
 ## Персональный план
 
 После онбординга главная страница строит ежедневную сессию под выбранную роль, уровень и дату интервью. Тренер учитывает точность, охват тем, практические тренажёры и просроченные SRS-повторы; из плана можно сразу запустить фокусную тренировку или повторение.
+
+## Внешний AI
+
+AI-разбор — опциональная server-side функция. Без настроенного провайдера приложение автоматически использует локальный детерминированный разбор, поэтому статическая публикация и PWA продолжают работать.
+
+Для OpenAI-compatible Chat Completions API задайте переменные окружения перед `npm start`:
+
+```bash
+IPMAX_AI_PROVIDER=openai-compatible \
+IPMAX_AI_BASE_URL=https://provider.example/v1 \
+IPMAX_AI_API_KEY=server-only-secret \
+IPMAX_AI_MODEL=provider-model \
+npm start
+```
+
+Вместо `IPMAX_AI_BASE_URL` можно задать полный `IPMAX_AI_ENDPOINT`. Ключ никогда не попадает в HTML, JavaScript браузера или ответы `/api/ai/status`.
 
 ## Формат вопросов
 
@@ -85,7 +104,7 @@ npm run test:e2e
 
 ## Приватность
 
-Все данные (прогресс, ответы, настройки) хранятся локально в `localStorage`. Никакие данные не отправляются на сервер. Экспорт/импорт прогресса — через копирование JSON в буфер обмена.
+Прогресс, ответы, настройки и журнал навыков хранятся локально в `localStorage`. При запуске AI-разбора на backend отправляются только агрегаты текущей контрольной: роль/уровень, темы, точность и среднее время ответа. Тексты вопросов, выбранные ответы, заметки и полный прогресс не отправляются. Экспорт/импорт прогресса — через копирование JSON в буфер обмена.
 
 ## Лицензия
 

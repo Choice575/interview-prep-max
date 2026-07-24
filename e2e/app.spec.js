@@ -80,6 +80,29 @@ test('stores and removes a skill-journal note', async ({ page }) => {
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_coach_journal')).length)).toBe(0);
 });
 
+test('gets an AI review through the backend without sending question text', async ({ page }) => {
+  await setProgress(page, {
+    ipmax_onboarding: profile,
+    ipmax_onboarding_complete: true,
+    ipmax_coach_control: {
+      id: 'control-e2e', startedAt: Date.now() - 60000, completedAt: null,
+      questionIds: ['1', '2', '3'], topics: ['Linux', 'Terraform'],
+      attempts: [
+        { questionId: '1', topic: 'Linux', score: 0, responseSeconds: 35, at: Date.now() - 30000 },
+        { questionId: '2', topic: 'Terraform', score: 1, responseSeconds: 20, at: Date.now() - 20000 }
+      ]
+    }
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: /AI-разбор/ }).click();
+  await expect(page.locator('#coach-ai-modal')).toHaveClass(/open/);
+  await expect(page.locator('.coach-ai-badge')).toHaveText('Внешний AI');
+  await expect(page.locator('.coach-ai-summary')).toContainText('AI-разбор готов');
+  await expect(page.locator('#coach-ai-content')).toContainText('Linux');
+  await page.getByRole('button', { name: 'Обновить разбор' }).click();
+  await expect(page.locator('#coach-ai-close')).toBeFocused();
+});
+
 test('records a Mock Interview rating in the skill-event journal', async ({ page }) => {
   await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
   await page.goto('/');
