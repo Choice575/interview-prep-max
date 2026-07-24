@@ -1216,6 +1216,12 @@ function pasteProgressFromClipboard(){return requireProgressIO().pasteProgressFr
 async function initApp(){
   await loadAllData();
 
+  if(appStorage&&typeof appStorage.migrate==='function'){
+    const migration=appStorage.migrate({curriculumVersion:STUDY_MAP&&STUDY_MAP.version||'5.1.0'});
+    if(!migration.ok) console.warn('Progress migration failed; existing data was preserved.',migration.error);
+    else if(migration.migrated) console.info('Progress storage migrated to curriculum '+migration.curriculumVersion+'.');
+  }
+
   configureCoachUI();
 
   // Обновляем счётчик вопросов динамически

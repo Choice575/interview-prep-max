@@ -13,7 +13,10 @@ const dependencies = {
 };
 
 test('builds a complete versioned export through the module contract', () => {
-  const values = { stats: { total: 4, correct: 3 }, streak_best: 5 };
+  const values = {
+    stats: { total: 4, correct: 3 }, streak_best: 5,
+    storage_schema: 2, curriculum_version: '5.1.0'
+  };
   const data = ProgressIO.createExportData({
     version: '12.9.0',
     now: () => Date.UTC(2026, 6, 24),
@@ -26,6 +29,8 @@ test('builds a complete versioned export through the module contract', () => {
 
   assert.equal(data.version, '12.9.0');
   assert.equal(data.exportDate, '2026-07-24T00:00:00.000Z');
+  assert.equal(data.storageSchemaVersion, 2);
+  assert.equal(data.curriculumVersion, '5.1.0');
   assert.deepEqual(data.stats, { total: 4, correct: 3 });
   assert.deepEqual(data.onboarding, { role: 'SRE' });
   assert.equal(data.onboarding_complete, true);

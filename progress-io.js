@@ -143,6 +143,7 @@
     const now = typeof source.now === 'function' ? source.now() : Date.now();
     return {
       version: source.version || 'dev', exportDate: new Date(now).toISOString(),
+      storageSchemaVersion: get('storage_schema', 1), curriculumVersion: get('curriculum_version', null),
       mistakes: get('mistakes', {}), stats: get('stats', {}), history: get('history', []),
       qprog: get('qprog', {}), streak_best: get('streak_best', 0), custom: get('custom', []),
       ts_scores: get('ts_scores', {}), cmd_prog: get('cmd_prog', {}), code_prog: get('code_prog', {}),
