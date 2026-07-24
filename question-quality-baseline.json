@@ -10,35 +10,9 @@
   "issueBudget": {
     "length-cue": 0,
     "question-echo": 0,
-    "absolute-distractor": 4,
-    "duplicate-question": 1
+    "absolute-distractor": 0,
+    "duplicate-question": 0
   },
-  "topics": {
-    "Linux": {
-      "length-cue": 0,
-      "question-echo": 0,
-      "absolute-distractor": 4,
-      "duplicate-question": 0
-    },
-    "CI/CD": {
-      "length-cue": 0,
-      "question-echo": 0,
-      "absolute-distractor": 0,
-      "duplicate-question": 1
-    }
-  },
-  "levels": {
-    "Senior": {
-      "length-cue": 0,
-      "question-echo": 0,
-      "absolute-distractor": 4,
-      "duplicate-question": 0
-    },
-    "Junior": {
-      "length-cue": 0,
-      "question-echo": 0,
-      "absolute-distractor": 0,
-      "duplicate-question": 1
-    }
-  }
+  "topics": {},
+  "levels": {}
 }

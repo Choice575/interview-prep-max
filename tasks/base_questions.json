@@ -7301,10 +7301,10 @@
     "category": "definition",
     "q": "Как strace помогает исследовать зависший процесс?",
     "options": [
-      "Строит user-space flame graph и показывает строки исходного кода, где thread расходует CPU между syscalls",
-      "Показывает syscalls, результаты и длительность; с -p/-f и filters можно найти blocking call и исследовать FD",
-      "Приостанавливает process на безопасной точке и проверяет mutex ownership без ptrace и заметных накладных расходов",
-      "Читает только завершённые calls из audit log, поэтому attach не влияет на timing и подходит для постоянного tracing"
+      "Строит user-space flame graph и показывает строки исходного кода между syscalls",
+      "Показывает syscalls, результаты и длительность; с -p/-f и filters помогает найти blocking call и FD",
+      "Приостанавливает process на безопасной точке и проверяет mutex ownership без ptrace и overhead",
+      "Читает завершённые calls из audit log, поэтому attach не влияет на timing постоянного tracing"
     ],
     "answer": 1,
     "explanation": "strace attach-ится через ptrace и показывает системные вызовы threads. Опции -f, -tt/-T и -e trace=... помогают увидеть долгий read, connect, futex или повторяющуюся ошибку; lsof и /proc/PID/fd связывают descriptor с объектом. epoll_wait или futex сами по себе могут быть нормой, поэтому вывод сопоставляют с дизайном процесса и учитывают overhead."
@@ -7316,10 +7316,10 @@
     "category": "definition",
     "q": "Как безопасно тюнить sysctl для нагруженного network service?",
     "options": [
-      "Скопировать набор максимальных значений somaxconn, buffers и port range: большие лимиты не требуют memory budget",
-      "Менять только tcp_tw_reuse: TIME_WAIT является основной причиной любой нехватки sockets и packet drops",
+      "Скопировать максимальные somaxconn, buffers и port range: большие лимиты не требуют memory budget",
+      "Менять tcp_tw_reuse: TIME_WAIT является основной причиной нехватки sockets и packet drops",
       "Измерить bottleneck, согласовать app backlog и kernel limits, менять по одному параметру и наблюдать drops/latency",
-      "Выключить SYN cookies и увеличить keepalive time: это освобождает accept queue без влияния на failure detection"
+      "Выключить SYN cookies и увеличить keepalive time: accept queue освободится без влияния на failure detection"
     ],
     "answer": 2,
     "explanation": "Универсального sysctl-рецепта нет. Сначала смотрят ss -s, nstat, softnet, listen queue, retransmits, drops, CPU и memory. Затем согласуют application listen backlog с somaxconn, при необходимости SYN backlog, buffer ceilings или local port range. Изменения версионируют в /etc/sysctl.d, применяют поэтапно и проверяют нагрузочным тестом и rollback."
@@ -7347,9 +7347,9 @@
     "q": "Как связаны dm-crypt, LUKS и key slots?",
     "options": [
       "dm-crypt шифрует blocks, LUKS хранит metadata; key slots оборачивают один volume key разными credentials",
-      "Каждый key slot шифрует отдельный диапазон blocks собственным data key, поэтому удаление slot требует reencrypt",
-      "LUKS хранит пароль в header открытым для dm-crypt, а TPM обязателен для проверки целостности при каждом read",
-      "dm-crypt управляет filesystem permissions, тогда как LUKS шифрует только имена файлов и directory metadata"
+      "Каждый key slot шифрует отдельный диапазон blocks своим data key, поэтому удаление slot требует reencrypt",
+      "LUKS хранит пароль в header открытым для dm-crypt, а TPM проверяет целостность при каждом read",
+      "dm-crypt управляет filesystem permissions, тогда как LUKS шифрует имена файлов и directory metadata"
     ],
     "answer": 0,
     "explanation": "LUKS описывает формат контейнера, KDF и key slots, а device-mapper target dm-crypt выполняет block encryption после unlock. Несколько slots позволяют разным passphrases или tokens получить один volume key без повторного шифрования данных. Header резервируют отдельно, новый ключ проверяют до удаления старого и никогда не удаляют последний рабочий slot."
@@ -7361,10 +7361,10 @@
     "category": "definition",
     "q": "Чем fanotify отличается от inotify?",
     "options": [
-      "inotify перехватывает open до доступа, а fanotify сообщает только после close и не умеет permission events",
+      "inotify перехватывает open до доступа, а fanotify сообщает после close и не поддерживает permission events",
       "inotify ставит watches на объекты; fanotify может следить за mount/filesystem и выдавать permission events",
-      "fanotify работает без kernel API через чтение journal, а inotify требует отдельный kernel module на каждый watch",
-      "Оба API гарантируют полный ordered event log: queue overflow и объединение одинаковых событий невозможны"
+      "fanotify читает события из journal, а inotify требует отдельный kernel module для каждого watch",
+      "Оба API дают ordered event log без потерь: queue сохраняет повторяющиеся события при overflow"
     ],
     "answer": 1,
     "explanation": "inotify удобен для изменений конкретных файлов и каталогов, но recursive monitoring требует управлять watches, а очередь может переполниться. fanotify умеет широкие marks на mount или filesystem и permission events, поэтому подходит некоторым antivirus и FIM tools, часто с повышенными privileges. Оба API требуют обработки overflow, races и повторного сканирования."
@@ -9096,15 +9096,15 @@
   {
     "topic": "CI/CD",
     "level": "Junior",
-    "q": "Чем Continuous Delivery отличается от Continuous Deployment?",
+    "q": "Какой этап может оставаться ручным в процессе Continuous Delivery?",
     "options": [
-      "Delivery собирает source, Deployment запускает unit tests; оба процесса заканчиваются до создания release artifact",
-      "Delivery относится к staging branch, Deployment — к main branch, а способ выпуска определяется именем Git ref",
-      "Delivery держит изменение готовым к release с решением о выпуске, Deployment автоматически выпускает прошедшее pipeline",
-      "Delivery отправляет binaries в registry, Deployment хранит source archive; production rollout выполняется вручную в обоих"
+      "Сохранение исходников в Git перед запуском CI pipeline",
+      "Запуск unit tests после изменения application code",
+      "Решение о выпуске прошедшего pipeline изменения в production",
+      "Создание build artifact в воспроизводимом environment"
     ],
     "answer": 2,
-    "explanation": "Continuous Delivery автоматизирует путь до deployable, проверенного изменения, но production release может требовать бизнес-решения или approval. Continuous Deployment автоматически выпускает каждое изменение, прошедшее policy и pipeline. Термины описывают release flow, а не конкретную ветку или среду.",
+    "explanation": "Continuous Delivery автоматизирует сборку, проверки и подготовку deployable изменения, но production release может требовать бизнес-решения или approval. Continuous Deployment убирает этот ручной release gate и выпускает изменение после успешной policy и pipeline.",
     "id": 10017
   },
   {
