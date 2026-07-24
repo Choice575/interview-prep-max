@@ -8,9 +8,9 @@
     186
   ],
   "issueBudget": {
-    "length-cue": 294,
-    "question-echo": 9,
-    "absolute-distractor": 159,
+    "length-cue": 264,
+    "question-echo": 8,
+    "absolute-distractor": 139,
     "duplicate-question": 4
   },
   "topics": {
@@ -21,15 +21,15 @@
       "duplicate-question": 3
     },
     "Linux": {
-      "length-cue": 50,
+      "length-cue": 30,
       "question-echo": 1,
-      "absolute-distractor": 34,
+      "absolute-distractor": 21,
       "duplicate-question": 0
     },
     "Сети": {
-      "length-cue": 60,
-      "question-echo": 5,
-      "absolute-distractor": 42,
+      "length-cue": 50,
+      "question-echo": 4,
+      "absolute-distractor": 35,
       "duplicate-question": 0
     },
     "Ansible": {
@@ -77,21 +77,21 @@
   },
   "levels": {
     "Middle": {
-      "length-cue": 118,
+      "length-cue": 110,
       "question-echo": 2,
-      "absolute-distractor": 53,
+      "absolute-distractor": 48,
       "duplicate-question": 2
     },
     "Senior": {
-      "length-cue": 113,
-      "question-echo": 5,
-      "absolute-distractor": 88,
+      "length-cue": 94,
+      "question-echo": 4,
+      "absolute-distractor": 74,
       "duplicate-question": 1
     },
     "Junior": {
-      "length-cue": 63,
+      "length-cue": 60,
       "question-echo": 2,
-      "absolute-distractor": 18,
+      "absolute-distractor": 17,
       "duplicate-question": 1
     }
   }

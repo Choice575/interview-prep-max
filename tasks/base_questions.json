@@ -7374,450 +7374,450 @@
     "topic": "Linux",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как диагностировать высокую latency disk I/O в production без перезапуска приложения?",
+    "q": "Как без перезапуска локализовать высокую latency disk I/O?",
     "options": [
-      "Перезагрузить сервер и проверить S.M.A.R.T",
-      "Только hdparm -t /dev/sda для теста скорости",
-      "iostat -x 1; iotop -o; biolatency из bcc (eBPF гистограмма latency); blktrace; /sys/block/sda/queue/scheduler; проверить iowait в mpstat",
-      "dd if=/dev/sda of=/dev/null — синтетический тест"
+      "Запустить direct dd на raw device с production data: последовательная скорость сразу укажет виновный процесс",
+      "Оценить CPU iowait изолированно: высокий процент доказывает saturation, а низкий исключает storage bottleneck",
+      "Сопоставить iostat queues/await с I/O процессов и PSI; при необходимости снять ограниченный block trace или eBPF",
+      "Сразу переключить I/O scheduler и увеличить readahead: улучшение средней latency подтвердит первопричину"
     ],
     "answer": 2,
-    "explanation": "iostat -x 1: await (средняя latency), %util, r/s, w/s. biolatency -D: гистограмма latency по диску (eBPF). blktrace -d /dev/sda + blkparse: детальный trace I/O. /sys/block/sda/queue/scheduler: mq-deadline/kyber/bfq выбор scheduler. smartctl -a /dev/sda для проверки здоровья диска."
+    "explanation": "Начинают с iostat -x, pidstat -d или iotop и /proc/pressure/io, сопоставляя время, устройство, throughput, queue depth и конкретный workload. await — среднее, а %util не всегда означает saturation на parallel/multiqueue storage. eBPF biolatency или короткий blktrace дают распределение задержек, но требуют privileges и контроля overhead; также проверяют kernel и device health logs."
   },
   {
     "id": 512,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает механизм pvmove в LVM и когда он применяется?",
+    "q": "Что делает LVM pvmove при выводе диска из volume group?",
     "options": [
-      "pvmove удаляет физический том из группы",
-      "pvmove требует размонтирования всех LV",
-      "pvmove работает только с зашифрованными томами",
-      "pvmove /dev/sdb переносит данные с PV на другие PV в группе без остановки сервисов; используется при замене диска или балансировке нагрузки"
+      "Удаляет PV metadata и оставляет extents на прежнем устройстве, пока filesystem не перезапишет занятые blocks",
+      "Создаёт filesystem snapshot каждого LV и копирует файлы на target PV через mounted paths с сохранением inode",
+      "Требует unmount всех logical volumes, потому что LVM не обновляет mapping активного device-mapper target",
+      "Перемещает занятые extents на другие PV при доступных LV; после проверки старый PV исключают через vgreduce"
     ],
     "answer": 3,
-    "explanation": "pvmove --background /dev/sdb мигрирует extents в фоне. pvmove /dev/sdb /dev/sdc переносит на конкретный PV. lvconvert --mirror добавляет зеркало перед pvmove для надёжности. После pvmove: vgreduce vg0 /dev/sdb; pvremove /dev/sdb. Применяется при hot swap дисков без простоя."
+    "explanation": "pvmove создаёт временное LVM mapping и переносит physical extents внутри той же VG, обновляя metadata по ходу операции, поэтому активные LV обычно остаются доступны. Нужны свободные extents на подходящих PV, backup metadata и мониторинг I/O/ошибок. Это не замена redundancy: после успешной проверки выполняют vgreduce и только затем выводят устройство."
   },
   {
     "id": 513,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое ftrace и как использовать function graph tracer?",
+    "q": "Как использовать ftrace function graph tracer?",
     "options": [
-      "ftrace: встроенный kernel tracer; echo function_graph > /sys/kernel/debug/tracing/current_tracer; trace-cmd record -p function_graph ./myapp; позволяет видеть дерево kernel вызовов",
-      "ftrace — утилита для форматирования текстовых файлов",
-      "ftrace работает только с модулями ядра",
-      "ftrace доступен только через perf"
+      "Включить function_graph в tracefs, сузить функции и PID filters и читать call nesting/durations напрямую или trace-cmd",
+      "Подключить tracer к user binary: ftrace восстановит его source lines и heap allocations без debug symbols",
+      "Загрузить отдельный kernel module для каждой функции: встроенные функции ядра нельзя трассировать динамически",
+      "Записать весь kernel без filters на часы: ring buffer расширяется автоматически и overhead остаётся постоянным"
     ],
     "answer": 0,
-    "explanation": "Tracefs: /sys/kernel/debug/tracing/. current_tracer: nop/function/function_graph/blk. available_tracers перечисляет доступные. trace-cmd упрощает работу: trace-cmd record -p function_graph -g __do_page_fault ./app. perf-tools и bpftrace предоставляют удобный фронтенд к kprobes/kretprobes."
+    "explanation": "ftrace — встроенная инфраструктура ядра; tracefs обычно смонтирован в /sys/kernel/tracing, а на старых системах виден через debugfs. function_graph показывает вход, выход и длительность kernel functions. set_graph_function, set_ftrace_pid и event filters ограничивают объём; trace-cmd упрощает запись и отчёт. На production сначала оценивают overhead и используют короткое окно."
   },
   {
     "id": 514,
     "topic": "Linux",
     "level": "Middle",
     "category": "definition",
-    "q": "Как работает systemd watchdog и зачем он нужен?",
+    "q": "Как работает service watchdog в systemd?",
     "options": [
-      "Watchdog — это просто таймер перезагрузки системы каждые 24 часа",
-      "Сервис уведомляет systemd через sd_notify(WATCHDOG=1) каждые WatchdogSec секунд; если не успевает — systemd рестартует сервис; защита от зависаний",
-      "Watchdog работает только с hardware watchdog устройствами",
-      "WatchdogSec заменяет TimeoutStartSec в юнитах"
+      "Systemd проверяет HTTP health endpoint любого service каждые WatchdogSec без поддержки со стороны daemon",
+      "После startup daemon шлёт sd_notify WATCHDOG=1; пропуск WatchdogSec завершает service и учитывается Restart policy",
+      "WatchdogSec заменяет start/stop timeouts и гарантирует restart даже при Restart=no или ручной остановке unit",
+      "Keepalive посылает kernel hardware watchdog, поэтому один зависший service автоматически перезагружает весь host"
     ],
     "answer": 1,
-    "explanation": "В unit file: WatchdogSec=30s; Restart=on-watchdog. Приложение вызывает sd_notify(0, 'WATCHDOG=1') каждые <WatchdogSec/2 секунды. Если пропускает — SIGABRT или SIGKILL. WATCHDOG_USEC env var доступна процессу. Используется: nginx, PostgreSQL, custom daemons для защиты от deadlock."
+    "explanation": "Service должен поддерживать sd_notify и регулярно отправлять WATCHDOG=1 после завершения startup; интервал systemd сообщает через WATCHDOG_USEC. При пропуске deadline unit становится failed и получает WatchdogSignal, обычно SIGABRT. Restart=on-watchdog или on-failure задаёт перезапуск; TimeoutAbortSec ограничивает время на core dump до принудительного завершения."
   },
   {
     "id": 515,
     "topic": "Linux",
     "level": "Middle",
     "category": "scenario",
-    "q": "Как найти все открытые сетевые соединения процесса и определить куда он подключается?",
+    "q": "Как определить сетевые соединения конкретного Linux process?",
     "options": [
-      "ps aux | grep process",
-      "netstat -an (без указания PID)",
-      "ss -tnp | grep PID или lsof -p PID -i; nsenter --net -t PID позволяет войти в network namespace процесса; /proc/PID/net/tcp",
-      "tcpdump -i any host 127.0.0.1"
+      "Прочитать netstat -an: каждая строка содержит PID даже без privileges и показывает owner во всех namespaces",
+      "Открыть /proc/PID/net/tcp: этот файл фильтруется по PID и исключает sockets других процессов того же netns",
+      "Использовать ss -p или lsof с PID, а для container netns выполнить nsenter -t PID -n ss и сверить socket FDs",
+      "Снять tcpdump по host interface: packet headers однозначно связываются с process после завершения соединения"
     ],
     "answer": 2,
-    "explanation": "ss -tnp | grep 'pid=1234' показывает соединения с PID. lsof -p 1234 -i выводит сетевые дескрипторы. /proc/1234/net/tcp: hex-encoded remote/local addresses. nsenter -t 1234 --net ss -tnp работает для контейнеров. conntrack -L | grep для tracked connections."
+    "explanation": "ss -tnp и lsof -a -p PID -i связывают sockets с процессом, если хватает прав. /proc/PID/fd показывает socket inode, который можно сопоставить с namespace tables. Важно: /proc/PID/net/* представляет весь network namespace, а не только этот PID. Для контейнера входят в его netns через nsenter; NAT и proxies анализируют отдельно."
   },
   {
     "id": 516,
     "topic": "Linux",
     "level": "Junior",
     "category": "definition",
-    "q": "Что показывает команда free -h и что означают колонки available vs free?",
+    "q": "Чем колонки available и free различаются в free -h?",
     "options": [
-      "free показывает только swap использование",
-      "available всегда равно free в современном Linux",
-      "free -h показывает только физическую память без swap",
-      "free: total/used/free/shared/buff-cache/available. available — реально доступно приложениям (free + reclaimable caches); free — буквально свободная RAM без кешей"
+      "available показывает неиспользуемый swap, а free — сумму anonymous memory и page cache в physical RAM",
+      "free уже включает весь reclaimable cache, поэтому available отличается лишь зарезервированной hugepage memory",
+      "available равен total минус used: kernel не учитывает watermarks и стоимость reclaim при этой оценке",
+      "free — совсем незанятая RAM; available — оценка памяти для новых задач без swap с учётом reclaimable cache"
     ],
     "answer": 3,
-    "explanation": "available учитывает reclaimable page cache — память, которую ядро может освободить при необходимости. free (буквальная) обычно мало и это нормально: Linux использует свободную RAM под cache. Для мониторинга памяти смотрите available. /proc/meminfo: MemAvailable более точен."
+    "explanation": "Linux использует свободную память как page cache, поэтому маленькое free само по себе нормально. MemAvailable оценивает, сколько памяти можно дать новой нагрузке без swapping, учитывая free pages, reclaimable cache и kernel watermarks; это не точная гарантия. free -h также отдельно показывает buff/cache и swap, а pressure оценивают по PSI и динамике reclaim."
   },
   {
     "id": 517,
     "topic": "Linux",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое overcommit memory в Linux и какие режимы существуют?",
+    "q": "Что задаёт vm.overcommit_memory в Linux?",
     "options": [
-      "vm.overcommit_memory: 0=эвристика (default), 1=всегда разрешать, 2=запрещать сверх CommitLimit; overcommit_ratio влияет на CommitLimit в режиме 2",
-      "Overcommit — это когда RAM физически заканчивается",
-      "Overcommit работает только при включённом swap",
-      "Overcommit mode 2 рекомендуется для всех production серверов"
+      "Режим 0 применяет heuristic, 1 разрешает overcommit, 2 проверяет committed memory против рассчитанного CommitLimit",
+      "Режим 0 запрещает malloc сверх свободной RAM, 1 резервирует swap, а 2 переносит все anonymous pages в hugepages",
+      "Параметр управляет фактическим RSS process и освобождает page cache сразу при каждом превышении CommitLimit",
+      "Режим 2 исключает OOM при любых условиях, включая kernel allocations, cgroup limits и depletion reserved memory"
     ],
     "answer": 0,
-    "explanation": "Mode 0: ядро разрешает большинство запросов эвристически. Mode 1: всегда разрешает mmap/malloc, память выделяется при первом обращении (Copy-on-Write). Mode 2: CommitLimit = swap + RAM * overcommit_ratio/100; запросы сверх этого отклоняются. Redis рекомендует mode 1 или 2 с большим overcommit_ratio."
+    "explanation": "Overcommit относится к обещанной virtual memory, а не к текущему RSS. Mode 0 использует heuristic, mode 1 не отказывает из-за commit accounting, mode 2 ограничивает commitment через CommitLimit. В mode 2 участвует overcommit_ratio либо overcommit_kbytes и swap. Выбор зависит от workload: строгий режим может раньше вернуть ENOMEM, а permissive — допустить поздний OOM."
   },
   {
     "id": 518,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работают btrfs snapshots и в чём их преимущество перед LVM snapshots?",
+    "q": "Как btrfs snapshots сравниваются с LVM snapshots?",
     "options": [
-      "btrfs snapshots требуют отдельного раздела",
-      "btrfs snapshot: copy-on-write subvolume, мгновенное создание, атомарное; не требует pre-allocated места как LVM; btrfs send/receive для инкрементального backup",
-      "btrfs snapshots медленнее LVM в 10x",
-      "btrfs snapshots несовместимы с Docker"
+      "btrfs snapshot копирует весь subvolume при создании, а LVM snapshot хранит изменённые extents",
+      "btrfs создаёт CoW view subvolume и поддерживает send/receive; consistency и сравнение с LVM зависят от типа snapshot",
+      "btrfs snapshot включает все subvolumes рекурсивно и атомарно, поэтому application quiesce для database не нужен",
+      "LVM thin snapshot требует заранее фиксированный COW volume, тогда как legacy LVM snapshot растёт динамически"
     ],
     "answer": 1,
-    "explanation": "btrfs subvolume snapshot /data /data_snap — мгновенно, CoW. LVM snapshot: нужен pre-allocated space, при заполнении — invalid. btrfs: нет pre-allocation, snapshot занимает место постепенно. btrfs send -p old new | ssh host btrfs receive /backup — инкрементальный backup. Риск: btrfs RAID5/6 исторически нестабилен."
+    "explanation": "btrfs snapshot — writable или read-only CoW view конкретного subvolume; вложенные subvolumes не включаются рекурсивно. send/receive удобно передаёт полные и incremental snapshots. Legacy LVM snapshots требуют COW space, но LVM thin snapshots тоже выделяют blocks динамически, поэтому простое сравнение некорректно. Crash-consistent snapshot не гарантирует согласованность приложения без flush/quiesce."
   },
   {
     "id": 519,
     "topic": "Linux",
     "level": "Middle",
     "category": "definition",
-    "q": "Как systemd resource control (cgroup delegation) ограничивает ресурсы сервисов?",
+    "q": "Как systemd применяет cgroup resource control к service?",
     "options": [
-      "systemd resource control работает только для памяти",
-      "Resource control требует ручной настройки cgroups v1",
-      "CPUQuota=50%, MemoryMax=512M, IOWeight=100, TasksMax=100 в unit file; systemd создаёт cgroup hierarchy; systemd-cgtop мониторит использование",
-      "MemoryLimit и MemoryMax — одно и то же в systemd"
+      "Unit properties меняют scheduler priority процесса; cgroup создаётся вручную отдельным boot script",
+      "MemoryMax и CPUQuota действуют после restart, но runtime set-property не может обновить controller files",
+      "CPUQuota, MemoryHigh/Max, TasksMax и I/O properties отображаются в cgroup service и наследуют slice hierarchy",
+      "Delegate=yes автоматически выдаёт service половину host resources и запрещает ему создавать дочерние cgroups"
     ],
     "answer": 2,
-    "explanation": "systemd автоматически управляет cgroups для сервисов. CPUQuota=50% — 50% одного ядра. MemoryMax (hard limit, OOM kill) vs MemoryHigh (soft limit, throttling). IOReadBandwidthMax=/dev/sda 100M. systemctl set-property myservice.service MemoryMax=1G применяет runtime. systemd-cgtop как top для cgroups."
+    "explanation": "Systemd размещает service в cgroup внутри slice hierarchy и записывает unit properties в controllers. MemoryHigh создаёт reclaim pressure, MemoryMax — hard limit; CPUQuota, CPUWeight, TasksMax и I/O controls задают другие границы. systemctl set-property может менять многие значения runtime или persistently. Delegate=yes — отдельный механизм передачи управления subtree вложенному manager, а не лимит."
   },
   {
     "id": 520,
     "topic": "Linux",
     "level": "Senior",
     "category": "scenario",
-    "q": "Ядро Linux убивает процессы при нехватке памяти. Как настроить OOM killer для защиты критических процессов?",
+    "q": "Как корректно влиять на выбор OOM victim для критичного service?",
     "options": [
-      "Отключить OOM killer через /proc/sys/vm/panic_on_oom=1",
-      "cgroups v2 memory.max отключает OOM killer для cgroup",
-      "OOM killer нельзя настроить, только отключить",
-      "oom_score_adj=-1000 в /proc/PID/oom_score_adj защищает процесс; systemd unit: OOMScoreAdjust=-1000; менее критичные: OOMScoreAdjust=+500; vm.overcommit_memory=2 предотвращает overcommit"
+      "Включить panic_on_oom: reboot сохраняет доступность лучше, чем завершение одного некритичного процесса",
+      "Отключить OOM killer для cgroup через memory.max: hard limit заставит kernel возвращать ENOMEM всем allocations",
+      "Задать каждому daemon oom_score_adj = -1000: kernel всё равно выберет наименее важный пользовательский процесс",
+      "Сначала ограничить cgroups и capacity, затем точечно настроить OOMScoreAdjust; memory.oom.group завершает workload целиком"
     ],
     "answer": 3,
-    "explanation": "oom_score_adj range: -1000 (защищён) до +1000 (первый кандидат). /proc/PID/oom_score = текущий score (0-1000). systemd: OOMScoreAdjust=-900 в [Service]. cgroups v2: memory.oom.group=1 убивает всю cgroup при OOM. vm.panic_on_oom=1 вызывает kernel panic вместо OOM kill."
+    "explanation": "OOMScoreAdjust лишь смещает вероятность выбора и не создаёт память; -1000 почти исключает task и потому оправдан только для действительно системно-критичных процессов. Cgroup boundaries ограничивают blast radius, а memory.oom.group помогает не оставлять полуработающий multi-process workload. Global OOM и memcg OOM различаются; systemd-oomd также имеет отдельную PSI-based policy."
   },
   {
     "id": 521,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое AF_XDP и для каких задач он применяется?",
+    "q": "Как AF_XDP передаёт packets user-space приложению?",
     "options": [
-      "AF_XDP: express data path, bypass kernel network stack; userspace приложение обрабатывает пакеты напрямую из NIC; скорость близкая к DPDK с возможностью использовать kernel stack для остального трафика",
-      "AF_XDP — новый тип сокетов для IPv6",
-      "AF_XDP работает только с виртуальными интерфейсами",
-      "AF_XDP требует специальных RDMA адаптеров"
+      "XDP program redirect-ит frames в socket UMEM и rings; zero-copy зависит от driver, иначе доступен copy mode",
+      "NIC записывает packets прямо в обычный TCP socket, а kernel protocol stack завершает handshake до user space",
+      "AF_XDP требует RDMA queue pair и работает с adapters, поддерживающими RoCE congestion management",
+      "Socket захватывает весь interface без BPF program, поэтому остальной трафик нельзя оставить kernel network stack"
     ],
     "answer": 0,
-    "explanation": "AF_XDP: UMEM (shared memory) + сокет привязан к очереди NIC. XDP программа (BPF) перенаправляет пакеты в UMEM через XDP_REDIRECT. Применение: high-frequency trading, DDoS mitigation, network monitoring с нулевым копированием. Преимущество над DPDK: не нужен poll-mode driver, можно селективно перехватывать пакеты."
+    "explanation": "AF_XDP socket привязан к network device и queue, использует shared UMEM и RX/TX/fill/completion rings. XDP program направляет выбранные frames через XSKMAP и XDP_REDIRECT; остальные пакеты могут идти обычным stack. Native zero-copy требует поддержки driver, а generic/copy mode имеет другие затраты. Решение применяют после измерений для high-rate packet processing."
   },
   {
     "id": 522,
     "topic": "Linux",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое load average в Linux и что означают три числа?",
+    "q": "Что означают три значения Linux load average?",
     "options": [
-      "Load average показывает загрузку CPU в процентах за последние 1, 5, 15 минут",
-      "Load average — среднее количество процессов в очереди выполнения (Running + Uninterruptible) за 1, 5, 15 минут",
-      "Три числа — это загрузка CPU, памяти и диска",
-      "Load average выше 1.0 означает перегрузку системы"
+      "Средний CPU utilization в процентах за точные окна 1, 5 и 15 минут, уже нормализованный по числу cores",
+      "Сглаженную нагрузку из runnable и uninterruptible tasks на горизонтах около 1, 5 и 15 минут",
+      "Количество CPU-bound, memory-bound и I/O-bound процессов, измеренное scheduler в момент чтения /proc/loadavg",
+      "Долю времени user, system и iowait: сумма трёх чисел равна эквиваленту занятых logical CPUs"
     ],
     "answer": 1,
-    "explanation": "Load average включает процессы в состоянии R (running) и D (uninterruptible sleep — ожидание I/O). Нормальное значение: LA/num_CPUs. LA=4.0 на 4-ядерном сервере — полная загрузка, не перегрузка. Высокий LA при низком CPU% указывает на I/O wait. uptime, top, /proc/loadavg."
+    "explanation": "Load average — экспоненциально сглаженное число tasks, которые выполняются/готовы выполняться либо находятся в uninterruptible sleep, часто из-за I/O. Это не CPU percentage и не простое среднее по жёстким окнам. Сравнение с числом CPUs полезно, но высокий load при свободном CPU может отражать D-state, поэтому смотрят run queue, process states, CPU и I/O вместе."
   },
   {
     "id": 523,
     "topic": "Linux",
     "level": "Middle",
     "category": "scenario",
-    "q": "Как быстро найти какой процесс создал файл /tmp/suspicious.sh?",
+    "q": "Можно ли постфактум узнать process, создавший файл?",
     "options": [
-      "ls -la /tmp/suspicious.sh",
-      "lsof /tmp/suspicious.sh",
-      "auditd с -w /tmp -p w -k tmp_writes; ausearch -k tmp_writes; или inotifywait в реальном времени; или eBPF: opensnoop -n bash из bcc",
-      "stat /tmp/suspicious.sh показывает создавший процесс"
+      "Да: stat хранит creator PID и executable в inode вместе с ctime, даже если процесс уже завершился",
+      "Да: inotify сохраняет durable журнал событий с PID до следующего reboot, даже если watcher не был запущен",
+      "Надёжно — если аудит или tracing были включены заранее; для будущих событий настраивают точечное audit rule с key",
+      "Можно сопоставить inode с /proc/*/fd: создатель обязан держать file descriptor открытым до удаления файла"
     ],
     "answer": 2,
-    "explanation": "auditd постфактум: ausearch -k tmp_writes -ts today покажет pid, uid, comm. Если нужно в реальном времени: inotifywait -m /tmp -e create. eBPF (bcc): opensnoop фильтрует по паттерну. stat показывает только ctime (время изменения inode), не процесс. /proc/PID/fd лишь для открытых файлов."
+    "explanation": "Обычные filesystem metadata не содержат creator PID или command, поэтому без прежней telemetry надёжного ответа может не быть. Для будущих событий задают persistent audit rule на критичный path/dir и ищут по key через ausearch; eBPF tracing подходит для краткой диагностики. inotify сообщает изменения текущему watcher, но не даёт durable forensic history и creator PID."
   },
   {
     "id": 524,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает kernel parameter vm.dirty_ratio и vm.dirty_background_ratio?",
+    "q": "Как vm.dirty_background_ratio и vm.dirty_ratio влияют на writeback?",
     "options": [
-      "dirty_ratio контролирует размер swap partition",
-      "vm.dirty_ratio=0 отключает кеширование записи",
-      "Оба параметра работают только с NFS",
-      "dirty_background_ratio (%RAM): фоновый writeback начинается; dirty_ratio: процесс блокируется до записи dirty pages; vm.dirty_expire_centisecs: возраст страниц до принудительной записи"
+      "Первый задаёт долю swap, второй — page cache; оба вступают в действие после исчерпания free memory",
+      "dirty_ratio отключает buffered I/O при значении 0, а background_ratio переводит filesystem в synchronous mode",
+      "Оба являются фиксированными defaults для всех kernels и считаются от полной установленной RAM включая hugepages",
+      "Background threshold будит flusher, верхний threshold заставляет dirtying tasks писать; byte settings имеют приоритет"
     ],
     "answer": 3,
-    "explanation": "dirty_background_ratio=10 (default): flusher начинает writeback при 10% dirty pages. dirty_ratio=20: процесс блокируется. Для БД с fsync: уменьшить dirty_ratio до 5-10, dirty_background_ratio до 1-5 для снижения write latency spikes. vm.dirty_writeback_centisecs=500 (5 секунд между flush wakeups)."
+    "explanation": "При фоновом пороге kernel writeback threads начинают очищать dirty pages. У верхнего порога процесс, создающий dirty pages, участвует в writeback и может throttling-оваться. Расчёт идёт от памяти, доступной для dirtying, а dirty_background_bytes/dirty_bytes заменяют ratio-варианты. Значения выбирают по workload, storage latency и burst size, а не копируют как универсальный database рецепт."
   },
   {
     "id": 525,
     "topic": "Linux",
     "level": "Middle",
     "category": "definition",
-    "q": "Как работает команда nsenter и для чего она используется?",
+    "q": "Для чего используется nsenter?",
     "options": [
-      "nsenter -t PID --net --pid --mount -- bash входит в namespaces указанного процесса; используется для отладки контейнеров без docker exec, особенно для scratch/distroless образов",
-      "nsenter создаёт новые namespaces",
-      "nsenter работает только с network namespaces",
-      "nsenter требует установки дополнительного пакета"
+      "Он присоединяет новый process к выбранным namespaces target PID; для PID namespace обычно нужен --fork",
+      "Он клонирует namespaces target в отдельный container, поэтому изменения network и mounts не видны исходной задаче",
+      "Он входит сразу во все namespaces без flags и обходит capability checks, если target принадлежит текущему user",
+      "Он заменяет container exec: при входе в mount namespace host binaries автоматически доступны в distroless image"
     ],
     "answer": 0,
-    "explanation": "nsenter -t $(docker inspect -f '{{.State.Pid}}' container) --net -- ss -tnp входит в сеть контейнера. -m (mount), -u (uts), -i (ipc), -n (net), -p (pid). Для distroless контейнеров нет shell — nsenter с хоста позволяет использовать хостовые утилиты в namespace контейнера. Эквивалент kubectl debug."
+    "explanation": "nsenter запускает команду после setns в явно выбранные mount, net, UTS, IPC, user, cgroup, time или PID namespaces. Вход в PID namespace влияет на дочерний process, поэтому используют --pid --fork. Нужны соответствующие privileges. Для distroless debugging можно войти только в нужный netns с host tools либо предоставить toolbox; вход в target mount namespace сам по себе host binaries не добавляет."
   },
   {
     "id": 526,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое DPDK и в каких случаях его использование оправдано?",
+    "q": "Когда оправдан DPDK?",
     "options": [
-      "DPDK — это библиотека для работы с Docker",
-      "DPDK: userspace polling-mode drivers, bypass kernel; 10-100Mpps обработка пакетов; оправдан при > 1Mpps, когда kernel overhead недопустим; требует dedicated CPU cores и hugepages",
-      "DPDK работает на любом железе без специальных требований",
-      "DPDK использует AF_PACKET для bypass"
+      "Когда требуется обычный socket API: DPDK сохраняет kernel TCP stack и уменьшает operational complexity",
+      "Когда измеренный packet-rate/latency требует user-space polling; команда принимает dedicated cores, memory и NIC ops",
+      "Для 10GbE карты: poll-mode driver снижает CPU usage в idle и не требует настройки queues или NUMA",
+      "Преимущественно для virtual NIC: physical devices нельзя привязать к DPDK driver без модификации firmware"
     ],
     "answer": 1,
-    "explanation": "DPDK PMD (Poll Mode Driver) не использует прерывания — постоянный опрос NIC. Требования: hugepages (1GB предпочтительно), isolated CPU cores, DPDK-compatible NIC (Intel i40e, Mellanox mlx5). Применения: OVS-DPDK (OpenStack, NFV), VPP (FD.io), firewall appliances, carrier-grade NAT. CPU всегда 100% на polling cores."
+    "explanation": "DPDK poll-mode drivers и user-space packet buffers убирают interrupt/socket-stack overhead, но обычно занимают CPU cores, требуют careful NUMA placement, hugepage-backed memory и совместимого device path. Это полезно для NFV, appliances и очень высокой packet rate после profiling. Для большинства сервисов kernel stack, XDP или AF_XDP проще и достаточно производительны."
   },
   {
     "id": 527,
     "topic": "Linux",
     "level": "Middle",
     "category": "definition",
-    "q": "Как посмотреть детальную информацию о процессе через /proc/PID/?",
+    "q": "Какие данные полезно читать в /proc/PID при диагностике?",
     "options": [
-      "/proc/PID содержит только PID и имя процесса",
-      "Для чтения /proc/PID нужны root права",
-      "/proc/PID/status (VmRSS, Threads, State), /proc/PID/maps (memory mappings), /proc/PID/fd/ (открытые файлы), /proc/PID/net/ (сетевые соединения), /proc/PID/environ (переменные среды)",
-      "/proc/PID/status — только для отладки ядра"
+      "status содержит имя, а memory, file descriptors и namespaces доступны через отдельный debugger API",
+      "Все файлы доступны любому user: hidepid, ptrace policy и ownership не ограничивают environ, maps или fd links",
+      "status/smaps показывают процесс и память, fd — descriptors, cgroup и ns — изоляцию; net отражает весь netns",
+      "cmdline и environ являются immutable копией exec arguments: процесс не может менять отображаемые memory regions"
     ],
     "answer": 2,
-    "explanation": "/proc/PID/status: Name, State (R/S/D/Z), VmRSS (resident), VmPeak, Threads, voluntary_ctxt_switches. /proc/PID/maps: адресное пространство. /proc/PID/smaps: подробно по регионам. /proc/PID/cmdline: командная строка. /proc/PID/cgroup: cgroup membership. Большинство файлов читаются без sudo для своих процессов."
+    "explanation": "/proc/PID/status, stat и sched дают состояние и counters, maps/smaps — mappings, fd — открытые descriptors, cgroup и ns — membership, cmdline/environ — стартовые области памяти процесса. Доступ ограничивают ownership, ptrace checks, mount hidepid и namespaces. /proc/PID/net не является списком sockets только этого процесса — это view его network namespace."
   },
   {
     "id": 528,
     "topic": "Linux",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое inode и как посмотреть количество свободных inode?",
+    "q": "Что хранит inode и зачем проверять df -i?",
     "options": [
-      "Inode — это тип файловой системы",
-      "Inode хранит содержимое файла",
-      "Количество inode не ограничено в ext4",
-      "Inode — структура данных с метаданными файла (права, владелец, размер, блоки); df -i показывает использование inode; нехватка inode = нельзя создать файл даже при свободном месте"
+      "Inode хранит filename и полный pathname, поэтому hard links создают копии metadata для каждого directory entry",
+      "Inode содержит file data внутри структуры фиксированного размера; blocks используются для sparse holes",
+      "df -i показывает свободные block extents, а исчерпание inode означает одновременно заполненный volume",
+      "Inode хранит metadata и block mapping, directory связывает имя с номером inode; df -i выявляет их исчерпание"
     ],
     "answer": 3,
-    "explanation": "df -i /: Inodes, IUsed, IFree, IUse%. Нехватка inode: 'No space left on device' при df -h показывает свободное место. Причина: тысячи мелких файлов (tmp, cache, log rotation). При форматировании ext4: mkfs.ext4 -N 2000000 увеличивает число inode. XFS и btrfs создают inode динамически."
+    "explanation": "Inode содержит type, mode, owner, timestamps, size, link count и mapping данных, но не обычное имя: directory entry связывает имя с inode number. На ext4 число inode в основном задаётся при mkfs, поэтому множество мелких файлов может исчерпать их при свободных bytes. df -i показывает IUsed/IFree; XFS выделяет inode динамически, но также имеет ресурсные пределы."
   },
   {
     "id": 529,
     "topic": "Linux",
     "level": "Middle",
     "category": "scenario",
-    "q": "Как профилировать сетевую задержку между двумя хостами более детально чем ping?",
+    "q": "Как исследовать network latency глубже, чем обычным ping?",
     "options": [
-      "hping3 --tcp -p 443 -S для TCP latency; mtr для per-hop latency; ss -i для TCP RTT; iperf3 для bandwidth; netperf для детального анализа; tracepath для MTU и latency",
-      "Только ping -c 100 и смотреть RTT",
-      "traceroute достаточно для любого анализа",
-      "nmap --timing для latency measurement"
+      "Сопоставить mtr/tracepath, TCP RTT и retransmits из ss -ti, packet capture и application timings на реальном path",
+      "Запустить длинный ICMP ping: его median точно предсказывает TLS handshake и tail latency production requests",
+      "Использовать traceroute loss каждого hop как end-to-end loss: routers отвечают на probes с тем же приоритетом",
+      "Измерить iperf3 throughput: высокая bandwidth автоматически исключает queueing, retransmits и server processing"
     ],
     "answer": 0,
-    "explanation": "mtr: реальный маршрут + latency на каждом hop + packet loss. hping3: TCP/UDP/ICMP latency с контролем флагов. ss -i (или -e): показывает rtt, rttvar, cwnd для TCP соединений. iperf3 -c host -t 60 --json: throughput + latency statistics. для приложенческой latency: wrk, ab, k6."
+    "explanation": "Разные инструменты отвечают на разные вопросы. mtr и tracepath показывают path и MTU clues, но loss промежуточного hop может быть лишь rate limiting. ss -ti показывает RTT, variance, cwnd и retransmits реального TCP flow; packet capture разделяет DNS/connect/TLS и retransmissions, а application tracing добавляет server time. iperf измеряет capacity, не пользовательскую latency."
   },
   {
     "id": 530,
     "topic": "Linux",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Какие компромиссы нужно учитывать при выборе между swap и no-swap в production?",
+    "q": "Какие компромиссы учитывать при использовании swap в production?",
     "options": [
-      "Swap всегда нужно отключить в production",
-      "Swap как safety net: предотвращает OOM kill при спорадических пиках; без swap: OOM kill при превышении; с swap: предсказуемость ухудшается; для latency-sensitive: отключить; для stateful: включить небольшой",
-      "Swap всегда нужно включить — минимум 2x RAM",
-      "Swap влияет только на виртуальные машины"
+      "Swap отключают: его наличие заставляет kernel выгрузить anonymous pages до использования page cache",
+      "Swap может пережить transient pressure, но ухудшить tail latency; решение учитывает workload, cgroups, encryption и metrics",
+      "Swap гарантирует отсутствие OOM, если размер равен RAM: kernel allocations и cgroup memory.max используют тот же reserve",
+      "Swap влияет на idle pages и потому безопасен для ключей и tmpfs без disk encryption или noswap controls"
     ],
     "answer": 1,
-    "explanation": "Kubernetes рекомендует отключить swap (kubelet проверяет). Для баз данных: небольшой swap (2-4GB) предотвращает OOM kill при пиках, но vm.swappiness=1-5 минимизирует своппинг. Без swap: OOM killer активируется быстрее, но нет swap latency. zswap (сжатие в RAM) — компромисс. Мониторинг: vmstat 1."
+    "explanation": "Swap даёт kernel больше вариантов при pressure и иногда предотвращает ранний OOM, но thrashing способен резко ухудшить latency и I/O. Политику выбирают по SLO, working set, storage, encryption и cgroup controls, наблюдая swap-in/out, major faults и PSI. Kubernetes теперь поддерживает default NoSwap и настраиваемый LimitedSwap, поэтому blanket-правило об отключении устарело; control-plane swap всё ещё не рекомендуется."
   },
   {
     "id": 531,
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое BGP communities и как они используются для управления маршрутизацией?",
+    "q": "Как BGP communities управляют routing policy?",
     "options": [
-      "BGP communities — это группы маршрутизаторов в одной AS",
-      "Communities заменяют AS-PATH для выбора лучшего маршрута",
-      "Communities: 32-bit tags (ASN:value) прикреплённые к prefix; no-export (не передавать eBGP), no-advertise; used для traffic engineering, blackhole routing (666), selective route filtering",
-      "BGP communities поддерживаются только в BGP4+"
+      "Community меняет BGP best-path algorithm сама по себе: меньшее числовое значение получает больший local-pref",
+      "Standard community заменяет AS_PATH и позволяет loop detection по ASN:value без участия import/export policy",
+      "Маршрут получает tags, а routers применяют к ним policy: local-pref, filtering, no-export, blackhole или upstream TE",
+      "Communities действуют end-to-end одинаково: каждый оператор обязан сохранять и интерпретировать чужие tags"
     ],
     "answer": 2,
-    "explanation": "RFC 1997: well-known: NO_EXPORT (65535:65281), NO_ADVERTISE. Extended communities (RFC 4360): route-target (MPLS VPN), route-origin. Large communities (RFC 8092): 4-byte ASN support. Traffic engineering: set community для выбора exit point у upstream провайдеров. Blackhole: 65535:666 или RTBH (Remote Triggered Black Hole)."
+    "explanation": "Community — атрибут маршрута, а не действие: policy конкретной сети решает, что означает tag. Standard communities имеют 32-bit формат, large communities удобны для 4-byte ASN, а well-known NO_EXPORT/NO_ADVERTISE имеют стандартизированное поведение. Upstream traffic-engineering и blackhole tags используют только по документированному контракту провайдера."
   },
   {
     "id": 532,
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
-    "q": "Чем отличается iBGP от eBGP и что такое проблема full mesh в iBGP?",
+    "q": "Почему iBGP требует full mesh или route reflectors?",
     "options": [
-      "iBGP и eBGP идентичны, разница только в номере AS",
-      "Route reflector нужен только в eBGP сетях",
-      "iBGP использует другой порт для соединения",
-      "iBGP: между роутерами одной AS (TTL=255, next-hop не меняется, нет split-horizon для route propagation — нужен full mesh или route reflector); eBGP: между разными AS (TTL=1 default, next-hop меняется)"
+      "iBGP работает на другом TCP port, поэтому intermediate routers не могут передавать session между peers одной AS",
+      "eBGP сохраняет AS_PATH, а iBGP удаляет его; full mesh восстанавливает loop detection через TCP sequence numbers",
+      "Route reflector нужен для eBGP multihop: обычный iBGP автоматически flooding-ует routes всем peers внутри AS",
+      "Route, полученный по iBGP, обычно не анонсируется другому iBGP peer; mesh, RR или confederation решают scaling"
     ],
     "answer": 3,
-    "explanation": "iBGP full mesh: N*(N-1)/2 соединений — при 100 роутерах 4950 сессий. Решения: Route Reflector (RR: cluster, client/non-client, cluster-id), Confederation (деление AS на sub-AS). iBGP next-hop: не изменяется (нужен IGP до next-hop). Sync rule (устарела): iBGP route не анонсируется без IGP."
+    "explanation": "Все BGP sessions используют TCP/179. Чтобы предотвратить loops внутри AS, обычный iBGP speaker не пересылает iBGP-learned route другому iBGP peer, поэтому без дополнительного механизма нужен N(N-1)/2 mesh. Route reflector меняет propagation model с cluster-list/originator-id loop prevention; confederations дают другой компромисс. Next-hop reachability обычно обеспечивает IGP."
   },
   {
     "id": 533,
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает VXLAN и что такое VTEP?",
+    "q": "Как VXLAN и VTEP создают overlay network?",
     "options": [
-      "VXLAN инкапсулирует L2 frame в UDP (port 4789); VTEP (VXLAN Tunnel Endpoint) — точка инкапсуляции/декапсуляции; VNI (24-bit) = 16M сегментов; BUM трафик через multicast или ingress replication",
-      "VXLAN — это протокол шифрования трафика",
-      "VXLAN работает только между физическими коммутаторами",
-      "VTEP требует специального оборудования"
+      "VTEP инкапсулирует L2 frame в UDP/IP, VNI разделяет segments; learning/BUM решает flood-replication или EVPN",
+      "VTEP шифрует Ethernet payload и согласует session keys по UDP/4789, поэтому overlay заменяет VPN между sites",
+      "VXLAN переносит IP packets без Ethernet header, а VNI является 12-bit аналогом VLAN ID на underlay switch",
+      "Каждый VTEP обязан быть hardware switch: Linux bridge и virtual switch не могут завершать VXLAN tunnel"
     ],
     "answer": 0,
-    "explanation": "VXLAN header: 8 bytes, VNI 24-bit. Outer: UDP dst=4789, IP, Ethernet. BUM (Broadcast, Unknown unicast, Multicast): либо multicast group per VNI, либо ingress replication (unicast копии). EVPN (BGP) для control plane: MAC/IP advertisement, eliminates BUM flood. Используется: OpenStack Neutron, Kubernetes (Flannel VXLAN), NSX-T."
+    "explanation": "VXLAN переносит inner Ethernet frame поверх UDP/IP underlay; 24-bit VNI даёт логическую сегментацию, а VTEP выполняет encapsulation/decapsulation в software или hardware. Broadcast, unknown-unicast и multicast трафик реплицируется multicast либо ingress replication. BGP EVPN распространяет MAC/IP reachability и уменьшает часть flooding, но VXLAN сам по себе не шифрует."
   },
   {
     "id": 534,
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое OSPF area types и как stub/NSSA area уменьшают размер LSDB?",
+    "q": "Как stub и NSSA areas уменьшают OSPF LSDB?",
     "options": [
-      "OSPF areas не влияют на размер таблицы маршрутизации",
-      "Stub area: нет external LSA (type 5), default route вместо; NSSA: нет external LSA но может анонсировать external через type 7 LSA; totally stub: нет inter-area и external — только default route",
-      "Stub area не поддерживает суммаризацию маршрутов",
-      "NSSA areas требуют OSPF v3"
+      "Stub area фильтрует router/network LSAs, поэтому routers внутри неё не знают topology и используют default",
+      "Stub не получает Type 5 и получает default; NSSA дополнительно допускает локальный ASBR с Type 7, переводимым ABR",
+      "NSSA разрешает Type 5 flooding без изменений, но скрывает summary Type 3; размер LSDB меняется на backbone",
+      "Любую area 0 можно сделать stub, если два ABR одновременно originate default route с одинаковой metric"
     ],
     "answer": 1,
-    "explanation": "Stub: ABR блокирует Type 5 LSA, посылает Type 3 default. NSSA (Not-So-Stubby Area): Type 7 LSA (external internal) преобразуется в Type 5 ABR'ом. Totally Stub: блокирует Type 3 и Type 5 — максимально уменьшает LSDB. Используется на spoke-сайтах с одним ABR. Backbone (area 0) не может быть stub."
+    "explanation": "В stub area внутренние Type 1/2 и межзонные summary остаются, но external Type 5 не flooding-уются; ABR даёт default route. NSSA сохраняет это ограничение для внешних Type 5, но local ASBR вводит external route как Type 7, который выбранный ABR переводит в Type 5 наружу. Backbone area 0 не бывает stub; totally-stub варианты зависят от реализации."
   },
   {
     "id": 535,
     "topic": "Сети",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "WireGuard vs IPSec: что выбрать для production VPN?",
+    "q": "Как выбирать между WireGuard и IPsec/IKEv2 для production VPN?",
     "options": [
-      "WireGuard всегда лучше IPSec для любых задач",
-      "IPSec всегда быстрее WireGuard",
-      "WireGuard: простота, ~4000 строк кода, быстрый handshake, нет negotiation overhead, kernel module; IPSec: гибкость алгоритмов, enterprise-grade, IKEv2 multivendor, site-to-site стандарт; WireGuard: peer-to-peer модель без central CA",
-      "WireGuard поддерживает динамические IP адреса нативно"
+      "WireGuard выбирать по умолчанию: fixed algorithms гарантируют совместимость с legacy appliance и enterprise PKI",
+      "IPsec быстрее: IKE negotiation переносит data plane encryption в NIC независимо от hardware offload",
+      "WireGuard проще и имеет fixed suite; IPsec/IKEv2 даёт широкую interoperability, auth и algorithm agility",
+      "Выбор задаёт throughput: key lifecycle, roaming, identity integration и support не меняют операционный риск"
     ],
     "answer": 2,
-    "explanation": "WireGuard: ChaCha20/Poly1305/Curve25519/BLAKE2s — фиксированные алгоритмы (no negotiation = меньше attack surface). Минус: нет PFS rotation без reconnect, нет built-in PKI. IPSec/IKEv2: гибкий, поддерживает RADIUS, EAP, certificates, XAUTH; стандарт для межоперабельности. WireGuard лучше для cloud overlays (Tailscale), IPSec для enterprise site-to-site."
+    "explanation": "WireGuard предлагает небольшой интерфейс, fixed modern cryptographic suite и peer public keys, но provisioning, identity и policy часто добавляет внешний control plane. IPsec/IKEv2 сложнее, зато стандартизован между множеством vendors и поддерживает certificates, EAP и согласование suites. Оба варианта могут быть безопасны; решение проверяют по interoperability, key lifecycle, roaming, compliance и benchmarks."
   },
   {
     "id": 536,
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает Cilium и почему eBPF заменяет kube-proxy в Kubernetes?",
+    "q": "Что означает kube-proxy replacement в Cilium?",
     "options": [
-      "Cilium — это просто CNI plugin без отличий от Flannel",
-      "eBPF в Cilium работает только в userspace",
-      "Cilium требует изменения kernel на custom версию",
-      "Cilium использует eBPF вместо iptables: нет iptables rules (O(n) → O(1) lookup через BPF map), identity-based security (не IP), L7 policy (HTTP/gRPC aware), замена kube-proxy через eBPF socket-based LB"
+      "Cilium отключает Kubernetes Services и заставляет applications выбирать Pod IP через DNS client-side balancing",
+      "Replacement переносит Envoy целиком в kernel и обрабатывает HTTP policy одним eBPF program без user-space proxy",
+      "Режим заменяет CNI address allocation; iptables kube-proxy остаётся обязательным для ClusterIP и NodePort",
+      "Cilium реализует Service load balancing eBPF hooks/maps и может обходиться без kube-proxy при подходящей конфигурации"
     ],
     "answer": 3,
-    "explanation": "kube-proxy iptables: O(n) правил при тысячах services. Cilium eBPF: BPF maps для O(1) service lookup. kube-proxy replacement: socket-based load balancing в eBPF. Network policy: identity (label-based), не IP. Hubble (observability): eBPF-based flow monitoring. Требует: kernel 4.9+ (рекомендован 5.10+)."
+    "explanation": "В kube-proxy-free режиме Cilium программирует ClusterIP, NodePort и LoadBalancer behavior через eBPF на socket, tc и при опциональном acceleration XDP hooks. Backend selection и state хранятся в BPF maps; точный datapath зависит от режима SNAT/DSR и traffic path. Это отдельная capability от identity-based network policy и Hubble observability и требует совместимого kernel и корректной установки."
   },
   {
     "id": 537,
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое QoS DSCP и как работает traffic policing vs shaping?",
+    "q": "Чем traffic policing отличается от shaping при использовании DSCP?",
     "options": [
-      "DSCP (6 bits в ToS/TC): маркировка приоритета (EF=101110 для VoIP, AF, CS); policing: drop/remark при превышении rate (нет буферизации); shaping: задержка пакетов в очереди до выравнивания rate",
-      "DSCP и ToS — это одно и то же поле с одинаковым применением",
-      "Traffic policing всегда лучше shaping для QoS",
-      "DSCP работает только на L3, а 802.1p — только внутри одного канала"
+      "DSCP выбирает per-hop behavior; policer drop/remark-ит excess, shaper буферизует его до заданного rate и добавляет delay",
+      "Policing и shaping меняют шесть DSCP bits: packet timing, queues и drops остаются одинаковыми",
+      "Shaper немедленно отбрасывает burst сверх token bucket, а policer сохраняет его в очереди до появления tokens",
+      "DSCP гарантирует приоритет через Internet: intermediate domains не могут remark или игнорировать выставленный class"
     ],
     "answer": 0,
-    "explanation": "DSCP EF (101110): expedited forwarding, для realtime (VoIP, video). AF (Assured Forwarding): 4 классы × 3 drop precedence. CS (Class Selector): совместимость с IP Precedence. Policing: token bucket, избыток — drop или remark в lower DSCP. Shaping: буфер + задержка, сглаживает burst, добавляет latency. WRED: probabilistic early discard для TCP."
+    "explanation": "DSCP занимает шесть bits DS field и просит network применить определённый per-hop behavior, но trust boundary может remark или сбросить marking. Policer измеряет rate и обычно drop-ит либо remark-ит excess без ожидания. Shaper удерживает packets в очереди и сглаживает burst ценой latency и memory. QoS требует согласованной classification, marking, queue policy и capacity на каждом управляемом hop."
   },
   {
     "id": 538,
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает service mesh Istio: control plane vs data plane?",
+    "q": "Как разделены control plane и data plane в современном Istio?",
     "options": [
-      "Istio использует централизованный proxy вместо sidecar",
-      "Data plane: Envoy sidecar proxies перехватывают трафик через iptables redirect; Control plane: Istiod (Pilot: xDS, Citadel: mTLS certs, Galley: config validation) управляет Envoy через xDS API",
-      "Istio control plane обрабатывает каждый пакет",
-      "Envoy работает в kernel space для производительности"
+      "Istiod проксирует каждый application packet, а sidecars хранят локальный cache сертификатов и logs",
+      "Istiod распространяет config и identities; traffic обрабатывают Envoy sidecars либо ambient ztunnel/waypoints",
+      "Pilot, Citadel и Galley остаются обязательными отдельными deployments, синхронно подтверждающими каждый request",
+      "Ambient mode удаляет data plane: kernel routing напрямую применяет все L7 policies без proxy или waypoint"
     ],
     "answer": 1,
-    "explanation": "Envoy sidecar: iptables intercept (port 15001/15006). Istiod: Pilot distributes routing rules via xDS (CDS, EDS, LDS, RDS, SDS). Citadel: SPIFFE/SPIRE certs для mTLS. Traffic management: VirtualService + DestinationRule. Политики: AuthorizationPolicy. Ambient mesh (Istio 1.15+): ztunnel без sidecar для базовой L4 encryption."
+    "explanation": "Istiod — control plane: преобразует platform/service config, выдаёт workload identities/certificates и распространяет xDS-конфигурацию. В sidecar mode Envoy proxy сопровождает workload. В ambient mode secure L4 overlay обеспечивает ztunnel, а waypoint proxy добавляет нужную L7 processing. Control plane не находится в packet path, хотя его доступность важна для обновления конфигурации."
   },
   {
     "id": 539,
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое ECMP и как он реализован в Kubernetes/Linux?",
+    "q": "Как ECMP реализуется в Linux и Kubernetes infrastructure?",
     "options": [
-      "ECMP — это протокол резервирования шлюза",
-      "ECMP работает только с протоколом OSPF",
-      "ECMP (Equal-Cost Multi-Path): несколько маршрутов одинаковой стоимости к одному назначению; хэш (src IP, dst IP, src port, dst port) выбирает path; ip route add с несколькими nexthop; Linux: multipath routing",
-      "ECMP в Kubernetes реализован через DNS round-robin"
+      "ECMP дублирует каждый packet по всем equal-cost paths, а destination удаляет копии по TCP sequence number",
+      "Linux использует round-robin per packet; hash policy нельзя менять, поэтому reordered TCP является нормой",
+      "Linux multipath route содержит равные nexthops и выбирает их hash-ем flow; в clusters ECMP обычно даёт BGP/CNI/underlay",
+      "Kube-proxy IPVS создаёт ECMP routes в host FIB, поэтому каждый ClusterIP автоматически рекламируется upstream routers"
     ],
     "answer": 2,
-    "explanation": "Linux ECMP: ip route add 10.0.0.0/8 nexthop via 192.168.1.1 nexthop via 192.168.1.2. Hash: 5-tuple по умолчанию (sysctl net.ipv4.fib_multipath_hash_policy). BGP ECMP: maximum-paths 4. Kubernetes: kube-proxy IPVS (lc/rr/sh), Cilium ECMP. Проблема: TCP flow asymmetry при смене маршрута."
+    "explanation": "ECMP устанавливает несколько next hops одинаковой стоимости для prefix. Linux FIB выбирает nexthop по hash policy, обычно сохраняя один path для flow; policy и resilient behavior зависят от kernel и настройки. В Kubernetes ECMP появляется через underlay routing, BGP-speaking CNI, load-balancer advertisements или fabric, а не автоматически через kube-proxy service scheduling."
   },
   {
     "id": 540,
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое DNSSEC и какие проблемы оно решает?",
+    "q": "Какие гарантии даёт DNSSEC validating resolver?",
     "options": [
-      "DNSSEC шифрует DNS запросы",
-      "DNSSEC работает только с IPv6",
-      "DNSSEC заменяет HTTPS для безопасности",
-      "DNSSEC обеспечивает аутентификацию DNS ответов через цифровые подписи (RRSIG, DNSKEY, DS, NSEC/NSEC3); защита от cache poisoning (Kaminsky attack); не шифрует — только целостность и аутентичность"
+      "Шифрует client queries и ответы authoritative server, скрывая имя и IP от recursive resolver и network observer",
+      "Подтверждает, что IP безопасен и HTTPS certificate действителен, даже если zone owner опубликовал неверную запись",
+      "Запрещает amplification и availability attacks: signed response меньше unsigned и проходит через firewall",
+      "Проверяет origin и integrity RRsets по chain of trust и authenticated denial; confidentiality DNSSEC не предоставляет"
     ],
     "answer": 3,
-    "explanation": "DNSSEC chain of trust: root zone → TLD → domain. DNSKEY записи (ZSK + KSK). RRSIG подписывает каждый RRset. DS (Delegation Signer) связывает зоны. NSEC/NSEC3 — authenticated denial of existence. Минусы: увеличение размера ответов, сложность управления ключами. DoH/DoT решает privacy (шифрование), не DNSSEC."
+    "explanation": "Resolver проверяет RRSIG с DNSKEY, связывает delegation через DS до trust anchor и валидирует отсутствие имени через NSEC/NSEC3. Это защищает от подмены signed data и cache poisoning при корректной chain, но не шифрует запросы, не гарантирует истинность данных владельца зоны и не обеспечивает availability. DoT/DoH решают transport privacy, а не заменяют DNSSEC validation."
   },
   {
     "id": 541,
