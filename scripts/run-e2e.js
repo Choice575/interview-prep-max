@@ -73,7 +73,7 @@ async function main() {
 
   try {
     await waitForServer();
-    const playwrightCli = path.join(projectRoot, 'node_modules', 'playwright', 'cli.js');
+    const playwrightCli = require.resolve('@playwright/test/cli');
     const result = await run(process.execPath, [playwrightCli, 'test', '--reporter=line'], {
       cwd: projectRoot,
       stdio: 'inherit',

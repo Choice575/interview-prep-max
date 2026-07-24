@@ -25,15 +25,13 @@ jobs:
           node --check storage.js
           node --check progress.js
           node --check coach.js
+          node --check question-quality.js
           node --check verify-release.js
-          node --test date.test.js
-          node --test progress.test.js
-          node --test storage.test.js
-          node --test coach.test.js
-          node --test coach-flow.integration.test.js
-          node --test app-shell.integration.test.js
+          npm test
       - name: JSON validation
         run: node validate.js
+      - name: Question quality baseline
+        run: npm run quality:questions
       - name: Release integrity check
         run: node verify-release.js
   e2e:

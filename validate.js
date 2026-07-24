@@ -110,7 +110,42 @@ else {
   });
 }
 
-// ═══ 2. Подсети ═══
+// ═══ 2. Best Practices ═══
+console.log('\n✦ Проверка Best Practices (best_practices.json)...');
+const bpfile = path.join(TASKS_DIR, 'best_practices.json');
+if (!fs.existsSync(bpfile)) { err('best_practices.json не найден'); }
+else {
+  const bestPractices = JSON.parse(fs.readFileSync(bpfile, 'utf8'));
+  if (bestPractices.schemaVersion !== 1) err('Best Practices: неподдерживаемая schemaVersion');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(bestPractices.updated || '')) err('Best Practices: updated должен быть датой YYYY-MM-DD');
+  if (!Array.isArray(bestPractices.topics)) err('Best Practices: topics должен быть массивом');
+  else {
+    const seenTopics = new Set();
+    const seenSlugs = new Set();
+    bestPractices.topics.forEach((topic, index) => {
+      const prefix = `BestPractices[${index}]`;
+      if (!KNOWN_TOPICS.includes(topic.topic)) err(`${prefix}: неизвестная тема "${topic.topic}"`);
+      if (seenTopics.has(topic.topic)) err(`${prefix}: дубликат темы "${topic.topic}"`);
+      if (!topic.slug || seenSlugs.has(topic.slug)) err(`${prefix}: slug отсутствует или дублируется`);
+      seenTopics.add(topic.topic);
+      seenSlugs.add(topic.slug);
+      if (!topic.summary || topic.summary.length < 40) err(`${prefix}: слишком короткое summary`);
+      if (!Array.isArray(topic.practices) || topic.practices.length < 5) err(`${prefix}: нужно минимум 5 практик`);
+      else topic.practices.forEach((practice, practiceIndex) => {
+        const practicePrefix = `${prefix}.practices[${practiceIndex}]`;
+        if (!practice.title) err(`${practicePrefix}: нет title`);
+        if (!practice.why || practice.why.length < 70) err(`${practicePrefix}: слишком короткое why`);
+        if (!practice.action || practice.action.length < 70) err(`${practicePrefix}: слишком короткое action`);
+      });
+    });
+    KNOWN_TOPICS.forEach(topic => {
+      if (!seenTopics.has(topic)) err(`Best Practices: отсутствует тема "${topic}"`);
+    });
+    ok(`Best Practices: ${bestPractices.topics.length} тем`);
+  }
+}
+
+// ═══ 3. Подсети ═══
 console.log('\n🌐 Проверка подсетей (subnet.json)...');
 const sfile = path.join(TASKS_DIR, 'subnet.json');
 if (fs.existsSync(sfile)) {
