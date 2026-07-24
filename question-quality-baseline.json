@@ -8,10 +8,10 @@
     186
   ],
   "issueBudget": {
-    "length-cue": 441,
-    "question-echo": 13,
-    "absolute-distractor": 233,
-    "duplicate-question": 5
+    "length-cue": 413,
+    "question-echo": 11,
+    "absolute-distractor": 220,
+    "duplicate-question": 4
   },
   "topics": {
     "Terraform": {
@@ -38,23 +38,23 @@
       "absolute-distractor": 41,
       "duplicate-question": 0
     },
-    "Docker": {
-      "length-cue": 18,
-      "question-echo": 2,
-      "absolute-distractor": 5,
-      "duplicate-question": 0
-    },
     "Kubernetes": {
-      "length-cue": 55,
-      "question-echo": 1,
-      "absolute-distractor": 28,
-      "duplicate-question": 1
+      "length-cue": 35,
+      "question-echo": 0,
+      "absolute-distractor": 17,
+      "duplicate-question": 0
     },
     "CI/CD": {
       "length-cue": 58,
       "question-echo": 2,
       "absolute-distractor": 29,
       "duplicate-question": 1
+    },
+    "Docker": {
+      "length-cue": 10,
+      "question-echo": 1,
+      "absolute-distractor": 3,
+      "duplicate-question": 0
     },
     "Monitoring": {
       "length-cue": 24,
@@ -77,22 +77,22 @@
   },
   "levels": {
     "Middle": {
-      "length-cue": 158,
-      "question-echo": 4,
-      "absolute-distractor": 74,
+      "length-cue": 147,
+      "question-echo": 3,
+      "absolute-distractor": 69,
       "duplicate-question": 2
     },
     "Senior": {
-      "length-cue": 206,
-      "question-echo": 7,
-      "absolute-distractor": 137,
+      "length-cue": 196,
+      "question-echo": 6,
+      "absolute-distractor": 130,
       "duplicate-question": 1
     },
     "Junior": {
-      "length-cue": 77,
+      "length-cue": 70,
       "question-echo": 2,
-      "absolute-distractor": 22,
-      "duplicate-question": 2
+      "absolute-distractor": 21,
+      "duplicate-question": 1
     }
   }
 }

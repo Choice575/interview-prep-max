@@ -5124,450 +5124,450 @@
     "topic": "Docker",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает docker events и для каких задач это полезно?",
+    "q": "Что именно предоставляет команда docker events?",
     "options": [
-      "Стрим событий жизненного цикла контейнеров/образов (start/stop/die/pull/tag); полезен для аудита и автоматизации реакций",
-      "docker events показывает историю изменений Dockerfile",
-      "Мониторинг использования ресурсов в реальном времени",
-      "Журнал изменений конфигурации Docker-демона"
+      "Поток событий Docker objects с фильтрами по type, action и времени",
+      "Историю изменений Dockerfile и diff инструкций между builds",
+      "Per-process CPU и memory samples для running containers",
+      "Версии daemon configuration с возможностью rollback"
     ],
     "answer": 0,
-    "explanation": "docker events --filter type=container выводит реальный поток событий (create, start, die, destroy и т.д.) с временными метками. Используется для аудита, автоматической реакции на события (webhook), интеграции с мониторингом."
+    "explanation": "docker events получает real-time events от daemon для containers, images, networks, volumes и других object types. --filter, --since и --until ограничивают поток. Это не долговечный audit log: при запросе истории daemon возвращает не более последних 256 событий, поэтому для аудита consumer должен сохранять их во внешней системе."
   },
   {
     "id": 362,
     "topic": "Docker",
     "level": "Middle",
     "category": "scenario",
-    "q": "Нужно пересобрать только определённую стадию multi-stage build. Как это сделать?",
+    "q": "Как собрать image, остановившись на named stage builder?",
     "options": [
-      "docker build --stage=stagename .",
-      "docker build --target=stagename .",
-      "docker build --only=stagename .",
-      "Нельзя, нужно пересобирать весь Dockerfile"
+      "docker build --stage builder .",
+      "docker build --target builder .",
+      "docker build --from builder .",
+      "docker build --output builder ."
     ],
     "answer": 1,
-    "explanation": "Флаг --target позволяет остановить сборку на определённой стадии (FROM ... AS stagename). Полезно для отладки промежуточных этапов или сборки образа для тестирования без финальной минимизации."
+    "explanation": "--target выбирает stage, объявленный как FROM ... AS builder, и завершает результатом этого stage. Builder всё равно выполняет необходимые dependency stages, а неизменившиеся steps может взять из cache. Это удобно для test/debug images и не означает безусловную пересборку каждого предыдущего stage."
   },
   {
     "id": 363,
     "topic": "Docker",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое Docker Compose profiles и как они используются?",
+    "q": "Как profiles управляют набором сервисов Compose project?",
     "options": [
-      "Профили производительности для оптимизации ресурсов контейнеров",
-      "Имена конфигурационных файлов для разных окружений",
-      "Группировка сервисов для запуска только нужного подмножества: docker compose --profile dev up",
-      "Настройки пользователей для доступа к сервисам"
+      "Выбирают presets CPU и memory limits для всех services проекта",
+      "Подменяют compose.yaml файлом, имя которого совпадает с profile",
+      "Условно включают отмеченные services через --profile или COMPOSE_PROFILES",
+      "Задают Docker contexts и registry credentials для project users"
     ],
     "answer": 2,
-    "explanation": "Profiles позволяют помечать сервисы (profiles: [dev, debug]) и запускать только нужные через --profile dev. Сервисы без профиля запускаются всегда. Удобно для опциональных инструментов (adminer, mailhog, мониторинг)."
+    "explanation": "Service с profiles активируется при включении одного из них через --profile или COMPOSE_PROFILES; services без profiles остаются включёнными. Явно указанный в CLI service запускается вместе со своими declared dependencies даже без ручной активации profile, но соседние services того же profile от этого не стартуют."
   },
   {
     "id": 364,
     "topic": "Docker",
     "level": "Middle",
     "category": "definition",
-    "q": "Как работает команда docker inspect и что она возвращает?",
+    "q": "Какой результат обычно возвращает docker inspect?",
     "options": [
-      "Показывает логи контейнера в JSON-формате",
-      "Показывает историю слоёв образа",
-      "Выполняет аудит безопасности образа",
-      "Возвращает детальную JSON-конфигурацию объекта (контейнера, образа, сети, volume): состояние, настройки, сетевые параметры"
+      "Строки stdout и stderr объекта, сериализованные как JSON events",
+      "Список Dockerfile commands и filesystem diff каждого image layer",
+      "Отчёт vulnerability scanner с packages, CVE и severity",
+      "Массив low-level JSON metadata выбранных Docker objects"
     ],
     "answer": 3,
-    "explanation": "docker inspect возвращает полный JSON с конфигурацией: State, HostConfig, NetworkSettings, Mounts и т.д. Используется с --format для извлечения конкретных полей: docker inspect --format '{{.NetworkSettings.IPAddress}}' <id>."
+    "explanation": "docker inspect возвращает JSON array с подробными metadata управляемых Docker objects: для container это, например, State, HostConfig, NetworkSettings и Mounts. --format применяет Go template для выборки полей, а --type устраняет неоднозначность имени между object types. Логи и layer history выводят другие команды."
   },
   {
     "id": 365,
     "topic": "Docker",
     "level": "Senior",
     "category": "definition",
-    "q": "Чем distroless-образы отличаются от alpine и в чём их преимущества?",
+    "q": "Каков основной trade-off distroless image по сравнению с Alpine?",
     "options": [
-      "Distroless — это образы Google без пакетного менеджера, shell и большинства инструментов ОС; только runtime и приложение",
-      "Distroless основаны на Alpine Linux с удалённым apk",
-      "Distroless образы содержат полный Linux, но без GUI",
-      "Distroless — маркетинговое название для scratch-образов"
+      "Меньше runtime-компонентов и attack surface, но меньше средств диагностики",
+      "Пакетный менеджер меняется с apk на apt при том же наборе утилит",
+      "В image добавляется debug shell, а размер и CVE count обычно растут",
+      "Приложение запускается без runtime libraries и системных сертификатов"
     ],
     "answer": 0,
-    "explanation": "Distroless (gcr.io/distroless/...) содержат только language runtime и системные библиотеки. Нет shell, apt/apk, wget. Меньше attack surface, меньше CVE. Alpine даёт shell и пакетный менеджер, но всё же содержит ОС. Для отладки используют :debug тег с busybox."
+    "explanation": "Distroless images содержат приложение и его runtime dependencies, но не включают обычные shell, package manager и admin utilities. Это уменьшает attack surface и scanner noise, но усложняет диагностику. Alpine остаётся минимальным Linux distribution с apk и BusyBox. Для distroless используют debug variants, kubectl debug или отдельный diagnostic image."
   },
   {
     "id": 366,
     "topic": "Docker",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как провести анализ содержимого слоёв Docker-образа для поиска утечки секретов?",
+    "q": "Как проверить image на секрет, удалённый в позднем Dockerfile layer?",
     "options": [
-      "docker history --no-trunc показывает все команды сборки",
-      "Комбинация docker save | tar -xf для просмотра слоёв; инструменты dive, trivy для анализа",
-      "docker inspect --format secrets покажет утечки",
-      "Секреты автоматически шифруются в слоях образа"
+      "Проверить docker history: он содержит содержимое каждого удалённого file",
+      "Просканировать history и exported layers; подтверждённый credential отозвать",
+      "Прочитать .Config.Env через inspect: там отражены deleted layer files",
+      "Запустить image prune: registry layers очистятся вместе с local cache"
     ],
     "answer": 1,
-    "explanation": "docker save экспортирует образ как tar-архив со слоями. Утилита dive визуализирует каждый слой и эффективность. Trivy и trufflehog сканируют образы на наличие секретов и уязвимостей. docker history --no-trunc показывает команды без обрезки."
+    "explanation": "Удаление file в новом layer скрывает path, но bytes остаются в предыдущем layer. docker history --no-trunc помогает найти утечки в commands/arguments, а docker save или scanner с поддержкой image layers — в filesystem content. После подтверждения секрет отзывают и перестраивают безопасную history; очистка local cache не удаляет уже опубликованный registry blob."
   },
   {
     "id": 367,
     "topic": "Docker",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Когда предпочтительнее использовать podman вместо Docker?",
+    "q": "Когда архитектура Podman может быть удобнее Docker Engine?",
     "options": [
-      "Podman всегда лучше Docker для production",
-      "Podman используется только на RHEL/CentOS",
-      "Podman предпочтителен в средах без daemon (rootless по умолчанию, systemd-интеграция), при требованиях безопасности без root-демона",
-      "Podman быстрее Docker в 10 раз"
+      "Когда нужен Docker daemon API и полная совместимость его plugins",
+      "Когда rootless containers недопустимы политикой Linux host",
+      "Когда ценны daemonless/rootless model, pods и systemd Quadlet integration",
+      "Когда требуется идентичное поведение всех Docker API extensions"
     ],
     "answer": 2,
-    "explanation": "Podman работает без центрального daemon (каждый контейнер — дочерний процесс пользователя), поддерживает rootless-контейнеры нативно, интегрируется с systemd (podman generate systemd). Docker daemon работает как root, что является security concern."
+    "explanation": "Podman не требует central manager daemon, хорошо поддерживает rootless operation, pods и декларативные systemd units через Quadlet. Docker также умеет rootless mode, поэтому выбор не сводится к root против non-root. Docker часто удобнее при зависимости от daemon API, Compose и plugin ecosystem; CLI/API compatibility Podman не гарантирует совпадение каждого edge case."
   },
   {
     "id": 368,
     "topic": "Docker",
     "level": "Middle",
     "category": "scenario",
-    "q": "Нужно запустить несколько экземпляров сервиса в Docker Compose. Как это сделать?",
+    "q": "Как запустить три экземпляра Compose service web?",
     "options": [
-      "Масштабирование невозможно в Docker Compose",
-      "docker compose duplicate --service web --count 3",
-      "Создать web1, web2, web3 как отдельные сервисы",
+      "docker compose up --replicas web=3",
+      "docker compose duplicate web --count=3",
+      "docker compose create web1 web2 web3",
       "docker compose up --scale web=3"
     ],
     "answer": 3,
-    "explanation": "docker compose up --scale web=3 запустит 3 экземпляра сервиса web. При этом нельзя использовать фиксированный container_name и нужно использовать динамический проброс портов (ports: - '80' вместо '80:80')."
+    "explanation": "--scale SERVICE=NUM переопределяет scale из Compose file для этого запуска. Service с фиксированным container_name нельзя масштабировать сверх одного container. Фиксированный published host port также конфликтует между replicas, поэтому обычно ставят reverse proxy/load balancer или не закрепляют один host port за каждой replica."
   },
   {
     "id": 369,
     "topic": "Docker",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое Docker Hub и для чего он используется?",
+    "q": "Какую роль выполняет Docker Hub?",
     "options": [
-      "Публичный реестр Docker-образов для хранения, распространения и поиска образов",
-      "GUI-приложение для управления Docker-контейнерами",
-      "Облачный сервис для запуска контейнеров без установки Docker",
-      "Система мониторинга Docker-инфраструктуры"
+      "Hosted registry и discovery service для public/private container images",
+      "Desktop GUI для управления local containers, networks и volumes",
+      "Runtime platform для выполнения containers без compute provider",
+      "Metrics backend для daemon events, logs и resource alerts"
     ],
     "answer": 0,
-    "explanation": "Docker Hub — публичный реестр образов. Содержит официальные образы (nginx, postgres, redis) и образы сообщества. Поддерживает автоматические сборки из GitHub. Для приватных образов используют Nexus, Harbor, AWS ECR, GitLab Registry."
+    "explanation": "Docker Hub хранит и распространяет OCI/container images по repositories и tags, поддерживает public и private repositories, organizations и curated Docker Official Images. Он не запускает application containers и не заменяет Docker Desktop или monitoring backend. Для reproducibility production deploy обычно pin-ит digest, а не полагается на mutable tag."
   },
   {
     "id": 370,
     "topic": "Docker",
     "level": "Junior",
     "category": "definition",
-    "q": "Что происходит с данными внутри контейнера после его удаления (docker rm)?",
+    "q": "Что происходит с filesystem data после docker rm?",
     "options": [
-      "Данные сохраняются автоматически в Docker-образе",
-      "Все данные в writeable-слое контейнера теряются; данные в volumes сохраняются",
-      "Docker автоматически делает backup перед удалением",
-      "Данные переносятся в /tmp на хост-машине"
+      "Writable layer сохраняется как новый image tag для следующего run",
+      "Writable layer удаляется; bind source и named volumes живут отдельно",
+      "Daemon архивирует root filesystem до завершения retention period",
+      "Изменённые files перемещаются в host /tmp с container ID"
     ],
     "answer": 1,
-    "explanation": "При удалении контейнера его writeable-слой (где хранятся изменения файловой системы) уничтожается. Docker volumes и bind mounts существуют независимо от контейнера и при его удалении сохраняются."
+    "explanation": "docker rm удаляет container metadata и его writable layer, не записывая изменения обратно в immutable image. Bind-mounted data остаётся в host path, а named volume — до явного удаления. Anonymous volume обычно тоже сохраняется, но docker run --rm удаляет связанный anonymous volume при завершении."
   },
   {
     "id": 371,
     "topic": "Kubernetes",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое Pod в Kubernetes?",
+    "q": "Как Kubernetes определяет Pod?",
     "options": [
-      "Виртуальная машина в Kubernetes-кластере",
-      "Узел кластера, на котором запускаются приложения",
-      "Минимальная единица развёртывания, содержащая один или несколько контейнеров с общей сетью и хранилищем",
-      "Конфигурационный файл для управления контейнерами"
+      "Отдельная VM с собственным kernel и выделенным virtual disk",
+      "Worker node, на котором scheduler размещает несколько workloads",
+      "Наименьшая deployable unit: co-scheduled containers с общей сетью",
+      "YAML template, из которого kubelet создаёт containers на разных nodes"
     ],
     "answer": 2,
-    "explanation": "Pod — атомарная единица Kubernetes. Контейнеры внутри Pod'а разделяют: сетевое пространство имён (один IP), localhost, IPC и optionally volumes. Обычно Pod содержит один основной контейнер + опционально sidecar/init контейнеры."
+    "explanation": "Pod — наименьшая deployable unit Kubernetes: один или несколько тесно связанных containers размещаются вместе и разделяют network namespace, IP и ports. Pod также может предоставить общие volumes. Containers разных Pods не разделяют этот network namespace."
   },
   {
     "id": 372,
     "topic": "Kubernetes",
     "level": "Junior",
     "category": "definition",
-    "q": "Чем Deployment отличается от ReplicaSet?",
+    "q": "Как Deployment дополняет ReplicaSet?",
     "options": [
-      "Они идентичны, Deployment — устаревшее название ReplicaSet",
-      "ReplicaSet поддерживает rolling updates, Deployment — нет",
-      "Deployment используется только для stateful приложений",
-      "Deployment управляет ReplicaSet'ами и обеспечивает декларативное обновление с историей"
+      "ReplicaSet резервирует volumes, а Deployment назначает claims",
+      "Deployment выдаёт Service IP, а ReplicaSet обновляет endpoints",
+      "ReplicaSet выбирает nodes, а Deployment применяет affinity",
+      "Deployment управляет ReplicaSets, rollout strategy и revisions"
     ],
     "answer": 3,
-    "explanation": "ReplicaSet поддерживает заданное число реплик Pod'ов. Deployment управляет ReplicaSet'ами: при обновлении создаёт новый RS, постепенно масштабирует вверх/вниз (rolling update). Хранит историю ревизий для rollback."
+    "explanation": "ReplicaSet поддерживает заданное число Pod replicas. Deployment управляет ReplicaSets: при изменении Pod template создаёт новый ReplicaSet, контролируемо масштабирует новый и старый наборы и сохраняет revisions для rollback. Управлять его ReplicaSets вручную не следует."
   },
   {
     "id": 373,
     "topic": "Kubernetes",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое Service типа ClusterIP?",
+    "q": "Как ведёт себя Service типа ClusterIP?",
     "options": [
-      "Виртуальный IP внутри кластера для балансировки нагрузки между Pod'ами; недоступен снаружи",
-      "Сервис с публичным IP-адресом для внешнего доступа",
-      "Сервис для маршрутизации трафика между кластерами",
-      "Тип сервиса для stateful приложений с постоянным IP"
+      "Получает cluster-internal virtual IP и направляет трафик на ready endpoints",
+      "Публикует каждый endpoint через host port на всех worker nodes",
+      "Создаёт внешний load balancer и ожидает адрес от cloud provider",
+      "Назначает Pod постоянный IP, сохраняемый после rescheduling"
     ],
     "answer": 0,
-    "explanation": "ClusterIP — дефолтный тип Service. Создаёт виртуальный IP (VIP), доступный только внутри кластера. kube-proxy настраивает iptables/ipvs правила для распределения трафика между Pod'ами по selector. DNS имя: <service>.<namespace>.svc.cluster.local."
+    "explanation": "ClusterIP — default Service type. Обычно Service получает virtual IP из cluster range, а cluster dataplane направляет соединения на ready endpoints. Для headless Service задают clusterIP: None: virtual IP и обычная proxying-модель тогда не создаются."
   },
   {
     "id": 374,
     "topic": "Kubernetes",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое ConfigMap в Kubernetes?",
+    "q": "Для каких данных предназначен ConfigMap?",
     "options": [
-      "Зашифрованное хранилище для паролей и токенов",
-      "Объект для хранения незашифрованных конфигурационных данных в парах ключ-значение или файлах",
-      "Карта топологии кластера для планировщика",
-      "Конфигурация сетевых правил NetworkPolicy"
+      "Для credentials, которые API server автоматически шифрует at rest",
+      "Для non-confidential config, доступной как env values, args или files",
+      "Для runtime metrics, которые kubelet отправляет metrics-server",
+      "Для NetworkPolicy rules, общих для нескольких namespaces"
     ],
     "answer": 1,
-    "explanation": "ConfigMap хранит конфигурацию отдельно от кода. Может монтироваться как volume (файлы) или передаваться как переменные окружения. Не шифруется — для секретов используется Secret. Обновление ConfigMap не перезапускает Pod автоматически."
+    "explanation": "ConfigMap отделяет non-confidential configuration от container image. Pod может получить values через environment, command arguments или projected files. ConfigMap не предназначен для secrets; обновлённые env values не появляются в уже запущенном container без его recreation."
   },
   {
     "id": 375,
     "topic": "Kubernetes",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое Namespace в Kubernetes и для чего он нужен?",
+    "q": "Что даёт Namespace сам по себе?",
     "options": [
-      "Физическое разделение кластера на несколько независимых кластеров",
-      "Сетевое пространство имён для изоляции Pod'ов",
-      "Логическое разделение ресурсов кластера; изоляция, квоты, разграничение прав",
-      "Псевдоним для группы Node в кластере"
+      "Отдельный control plane и набор worker nodes для каждой команды",
+      "Network isolation между Pods без дополнительных policies",
+      "Scope для имён и namespaced resources; основу для RBAC и quotas",
+      "Группу nodes, которую scheduler считает единым failure domain"
     ],
     "answer": 2,
-    "explanation": "Namespace создаёт логическую изоляцию: ресурсы в разных NS не конфликтуют по именам. Используется для разделения окружений (dev/staging/prod), команд, приложений. ResourceQuota и LimitRange применяются на уровне NS."
+    "explanation": "Namespace задаёт scope имён для namespaced resources и границу, к которой можно привязать RBAC, ResourceQuota, LimitRange и policies. Сам Namespace не создаёт network isolation или отдельный control plane. Nodes, PersistentVolumes и ряд других ресурсов остаются cluster-scoped."
   },
   {
     "id": 376,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
-    "q": "Чем StatefulSet отличается от Deployment?",
+    "q": "Когда StatefulSet предпочтительнее Deployment?",
     "options": [
-      "StatefulSet используется только для баз данных",
-      "StatefulSet не поддерживает rolling updates",
-      "Deployment поддерживает больше реплик",
-      "StatefulSet предоставляет стабильные сетевые идентификаторы, стабильное хранилище и упорядоченное развёртывание/масштабирование"
+      "Когда Pod replicas взаимозаменяемы и используют ephemeral storage",
+      "Когда нужен unordered rollout без stable identity для replicas",
+      "Когда lifecycle workload ограничен выполнением одной batch task",
+      "Когда нужны stable identity, storage и управляемый порядок replicas"
     ],
     "answer": 3,
-    "explanation": "StatefulSet гарантирует: уникальные стабильные Pod-имена (app-0, app-1...), стабильные DNS имена, PVC на каждый Pod (не удаляется при рестарте), упорядоченный запуск и остановку. Deployment — для stateless, StatefulSet — для Kafka, Cassandra, Redis Cluster."
+    "explanation": "StatefulSet поддерживает sticky identity, ordinal Pod names, stable network identity и persistent storage через volumeClaimTemplates. Default OrderedReady policy задаёт порядок scaling и rollout, но Parallel policy меняет часть этих гарантий. StatefulSet поддерживает rolling updates и нужен не каждому stateful workload."
   },
   {
     "id": 377,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "scenario",
-    "q": "Pod находится в статусе CrashLoopBackOff. Какова процедура диагностики?",
+    "q": "С чего начать диагностику CrashLoopBackOff?",
     "options": [
-      "kubectl logs <pod> --previous, kubectl describe pod <pod> — события, kubectl exec для интерактивной отладки",
-      "Удалить и пересоздать Pod",
-      "Перезапустить node где находится Pod",
-      "Изменить imagePullPolicy на Always"
+      "Проверить describe/events и logs --previous для нужного container",
+      "Удалить Pod и ReplicaSet, чтобы сбросить restart counter",
+      "Поставить imagePullPolicy: Always и скачать тот же image заново",
+      "Перезапустить node и пересоздать CNI state для workloads"
     ],
     "answer": 0,
-    "explanation": "kubectl logs --previous — логи предыдущего (упавшего) контейнера. kubectl describe показывает Events с причиной сбоя (OOMKilled, exit code, probe failure). Если контейнер не стартует — использовать command: ['sleep', '3600'] для отладки внутри."
+    "explanation": "kubectl describe pod показывает container state, lastState, exit reason и Events; kubectl logs POD -c CONTAINER --previous читает логи предыдущего упавшего instance. Затем проверяют OOMKilled, command/args, config и probe failures. Для image без shell или слишком быстрого crash полезен kubectl debug с ephemeral container или копией Pod."
   },
   {
     "id": 378,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое liveness и readiness пробы и в чём их отличие?",
+    "q": "Чем различаются liveness, readiness и startup probes?",
     "options": [
-      "Liveness проверяет версию образа, readiness — наличие трафика",
-      "Liveness перезапускает контейнер при сбое; readiness убирает Pod из балансировки, не перезапуская",
-      "Они идентичны, разница только в конфигурации порогов",
-      "Readiness запускается до старта, liveness — после"
+      "Liveness сверяет image digest, readiness измеряет request latency",
+      "Liveness решает restart; readiness — traffic; startup защищает slow start",
+      "Readiness перезапускает container, startup добавляет Pod в Service",
+      "Startup идёт после liveness и проверяет состояние scheduler"
     ],
     "answer": 1,
-    "explanation": "Liveness probe: если провалится — kubelet убьёт и перезапустит контейнер. Readiness probe: если провалится — Pod удаляется из Endpoints Service (трафик не поступает), но контейнер не перезапускается. Startup probe: даёт время на инициализацию перед включением liveness."
+    "explanation": "Failed liveness заставляет kubelet restart-ить container по его restartPolicy. Failed readiness помечает Pod not ready, и Service перестаёт направлять на него обычный traffic. Пока startup probe не стала successful, liveness и readiness не выполняются; это защищает медленно стартующий container от преждевременного restart."
   },
   {
     "id": 379,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое HPA (Horizontal Pod Autoscaler) и на основе чего он масштабирует?",
+    "q": "Что масштабирует HorizontalPodAutoscaler?",
     "options": [
-      "HPA увеличивает размер Node при нехватке ресурсов",
-      "HPA масштабирует хранилище PVC при его заполнении",
-      "HPA автоматически изменяет число реплик Deployment/StatefulSet на основе метрик (CPU, память, кастомные)",
-      "HPA работает только с CPU-метриками Deployment"
+      "Node group по суммарным requests всех Pending Pods",
+      "PVC capacity по проценту занятого filesystem space",
+      "Scale target workload по resource, custom или external metrics",
+      "Container limits внутри запущенного Pod без его recreation"
     ],
     "answer": 2,
-    "explanation": "HPA периодически (по умолчанию 15с) запрашивает метрики из metrics-server или custom metrics API. Рассчитывает желаемое число реплик: желаемые реплики = ceil(текущие * текущая_нагрузка / целевая_нагрузка). KEDA расширяет HPA внешними источниками (Kafka, SQS)."
+    "explanation": "HPA controller изменяет scale subresource target workload, например Deployment или StatefulSet, чтобы подобрать replica count к наблюдаемым resource, custom или external metrics. CPU utilization обычно рассчитывается относительно requests. DaemonSet не предоставляет подходящую scaling semantics для HPA."
   },
   {
     "id": 380,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое PersistentVolumeClaim (PVC) и как он связан с PersistentVolume (PV)?",
+    "q": "Как связаны PVC, PV и StorageClass?",
     "options": [
-      "PVC — это PV, созданный автоматически через StorageClass",
-      "PVC используется только с StatefulSet",
-      "PV и PVC идентичны, разница в namespace-принадлежности",
-      "PVC — запрос пользователя на хранилище; Kubernetes связывает его с подходящим PV или создаёт через StorageClass"
+      "PV является namespaced request, а PVC описывает physical backend",
+      "PVC создаётся внутри Pod и исчезает при container restart",
+      "StorageClass монтирует volume напрямую, обходя binding loop",
+      "PVC запрашивает storage; он bind-ится с PV, иногда provisioned по class"
     ],
     "answer": 3,
-    "explanation": "PV — ресурс кластера (конкретное хранилище). PVC — запрос от namespace (размер, режим доступа, storageClass). Kubernetes связывает PVC с PV по параметрам. StorageClass с provisioner автоматически создаёт PV при создании PVC (dynamic provisioning)."
+    "explanation": "PV — cluster-scoped storage resource с lifecycle независимо от Pod, а PVC — namespaced request с размером, access modes и storageClassName. Control plane bind-ит claim к подходящему PV один-к-одному. Если статического PV нет, настроенный StorageClass provisioner может создать его динамически."
   },
   {
     "id": 381,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "scenario",
-    "q": "Как откатить Deployment к предыдущей версии?",
+    "q": "Какая команда откатывает Deployment на предыдущую revision?",
     "options": [
-      "kubectl rollout undo deployment/myapp (или --to-revision=N для конкретной)",
-      "kubectl rollback deployment/myapp",
-      "Удалить Deployment и применить старый манифест",
-      "kubectl apply -f old_deployment.yaml --force"
+      "kubectl rollout undo deployment/myapp",
+      "kubectl rollout rollback deployment/myapp",
+      "kubectl deploy undo myapp --previous",
+      "kubectl apply revision deployment/myapp"
     ],
     "answer": 0,
-    "explanation": "kubectl rollout undo создаёт новое обновление, возвращающее к предыдущей ревизии. kubectl rollout history deployment/myapp показывает историю. --to-revision=2 откатывает к конкретной ревизии. Количество сохраняемых ревизий задаётся revisionHistoryLimit."
+    "explanation": "kubectl rollout undo deployment/myapp возвращает Pod template к предыдущей revision; --to-revision=N выбирает конкретную. kubectl rollout history показывает доступную history. Возможность rollback зависит от сохранённых ReplicaSets, число которых ограничивает spec.revisionHistoryLimit."
   },
   {
     "id": 382,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое DaemonSet и когда его использовать?",
+    "q": "Какую гарантию задаёт DaemonSet?",
     "options": [
-      "Набор Pod'ов, запущенных на случайных нодах для балансировки нагрузки",
-      "Гарантирует запуск одного Pod'а на каждой (или выбранных) ноде; для агентов мониторинга, log-collector, network plugin",
-      "Сервис для управления фоновыми задачами по расписанию",
-      "Инструмент для управления системными демонами Linux на нодах"
+      "Равномерно распределяет replicas count по available zones",
+      "Поддерживает Pod на каждой eligible node или выбранном subset nodes",
+      "Запускает один Job после изменения cluster configuration",
+      "Создаёт systemd unit для каждого container in namespace"
     ],
     "answer": 1,
-    "explanation": "DaemonSet запускает Pod на каждой ноде (или на нодах по nodeSelector/affinity). При добавлении новой ноды Pod автоматически создаётся. Используется для: fluentd/filebeat (логи), node-exporter (метрики), Calico/Cilium (сеть), kube-proxy."
+    "explanation": "DaemonSet controller поддерживает Pod на всех eligible nodes или на subset, ограниченном nodeSelector и affinity. Taints и tolerations также влияют на eligibility. При появлении подходящей node controller создаёт Pod. Типичные workloads — node metrics, log collection и networking agents."
   },
   {
     "id": 383,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
-    "q": "Чем отличаются Taints и Tolerations от NodeAffinity?",
+    "q": "Как совместно работают taints, tolerations и node affinity?",
     "options": [
-      "Они идентичны, просто разный синтаксис",
-      "NodeAffinity запрещает ноды, Taints — рекомендует",
-      "Taints — запрещают размещение Pod'ов на ноде если нет Toleration; NodeAffinity — правила предпочтения/требования планировщика",
-      "Taints используются для Node, Tolerations — для Namespace"
+      "Taint выбирает node для Pod, toleration заменяет resource requests",
+      "Affinity evict-ит running Pods, toleration задаёт Pod Priority",
+      "Taint отталкивает; toleration допускает; affinity выбирает nodes",
+      "Toleration удаляет taint с node, affinity переписывает node labels"
     ],
     "answer": 2,
-    "explanation": "Taint на ноде отталкивает Pod'ы (NoSchedule/PreferNoSchedule/NoExecute). Toleration в Pod'е позволяет разместить его на ноде с конкретным taint. NodeAffinity задаёт требования к ноде через labels. PodAffinity/AntiAffinity — размещение относительно других Pod'ов."
+    "explanation": "Taints с effects NoSchedule, PreferNoSchedule или NoExecute отталкивают Pods. Matching toleration разрешает пройти это ограничение, но не притягивает Pod к node и не гарантирует scheduling. Node affinity независимо задаёт required или preferred selection по node labels."
   },
   {
     "id": 384,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "scenario",
-    "q": "Как реализовать canary-деплой в Kubernetes без Ingress-контроллера?",
+    "q": "Как получить простой canary без weighted router?",
     "options": [
-      "Настроить два ClusterIP Service на одном порту",
-      "Canary невозможен без Ingress или service mesh",
-      "Использовать PodDisruptionBudget для ограничения трафика",
-      "Использовать два Deployment с общим label в Service selector, контролируя число реплик"
+      "Создать два Services с одинаковым ClusterIP и port",
+      "Менять Service selector между stable и canary для каждого request",
+      "Использовать PodDisruptionBudget как процентную traffic policy",
+      "Свести stable и canary Pods под один Service, задав replica ratio"
     ],
     "answer": 3,
-    "explanation": "Два Deployment: stable (9 реплик) и canary (1 реплика) с одинаковым label (app: myapp). Service выбирает оба через selector. 10% трафика пойдёт на canary. Для точного процентного сплита нужен Ingress (weight) или service mesh (Istio VirtualService)."
+    "explanation": "Stable и canary Deployments могут создавать ready endpoints одного Service; отношение replicas даёт приблизительный traffic split. Это не точный процент запросов: распределение зависит от connections, readiness, topology и реализации dataplane. Для контролируемых weights нужен Gateway, Ingress controller или service mesh с такой функцией."
   },
   {
     "id": 385,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает etcd в Kubernetes и что происходит при потере кворума?",
+    "q": "Что означает потеря quorum в etcd для Kubernetes?",
     "options": [
-      "etcd — распределённое key-value хранилище состояния кластера; при потере кворума (n/2+1) API-server переходит в read-only",
-      "etcd — реляционная БД для хранения метрик кластера; при отказе кластер работает из кэша",
-      "etcd хранит только конфигурацию kubelet'ов",
-      "При отказе etcd Pod'ы продолжают работать, только нельзя создавать новые"
+      "etcd не commit-ит updates; API operations деградируют, running Pods могут продолжить",
+      "etcd выбирает minority leader и принимает writes до возврата peers",
+      "kubelets восстанавливают desired state из cache и заменяют etcd",
+      "API server переключается на SQL store до восстановления snapshot"
     ],
     "answer": 0,
-    "explanation": "etcd использует Raft consensus. Для записи нужен кворум (>50% members). При потере кворума: API server не может сохранять изменения (read-only). Работающие Pod'ы продолжают работать, но новые не создаются. Бэкап: etcdctl snapshot save. Рекомендуется 3 или 5 нод etcd."
+    "explanation": "etcd commit-ит consensus updates после подтверждения majority: floor(n/2)+1 members. При потере quorum он не делает progress, а Kubernetes API operations, которым нужны согласованные reads или writes, сбоят; API server не становится простым read-only store. Уже запущенные workloads могут продолжить на nodes, но управление desired state деградирует."
   },
   {
     "id": 386,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое QoS классы Pod'ов в Kubernetes и как они влияют на поведение при нехватке ресурсов?",
+    "q": "Как QoS влияет на eviction при memory pressure?",
     "options": [
-      "QoS классы определяют приоритет сетевого трафика Pod'а",
-      "Guaranteed (req=lim), Burstable (req<lim), BestEffort (нет req/lim); при нехватке памяти BestEffort убивается первым",
-      "QoS классы задаются вручную в аннотациях Pod'а",
-      "Guaranteed Pod'ы не могут быть вытеснены никогда"
+      "Guaranteed получает высокий eviction rank независимо от usage",
+      "Класс влияет через requests и usage вместе с Pod Priority; immunity нет",
+      "BestEffort резервирует memory request и вытесняет Burstable",
+      "QoS меняет CNI traffic priority, но не memory eviction"
     ],
     "answer": 1,
-    "explanation": "Guaranteed: requests == limits для всех контейнеров. Burstable: хотя бы один контейнер имеет requests. BestEffort: нет requests/limits. При OOM killer: BestEffort → Burstable (выше oom_score_adj) → Guaranteed (низший oom_score_adj). Guaranteed Pod'ы вытесняются только в крайнем случае."
+    "explanation": "Kubernetes выводит Guaranteed, Burstable или BestEffort из CPU/memory requests и limits containers. При node-pressure eviction сначала учитывается, превышает ли Pod requests, затем Pod Priority и величина превышения. Поэтому QoS влияет на результат, но не задаёт абсолютную очередь; Guaranteed Pod также может быть evicted или OOM-killed."
   },
   {
     "id": 387,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работают kube-proxy в режимах iptables и ipvs? В чём разница?",
+    "q": "Как сейчас оценивать kube-proxy modes iptables и IPVS?",
     "options": [
-      "iptables всегда быстрее ipvs из-за отсутствия userspace overhead",
-      "ipvs работает только с NodePort Service",
-      "iptables: правила для каждого Service (O(n) линейный поиск); ipvs: хэш-таблица (O(1)), поддерживает больше алгоритмов LB, масштабируется лучше",
-      "Режимы идентичны по производительности, разница только в инструментах управления"
+      "iptables использует userspace proxy, IPVS переписывает DNS records",
+      "IPVS стал default на Linux nodes и заменил nftables mode",
+      "Оба настраивают kernel dataplane; IPVS deprecated с Kubernetes 1.35",
+      "Modes отличаются CLI output, но создают одинаковые netfilter rules"
     ],
     "answer": 2,
-    "explanation": "iptables: правила просматриваются линейно, при тысячах Services деградирует. ipvs использует kernel hash tables (O(1)), поддерживает rr/lc/dh/sh/sed/nq алгоритмы. Для >1000 Services рекомендуется ipvs. Управление: ipvsadm vs iptables."
+    "explanation": "iptables mode создаёт netfilter rules для Services и endpoints; IPVS mode программирует kernel virtual services и предлагал другие load-balancing algorithms. Однако его соответствие Service semantics потребовало сложных обходов, поэтому IPVS mode deprecated начиная с Kubernetes 1.35. На поддерживаемых kernels nftables mode рассматривается как современная замена."
   },
   {
     "id": 388,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "scenario",
-    "q": "Pod получает статус OOMKilled. Как диагностировать и предотвратить без простого увеличения лимита?",
+    "q": "Как разбирать OOMKilled без blind increase memory limit?",
     "options": [
-      "Перенести Pod на ноду с большим объёмом RAM",
-      "OOMKilled всегда означает баг в приложении, нужно обновить версию",
-      "Установить --memory-swap для разрешения swap",
-      "kubectl describe pod (причина, limit), профилирование через kubectl top/heap dumps, VPA для рекомендаций, анализ memory leaks в коде"
+      "Перенести Pod на node с большей RAM, оставив прежний cgroup limit",
+      "Включить swap и считать memory profile несущественным для анализа",
+      "Сбросить restart count и повторять Pod до другого exit code",
+      "Сверить lastState, limit, metrics и app profile для leak или peak"
     ],
     "answer": 3,
-    "explanation": "Диагностика: kubectl describe pod → LastState.ExitCode=137. kubectl top pod для текущего потребления. VPA (Vertical Pod Autoscaler) анализирует историю и рекомендует limits. Профилирование heap: pprof (Go), jmap (JVM), memory_profiler (Python). Возможна утечка памяти."
+    "explanation": "Сначала подтверждают reason OOMKilled и exit code в lastState, затем сравнивают container limit с историческими metrics и memory working set. kubectl top показывает текущее, а не прошедший spike. Heap/native profiles, logs и нагрузочный сценарий помогают отличить leak, unbounded cache и допустимый peak; requests/limits меняют после полученных данных."
   },
   {
     "id": 389,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое Operator и Custom Resource Definition (CRD)?",
+    "q": "Как связаны CRD и Operator pattern?",
     "options": [
-      "CRD расширяет API Kubernetes новыми типами ресурсов; Operator — контроллер, управляющий этими CRD и реализующий operational knowledge",
-      "Operator — администратор кластера, CRD — его права доступа",
-      "CRD — это ConfigMap с кастомной схемой",
-      "Operator используется только для баз данных в Kubernetes"
+      "CRD добавляет API type/schema; controller reconciles instances к desired state",
+      "CRD является controller binary, Operator — RBAC role администратора",
+      "Operator хранит app state в ConfigMap вместо API resources",
+      "CRD запускает reconciliation loop без отдельного controller code"
     ],
     "answer": 0,
-    "explanation": "CRD позволяет определить новый тип ресурса (например, Kafka, PostgresCluster). Operator — это Kubernetes-контроллер (watch → reconcile loop), который управляет этим CRD, автоматизируя operational задачи: backup, failover, scaling. Примеры: cert-manager, prometheus-operator."
+    "explanation": "CRD расширяет Kubernetes API схемой и endpoints нового resource type, но сам не реализует поведение. Operator pattern использует controller с domain knowledge: он наблюдает custom и при необходимости built-in resources и reconciles actual state к desired state. Operator может применять CRD, но эти понятия не являются одним объектом."
   },
   {
     "id": 390,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Какие компромиссы между Helm и Kustomize для управления Kubernetes-манифестами?",
+    "q": "Как выбирать между Helm и Kustomize?",
     "options": [
-      "Helm всегда лучше для production, Kustomize — только для разработки",
-      "Helm: шаблонизация, версионирование chart'ов, хуки, но сложный синтаксис; Kustomize: простые overlays без шаблонов, встроен в kubectl, но ограниченные возможности",
-      "Kustomize заменяет Helm полностью начиная с Kubernetes 1.20",
-      "Они решают разные задачи и не взаимозаменяемы"
+      "Helm patch-ит live objects, Kustomize хранит release history",
+      "Helm пакует templated charts/releases; Kustomize меняет YAML overlays",
+      "Kustomize даёт lifecycle hooks, chart registry и rollback revisions",
+      "Оба render-ят manifests из одного template language и values files"
     ],
     "answer": 1,
-    "explanation": "Helm: мощная шаблонизация (Go templates), chart registry, lifecycle hooks, тестирование. Недостатки: сложность отладки, скользкий синтаксис. Kustomize: patching поверх base без шаблонов, читаемые YAML, встроен в kubectl. Часто используются вместе: Helm для сторонних chart'ов + Kustomize для overlays."
+    "explanation": "Helm отвечает за package/release lifecycle: Go templates, values, chart dependencies, hooks, history и rollback. Kustomize декларативно transforms и patch-ит YAML bases через overlays без отдельного template language и release state. Их можно сочетать, но сложность generated manifests и ownership нужно контролировать."
   },
   {
     "id": 391,
