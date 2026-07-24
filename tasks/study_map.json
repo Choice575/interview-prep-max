@@ -1,8 +1,13 @@
 {
-  "version": "4.0.0",
-  "title": "DevOps Plan v4 Middle+/Senior: Weeks 1-32 Study Map",
+  "version": "5.1.0",
+  "title": "Учебный план DevOps + AI v5.1: 32 недели",
   "profile": "devops",
   "language": "ru",
+  "sourceDocument": "devops_learning_plan_v5.1.md",
+  "status": "active",
+  "durationWeeks": 32,
+  "weeklyHours": "5-8",
+  "targetOutcome": "Готовность к собеседованиям Junior+/начального Middle, практическая база уровня Middle по отдельным темам и Senior-track мышление в учебных инцидентах.",
   "weeklyRhythm": {
     "monday": "Новая тема и базовая практика",
     "tuesday": "Углубление и работа с выводом команд",
