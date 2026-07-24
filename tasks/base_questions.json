@@ -8274,450 +8274,450 @@
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое Ansible Collection и как организована его структура?",
+    "q": "Как Ansible Collection организует и публикует переиспользуемый контент?",
     "options": [
-      "Collection — это просто папка с playbooks",
-      "Collections поддерживают только официальные Ansible модули",
-      "Collection: namespace.name структура; содержит roles/, modules/, plugins/, playbooks/, tests/; устанавливается через ansible-galaxy collection install; requirements.yml для зависимостей; galaxy.yml метаданные",
-      "Collection нельзя публиковать в Automation Hub"
+      "Она группирует inventory и ansible.cfg одного проекта, а namespace вычисляет из имени каталога playbook",
+      "Она упаковывает Python virtualenv с ansible-core, а роли загружает отдельно из requirements.yml при запуске",
+      "Она имеет имя namespace.name, содержит roles, playbooks и plugins, а ресурсы адресуются через FQCN",
+      "Она объединяет несколько Execution Environment, а galaxy.yml выбирает container image для каждой роли"
     ],
     "answer": 2,
-    "explanation": "Структура: namespace/collection/roles/, plugins/modules/, plugins/lookup/, plugins/filter/, plugins/callback/, playbooks/, tests/. galaxy.yml: namespace, name, version, dependencies. ansible-galaxy collection install my_namespace.my_collection. В playbook: collections: [my_namespace.my_collection] или FQCN: my_namespace.my_collection.my_module."
+    "explanation": "Collection — дистрибутивный формат с namespace и name. В ней могут быть plugins, roles, playbooks, docs и metadata; galaxy.yml описывает сборку и зависимости, а meta/runtime.yml — runtime metadata. FQCN вида namespace.collection.module устраняет неоднозначность и делает источник контента явным."
   },
   {
     "id": 572,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как написать custom Ansible module на Python с поддержкой check mode?",
+    "q": "Что должен сделать custom module, чтобы корректно поддержать check mode?",
     "options": [
-      "Custom модули пишутся только на bash",
-      "AnsibleModule не поддерживает сложные типы аргументов",
-      "Check mode в custom модулях включается автоматически без кода",
-      "AnsibleModule(argument_spec, supports_check_mode=True); module.check_mode для условного пропуска изменений; module.exit_json(changed=True/False, result=...); module.fail_json(msg='error')"
+      "Добавить check_mode в argument_spec и доверить action plugin откатить изменения после выполнения модуля",
+      "Вызвать exit_json до валидации параметров, а прогноз changed вычислить на control node из diff результата",
+      "Запустить внешнюю команду с флагом dry-run, даже если команда не умеет предсказывать итоговое состояние",
+      "Создать AnsibleModule с supports_check_mode, проверить module.check_mode и вернуть прогноз без мутации"
     ],
     "answer": 3,
-    "explanation": "from ansible.module_utils.basic import AnsibleModule. argument_spec: type (str/int/bool/list/dict), required, default, choices, no_log. supports_check_mode=True: если module.check_mode, skip действие, вернуть changed=True (если бы изменилось). diff: module.exit_json(diff={'before': old, 'after': new}). Документация: DOCUMENTATION, EXAMPLES, RETURN YAML strings."
+    "explanation": "supports_check_mode=True объявляет поддержку, но не реализует её автоматически. Модуль должен определить текущее и желаемое состояние, в module.check_mode не выполнять мутацию и вернуть корректный changed, а при обычном запуске применить изменение. Ошибки передают через fail_json, результат и diff — через exit_json."
   },
   {
     "id": 573,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Чем include_tasks отличается от import_tasks и когда использовать каждый?",
+    "q": "В чём практическая разница между import_tasks и include_tasks?",
     "options": [
-      "import_tasks: статический (pre-processed), теги и when применяются к задачам внутри; include_tasks: динамический (runtime), переменные loop работают, но теги не propagate автоматически в задачи внутри",
-      "include_tasks и import_tasks полностью идентичны",
-      "include_tasks нельзя использовать в handlers",
-      "import_tasks не поддерживает переменные в имени файла"
+      "Import разворачивается при разборе и наследует keywords дочерним tasks; include вычисляется во время выполнения и допускает loop",
+      "Import загружает задачи на managed host, а include исполняет их на control node через локальный action plugin",
+      "Include создаёт отдельный play для файла, а import добавляет handler, который запускается после завершения текущего play",
+      "Include фиксирует имена файлов до чтения inventory, а import позволяет шаблонизировать путь результатами предыдущих tasks"
     ],
     "answer": 0,
-    "explanation": "import_tasks: задачи встраиваются статически до выполнения — теги работают на включённые задачи, --list-tasks показывает их. Нельзя: include_tasks с loop или when на переменную, которой нет при парсинге. include_tasks: динамически, можно {{ variable }}_tasks.yml в имени файла, loop с include, but: теги нужно передавать явно apply: tags:. Roles: include_role vs import_role аналогично."
+    "explanation": "Статический import раскрывается заранее: его tasks видны в --list-tasks, а tags и when import применяются к импортированным задачам. Динамический include обрабатывается при достижении, поэтому поддерживает loop и runtime-шаблонизацию имени. Tags include по умолчанию относятся к самому include; для дочерних задач используют apply или теги внутри файла."
   },
   {
     "id": 574,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает Ansible Vault с несколькими ключами (vault-id)?",
+    "q": "Как vault IDs помогают работать с несколькими паролями Ansible Vault?",
     "options": [
-      "Ansible Vault поддерживает только один глобальный пароль",
-      "vault-id: --vault-id label@source (label@prompt, label@/path/to/file, label@script); файл может содержать несколько зашифрованных значений с разными vault-id; ansible-vault encrypt_string --vault-id prod@vault_pass_prod",
-      "Несколько vault-id нельзя использовать в одном playbook",
-      "vault-id работает только в Ansible Tower/AWX"
+      "ID хранит пароль в заголовке ciphertext и позволяет расшифровать файл без prompt, password file или client script",
+      "Флаг label@source связывает метку с источником пароля; метка является hint, если не включён строгий match",
+      "ID создаёт отдельный cipher для каждой YAML-переменной и выбирает алгоритм шифрования по имени environment",
+      "ID выдаётся Automation Controller для одного job и заменяет Vault header после каждого успешного запуска playbook"
     ],
     "answer": 1,
-    "explanation": "Синтаксис: $ANSIBLE_VAULT;1.2;AES256;label — label идентифицирует какой ключ использовать. --vault-id dev@dev_pass --vault-id prod@prod_pass — Ansible попробует подходящий ключ. encrypt_string: ansible-vault encrypt_string 'секрет' --vault-id prod@prompt --name 'db_password'. Преимущество: разные секреты шифруются разными командами без общего ключа."
+    "explanation": "--vault-id dev@prompt, dev@file или dev@script передаёт label и источник секрета. Label хранится открыто в vault header версии 1.2, но по умолчанию служит подсказкой: Ansible пробует предоставленные пароли. DEFAULT_VAULT_ID_MATCH ограничивает попытки совпадающей меткой, однако не гарантирует единый пароль для всех данных с этим label."
   },
   {
     "id": 575,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как настроить Molecule для тестирования Ansible роли?",
+    "q": "Что должен проверять полноценный Molecule scenario для Ansible role?",
     "options": [
-      "Molecule — только для синтаксической проверки playbooks",
-      "Molecule поддерживает только Docker driver",
-      "Molecule: molecule init role; molecule.yml (driver: docker/vagrant/delegated), converge.yml (apply role), verify.yml (testinfra/pytest/ansible); molecule test запускает полный цикл create→converge→verify→destroy",
-      "Molecule тестирует только idempotency без проверки функциональности"
+      "Scenario сравнивает YAML с JSON Schema, а состояние instance после converge не участвует в результате теста",
+      "Scenario запускает роль на inventory из production и откатывает каждый changed task через автоматически созданный handler",
+      "Scenario создаёт instances, выполняет converge, проверяет idempotence и assertions, затем очищает ресурсы",
+      "Scenario измеряет длительность tasks, а роль считается корректной, если второй запуск быстрее первого на заданный процент"
     ],
     "answer": 2,
-    "explanation": "molecule/default/molecule.yml: driver.name (docker, vagrant, ec2, delegated). platforms: name, image, pre_build_image. provisioner: name: ansible, options, config_options. verifier: name: ansible или testinfra. Сценарии: несколько scenarios для разных OS. molecule converge — только apply. molecule idempotency — второй прогон должен вернуть changed=0. CI: запуск в GitLab/GitHub Actions."
+    "explanation": "Molecule организует сценарий вокруг create/prepare/converge/idempotence/verify/cleanup/destroy в зависимости от sequence. Converge применяет роль, idempotence выявляет повторные изменения, verify проверяет фактическое состояние. Drivers и verifiers могут поставляться отдельными plugins, поэтому конфигурацию и CI-окружение нужно закреплять версиями."
   },
   {
     "id": 576,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает Ansible callback plugin и для чего используется?",
+    "q": "Как callback plugins получают события Ansible и как их активировать?",
     "options": [
-      "Callback plugin — это просто альтернативное название для filter plugin",
-      "Можно активировать только один callback plugin одновременно",
-      "Callback plugins работают только в AWX/Tower",
-      "Callback plugin: хуки на события playbook (v2_playbook_on_start, v2_runner_on_ok/failed/skipped, v2_playbook_on_stats); используется для кастомного вывода, нотификаций (Slack, PagerDuty), audit logging, metrics"
+      "Plugin опрашивает result cache после play и восстанавливает события по ansible_facts каждого inventory host",
+      "Plugin заменяет strategy и получает tasks до templating, поэтому несколько notification callbacks создают конфликт",
+      "Plugin работает как remote module: копируется на host и отправляет результаты в stdout через SSH connection",
+      "CallbackBase получает runner/playbook hooks; один stdout выбирает stdout_callback, прочие — callbacks_enabled"
     ],
     "answer": 3,
-    "explanation": "Базовый класс: CallbackBase. CALLBACK_TYPE: stdout (один активный) или notification/aggregate (несколько). Активация: ansible.cfg [defaults] callback_whitelist=slack_callback,my_callback или ANSIBLE_CALLBACKS_ENABLED. Примеры: timer (время выполнения), profile_tasks (топ медленных задач), json (вывод в JSON), slack (нотификации), ara (веб-интерфейс для записи)."
+    "explanation": "Callback plugins подписываются на hooks вроде v2_runner_on_ok и v2_playbook_on_stats. Главным менеджером консольного вывода может быть один CALLBACK_TYPE=stdout, выбранный stdout_callback. Notification и aggregate callbacks включают через callbacks_enabled; это актуальное имя настройки вместо прежнего callback_whitelist."
   },
   {
     "id": 577,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как реализовать динамический инвентарь для AWS с помощью плагина?",
+    "q": "Как устроен inventory source на базе amazon.aws.aws_ec2?",
     "options": [
-      "aws_ec2 inventory plugin: aws_ec2.yml с plugin: amazon.aws.aws_ec2; regions, filters, keyed_groups (теги → Ansible группы); hostnames (предпочтительное имя хоста); compose для переменных",
-      "Динамический инвентарь AWS требует написания bash скрипта",
-      "Динамический инвентарь работает только с EC2 classic",
-      "aws_ec2 plugin требует установки boto3 только на target hosts"
+      "YAML source включает plugin, regions и filters; compose/keyed_groups строят hostvars и группы, API вызывается с controller",
+      "Плагин устанавливает Python и boto libraries на каждую EC2 instance, затем получает tags из instance metadata",
+      "Source импортирует вывод aws cli как статический INI, а обновление требует пересоздать inventory перед каждым task",
+      "Плагин читает Terraform state на managed hosts и формирует группы из resource address без обращения к AWS API"
     ],
     "answer": 0,
-    "explanation": "aws_ec2.yml: plugin: amazon.aws.aws_ec2; regions: [us-east-1]; filters: instance-state-name: running; keyed_groups: - key: tags.Environment; prefix: env. hostnames: [tag:Name, ip-address]. compose: ansible_host: public_ip_address. Запуск: ansible-inventory -i aws_ec2.yml --list. Кэш: cache: yes; cache_plugin: jsonfile; cache_timeout: 3600."
+    "explanation": "Inventory plugin выполняется там, где запускается Ansible, и использует AWS SDK/credentials этого окружения. Конфигурация задаёт regions, filters и hostnames; compose вычисляет hostvars, keyed_groups создаёт группы из атрибутов и tags. Для больших inventory полезен cache plugin с осознанным timeout."
   },
   {
     "id": 578,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое AWX/AAP (Ansible Automation Platform) и как устроены Workflows?",
+    "q": "Что добавляет Workflow Job Template поверх отдельного Job Template в AWX/AAP?",
     "options": [
-      "AWX — это просто веб-интерфейс для запуска ansible-playbook",
-      "AWX: Job Templates (playbook + inventory + credentials), Workflows (DAG из Job Templates с условиями on_success/on_failure/always), RBAC, schedules, webhook triggers, API-first архитектура",
-      "Workflow в AWX не поддерживает условные ветки",
-      "AWX не поддерживает работу с Vault credentials"
+      "Он объединяет tasks одного play в блоки и заменяет block/rescue условиями success и failure на уровне task",
+      "Он строит DAG из jobs, sync и approval nodes с переходами success/failure/always и единым RBAC launch point",
+      "Он создаёт Kubernetes Pod для каждого module invocation и передаёт register values между ними через inventory",
+      "Он компилирует playbooks в Execution Environment image и публикует этот image после прохождения approval node"
     ],
     "answer": 1,
-    "explanation": "Workflow Job Template: визуальный DAG редактор. Nodes: Job Template, Inventory Source Sync, Approval. Edges: on_success, on_failure, always. Workflow Variables передаются между nodes. API: POST /api/v2/workflow_job_templates/<id>/launch/. Webhook: GitHub/GitLab push → trigger job. Survey: форма для runtime variables. RBAC: Organization → Team → User → Role (Admin/Execute/Read)."
+    "explanation": "Workflow связывает job templates и другие узлы, например project/inventory sync и approval, направленными ветвями. Переход выбирается по success, failure или always; survey, credentials и RBAC контролируют запуск. Данные, явно опубликованные job через set_stats как artifacts, могут использоваться downstream, но обычные локальные variables не становятся глобальными автоматически."
   },
   {
     "id": 579,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает Ansible connection plugin mitogen и каковы его преимущества?",
+    "q": "Как безопасно оценивать Mitogen как ускоритель Ansible?",
     "options": [
-      "Mitogen — это способ шифрования Ansible трафика",
-      "Mitogen несовместим с Ansible Collections",
-      "Mitogen: alternative connection/strategy plugin; переиспользует SSH соединения, выполняет Python напрямую (не fork+exec), кэширует файлы модулей; ускорение 1.5-7x для больших инвентарей",
-      "Mitogen требует установки агента на target hosts"
+      "Считать его встроенной strategy ansible-core и включать без version pin, поскольку интерфейс plugins стабилен между releases",
+      "Использовать его как daemon на managed hosts, который заменяет SSH и принимает модули через постоянный TCP port",
+      "Рассматривать как сторонний plugin, сверять совместимость версий и benchmark; сначала настроить native transport",
+      "Применять его для сетевых devices с httpapi, где он преобразует REST response в факты и ускоряет API pagination"
     ],
     "answer": 2,
-    "explanation": "Стандартный Ansible: каждая задача = SSH + python -c ... Mitogen: один SSH tunnel per host, Python interpreter injection, module code передаётся по pipe без sftp/scp. Конфигурация: strategy_plugins = /path/to/mitogen/ansible_mitogen/plugins/strategy; strategy = mitogen_linear. Ограничения: не поддерживает все модули (raw, script, become method su). Отлично для scale (1000+ hosts)."
+    "explanation": "Mitogen for Ansible — сторонняя реализация strategy/connection оптимизаций, а не гарантия ansible-core. Совместимость зависит от конкретных версий, collections, become и типов задач, поэтому нужны pinning и репрезентативный тест. До добавления plugin стоит измерить native SSH multiplexing, pipelining, forks, fact gathering и bottleneck модулей."
   },
   {
     "id": 580,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как реализовать event-driven automation с Ansible EDA (Event-Driven Ansible)?",
+    "q": "Из каких частей состоит Event-Driven Ansible rulebook?",
     "options": [
-      "EDA — это просто cron-based планировщик для Ansible",
-      "EDA не интегрируется с AWX/AAP",
-      "EDA работает только с Prometheus alerts",
-      "EDA: rulebooks (sources + rules + actions); sources: kafka, webhooks, alertmanager, aws_sqs; rules: условия (event.payload.status == 'firing'); actions: run_playbook, run_job_template, debug"
+      "Из cron expression, inventory refresh и playbook, который controller запускает по расписанию без входного event",
+      "Из callback, fact cache и handler, который сравнивает прошлый result с текущим после завершения обычного play",
+      "Из webhook ingress, Jinja template и workflow survey, который пользователь подтверждает перед каждым условием",
+      "Из event sources, condition rules и actions, например запуска playbook или job template по совпавшему событию"
     ],
     "answer": 3,
-    "explanation": "Rulebook структура: - name; hosts; sources: (плагин + параметры); rules: - name; condition; action. ansible-rulebook -i inventory -r rulebook.yml --verbose. Sources: ansible.eda.webhook (HTTP events), ansible.eda.kafka (Kafka consumer), ansible.eda.alertmanager. Actions: run_playbook (локально), run_job_template (AWX API), post_event (в очередь). EDA Controller в AAP 2.4+."
+    "explanation": "Rulebook подключает source plugins к потокам событий, сопоставляет события условиями и вызывает actions. Source может получать webhook, сообщение очереди или alert; action — запустить playbook/job template, вывести debug или отправить событие дальше. Надёжность требует продумать дедупликацию, storm control, credentials и идемпотентность действий."
   },
   {
     "id": 581,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работают lookup plugins и приведите примеры практического использования?",
+    "q": "Где выполняется lookup plugin и чем query обычно отличается от lookup?",
     "options": [
-      "Lookup возвращает данные из внешних источников на control node; file, env, template, pipe (shell output), url, aws_ssm, hashi_vault, password (generate/store), csvfile, ini",
-      "Lookup plugins используются только для чтения файлов",
-      "Lookup plugins выполняются на target hosts",
-      "Lookup результаты нельзя использовать в with_items"
+      "Lookup получает данные при templating на control node; query возвращает list, а lookup может вернуть scalar либо wantlist",
+      "Lookup запускается как module на managed host; query выполняет тот же код параллельно на всех hosts текущего batch",
+      "Lookup обращается к inventory server после task; query читает register values из fact cache следующего play",
+      "Lookup исполняется внутри Jinja sandbox на remote host; query переносит результат через callback в controller memory"
     ],
     "answer": 0,
-    "explanation": "{{ lookup('file', '/etc/ssl/cert.pem') }} — содержимое файла. {{ lookup('env', 'HOME') }} — переменная среды. {{ lookup('pipe', 'date +%Y%m%d') }} — вывод команды. {{ lookup('hashi_vault', 'secret/data/db:password') }} — Vault KV. {{ lookup('url', 'https://api.example.com/config') }} — HTTP. query() vs lookup(): query всегда возвращает список, lookup — строку (wantlist=True для списка)."
+    "explanation": "Lookups читают file, environment, secret store и другие источники на control side во время templating. query() обеспечивает list-friendly результат для loop, тогда как lookup() исторически часто возвращает строку и поддерживает wantlist=True. Секретный результат всё равно может попасть в task output, поэтому применяют no_log и безопасную обработку ошибок."
   },
   {
     "id": 582,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как написать custom filter plugin для Ansible?",
+    "q": "Как устроен custom Jinja filter plugin для Ansible?",
     "options": [
-      "Custom filter plugins пишутся только на Ruby",
-      "Python файл в filter_plugins/ или collection plugins/filter/; класс FilterModule с методом filters() возвращающим dict {name: function}; функция принимает value + опциональные args",
-      "Custom filters не поддерживают аргументы",
-      "Filter plugins работают только с строками"
+      "Это YAML-файл с mapping filter→shell command; Ansible запускает command на managed host для каждого template value",
+      "Python-класс FilterModule возвращает name→callable из filters(); файл размещают в filter_plugins или Collection",
+      "Это action plugin с методом run(), который изменяет hostvars и возвращает отфильтрованный inventory pattern",
+      "Это callback с методом v2_runner_on_ok, который переписывает result перед register и последующим templating"
     ],
     "answer": 1,
-    "explanation": "class FilterModule: def filters(self): return {'my_filter': self.my_filter} def my_filter(self, value, arg1='default'): return processed_value. Путь поиска: filter_plugins/ рядом с playbook, ~/.ansible/plugins/filter/, ansible.cfg [defaults] filter_plugins=./filter_plugins. FQCN в collection: my_ns.my_col.my_filter. Тест: from filter_plugins.my_filter import FilterModule."
+    "explanation": "Filter plugin выполняется на control side как часть Jinja templating. FilterModule.filters() экспортирует отображение имён в Python callables; функции принимают входное значение и дополнительные аргументы. В Collection plugin находится в plugins/filter и адресуется FQCN; ошибки лучше возвращать понятным AnsibleFilterError."
   },
   {
     "id": 583,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает Ansible Execution Environment (EE) и зачем нужен ansible-builder?",
+    "q": "Как связаны Ansible Execution Environment и ansible-builder?",
     "options": [
-      "Execution Environment — это VM для запуска Ansible",
-      "EE работает только в cloud окружениях",
-      "EE: OCI container image с Ansible + collections + Python dependencies; ansible-builder создаёт EE из execution-environment.yml; обеспечивает воспроизводимость; AWX/AAP запускает job в EE контейнере",
-      "ansible-builder требует Docker Enterprise"
+      "EE — это persistent VM с inventory, а builder создаёт snapshot после каждого job для повторного запуска tasks",
+      "EE — это Python venv на managed host, а builder синхронизирует его через module_utils перед выполнением play",
+      "EE — OCI image с automation runtime и dependencies, а builder по definition создаёт build context и image",
+      "EE — это AWX database schema, а builder преобразует project repository в workflow nodes и credentials"
     ],
     "answer": 2,
-    "explanation": "execution-environment.yml: version, build_arg_defaults, ansible_config, dependencies (python, system, galaxy — requirements files), images (base). ansible-builder build -t my_ee:1.0 -f execution-environment.yml. Базовые образы: ee-minimal, ee-supported (Red Hat). Слои: base + galaxy collections + python packages + system packages. AWX: Container Group использует EE. ansible-navigator для локальной разработки с EE."
+    "explanation": "Execution Environment упаковывает ansible-core/runner, collections, Python и system dependencies в OCI image. ansible-builder читает execution-environment definition, разрешает requirements и создаёт воспроизводимый build context, после чего container tool собирает image. Версии base image и зависимостей нужно фиксировать и сканировать."
   },
   {
     "id": 584,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как настроить fact caching в Ansible для больших инвентарей?",
+    "q": "Как fact caching сокращает повторный сбор данных на большом inventory?",
     "options": [
-      "Fact caching отключает gather_facts полностью",
-      "Fact caching несовместим с dynamic inventory",
-      "Fact caching работает только для custom facts",
-      "ansible.cfg: fact_caching=jsonfile/redis/memcached; fact_caching_connection=/path или redis://; fact_caching_timeout=86400; gather_facts=smart (собирает только если кэш устарел); существенно ускоряет повторные запуски"
+      "Он отключает setup module и подставляет hostvars из inventory независимо от давности, connection и gather_facts",
+      "Он сохраняет stdout всех tasks и воспроизводит успешный result, пока checksum playbook остаётся прежним",
+      "Он использует inventory cache как единый backend и обновляет facts при каждом обращении hostvars к отсутствующему key",
+      "Cache plugin хранит facts с timeout; smart gathering переиспользует свежие данные, set_fact cacheable добавляет свои"
     ],
     "answer": 3,
-    "explanation": "gather_facts: smart — если кэш актуален, не собирает; yes — всегда; no — никогда. Backends: jsonfile (файлы в директории), redis (redis-py), memcached. Формат ключа: hostname. Обновление: ansible host -m setup принудительно обновляет. В playbook: set_fact cacheable: yes — сохраняет custom fact в кэш. Полезно: 1000+ hosts, факты собираются 5-10 сек на хост."
+    "explanation": "Fact cache backend, например jsonfile или Redis plugin, сохраняет gathered facts между runs. Gathering policy smart может не повторять setup, пока cache entry действителен; timeout задаёт допустимую давность. set_fact cacheable создаёт также более низкоприоритетный cached fact, а inventory caching настраивается отдельно."
   },
   {
     "id": 585,
     "topic": "Ansible",
     "level": "Senior",
     "category": "scenario",
-    "q": "Ansible playbook зависает на конкретном host. Как диагностировать?",
+    "q": "Как локализовать причину зависания playbook на одном host?",
     "options": [
-      "ANSIBLE_DEBUG=1; -vvvv для verbose; async + poll=0 с async_status; timeout параметр задач; проверить SSH соединение вручную; strace python process; ansible.cfg: timeout=30",
-      "Убить процесс ansible и перезапустить",
-      "Просто добавить ignore_errors: yes",
-      "Перезагрузить target host"
+      "Запустить с -vvvv, проверить SSH и become вручную, определить зависший module/command и затем подобрать timeout или async",
+      "Удалить persistent sockets и увеличить forks до числа hosts, не проверяя фазу connection и состояние remote process",
+      "Добавить ignore_errors ко всем tasks и считать host исправным, если play доходит до следующего inventory batch",
+      "Переключить strategy на free и перезагрузить host после play, чтобы controller не ожидал stdout текущего module"
     ],
     "answer": 0,
-    "explanation": "ansible-playbook -vvvv: verbose SSH, module execution. ANSIBLE_DEBUG=1: полный debug. SSH зависание: ControlMaster соединение stuck — удалить ~/.ansible/cp/. Задача зависла: async: 60; poll: 0 + async_status модуль. Timeout: ansible.cfg: timeout=30 (SSH connection), task timeout: ansible.builtin.async_status. SSH параметры: ServerAliveInterval, ServerAliveCountMax в ssh_args."
+    "explanation": "Сначала определяют границу: DNS/SSH, privilege escalation, transfer, Python module или внешняя команда. -vvvv показывает connection details; ручной SSH с теми же параметрами и проверка remote process уточняют причину. Connection timeout, task timeout или async/poll применяют после диагностики и с учётом поддержки async конкретным action."
   },
   {
     "id": 586,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает стратегия free в Ansible и когда её применять?",
+    "q": "Как strategy: free меняет порядок выполнения относительно linear?",
     "options": [
-      "Стратегия free означает выполнение без ограничений на хостах",
-      "strategy: free — каждый host выполняет задачи независимо, не ждёт остальных (vs linear: все хосты синхронизируются после каждой задачи); ускоряет при неоднородных хостах; host_pinned — free но без перехода к следующему play",
-      "Free strategy запускает все задачи параллельно на каждом хосте",
-      "Free strategy отключает error handling"
+      "Она снимает forks limit и запускает все tasks каждого host одновременно, сохраняя порядок через handler queue",
+      "Каждый host идёт к следующей task, не ожидая остальные hosts; forks сохраняет предел, а зависимости могут дать race",
+      "Она случайно перемешивает inventory перед каждым task, но оставляет barrier между tasks на уровне текущего play",
+      "Она создаёт отдельный play process на host и объединяет registered results после завершения всех plays в run"
     ],
     "answer": 1,
-    "explanation": "linear (default): хосты A,B,C выполняют task1, все ждут, затем task2. free: хост A выполняет task1→task2→task3, не ожидая B и C. Эффективно: разные скорости хостов, независимые задачи. Осторожно: если задача зависит от завершения на других хостах — race condition. host_pinned: как free, но host не переходит к следующему play до завершения. Forks контролирует параллелизм."
+    "explanation": "Linear выполняет очередную task на текущем наборе hosts и ждёт barrier. Free разрешает быстрому host продвигаться по play, пока медленные hosts остаются на ранних tasks; число рабочих процессов всё равно ограничивают forks/throttle. Такой порядок подходит независимым hosts, но опасен при межхостовых предположениях и shared side effects."
   },
   {
     "id": 587,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает network automation в Ansible: connection: network_cli vs httpapi?",
+    "q": "Чем connection plugins network_cli, httpapi и netconf отличаются в network automation?",
     "options": [
-      "Network модули работают как обычные SSH модули",
-      "Оба метода идентичны для всех сетевых устройств",
-      "network_cli: SSH + CLI парсинг (show commands, configure mode); httpapi: REST/NETCONF API (более надёжный, structured data); ios/eos/nxos/junos модули; ansible_network_os определяет платформу",
-      "network_cli требует Python агента на сетевом устройстве"
+      "network_cli использует локальный shell, httpapi передаёт Python modules по SFTP, netconf запускает commands через sudo",
+      "network_cli и httpapi различаются форматом inventory, а netconf является filter plugin для XML response от CLI",
+      "network_cli ведёт CLI по SSH, httpapi обращается к HTTP(S) API, netconf передаёт XML RPC по SSH как отдельный transport",
+      "network_cli работает через SNMP, httpapi создаёт gRPC stream, netconf копирует candidate config обычным scp"
     ],
     "answer": 2,
-    "explanation": "network_cli: ansible_connection=ansible.netcommon.network_cli; ansible_network_os=cisco.ios.ios. Модули: ios_command (show), ios_config (configure). httpapi: EOS (eAPI), NXOS (NX-API), Junos (NETCONF). Persist connection: CONNECTION_PERSISTENT. ansible_become: enable mode. Рекомендации: предпочитать httpapi/NETCONF для idempotency. NAPALM: абстрактный слой над разными платформами."
+    "explanation": "Network modules обычно исполняются на control node и используют persistent connection plugin к устройству. network_cli взаимодействует с интерактивным CLI по SSH, httpapi — с platform API по HTTP/HTTPS, а ansible.netcommon.netconf — отдельный XML/SSH transport. ansible_network_os выбирает platform plugin и особенности протокола."
   },
   {
     "id": 588,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как настроить error handling с block/rescue/always в Ansible?",
+    "q": "Когда выполняются rescue и always в Ansible block?",
     "options": [
-      "block/rescue/always аналогичен try/catch только для одной задачи",
-      "always блок пропускается если rescue завершился с ошибкой",
-      "rescue блок не может содержать notify handlers",
-      "block: группа задач; rescue: выполняется при ошибке в block (как catch); always: выполняется всегда независимо от результата; ansible_failed_task и ansible_failed_result доступны в rescue"
+      "Rescue срабатывает после changed task, а always выполняется при отсутствии notify, чтобы заменить handler flush",
+      "Rescue перехватывает unreachable host и YAML syntax errors, а always возвращает host в active set после сбоя connection",
+      "Rescue откатывает changed tasks автоматически, а always повторяет failed task с теми же arguments после cleanup",
+      "Rescue идёт после failed task в block, always — после block/rescue; failed task/result доступны для обработки"
     ],
     "answer": 3,
-    "explanation": "block: [task1, task2] rescue: - name: cleanup; debug: msg: '{{ ansible_failed_task.name }}'; always: - name: send notification. Вложенные block возможны. ignore_errors: yes — задача помечается ok, но changed/failed статус. failed_when: переопределяет условие failure. any_errors_fatal: true на уровне play — ошибка на одном хосте останавливает всё."
+    "explanation": "Block группирует tasks и общие directives. Когда task возвращает failed, Ansible переходит в rescue; там доступны ansible_failed_task и ansible_failed_result, но rollback нужно описать явно. always выполняется после основной или rescue-ветки. Unreachable и ошибки разбора не обрабатываются rescue как обычный failed result."
   },
   {
     "id": 589,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как использовать Jinja2 macros и loop controls в Ansible templates?",
+    "q": "Для чего нужны Jinja macros и параметры loop_control в Ansible?",
     "options": [
-      "{% macro render_vhost(name, port) %}...{% endmacro %}; loop_control: label/pause/index_var/loop_var; | selectattr | map | unique | groupby фильтры для сложных трансформаций",
-      "Jinja2 macros в Ansible не поддерживаются",
-      "Jinja2 macros работают только в файлах templates/, не в tasks",
-      "loop_control поддерживает только label атрибут"
+      "Macro переиспользует rendering-логику; loop_control задаёт label, loop_var, index_var или pause без изменения items",
+      "Macro создаёт новый Ansible module во время templating; loop_control назначает forks для его remote invocations",
+      "Macro экспортирует host facts между plays; loop_control сохраняет каждый item в fact cache до следующего run",
+      "Macro компилирует template в Python package; loop_control выбирает strategy plugin для вложенной роли"
     ],
     "answer": 0,
-    "explanation": "Macros: определяются в template файле или через {% from 'macros.j2' import render_vhost %}. В tasks: loop_control: label: '{{ item.name }}' (чистый вывод), index_var: idx (индекс 0-based), pause: 2 (задержка между итерациями), loop_var: outer_item (переименование для вложенных loop). Фильтры: items | selectattr('active') | map(attribute='name') | list."
+    "explanation": "Jinja macro инкапсулирует повторяемую генерацию текста и может импортироваться из другого template. loop_control улучшает читаемость и безопасность loops: label сокращает вывод, loop_var предотвращает конфликт вложенных циклов, index_var даёт индекс, pause регулирует темп. Фильтры selectattr/map применяют преобразования до rendering."
   },
   {
     "id": 590,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое Ansible Pull mode и как он работает?",
+    "q": "Как ansible-pull меняет обычную push-модель управления?",
     "options": [
-      "Ansible Pull — это способ передачи файлов на хосты",
-      "ansible-pull: целевой хост сам клонирует git repo и запускает playbook локально; инвертирует push → pull модель; масштабируется горизонтально без нагрузки на control node; запускается через cron или systemd timer",
-      "ansible-pull требует Ansible Tower для работы",
-      "Pull mode не поддерживает Vault encrypted variables"
+      "Controller отправляет repository archive на hosts через rsync, а каждый host возвращает plan до подтверждения operator",
+      "Каждый host по расписанию получает repository и запускает playbook локально; масштаб проще, контроль результатов сложнее",
+      "Managed host открывает reverse SSH tunnel к controller, который исполняет стандартный play с централизованным inventory",
+      "Automation Controller опрашивает hosts по webhook и запускает workflow, когда локальная версия роли отстаёт от Galaxy"
     ],
     "answer": 1,
-    "explanation": "ansible-pull -U https://git.example.com/infra.git -i localhost, playbook.yml. Хост сам: git pull → ansible-playbook local.yml. Преимущества: 10000+ hosts (нет SSH от control node), offline nodes (при следующем запуске применят изменения). Недостатки: нет centralized view результатов (нужен ara/callback), сложнее secrets (Vault ключ на каждом хосте). ARA records results to DB."
+    "explanation": "ansible-pull запускается на управляемой машине, получает repository и применяет локальный playbook, часто из cron/systemd timer. Это уменьшает fan-out controller и подходит периодически доступным hosts. Цена — Ansible runtime и credentials на каждом host, возможные одновременные runs и необходимость отдельной централизованной наблюдаемости."
   },
   {
     "id": 591,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как тестировать идемпотентность Ansible ролей и что проверяет ansible-lint?",
+    "q": "Что проверяют Molecule idempotence и ansible-lint, а чего они не доказывают?",
     "options": [
-      "Идемпотентность проверяется только вручную",
-      "ansible-lint проверяет только синтаксис YAML",
-      "Molecule idempotency scenario: второй запуск converge должен вернуть changed=0; ansible-lint: синтаксис, best practices (no command/shell когда есть модуль, name на задачах, deprecated syntax, yaml lint)",
-      "Идемпотентность гарантирована для всех встроенных модулей"
+      "Idempotence проверяет YAML formatting, lint повторно запускает role и доказывает отсутствие изменений в production",
+      "Idempotence сравнивает package versions, lint выполняет integration tests на matrix поддерживаемых distributions",
+      "Idempotence ищет changed при повторном converge, lint применяет static rules; итоговое состояние проверяет verify",
+      "Idempotence откатывает role после failure, lint исправляет risky tasks и гарантирует совместимость collections"
     ],
     "answer": 2,
-    "explanation": "molecule test --scenario-name idempotency (или внутри molecule test). ansible-lint rules: no-changed-when (command/shell должны иметь changed_when), risky-file-permissions, latest (git/pip не latest), fqcn (использовать FQCN модулей). .ansible-lint конфиг: exclude_paths, warn_list, skip_list. pre-commit хук: ansible-lint в CI/CD. Testinfra/pytest: проверка итогового состояния системы."
+    "explanation": "Molecule idempotence повторяет converge и падает при неожиданном changed. ansible-lint статически проверяет syntax и набор правил, например FQCN, risky file permissions и changed_when для command-like tasks. Ни один инструмент сам по себе не доказывает функциональное состояние; assertions в verify и тестовая matrix закрывают эту часть."
   },
   {
     "id": 592,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как оптимизировать производительность Ansible для 1000+ хостов?",
+    "q": "Как системно ускорять Ansible run на тысячах hosts?",
     "options": [
-      "Просто увеличить forks до 1000",
-      "Единственный способ — использовать AWX",
-      "Производительность Ansible не масштабируется выше 100 хостов",
-      "forks=50-100; pipelining=True; mitogen strategy; fact caching (redis); gather_subset (minimal facts); async tasks; serial для rolling; ssh ControlMaster/ControlPersist; delegation для heavy tasks"
+      "Установить forks равным числу hosts и отключить SSH host-key checking, считая controller CPU и лимиты сети несущественными",
+      "Перевести все tasks в async poll=0 и завершать play до проверки результатов, чтобы долгие operations не занимали workers",
+      "Добавить serial: 1 и gather_facts: true, чтобы каждый host получил отдельный process и свежий полный набор facts",
+      "Измерить bottleneck, настроить forks/multiplexing/pipelining, сократить facts, применить cache и async к подходящим waits"
     ],
     "answer": 3,
-    "explanation": "pipelining=True: не нужен sftp, Python exec через SSH pipe (требует requiretty=False в sudoers). forks: ограничен CPU control node и SSH connections. gather_subset=min: только min facts (hostname, os_family). async: 300; poll: 0 для длительных задач → async_status в конце. Митоген: 3-7x ускорение. serial: 10 hosts за раз для rolling deploy. SSH multiplexing: ControlMaster auto; ControlPersist 60s."
+    "explanation": "Сначала профилируют task duration, controller CPU/memory, SSH setup и remote bottleneck. Затем подбирают forks под ресурсы, используют ControlPersist/pipelining там, где это безопасно, уменьшают gather_subset или включают fact cache. Async освобождает workers для поддерживаемых долгих операций, а serial управляет риском rollout, не является общей оптимизацией скорости."
   },
   {
     "id": 593,
     "topic": "Ansible",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое Ansible tags и как их использовать эффективно?",
+    "q": "Как tags взаимодействуют с import, include и выбором tasks в Ansible?",
     "options": [
-      "tags на task/block/role уровне; ansible-playbook --tags deploy,config; --skip-tags; специальные: always (всегда), never (только явно); --list-tags; теги наследуются дочерними задачами блока",
-      "Tags в Ansible работают только на уровне play",
-      "Tags нельзя применять к roles",
-      "always и never — зарезервированные системные теги без возможности переопределения"
+      "Tags выбирают tasks; import передаёт tag детям, у dynamic include tag относится к include без apply; есть always и never",
+      "Tags меняют variable precedence: import получает play vars, include получает inventory vars, always фиксирует extra vars",
+      "Tags выбирают hosts до inventory plugins, а skip-tags удаляет hosts из ansible_play_hosts для оставшихся tasks",
+      "Tags выполняются как conditions после module result, поэтому tagged task сначала меняет состояние, затем может быть пропущен"
     ],
     "answer": 0,
-    "explanation": "always: задача выполняется даже с --tags other_tag. never: только при --tags this_tag. Блок тегов: наследуется всеми задачами в block. Role tags: в playbook - role: my_role; tags: [deploy] — все задачи роли получают тег. --tags tagged: только задачи с хоть каким-то тегом. --tags untagged: только без тегов. Паттерн: теги для быстрого CI (--tags quick_check)."
+    "explanation": "--tags и --skip-tags формируют исполняемый набор, но не анализируют зависимости между задачами. Статический import наследует tags дочерним tasks. У dynamic include tag на statement не распространяется внутрь без apply: tags или внутренних tags. always обычно включён при tag filtering, а never требует явного выбора связанного tag."
   },
   {
     "id": 594,
     "topic": "Ansible",
     "level": "Middle",
     "category": "definition",
-    "q": "Как работает serial в Ansible и зачем использовать rolling deployment?",
+    "q": "Как serial управляет rolling deployment и областью ошибок?",
     "options": [
-      "serial запускает playbook только на одном хосте",
-      "serial: N или [1, 5, 10%] — поэтапный rolling deploy; play выполняется на N хостах, затем следующая группа; max_fail_percentage: остановить если X% хостов упали; обеспечивает zero-downtime при обновлении",
-      "serial конфликтует со стратегией free",
-      "serial: 0 означает параллельное выполнение"
+      "Он ограничивает forks внутри task, но следующий task начинается на всех hosts до завершения текущего batch",
+      "Он делит hosts на batches по числу, проценту или списку размеров; play завершается на batch перед следующим",
+      "Он создаёт отдельный inventory для каждой роли, а max_fail_percentage считается от всех hosts исходного repository",
+      "Он выполняет task по одному host в заданном order, но handlers откладывает до завершения последнего playbook run"
     ],
     "answer": 1,
-    "explanation": "serial: [1, 5, '10%'] — сначала 1 хост (canary), затем 5, затем 10% остальных. max_fail_percentage: 20 — если >20% упали, прервать play. Паттерн: pre_tasks: remove from LB → roles: deploy → post_tasks: add to LB, verify health. В сочетании с когда playbook останавливается при ошибке (any_errors_fatal: true) обеспечивает safe rolling update."
+    "explanation": "serial задаёт размер batch числом, процентом или последовательностью вроде [1, 5, 20%]. Ansible выполняет play для текущей партии перед следующей, поэтому удобно выводить hosts из LB и возвращать после проверки. Failure scope и max_fail_percentage относятся к batch; run_once вместе с serial также выполняется один раз в каждой партии."
   },
   {
     "id": 595,
     "topic": "Ansible",
     "level": "Middle",
     "category": "scenario",
-    "q": "Нужно обновить конфигурацию 500 серверов, но только если файл изменился. Как реализовать?",
+    "q": "Как обновить конфигурацию многих hosts и перезапустить сервис при реальном изменении?",
     "options": [
-      "Обновлять всегда, игнорируя изменения",
-      "Использовать shell: diff для сравнения файлов",
-      "template/copy модуль возвращает changed только при изменении контента (MD5 сравнение); handler вызывается только при changed; stat модуль для предварительной проверки; --check --diff для preview",
-      "Только синхронизация через rsync решает эту задачу"
+      "Запускать shell diff, затем shell cp и service restart в одном task, чтобы Ansible получил единый return code операции",
+      "Сначала stat каждого destination, а при совпадении размера считать content одинаковым и пропускать template rendering",
+      "Использовать template/copy с notify: module сравнит content, changed вызовет handler; check и diff покажут план",
+      "Передавать force=true в copy и вызывать handler через meta: flush_handlers после каждого host независимо от changed"
     ],
     "answer": 2,
-    "explanation": "template module: если содержимое файла изменилось → changed=True → notify handler. Handlers вызываются один раз в конце play (flush_handlers для досрочного). --check mode: показывает что изменится без применения. --diff: показывает diff файлов. Оптимизация: gather_facts: no для несвязанных playbooks. fact_caching для ускорения fact gathering."
+    "explanation": "template и copy рассчитывают желаемый content и сообщают changed, если destination нужно обновить. notify ставит handler в очередь лишь для изменившихся tasks, а одинаковые уведомления дедуплицируются. --check оценивает изменение без применения, --diff показывает разницу для поддерживаемых файлов; отдельный stat обычно не нужен."
   },
   {
     "id": 596,
     "topic": "Ansible",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое Ansible inventory и какие форматы поддерживаются?",
+    "q": "Какие источники может объединять Ansible inventory?",
     "options": [
-      "Inventory в Ansible — это только список IP адресов",
-      "Inventory обязательно должен быть одним файлом",
-      "Ansible поддерживает только INI формат инвентаря",
-      "Inventory: список хостов и групп; форматы: INI (hosts в секциях [group]), YAML (удобнее для сложных структур), dynamic (scripts/plugins); группы: all, ungrouped, user-defined; host/group vars"
+      "Один INI-файл с IP: группы и variables после запуска разрешено добавлять через register в тот же файл",
+      "Один YAML-файл: dynamic cloud data сначала преобразуют в host_vars вручную и хранят рядом с playbook",
+      "Database AWX: ansible-playbook читает её напрямую, а локальный inventory directory используется как cache",
+      "INI/YAML files, directories и dynamic plugins/scripts; источники дают hosts, groups и variables с precedence rules"
     ],
     "answer": 3,
-    "explanation": "INI: [webservers] и web1.example.com ansible_host=192.168.1.1. YAML: all: children: webservers: hosts: web1:. Директория inventory/: несколько файлов объединяются. group_vars/webservers.yml, host_vars/web1.yml. Dynamic: --inventory aws_ec2.yml. ansible_host, ansible_user, ansible_port, ansible_ssh_private_key_file — connection vars."
+    "explanation": "Inventory может состоять из нескольких sources: статических INI/YAML, directory, inventory plugins и legacy scripts. Они формируют hosts, parent/child groups и variables; group_vars/host_vars дополняют данные, а precedence определяет итог. Dynamic plugin запускается на control side и может кэшировать результаты API."
   },
   {
     "id": 597,
     "topic": "Ansible",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое Ansible role и какова её структура директорий?",
+    "q": "Какие части Ansible role обязательны и чем defaults отличаются от vars?",
     "options": [
-      "Role: tasks/main.yml, handlers/main.yml, vars/main.yml, defaults/main.yml, templates/, files/, meta/main.yml (dependencies), tests/; позволяет переиспользовать код; ansible-galaxy role init",
-      "Роль — это просто отдельный playbook файл",
-      "Роль обязательно должна содержать все директории",
-      "defaults/main.yml и vars/main.yml — одно и то же"
+      "Role использует стандартные directories с main files, но создаются нужные; defaults имеют низкий, vars — высокий precedence",
+      "Role должна содержать tasks, handlers, templates, files, tests и meta, иначе ansible-galaxy отклонит её при local run",
+      "defaults загружаются после extra vars, а vars служат fallback и переопределяются inventory без дополнительных условий",
+      "tasks/main.yml является отдельным playbook с hosts, а meta/main.yml исполняет dependencies как handlers после роли"
     ],
     "answer": 0,
-    "explanation": "defaults/main.yml: наименьший приоритет (можно переопределить из inventory/playbook). vars/main.yml: высокий приоритет (сложно переопределить). tasks/main.yml: основные задачи. handlers/main.yml: handlers (restart). meta/main.yml: galaxy_info + dependencies (другие роли). templates/: Jinja2 шаблоны. files/: статические файлы для copy модуля."
+    "explanation": "Обычно роль имеет tasks/main.yml и по необходимости handlers, defaults, vars, files, templates, meta и другие directories; пустые части не обязательны. Role defaults находятся близко к нижней границе variable precedence и удобны для публичной настройки. Role vars имеют высокий приоритет, поэтому их применяют осторожно."
   },
   {
     "id": 598,
     "topic": "Ansible",
     "level": "Middle",
     "category": "definition",
-    "q": "Как работает делегирование задач (delegate_to) в Ansible?",
+    "q": "Какие контекст и риски появляются у task с delegate_to?",
     "options": [
-      "delegate_to заставляет задачу выполняться на всех хостах одновременно",
-      "delegate_to: другой_хост — задача выполняется на указанном хосте, но переменные остаются от текущего inventory_host; delegate_facts: yes для сбора фактов на делегированном хосте; run_once: true для однократного выполнения",
-      "delegate_to работает только с localhost",
-      "delegate_to несовместимо с loop"
+      "Task меняет inventory_hostname на delegated host, поэтому variables исходного host теряются до конца текущего play",
+      "Task остаётся привязан к исходному host, но исполняется на delegated; параллельные hosts могут конфликтовать за общий ресурс",
+      "Task выполняется controller один раз для play, а delegate_facts копирует весь fact cache исходной группы в localhost",
+      "Task добавляет delegated host в текущий batch, и serial автоматически выделяет ему отдельный fork без конкуренции"
     ],
     "answer": 1,
-    "explanation": "Применение: добавить хост в/из LB (delegate_to: lb_server), consul deregister (delegate_to: consul_server), локальная задача в цикле по remote hosts. run_once: true — выполнить один раз для всей группы (на первом хосте). delegate_to: localhost для локальных операций (создать DNS запись, API вызов). Переменные: hostvars[inventory_hostname] доступны на делегированном."
+    "explanation": "Delegation меняет место выполнения и templating connection-related options, но inventory_hostname остаётся исходным host. Поэтому много исходных hosts могут параллельно писать один файл или API на delegate; применяют throttle, serial или run_once+loop. delegate_facts назначает собранные facts делегированному host. run_once при serial означает один запуск на batch."
   },
   {
     "id": 599,
     "topic": "Ansible",
     "level": "Middle",
     "category": "definition",
-    "q": "Как использовать Ansible для управления секретами с HashiCorp Vault?",
+    "q": "Как получать secrets из HashiCorp Vault без хранения token в playbook?",
     "options": [
-      "HashiCorp Vault и Ansible Vault — одно и то же",
-      "Ansible не может интегрироваться с HashiCorp Vault",
-      "hashi_vault lookup plugin: {{ lookup('hashi_vault', 'secret/data/db:password') }}; collection community.hashi_vault; аутентификация: token, approle, aws_iam; VAULT_ADDR и VAULT_TOKEN env vars или playbook vars",
-      "Vault integration работает только в AWX"
+      "Зашифровать Vault token тем же KV key и передать ciphertext модулю, который расшифрует его через публичный API endpoint",
+      "Сохранить root token в group_vars с no_log, потому что no_log шифрует variables при записи repository и fact cache",
+      "Использовать community.hashi_vault lookup/module и внешнюю auth identity; скрыть output и ограничить policy/TTL",
+      "Экспортировать secret в inventory plugin, чтобы он стал hostvar и автоматически удалился после завершения каждого task"
     ],
     "answer": 2,
-    "explanation": "community.hashi_vault.hashi_vault lookup: url, auth_method (token/approle/aws_iam/ldap), secret path. AppRole: role_id + secret_id (rotatable credentials). KV v2: secret/data/path:key. vars_plugins: hashi_vault vars plugin для автоматического импорта. Locking: не хранить Vault token в playbook — использовать env var или approle. AWX: Vault credential type с token rotation."
+    "explanation": "community.hashi_vault предоставляет lookups и modules для KV и других engines. Аутентификацию лучше получать из AppRole, workload/cloud identity, short-lived token или credential injection controller, а не фиксировать в repository. no_log защищает task output, но нужно также учитывать exceptions, fact cache, debug и минимальную Vault policy."
   },
   {
     "id": 600,
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает ansible-navigator и в чём его преимущество перед ansible-playbook?",
+    "q": "Что ansible-navigator добавляет к запуску playbook в разработке и CI?",
     "options": [
-      "ansible-navigator — это просто UI для ansible-playbook без новых функций",
-      "ansible-navigator работает только с podman, не Docker",
-      "ansible-navigator заменяет AWX для production",
-      "ansible-navigator: TUI interface, запускает playbooks в Execution Environment (контейнер), режимы stdout/interactive, replay артефакты для анализа; подготовлен для AAP workflow"
+      "Он заменяет inventory и controller database локальным SQLite, поэтому один artifact можно продолжить с failed task",
+      "Он компилирует YAML в Python bytecode и отправляет его на hosts без ansible-core внутри Execution Environment",
+      "Он создаёт workflow approvals и schedules на local machine, синхронизируя их с AWX при следующем project update",
+      "Он даёт interactive/stdout interface, запускает через Execution Environment и сохраняет artifacts для replay"
     ],
     "answer": 3,
-    "explanation": "ansible-navigator run playbook.yml --eei my-ee:latest — в EE контейнере. Modes: -m stdout (CI-friendly), -m interactive (TUI browser). Settings: ansible-navigator.yml или .ansible-navigator.yml. Артефакты: --artifact-dir — сохраняет JSON replay для анализа. ansible-navigator replay artifact.json — просмотр результатов. Интеграция с VS Code extension для разработки EE."
+    "explanation": "ansible-navigator — интерфейс для запуска и исследования automation content, особенно вместе с Execution Environments. Interactive mode помогает изучать результаты, stdout подходит CI, а artifact можно открыть через replay для анализа. Он не заменяет Automation Controller с RBAC, schedules и workflows и не возобновляет изменяющий run из artifact."
   },
   {
     "id": 601,

@@ -8,9 +8,9 @@
     186
   ],
   "issueBudget": {
-    "length-cue": 234,
+    "length-cue": 204,
     "question-echo": 5,
-    "absolute-distractor": 114,
+    "absolute-distractor": 96,
     "duplicate-question": 4
   },
   "topics": {
@@ -33,9 +33,9 @@
       "duplicate-question": 0
     },
     "Ansible": {
-      "length-cue": 66,
+      "length-cue": 36,
       "question-echo": 0,
-      "absolute-distractor": 41,
+      "absolute-distractor": 23,
       "duplicate-question": 0
     },
     "Docker": {
@@ -77,21 +77,21 @@
   },
   "levels": {
     "Middle": {
-      "length-cue": 100,
+      "length-cue": 95,
       "question-echo": 0,
-      "absolute-distractor": 40,
+      "absolute-distractor": 37,
       "duplicate-question": 2
     },
     "Senior": {
-      "length-cue": 77,
+      "length-cue": 54,
       "question-echo": 3,
-      "absolute-distractor": 59,
+      "absolute-distractor": 45,
       "duplicate-question": 1
     },
     "Junior": {
-      "length-cue": 57,
+      "length-cue": 55,
       "question-echo": 2,
-      "absolute-distractor": 15,
+      "absolute-distractor": 14,
       "duplicate-question": 1
     }
   }
