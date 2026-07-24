@@ -9572,421 +9572,421 @@
   {
     "topic": "CI/CD",
     "level": "Middle",
-    "q": "Как кэшировать в GitHub Actions?",
+    "q": "Как проектировать cache в GitHub Actions?",
     "options": [
-      "actions/cache@v4 с ключом по хешу lock-файла",
-      "Хранить в образе",
-      "Git LFS",
-      "Недоступно"
+      "Кешировать каталог package manager через setup-action или cache-action с ключом из OS и lockfile hash",
+      "Добавлять dependencies в Git history и восстанавливать их checkout-ом перед каждым workflow run",
+      "Публиковать build outputs под общим cache key и использовать кеш как неизменяемый release artifact",
+      "Сохранять credentials runner в cache, чтобы jobs из branches получали доступ без повторной проверки"
     ],
     "answer": 0,
-    "explanation": "actions/cache@v4 кэширует node_modules, pip-пакеты. Ключ: hashFiles().",
+    "explanation": "Cache подходит для воспроизводимо загружаемых зависимостей и инструментов. Ключ обычно включает платформу, версию инструмента и hash lock-файла; fallback keys позволяют частичное совпадение. Cache не является доверенным хранилищем secrets или release artifacts, а конкретную major-версию actions сверяют с актуальной документацией.",
     "id": 14048
   },
   {
     "topic": "CI/CD",
     "level": "Middle",
-    "q": "Что такое Matrix Build?",
+    "q": "Что делает matrix strategy в CI workflow?",
     "options": [
-      "Сборка multi-arch образа",
-      "Запуск job с разными комбинациями ОС/версий",
-      "Параллельный запуск разных job",
-      "Матрица RBAC"
+      "Собирает один multi-platform image из Dockerfile и объединяет manifests для разных CPU architectures",
+      "Разворачивает одну job в набор комбинаций параметров, которые можно дополнять, исключать и ограничивать",
+      "Связывает независимые jobs через artifacts и задаёт им последовательность независимо от входных параметров",
+      "Создаёт таблицу RBAC для runners и назначает каждой branch собственный набор repository permissions"
     ],
     "answer": 1,
-    "explanation": "Strategy matrix: os x version — декартово произведение комбинаций.",
+    "explanation": "Matrix strategy генерирует несколько запусков job из combinations параметров, например OS, runtime и feature set. `include` и `exclude` корректируют набор, а fail-fast и max-parallel управляют выполнением. Комбинации могут идти параллельно, но это зависит от лимитов и доступных runners.",
     "id": 14049
   },
   {
     "topic": "CI/CD",
     "level": "Senior",
-    "q": "Как работает GitOps с ArgoCD?",
+    "q": "Как Argo CD обрабатывает расхождение декларативного и фактического состояния?",
     "options": [
-      "rsync на сервер",
-      "Ручной kubectl apply",
-      "ArgoCD синхронизирует кластер с Git-репозиторием",
-      "Замена Docker Registry"
+      "Копирует рабочий каталог по rsync на cluster nodes и запускает manifests из локального filesystem",
+      "Выполняет `kubectl apply` с ноутбука оператора и записывает результат в Git после завершения deployment",
+      "Сравнивает desired manifests из настроенного source с live resources и синхронизирует drift по policy",
+      "Заменяет container registry и хранит image layers внутри custom resources каждого приложения"
     ],
     "answer": 2,
-    "explanation": "ArgoCD: Git — источник истины. Auto-sync, prune, Helm, Kustomize.",
+    "explanation": "Argo CD получает желаемые Kubernetes manifests из Git или другого настроенного source, сравнивает их с live state и показывает drift. Sync бывает ручным или автоматическим; prune, self-heal, hooks и sync waves включаются явной политикой. Git должен хранить декларативное состояние, а secrets требуют отдельной безопасной схемы.",
     "id": 14050
   },
   {
     "topic": "CI/CD",
     "level": "Senior",
-    "q": "Как настроить Canary через Argo Rollouts?",
+    "q": "Из каких элементов складывается canary rollout в Argo Rollouts?",
     "options": [
-      "Cronjob",
-      "Ручное переключение трафика",
-      "Отдельный кластер",
-      "Argo Rollouts с шагами канареечного анализа метрик"
+      "CronJob периодически меняет replicas у Deployment, а успешность определяется временем завершения schedule",
+      "Оператор вручную переключает Service selector и удаляет прежний ReplicaSet после просмотра dashboard",
+      "Каждая версия разворачивается в отдельном cluster, а DNS TTL служит единственным шагом изменения трафика",
+      "Rollout задаёт weight и pause steps, а traffic routing и metric analysis подключаются при необходимости"
     ],
     "answer": 3,
-    "explanation": "Argo Rollouts: Blue/Green, Canary с анализом Prometheus/Datadog.",
+    "explanation": "Argo Rollouts заменяет Deployment ресурсом Rollout и управляет ReplicaSets по canary или blue-green strategy. Шаги могут менять вес, ставить паузу и запускать AnalysisRun. Точное распределение трафика требует поддерживаемого router/service mesh либо replica-based approximation; поведение при ошибке задаётся стратегией.",
     "id": 14051
   },
   {
     "topic": "CI/CD",
     "level": "Senior",
-    "q": "Multi-account CI/CD в AWS через OIDC?",
+    "q": "Как CI job получает временный доступ к нескольким AWS accounts через OIDC?",
     "options": [
-      "OIDC-федерация: временный токен AWS STS без хранения ключей",
-      "Хранить Access Key",
-      "Отдельный IAM-пользователь",
-      "VPN"
+      "Job предъявляет подписанный OIDC token сервису STS и принимает role, чья trust policy ограничивает issuer и claims",
+      "Runner хранит IAM user access keys каждого account и выбирает пару по имени protected environment",
+      "Pipeline копирует root credentials между accounts через Secrets Manager перед каждым deployment stage",
+      "VPN соединяет runner с VPC, после чего AWS API считает сетевой маршрут достаточным подтверждением identity"
     ],
     "answer": 0,
-    "explanation": "IAM Role доверяет token.actions.githubusercontent.com. STS-токен временный.",
+    "explanation": "CI provider выдаёт job OIDC identity token. AWS STS `AssumeRoleWithWebIdentity` проверяет trust policy роли и возвращает временные credentials. Для multi-account схемы создают ограниченные роли в целевых accounts и сужают `aud`, `sub`, branch/environment claims; постоянные access keys в CI не требуются.",
     "id": 14052
   },
   {
     "topic": "CI/CD",
     "level": "Middle",
-    "q": "Что такое Self-Hosted Runner?",
+    "q": "Что означает self-hosted runner в CI-системе?",
     "options": [
-      "Плагин для локального запуска",
-      "Собственный сервер для GitHub Actions job",
-      "Резервный раннер",
-      "Библиотека тестирования"
+      "Локальный plugin запускает отдельные commands разработчика, но не регистрируется у CI control plane",
+      "Пользователь управляет machine и runner agent, а CI назначает ей jobs по labels, groups и permissions",
+      "Провайдер держит ephemeral VM в своей инфраструктуре, а repository выбирает её стандартным image label",
+      "Test library эмулирует workflow syntax внутри unit tests и не исполняет shell или container steps"
     ],
     "answer": 1,
-    "explanation": "Self-Hosted Runner: доступ к внутренним серверам, GPU. Минус: обслуживание.",
+    "explanation": "Self-hosted runner работает на инфраструктуре пользователя и даёт контроль над сетью, hardware, tools и isolation. Пользователь отвечает за patching, capacity, cleanup и защиту credentials. Persistent runner особенно опасен для недоверенного pull request кода, поэтому применяют узкий scope и ephemeral isolation.",
     "id": 14053
   },
   {
     "topic": "CI/CD",
     "level": "Middle",
-    "q": "Как работает approval в GitLab CI?",
+    "q": "Как различаются manual job и deployment approval в GitLab?",
     "options": [
-      "Email всем",
-      "Автодеплой без ограничений",
-      "when: manual с Protected Environments ограничивает круг утверждающих",
-      "Через Jira"
+      "Email notification считается approval и автоматически запускает deployment от имени первого получателя письма",
+      "Pipeline без manual jobs ожидает approval для каждой stage, даже если environment и protection не настроены",
+      "`when: manual` требует запуска job, protected environment ограничивает actors, а approval добавляет отдельный gate",
+      "Issue в Jira меняет pipeline status через название environment без GitLab permissions и audit events"
     ],
     "answer": 2,
-    "explanation": "when: manual — кнопка Play. Protected Environments — кто может деплоить.",
+    "explanation": "Manual job получает кнопку запуска согласно своей конфигурации и permissions. Protected environments ограничивают, кто может deploy, а deployment approvals — отдельный механизм проверки deployment перед выполнением в поддерживаемой редакции и настройке GitLab. Эти controls дополняют друг друга и не сводятся к `when: manual`.",
     "id": 14054
   },
   {
     "topic": "Kubernetes",
     "level": "Junior",
-    "q": "Что такое Namespace?",
+    "q": "Какую границу создаёт Kubernetes Namespace?",
     "options": [
-      "Сетевой протокол",
-      "Docker-контейнер",
-      "Физический сервер",
-      "Виртуальный кластер для изоляции ресурсов"
+      "Отдельный network stack с собственным control plane и независимым etcd для namespaced resources",
+      "Container runtime sandbox, который изолирует процессы Pod от host kernel и соседних namespaces",
+      "Физический pool nodes, на который scheduler размещает Pods без taints, affinity и resource requests",
+      "Область имён для namespaced objects и точка применения RBAC, quota и policy без изоляции по умолчанию"
     ],
     "answer": 3,
-    "explanation": "Namespace разделяет кластер. ResourceQuota и NetworkPolicy для изоляции.",
+    "explanation": "Namespace позволяет повторять имена namespaced resources и группировать их для RBAC, ResourceQuota и policy. Многие объекты, включая Nodes и StorageClasses, cluster-scoped. Сам Namespace не создаёт отдельный cluster и не запрещает сеть или доступ: для изоляции нужны NetworkPolicy, RBAC и другие controls.",
     "id": 11001
   },
   {
     "topic": "Kubernetes",
     "level": "Junior",
-    "q": "Что такое ServiceAccount?",
+    "q": "Какую identity предоставляет Kubernetes ServiceAccount?",
     "options": [
-      "Учётная запись подов для доступа к K8s API",
-      "Аккаунт админа",
-      "Облачный сервисный аккаунт",
-      "SSH-ключ"
+      "Идентифицирует workload внутри cluster; RBAC выдаёт права, а projected API token зависит от Pod configuration",
+      "Представляет human administrator и хранит его password для входа в API server и worker nodes",
+      "Создаёт cloud IAM principal у provider и автоматически назначает ему права на buckets и databases",
+      "Распространяет SSH private key по Nodes, чтобы kubelet подключался к containers для выполнения probes"
     ],
     "answer": 0,
-    "explanation": "ServiceAccount — идентификатор для подов. Монтируется автоматически.",
+    "explanation": "ServiceAccount — namespaced identity для процессов workload. Pod использует указанную учётную запись или `default`, а доступ к API определяется RBAC. Короткоживущий projected token может монтироваться в Pod, но `automountServiceAccountToken` и явные volume settings позволяют это изменить.",
     "id": 11002
   },
   {
     "topic": "Kubernetes",
     "level": "Junior",
-    "q": "Для чего ConfigMap?",
+    "q": "Для каких данных предназначен Kubernetes ConfigMap?",
     "options": [
-      "Шифрование секретов",
-      "Хранение несекретных конфигураций",
-      "Сетевые политики",
-      "Мониторинг"
+      "Для ciphertext credentials, которые kubelet расшифровывает аппаратным ключом перед запуском container",
+      "Для несекретной конфигурации key/value, доступной Pod как environment variables, arguments или files",
+      "Для правил L3/L4 filtering между selected Pods и внешними CIDR, применяемых network plugin",
+      "Для временных рядов node metrics, которые API server сохраняет между перезапусками monitoring stack"
     ],
     "answer": 1,
-    "explanation": "ConfigMap отделяет конфигурацию от образа. Монтируется как файлы или env.",
+    "explanation": "ConfigMap отделяет несекретную конфигурацию от container image. Pod может читать keys через environment variables, command arguments или projected volume. Обновления volume и environment ведут себя по-разному, а конфиденциальные значения требуют Secret и надлежащей защиты, а не ConfigMap.",
     "id": 11003
   },
   {
     "topic": "Kubernetes",
     "level": "Middle",
-    "q": "StatefulSet vs Deployment?",
+    "q": "Когда StatefulSet подходит лучше Deployment?",
     "options": [
-      "StatefulSet только stateless",
-      "Deployment без реплик",
-      "StatefulSet сохраняет идентичность подов и persistent storage",
-      "Алиасы"
+      "Когда replicas взаимозаменяемы, имена Pods несущественны и rollout должен быстро заменять экземпляры",
+      "Когда workload состоит из Jobs с конечным числом attempts и должен завершиться после успешного результата",
+      "Когда replicas нужны стабильные ordinal identities, ordered lifecycle или отдельные PVC из templates",
+      "Когда Daemon должен запускаться на подходящих Nodes и следовать за их добавлением или удалением"
     ],
     "answer": 2,
-    "explanation": "StatefulSet: стабильные имена, сетевые ID, PVC-шаблоны. Для БД, Kafka.",
+    "explanation": "Deployment управляет взаимозаменяемыми replicas. StatefulSet даёт Pods стабильные ordinal names и управляемый порядок операций; `volumeClaimTemplates` создаёт отдельные PVC, чья retention policy настраивается. StatefulSet полезен не каждой базе данных автоматически: приложение всё равно отвечает за replication и consistency.",
     "id": 11004
   },
   {
     "topic": "Kubernetes",
     "level": "Middle",
-    "q": "Что делает Ingress Controller?",
+    "q": "Какую функцию выполняет Kubernetes Ingress Controller?",
     "options": [
-      "Распределяет поды",
-      "Мониторит CPU",
-      "Управляет сертификатами",
-      "Управляет внешним HTTP/HTTPS-доступом к сервисам"
+      "Размещает Pods по Nodes, учитывая requests, affinity, topology constraints и доступные resources",
+      "Собирает CPU usage из kubelet и меняет replicas Deployment по target utilization в HPA",
+      "Выпускает TLS certificates для доменов независимо от дополнительных controllers и issuer configuration",
+      "Наблюдает Ingress resources и настраивает data plane для HTTP routing согласно своей реализации"
     ],
     "answer": 3,
-    "explanation": "Ingress Controller (nginx, traefik): маршрутизация по host/path, TLS.",
+    "explanation": "Ingress API описывает базовую HTTP/HTTPS-маршрутизацию, но реальное поведение обеспечивает установленный controller. TLS certificates обычно предоставляет Secret или отдельный certificate controller. Ingress API стабилен, но расширяется implementation-specific annotations; для новых выразительных сценариев экосистема использует Gateway API.",
     "id": 11005
   },
   {
     "topic": "Kubernetes",
     "level": "Middle",
-    "q": "Как работает NetworkPolicy?",
+    "q": "Как Kubernetes NetworkPolicy ограничивает трафик?",
     "options": [
-      "Правила in/egress трафика между подами",
-      "Управление DNS",
-      "Фаервол на ноде",
-      "Распределение IP"
+      "Policy выбирает Pods и задаёт разрешённые ingress/egress peers и ports; реализацию обеспечивает network plugin",
+      "Policy меняет DNS records Service и направляет запросы к EndpointSlices по round-robin на уровне приложения",
+      "Policy добавляет host firewall rules для каждого процесса Node без связи с Pod labels и namespaces",
+      "Policy распределяет Pod CIDR между Nodes и объявляет маршруты соседям через выбранный routing protocol"
     ],
     "answer": 0,
-    "explanation": "L3/L4 firewall для подов. Требует CNI (Calico, Cilium).",
+    "explanation": "NetworkPolicy — декларативная L3/L4 allow-модель. Когда Pod изолирован policy по направлению, разрешения образуют объединение подходящих policies; обе стороны соединения должны допускать нужный трафик. Эффект зависит от CNI/plugin, а некоторые протоколы и поведение до/после NAT implementation-specific.",
     "id": 11006
   },
   {
     "topic": "Kubernetes",
     "level": "Senior",
-    "q": "Multi-cluster Istio?",
+    "q": "Что нужно выбрать при проектировании Istio для нескольких clusters?",
     "options": [
-      "Один Istiod",
-      "Общий корневой CA, DNS-прокси для обнаружения сервисов",
-      "Только Ingress",
-      "VPN"
+      "Один `istiod` подходит каждой topology и failure domain, поэтому control planes и API connectivity не анализируют",
+      "Определяют topology control planes, networks, service discovery и trust; gateways нужны при отсутствии flat reachability",
+      "Ingress gateway публикует все services в internet, после чего east-west traffic использует public DNS без mTLS",
+      "Site-to-site VPN автоматически объединяет service registries и certificates без настройки Istio identities"
     ],
     "answer": 1,
-    "explanation": "Multi-cluster: общий root CA, east-west gateway для non-flat сети.",
+    "explanation": "Istio поддерживает разные multi-cluster topologies: primary/remote или несколько primaries, одну или несколько networks, общую либо разделённую service visibility. Общий trust требует согласованной CA/trust domain, а east-west gateways помогают между несвязанными Pod networks. Единой схемы с одним `istiod` для всех случаев нет.",
     "id": 11007
   },
   {
     "topic": "Kubernetes",
     "level": "Senior",
-    "q": "Что такое Admission Webhooks?",
+    "q": "Где в Kubernetes API request участвуют admission webhooks?",
     "options": [
-      "Сбор логов",
-      "Автомасштабирование",
-      "Webhook для модификации/валидации объектов до сохранения в etcd",
-      "Балансировка"
+      "Читают container logs после scheduling и отправляют их во внешний collector для indexing и retention",
+      "Изменяют replica count после получения metrics и вызывают scheduler для размещения дополнительных Pods",
+      "Mutating и validating hooks обрабатывают подходящие requests в admission chain до persistence объекта",
+      "Распределяют Service traffic после kube-proxy и выбирают backend Endpoint по latency каждой Node"
     ],
     "answer": 2,
-    "explanation": "MutatingWebhook изменяет объект. ValidatingWebhook отклоняет.",
+    "explanation": "После authentication и authorization API server пропускает request через admission chain. Mutating webhooks могут изменить объект, validating webhooks — принять или отклонить его перед persistence. Webhook — внешний HTTPS dependency control plane, поэтому selectors, timeout, failurePolicy, availability и защита от self-deadlock критичны.",
     "id": 11008
   },
   {
     "topic": "Kubernetes",
     "level": "Senior",
-    "q": "Как работает VPA?",
+    "q": "Как Vertical Pod Autoscaler меняет resource sizing?",
     "options": [
-      "Только уменьшает",
-      "Добавляет ноды",
-      "Заменяет HPA",
-      "Анализирует потребление и корректирует requests/limits"
+      "Уменьшает limits по расписанию независимо от наблюдаемого usage и не создаёт рекомендации для requests",
+      "Добавляет Nodes в cluster при unschedulable Pods и меняет capacity cloud node group через provider API",
+      "Заменяет HPA и управляет replicas по request rate, не анализируя CPU или memory потребление containers",
+      "Recommender оценивает requests, а admission/updater применяют их согласно update mode и resource policy"
     ],
     "answer": 3,
-    "explanation": "VPA: режимы Off/Initial/Auto. Не совместим с HPA по CPU/Memory.",
+    "explanation": "VPA собирает usage history и формирует рекомендации CPU/memory requests. Admission component подставляет рекомендации новым Pods, а updater может инициировать применение для существующих Pods согласно режиму и возможностям cluster. VPA не добавляет Nodes и может сосуществовать с HPA, если controllers не конкурируют за одну resource signal.",
     "id": 11009
   },
   {
     "topic": "Kubernetes",
     "level": "Middle",
-    "q": "Что такое Helm?",
+    "q": "Какую задачу решает Helm в Kubernetes?",
     "options": [
-      "Пакетный менеджер — шаблоны и версионирование релизов",
-      "Система логирования",
-      "Утилита дампов",
-      "Плагин авторизации"
+      "Упаковывает templated manifests в charts и управляет release values, upgrades и rollback metadata",
+      "Собирает container logs на Nodes и пересылает chunks в object storage по labels приложения",
+      "Создаёт memory dumps процессов Pod через CRI и хранит их как immutable cluster resources",
+      "Выдаёт API credentials пользователям и заменяет RBAC roles, bindings и admission policies"
     ],
     "answer": 0,
-    "explanation": "Helm: Chart с шаблонами и values.yaml. helm install/upgrade/rollback.",
+    "explanation": "Helm chart содержит metadata, templates, default values и dependencies для Kubernetes application. При install/upgrade Helm рендерит manifests и хранит release metadata, что позволяет просматривать history и выполнять rollback. Chart не гарантирует корректность generated resources, поэтому полезны lint, diff и policy checks.",
     "id": 11010
   },
   {
     "topic": "Monitoring",
     "level": "Junior",
-    "q": "Что такое мониторинг в DevOps?",
+    "q": "Какую функцию выполняет monitoring в эксплуатации систем?",
     "options": [
-      "Ручная проверка серверов",
-      "Непрерывный сбор, анализ и оповещение о состоянии систем",
-      "Система резервного копирования",
-      "Инструмент деплоя"
+      "Оператор вручную входит на servers по расписанию и считает отсутствие жалоб подтверждением здоровья",
+      "Система собирает signals, сопоставляет их с целями и помогает обнаруживать, объяснять и оповещать о проблемах",
+      "Backup service копирует data, но не измеряет availability, latency, errors или capacity текущей системы",
+      "Deployment tool применяет manifests и считает успешный exit code достаточной оценкой дальнейшей работы"
     ],
     "answer": 1,
-    "explanation": "Мониторинг: метрики (CPU, память), логи (ELK/Loki), трейсинг, алертинг, визуализация (Grafana).",
+    "explanation": "Monitoring превращает telemetry и synthetic checks в представление о поведении системы: dashboards, alerts, trends и capacity signals. Метрики, logs и traces дают разные стороны observability. Полезный monitoring связан с пользовательскими целями и actionable response, а не сводится к сбору CPU counters.",
     "id": 12001
   },
   {
     "topic": "Monitoring",
     "level": "Junior",
-    "q": "Для чего используется Prometheus?",
+    "q": "Какова основная модель Prometheus?",
     "options": [
-      "Резервное копирование БД",
-      "Потоковая обработка логов",
-      "Сбор и хранение временных рядов метрик с PromQL и алертингом",
-      "Управление контейнерами"
+      "Копирует database backups между regions и проверяет их восстановление с помощью scheduled restore jobs",
+      "Принимает произвольные application logs, индексирует full text и выполняет correlation по trace identifiers",
+      "Scrapes metric endpoints в time-series database, выполняет PromQL и оценивает recording и alerting rules",
+      "Оркестрирует containers по desired state и пересоздаёт workloads после отказа worker nodes"
     ],
     "answer": 2,
-    "explanation": "Prometheus: pull-модель, TSDB, PromQL, AlertManager. Federation и remote write.",
+    "explanation": "Prometheus преимущественно сам опрашивает targets, хранит labelled time series локально и вычисляет PromQL rules. Alerting rules отправляют active alerts в Alertmanager, а remote write/federation расширяют архитектуру. Pushgateway применяют для ограниченных batch-сценариев, а не как общую замену scrape.",
     "id": 12002
   },
   {
     "topic": "Monitoring",
     "level": "Junior",
-    "q": "Что такое Grafana?",
+    "q": "Какую роль обычно выполняет Grafana?",
     "options": [
-      "Прокси для Kubernetes",
-      "База данных временных рядов",
-      "Система сбора логов",
-      "Платформа визуализации метрик, логов и трейсов"
+      "Проксирует Kubernetes API и применяет NetworkPolicy к запросам dashboards от cluster users",
+      "Хранит исходные time series как primary TSDB и принимает remote write вместо monitoring backend",
+      "Собирает log files с hosts через agent и индексирует их content без внешнего data source",
+      "Запрашивает разные data sources, визуализирует telemetry и оценивает настроенные alert rules"
     ],
     "answer": 3,
-    "explanation": "Grafana — дашборды и алертинг. Источники: Prometheus, InfluxDB, Loki, Elasticsearch.",
+    "explanation": "Grafana подключается к Prometheus, Loki, Elasticsearch, SQL и другим data sources, выполняет их queries и строит dashboards. Unified alerting может оценивать rules и направлять notifications. Grafana обычно не заменяет backend хранения: availability и retention данных определяются источником.",
     "id": 12003
   },
   {
     "topic": "Monitoring",
     "level": "Middle",
-    "q": "Чем отличаются метрики USE и RED?",
+    "q": "Для каких объектов применяют методы USE и RED?",
     "options": [
-      "USE — для ресурсов (Utilization, Saturation, Errors); RED — для сервисов (Rate, Errors, Duration)",
-      "USE для логов, RED для метрик",
-      "Оба метода идентичны",
-      "USE — Google, RED — AWS"
+      "USE проверяет utilization, saturation и errors ресурсов, а RED — rate, errors и duration запросов сервиса",
+      "USE разбирает unstructured logs по severity, а RED преобразует их в time-series labels и dashboards",
+      "USE и RED задают одинаковый набор counters, различаясь названием vendor-specific monitoring agent",
+      "USE описывает cloud billing, а RED оценивает deployment frequency и lead time delivery pipeline"
     ],
     "answer": 0,
-    "explanation": "USE (Brendan Gregg): инфраструктура. RED (Tom Wilkie): микросервисы. Google SRE: Four Golden Signals.",
+    "explanation": "USE помогает пройти по каждому ресурсу: насколько он занят, есть ли очередь/дефицит и ошибки. RED рассматривает request-driven service через rate, errors и duration. Методы дополняют друг друга: первый полезен для инфраструктурных bottlenecks, второй — для поведения сервиса глазами его traffic.",
     "id": 12004
   },
   {
     "topic": "Monitoring",
     "level": "Middle",
-    "q": "Как работает AlertManager?",
+    "q": "Что делает Prometheus Alertmanager после получения alerts?",
     "options": [
-      "Хранит историю алертов",
-      "Принимает алерты, группирует, дедуплицирует, маршрутизирует в Slack/PagerDuty",
-      "Генерирует метрики",
-      "Заменяет Grafana"
+      "Хранит долговременную историю time series и выполняет PromQL queries вместо Prometheus servers",
+      "Дедуплицирует, группирует, подавляет и маршрутизирует notifications по labels, routes и receiver settings",
+      "Генерирует application metrics из source code и публикует их на `/metrics` для последующего scrape",
+      "Рендерит Grafana dashboards и меняет panel queries при каждом изменении firing alert state"
     ],
     "answer": 1,
-    "explanation": "AlertManager: grouping, inhibition, silencing. Маршрутизация через routes.",
+    "explanation": "Alertmanager принимает alerts от Prometheus и совместимых clients, группирует и дедуплицирует их, применяет routing tree, inhibition и silences, затем отправляет notifications receivers. Он не является долговременным audit log: отдельная интеграция нужна, если требуется история уведомлений и действий.",
     "id": 12005
   },
   {
     "topic": "Monitoring",
     "level": "Senior",
-    "q": "Как организовать долгосрочное хранение метрик?",
+    "q": "Как строят долгосрочное хранение Prometheus-метрик?",
     "options": [
-      "Экспорт в Excel",
-      "Локальный диск Prometheus",
-      "Thanos/VictoriaMetrics с объектным хранилищем, дедупликацией и downsampling",
-      "Только Grafana Cloud"
+      "Периодически экспортируют dashboard в spreadsheet и удаляют исходные series после подтверждения оператора",
+      "Увеличивают local retention одного Prometheus без backups, HA replicas и контроля disk failure domain",
+      "Используют remote write или block shipping в durable scalable backend с retention, HA query и deduplication",
+      "Переносят series в Grafana dashboard JSON, который затем служит queryable source для historical panels"
     ],
     "answer": 2,
-    "explanation": "Thanos: sidecar загружает блоки в S3, Querier объединяет данные. Downsampling, dedup.",
+    "explanation": "Для долгого retention и горизонтального масштаба используют системы вроде Thanos, Mimir или VictoriaMetrics через remote write, receive либо shipping blocks — схема зависит от продукта. Архитектура должна учитывать durable storage, tenancy, compaction, deduplication HA replicas, query path, retention, cost и восстановление.",
     "id": 12006
   },
   {
     "topic": "Monitoring",
     "level": "Senior",
-    "q": "Как работает распределённый трейсинг с OpenTelemetry?",
+    "q": "Как OpenTelemetry связывает spans распределённого запроса?",
     "options": [
-      "В пределах одного пода",
-      "Только логи приложения",
-      "tcpdump на серверах",
-      "OTel SDK инструментирует код, Collector экспортирует спаны с W3C Trace Context"
+      "Сохраняет каждый span как локальный log без context propagation, а backend объединяет записи по timestamp",
+      "Снимает packets через tcpdump и выводит parent-child relationship из sequence numbers TCP streams",
+      "Использует имя Pod как trace identifier, поэтому несколько запросов к одной replica образуют один trace",
+      "Передаёт trace context через process boundaries, а instrumentation создаёт spans и экспортирует telemetry"
     ],
     "answer": 3,
-    "explanation": "OpenTelemetry: SDK (traceId/spanId), Collector (OTLP), экспорт в Jaeger/Tempo.",
+    "explanation": "Instrumentation создаёт spans с trace/span identifiers и передаёт context через поддерживаемые protocols, часто в формате W3C Trace Context. SDK или auto-instrumentation экспортирует данные напрямую либо через OpenTelemetry Collector по OTLP. Collector полезен для processing и routing, но не является обязательным звеном каждого deployment.",
     "id": 12007
   },
   {
     "topic": "Monitoring",
     "level": "Middle",
-    "q": "Что такое Loki?",
+    "q": "Как Grafana Loki организует хранение и поиск logs?",
     "options": [
-      "Система агрегации логов от Grafana — индексирует метаданные, дешевле ELK",
-      "Форк Prometheus",
-      "Инструмент трейсинга",
-      "БД для Secrets"
+      "Индексирует labels, хранит compressed log chunks и выполняет LogQL, поэтому cardinality labels нужно ограничивать",
+      "Хранит Prometheus samples в TSDB blocks и поддерживает PromQL recording rules вместо log queries",
+      "Принимает spans по OTLP и строит service graph без сохранения исходных log lines и stream labels",
+      "Шифрует application secrets в relational tables и выдаёт их workloads по short-lived credentials"
     ],
     "answer": 0,
-    "explanation": "Loki: horizontally-scalable логи. Индексирует метки, текст в S3. LogQL. Promtail/Alloy.",
+    "explanation": "Loki группирует logs в streams по labels, индексирует metadata, а содержимое хранит в compressed chunks согласно выбранной storage architecture. LogQL фильтрует строки и вычисляет метрики из logs. High-cardinality dynamic values не стоит помещать в labels; их оставляют в содержимом или structured metadata.",
     "id": 12008
   },
   {
     "topic": "Monitoring",
     "level": "Middle",
-    "q": "Какие метрики мониторить у K8s-кластера?",
+    "q": "Какие уровни сигналов нужны для monitoring Kubernetes cluster?",
     "options": [
-      "Только uptime мастер-нод",
-      "Node CPU/Memory, Pod restarts, etcd leader changes, API latency, scheduler queue",
-      "Количество образов",
-      "Скорость интернета"
+      "Проверяют heartbeat одного control-plane endpoint и считают workloads здоровыми при успешном TCP connect",
+      "Связывают workload SLI с control plane, nodes, scheduling, capacity, Pod health и dependency signals",
+      "Считают tags container images, не измеряя running replicas, resource pressure и request outcomes",
+      "Измеряют bandwidth внешнего канала, но исключают API latency, queue depth, restarts и Node conditions"
     ],
     "answer": 1,
-    "explanation": "Критические: control plane (API latency, etcd fsync), узлы (Node condition), поды (OOMKill).",
+    "explanation": "Monitoring должен начинаться с пользовательских SLI workloads, затем охватывать control plane, Nodes, scheduler, capacity, Pods и ключевые dependencies. Примеры сигналов: API latency/errors, etcd health где он доступен, pending Pods, Node conditions, OOM/restarts, resource pressure и saturation. Набор зависит от managed/self-managed модели.",
     "id": 12009
   },
   {
     "topic": "Monitoring",
     "level": "Senior",
-    "q": "Что такое SLO/SLI/SLA?",
+    "q": "Как связаны SLI, SLO, SLA и error budget?",
     "options": [
-      "SLO для логов, SLI для метрик",
-      "Одно и то же",
-      "SLI — индикатор (p99), SLO — цель (99.9%), SLA — договор; error budget = 1-SLO",
-      "Только Google Cloud"
+      "SLI хранит raw logs, SLO задаёт dashboard layout, а SLA выбирает notification receiver для alerts",
+      "Термины обозначают одну availability metric, но применяются разными monitoring vendors в своих UI",
+      "SLI измеряет service outcome, SLO задаёт цель за окно, SLA формализует обязательства, budget допускает misses",
+      "SLO относится к cloud provider, а SLI и SLA применяются к приложению без измеримого временного окна"
     ],
     "answer": 2,
-    "explanation": "SLI — метрика. SLO — цель за период. Error Budget — допустимый уровень ошибок.",
+    "explanation": "SLI — количественный индикатор, например доля успешных запросов с latency ниже порога. SLO задаёт цель для SLI за период. SLA — внешнее соглашение с последствиями нарушения. Error budget переводит SLO в допустимый объём bad events или downtime и расходуется фактическими нарушениями.",
     "id": 12010
   },
   {
     "topic": "Monitoring",
     "level": "Middle",
-    "q": "Как работает Blackbox Exporter?",
+    "q": "Как Prometheus Blackbox Exporter проверяет endpoint?",
     "options": [
-      "Мониторит ноды",
-      "Собирает CPU метрики",
-      "Экспортирует Docker-логи",
-      "Проверяет доступность: HTTP-статус, TCP, DNS, SSL-сертификаты"
+      "Читает Node CPU и filesystem counters из `/proc`, используя тот же collector набор, что node exporter",
+      "Подключается к container runtime и пересылает stdout logs в storage с labels Namespace и Pod",
+      "Экспортирует Docker images в registry и проверяет signatures manifests перед запуском deployment",
+      "Получает target и probe module, выполняет HTTP, TCP, DNS, ICMP или gRPC probe и публикует результат как metrics"
     ],
     "answer": 3,
-    "explanation": "Blackbox Exporter: probing HTTP, HTTPS (SSL expiry), TCP, DNS, ICMP.",
+    "explanation": "Prometheus вызывает endpoint `/probe` exporter с target и module. Exporter выполняет проверку из своей сетевой точки и возвращает metrics об успехе, фазах, latency, DNS и TLS там, где применимо. Такой probe измеряет внешний путь, но не заменяет внутренние application metrics и tracing.",
     "id": 12011
   },
   {
     "topic": "Monitoring",
     "level": "Middle",
-    "q": "Что такое ELK-стек?",
+    "q": "Какие роли выполняют компоненты классического ELK stack?",
     "options": [
-      "Elasticsearch + Logstash + Kibana для централизованного логирования",
-      "Система мониторинга метрик",
-      "Платформа CI/CD",
-      "Инструмент управления конфигурациями"
+      "Elasticsearch индексирует и ищет данные, Logstash обрабатывает events, Kibana предоставляет анализ и визуализацию",
+      "Elasticsearch собирает host metrics, Logstash оркестрирует containers, Kibana управляет deployment approvals",
+      "Elasticsearch выдаёт secrets, Logstash создаёт IAM roles, Kibana применяет firewall policies на endpoints",
+      "Elasticsearch хранит Git objects, Logstash запускает CI jobs, Kibana публикует OCI images в registry"
     ],
     "answer": 0,
-    "explanation": "ELK: Filebeat/Logstash собирают, Elasticsearch хранит, Kibana визуализирует. OpenSearch — форк.",
+    "explanation": "ELK исторически означает Elasticsearch, Logstash и Kibana: storage/search, ingestion/transformation и UI соответственно. В реальной Elastic Stack ingestion часто выполняют Beats, Elastic Agent или другие shippers, а pipeline может обходить Logstash. Архитектуру выбирают по объёму, parsing, retention, security и licensing.",
     "id": 12012
   },
   {
     "topic": "Monitoring",
     "level": "Middle",
-    "q": "Что такое instrumentation?",
+    "q": "Что означает instrumentation в observability?",
     "options": [
-      "Настройка серверов",
-      "Встраивание кода для сбора метрик/трейсов — экспорт в Prometheus/Jaeger",
-      "Установка агентов",
-      "Конфигурация сети"
+      "Настройку server packages и kernel parameters без генерации telemetry из application operations",
+      "Добавление manual или automatic hooks, которые создают metrics, logs, spans и передают context",
+      "Установку monitoring agent, которая сама объясняет бизнес-операции без libraries и semantic conventions",
+      "Конфигурацию routes и firewall rules для доступа collector к backends без изменения telemetry sources"
     ],
     "answer": 1,
-    "explanation": "Instrumentation: Prometheus client libraries, OpenTelemetry SDK. Автоинструментация через агенты.",
+    "explanation": "Instrumentation делает выполнение системы наблюдаемым: код, library wrappers или auto-instrumentation создают telemetry и semantic attributes, а context propagation связывает операции. Agent или Collector транспортирует и обрабатывает данные, но не заменяет корректные signals внутри приложения и защиту sensitive attributes.",
     "id": 12013
   },
   {
