@@ -8,9 +8,9 @@
     186
   ],
   "issueBudget": {
-    "length-cue": 116,
-    "question-echo": 2,
-    "absolute-distractor": 67,
+    "length-cue": 86,
+    "question-echo": 1,
+    "absolute-distractor": 58,
     "duplicate-question": 2
   },
   "topics": {
@@ -38,22 +38,22 @@
       "absolute-distractor": 13,
       "duplicate-question": 0
     },
-    "Monitoring": {
-      "length-cue": 11,
+    "Cloud": {
+      "length-cue": 6,
       "question-echo": 0,
-      "absolute-distractor": 6,
+      "absolute-distractor": 1,
       "duplicate-question": 0
     },
-    "Cloud": {
-      "length-cue": 23,
-      "question-echo": 1,
-      "absolute-distractor": 6,
+    "Monitoring": {
+      "length-cue": 10,
+      "question-echo": 0,
+      "absolute-distractor": 5,
       "duplicate-question": 0
     },
     "Security": {
-      "length-cue": 22,
+      "length-cue": 10,
       "question-echo": 0,
-      "absolute-distractor": 4,
+      "absolute-distractor": 1,
       "duplicate-question": 0
     },
     "CI/CD": {
@@ -65,21 +65,21 @@
   },
   "levels": {
     "Middle": {
-      "length-cue": 46,
+      "length-cue": 34,
       "question-echo": 0,
-      "absolute-distractor": 21,
+      "absolute-distractor": 18,
       "duplicate-question": 0
     },
     "Senior": {
-      "length-cue": 38,
+      "length-cue": 31,
       "question-echo": 1,
-      "absolute-distractor": 35,
+      "absolute-distractor": 32,
       "duplicate-question": 1
     },
     "Junior": {
-      "length-cue": 32,
-      "question-echo": 1,
-      "absolute-distractor": 11,
+      "length-cue": 21,
+      "question-echo": 0,
+      "absolute-distractor": 8,
       "duplicate-question": 1
     }
   }
