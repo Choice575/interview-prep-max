@@ -9152,421 +9152,421 @@
   {
     "topic": "Terraform",
     "level": "Middle",
-    "q": "Что такое terraform state и где он хранится?",
+    "q": "Какую функцию выполняет state в Terraform?",
     "options": [
-      "Это файл конфигурации провайдера",
-      "Это план изменений",
-      "JSON-файл с текущим состоянием инфраструктуры; локально или в remote backend",
-      "Только переменные окружения"
+      "Хранит исходный HCL-код модулей и выбирает версии provider-плагинов для рабочего каталога",
+      "Записывает операции из последнего plan и повторяет этот набор при следующем запуске apply",
+      "Связывает resource addresses с удалёнными объектами и хранит их снимок локально либо в backend",
+      "Заменяет учётные данные провайдеров и передаёт облачным API токены при изменении ресурсов"
     ],
     "answer": 2,
-    "explanation": "State (terraform.tfstate) — источник истины о созданных ресурсах. Remote backend (S3, Terraform Cloud) нужен для командной работы и блокировок.",
+    "explanation": "State связывает адреса ресурсов в конфигурации с реальными объектами и хранит известные Terraform атрибуты и зависимости. По умолчанию он локальный; backend может хранить state удалённо, а поддержка блокировок зависит от выбранного backend. Формат state — внутренний, поэтому его меняют командами Terraform, а не ручным редактированием.",
     "id": 10021
   },
   {
     "topic": "Terraform",
     "level": "Middle",
-    "q": "Что такое data source в Terraform?",
+    "q": "Как data source участвует в конфигурации Terraform?",
     "options": [
-      "Резервная копия state",
-      "Способ удаления ресурсов",
-      "Тип переменной",
-      "Только для чтения — получение информации о существующих ресурсах вне текущего state"
+      "Создаёт управляемый объект через provider и отвечает за его обновление и удаление при apply",
+      "Преобразует input variables в локальные значения до построения dependency graph конфигурации",
+      "Выбирает backend для workspace и переносит между ним state после выполнения команды init",
+      "Читает данные через provider без владения их жизненным циклом и отдаёт значения выражениям"
     ],
     "answer": 3,
-    "explanation": "Data source позволяет читать атрибуты существующих ресурсов (например, AMI ID, VPC ID), не управляя ими через Terraform.",
+    "explanation": "Data source запрашивает данные у provider, но не управляет жизненным циклом прочитанного объекта как resource. Результаты чтения доступны выражениям и могут сохраняться в state. Источник данных может описывать объект другой конфигурации или вычисляемую информацию самого provider.",
     "id": 10022
   },
   {
     "topic": "Terraform",
     "level": "Middle",
-    "q": "Что делает terraform import?",
+    "q": "Что происходит при импорте существующего объекта в Terraform?",
     "options": [
-      "Импортирует существующий ресурс в state без пересоздания",
-      "Удаляет ресурс из облака",
-      "Скачивает провайдер",
-      "Обновляет план"
+      "Объект связывается с resource address в state, после чего plan сравнивает его с конфигурацией",
+      "Атрибуты объекта копируются в input variables, а его дальнейший жизненный цикл остаётся вне state",
+      "Provider загружается из registry и получает доступ ко всем объектам указанного облачного проекта",
+      "Запись state переносится между двумя addresses без обращения к API и проверки удалённого объекта"
     ],
     "answer": 0,
-    "explanation": "import связывает реальный облачный ресурс с блоком resource в конфигурации. Сам конфиг нужно написать вручную. Ресурс НЕ пересоздаётся.",
+    "explanation": "Импорт связывает уже существующий удалённый объект с адресом resource в state; он не создаёт объект заново. CLI-команде нужна соответствующая конфигурация, а declarative import block можно включить в обычный plan/apply; генерация конфигурации доступна отдельной опцией и требует проверки результата.",
     "id": 10023
   },
   {
     "topic": "Terraform",
     "level": "Senior",
-    "q": "Почему terraform taint считается устаревшим по сравнению с -replace?",
+    "q": "Почему `-replace=ADDRESS` предпочтительнее команды `terraform taint`?",
     "options": [
-      "taint работает только с HCP Terraform, а -replace — только с local backend",
-      "taint изменяет state сразу, а -replace показывает намерение замены в проверяемом плане",
-      "taint удаляет resource без возможности создать его повторно",
-      "taint не поддерживает resource addresses с index или for_each key"
+      "`-replace` переносит объект в другой backend, тогда как taint сохраняет его в текущем workspace",
+      "`-replace` выражает намерение в plan/apply, а taint заранее помечает объект в сохранённом state",
+      "`-replace` меняет provider source, тогда как taint обновляет выбранную версию provider-плагина",
+      "`-replace` применим к data sources, тогда как taint обрабатывает outputs и локальные значения"
     ],
     "answer": 1,
-    "explanation": "HashiCorp рекомендует terraform apply -replace=ADDRESS: действие видно в plan до изменения инфраструктуры. terraform taint меняет state заранее и может повлиять на планы других пользователей.",
+    "explanation": "`terraform taint` устарел: он сразу записывает в state признак повреждённого объекта, и следующий plan может неожиданно запланировать замену. Опция `-replace=ADDRESS` относится к конкретной операции plan/apply, поэтому намерение видно в проверяемом плане до изменения инфраструктуры.",
     "id": 10024
   },
   {
     "topic": "Linux",
     "level": "Middle",
-    "q": "Что делает команда chmod 755 script.sh?",
+    "q": "Как изменятся права после `chmod 755 script.sh`?",
     "options": [
-      "Удаляет файл",
-      "Меняет владельца файла",
-      "Даёт права: владельцу rwx, группе и остальным r-x",
-      "Запускает скрипт"
+      "Владелец получит `rw-`, группа `r--`, остальные `r--`, поскольку исполняемый бит будет снят",
+      "Владелец получит `rwx`, группа `rw-`, остальные `rw-`, поскольку цифра 5 задаёт запись",
+      "Владелец получит `rwx`, группа `r-x`, остальные `r-x`, то есть режим станет `0755`",
+      "Владелец получит `r-x`, группа `rwx`, остальные `rwx`, поскольку цифры читаются справа налево"
     ],
     "answer": 2,
-    "explanation": "7=rwx(4+2+1) для владельца, 5=r-x(4+1) для группы, 5=r-x для остальных. Итого: -rwxr-xr-x.",
+    "explanation": "В восьмеричной записи 7 = 4 + 2 + 1 (`rwx`), а 5 = 4 + 1 (`r-x`). Первая цифра задаёт права владельца, вторая — группы, третья — остальных. Команда меняет mode bits, но не владельца, группу или содержимое файла.",
     "id": 10025
   },
   {
     "topic": "Linux",
     "level": "Middle",
-    "q": "Для чего используется /etc/fstab?",
+    "q": "Какую роль обычно выполняет `/etc/fstab`?",
     "options": [
-      "Для хранения паролей",
-      "Список пользователей",
-      "Конфигурация systemd",
-      "Автоматическое монтирование файловых систем при загрузке"
+      "Описывает локальных пользователей, их домашние каталоги и оболочки для процессов входа в систему",
+      "Задаёт unit dependencies systemd и команды запуска сервисов после достижения boot target",
+      "Хранит таблицу разделов диска с физическими секторами и изменяет её во время загрузки ядра",
+      "Описывает файловые системы, точки монтирования и опции для `mount` и загрузочных генераторов"
     ],
     "answer": 3,
-    "explanation": "fstab (file system table) описывает какие разделы/диски/сетевые шары монтировать при старте: устройство, точка монтирования, ФС, опции.",
+    "explanation": "`fstab` содержит статические записи об источнике, точке монтирования, типе файловой системы, опциях и порядке проверок. Запись не обязательно монтируется при старте: например, опция `noauto` это отключает. В systemd записи обычно преобразуются генератором в mount units.",
     "id": 10026
   },
   {
     "topic": "Linux",
     "level": "Middle",
-    "q": "Что делает команда kill -9 PID?",
+    "q": "Как действует команда `kill -9 PID`?",
     "options": [
-      "Принудительно убивает процесс (SIGKILL) — нельзя перехватить",
-      "Мягко завершает процесс (SIGTERM)",
-      "Приостанавливает процесс (SIGSTOP)",
-      "Перезапускает процесс"
+      "Посылает SIGKILL: процесс не может перехватить или игнорировать сигнал и не выполняет cleanup handler",
+      "Посылает SIGTERM: процесс получает возможность закрыть файлы, сохранить state и завершиться штатно",
+      "Посылает SIGSTOP: выполнение замораживается до SIGCONT, но процесс и его ресурсы сохраняются",
+      "Посылает SIGHUP: демон перечитывает конфигурацию или завершает работу согласно своему handler"
     ],
     "answer": 0,
-    "explanation": "-9 = SIGKILL — ядро немедленно уничтожает процесс. Процесс не может обработать этот сигнал или очистить ресурсы. Использовать только когда SIGTERM (-15) не сработал.",
+    "explanation": "Сигнал 9 — SIGKILL. Ядро завершает процесс без пользовательской обработки сигнала, поэтому приложение не успевает выполнить cleanup. Процесс в непрерываемом ожидании ядра может исчезнуть не сразу; обычно сначала пробуют SIGTERM и диагностируют причину зависания.",
     "id": 10027
   },
   {
     "topic": "Linux",
     "level": "Senior",
-    "q": "Что такое inode и что будет если они закончатся?",
+    "q": "Как исчерпание inode влияет на файловую систему?",
     "options": [
-      "Это IP-адрес сервера",
-      "inode — структура с метаданными файла; если закончатся — нельзя создать новые файлы даже при свободном месте",
-      "Тип файловой системы",
-      "Процесс systemd"
+      "Заканчиваются сетевые сокеты, поэтому новые TCP-соединения отклоняются при свободных disk blocks",
+      "Нельзя создать новые файловые объекты, хотя блоки данных ещё свободны, поскольку нет inode для metadata",
+      "Каталог переходит в read-only из-за переполнения journal, но новые файлы появляются после remount",
+      "Ядро удаляет старые directory entries, чтобы освободить inode без изменения занятых блоков данных"
     ],
     "answer": 1,
-    "explanation": "Каждый файл требует inode (владелец, права, размер). df -i покажет использование. Частая причина — миллионы мелких файлов (сессии PHP, кэш). Решение: удалить ненужное или пересоздать ФС с большим числом inode.",
+    "explanation": "Inode хранит метаданные и ссылки на блоки файла; имя находится в записи каталога. Если доступные inode закончились, создание файлов и каталогов завершается ошибкой даже при свободном месте для данных. Использование проверяют через `df -i`, а причину часто ищут среди множества мелких файлов.",
     "id": 10028
   },
   {
     "topic": "Сети",
     "level": "Middle",
-    "q": "Что такое VLAN и зачем он нужен?",
+    "q": "Какую сетевую задачу решает VLAN?",
     "options": [
-      "Тип кабеля",
-      "Протокол маршрутизации",
-      "Виртуальная сеть для логического разделения broadcast-доменов на одном физическом коммутаторе",
-      "Способ шифрования"
+      "Шифрует Ethernet payload между коммутаторами и выдаёт ключи участникам одного IP-сегмента",
+      "Выбирает кратчайший маршрут между автономными системами и распространяет prefix через BGP",
+      "Разделяет одну L2-инфраструктуру на логические broadcast-домены; trunks переносят теги 802.1Q",
+      "Преобразует private addresses в public addresses и отслеживает состояния транспортных соединений"
     ],
     "answer": 2,
-    "explanation": "VLAN (802.1Q) позволяет в одном физическом коммутаторе создать несколько изолированных сетей. Каждый VLAN — отдельный broadcast-домен. Связь между VLAN через router/L3-коммутатор.",
+    "explanation": "VLAN создаёт отдельный L2 broadcast-домен поверх общей коммутационной инфраструктуры. Access-порт обычно относится к одному VLAN без тега для конечного узла, trunk переносит несколько VLAN с тегами 802.1Q. Обмен между VLAN требует L3-маршрутизации и соответствующей политики.",
     "id": 10029
   },
   {
     "topic": "Сети",
     "level": "Middle",
-    "q": "В чём разница между TCP и UDP?",
+    "q": "Как точнее сравнить транспортные свойства TCP и UDP?",
     "options": [
-      "Никакой разницы",
-      "TCP — медленный, UDP — только для видео",
-      "UDP — для веб-серверов, TCP — для DNS",
-      "TCP — с установкой соединения и гарантией доставки; UDP — без соединения, быстрее, но без гарантий"
+      "TCP передаёт отдельные datagrams без порядка, а UDP формирует над ними надёжный поток байтов",
+      "TCP предназначен для локальных сетей, а UDP маршрутизируется между подсетями через IP-шлюзы",
+      "UDP подтверждает каждый segment, а TCP оставляет повторную передачу и ordering приложению",
+      "TCP даёт упорядоченный надёжный byte stream, а UDP посылает datagrams без встроенной доставки и порядка"
     ],
     "answer": 3,
-    "explanation": "TCP: three-way handshake, подтверждения, контроль потока (HTTP, SSH). UDP: отправил и забыл, быстрее, терпит потери (DNS, VoIP, стриминг, игры).",
+    "explanation": "TCP устанавливает соединение и реализует порядок, повторную передачу, flow control и congestion control для потока байтов. UDP сохраняет границы datagrams и не добавляет подтверждения или ordering. Приложение может построить нужную надёжность поверх UDP, как это делают современные транспортные протоколы.",
     "id": 10030
   },
   {
     "topic": "Сети",
     "level": "Senior",
-    "q": "Что делает traceroute и как он работает?",
+    "q": "На каком механизме строится `traceroute`?",
     "options": [
-      "Показывает путь пакетов до цели, увеличивая TTL и анализируя ICMP Time Exceeded ответы",
-      "Блокирует маршруты",
-      "Измеряет скорость интернета",
-      "Настраивает маршрутизатор"
+      "Посылает probes с растущим TTL или Hop Limit и сопоставляет ответы ICMP Time Exceeded от промежуточных узлов",
+      "Читает BGP RIB каждого маршрутизатора по SNMP и объединяет полученные next hop в единый путь",
+      "Измеряет пропускную способность каждого L2-link сериями больших packets с фиксированным TTL",
+      "Устанавливает TCP-сессию с каждым gateway и получает из неё таблицу соседей и routing policy"
     ],
     "answer": 0,
-    "explanation": "traceroute отправляет серии пакетов с TTL=1,2,3... Каждый маршрутизатор уменьшает TTL; когда TTL=0 — возвращает ICMP Time Exceeded. Так постепенно строится карта маршрута. mtr — улучшенная версия.",
+    "explanation": "Каждый L3-hop уменьшает TTL IPv4 или Hop Limit IPv6. Когда значение достигает нуля, маршрутизатор обычно отвечает ICMP Time Exceeded, что позволяет постепенно выявлять hops. Тип probe зависит от реализации: встречаются UDP, ICMP Echo и TCP; фильтрация, rate limiting и асимметрия делают результат неполным.",
     "id": 10031
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое Ansible inventory?",
+    "q": "Что описывает inventory в Ansible?",
     "options": [
-      "Список задач для выполнения",
-      "Файл со списком хостов и групп для управления",
-      "Тип модуля",
-      "Резервная копия конфигурации"
+      "Последовательность tasks и handlers, которую controller выполняет для каждого host в рамках play",
+      "Управляемые hosts, группы и связанные variables, полученные из статических или динамических sources",
+      "Коллекцию Python-модулей, которую execution environment копирует на remote host перед запуском",
+      "Журнал результатов предыдущего playbook run с changed status и stdout зарегистрированных tasks"
     ],
     "answer": 1,
-    "explanation": "Inventory (инвентаризация) — статический (INI/YAML) или динамический скрипт, возвращающий список хостов. Группы: [webservers], [databases]. Можно задавать переменные для групп и хостов.",
+    "explanation": "Inventory задаёт hosts и groups, а также может предоставлять host/group variables. Источником бывает INI/YAML-файл или inventory plugin, который получает динамические данные из внешней системы. Скриптовый интерфейс поддерживается, но plugins дают стандартную конфигурацию и кеширование.",
     "id": 10032
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Чем отличается playbook от роли (role)?",
+    "q": "Чем роль Ansible отличается от playbook?",
     "options": [
-      "Ничем — синонимы",
-      "Роль — это только переменные",
-      "Playbook — конкретный сценарий; роль — переиспользуемый пакет (tasks, handlers, vars, templates, files)",
-      "Playbook — для маленьких проектов"
+      "Роль определяет hosts и connection settings, а playbook содержит inventory groups и их variables",
+      "Роль хранит encrypted secrets, а playbook расшифровывает их и выдаёт managed hosts во время run",
+      "Playbook оркестрирует plays, а роль упаковывает переиспользуемые tasks, defaults, handlers и assets",
+      "Playbook устанавливает collections, а роль разрешает версии dependencies из Galaxy перед каждым play"
     ],
     "answer": 2,
-    "explanation": "Роль — способ организации: tasks/main.yml, handlers, vars, templates, files. Playbook вызывает роли. Структура ролей стандартизирована: ansible-galaxy init myrole.",
+    "explanation": "Playbook состоит из plays и задаёт, что выполнять на выбранных hosts. Роль организует переиспользуемый компонент по ожидаемым каталогам: tasks, handlers, defaults, vars, files, templates и другим. Роль подключают из play или task; это не отдельный механизм inventory или запуска.",
     "id": 10033
   },
   {
     "topic": "Ansible",
     "level": "Senior",
-    "q": "Что такое Ansible Vault и когда его использовать?",
+    "q": "Для чего предназначен Ansible Vault?",
     "options": [
-      "Тип подключения к хостам",
-      "Менеджер паролей для Linux",
-      "Плагин для Docker",
-      "Инструмент для шифрования конфиденциальных данных в плейбуках (пароли, ключи)"
+      "Выдаёт приложениям короткоживущие database credentials и отзывает их после завершения play",
+      "Ограничивает remote user команды через sudo policy и проверяет privilege escalation на hosts",
+      "Хранит inventory history и позволяет откатить изменённые managed hosts к предыдущему snapshot",
+      "Шифрует файлы или значения в репозитории, защищая secrets в покое до расшифровки при запуске"
     ],
     "answer": 3,
-    "explanation": "ansible-vault encrypt/decrypt защищает секреты в репозитории. Файл зашифрован AES256. Запуск с --ask-vault-pass или файлом пароля. Можно шифровать отдельные переменные.",
+    "explanation": "Ansible Vault шифрует данные, которые нужно хранить рядом с automation-кодом. Пароль или vault identity передают отдельно. После расшифровки секрет существует в памяти процесса и может попасть в вывод при неосторожной задаче, поэтому Vault не заменяет runtime secrets manager, разграничение доступа и `no_log`.",
     "id": 10034
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое handler в Ansible?",
+    "q": "Когда Ansible запускает handler?",
     "options": [
-      "Задача, которая выполняется только по notify (перезапуск сервиса при изменении конфига)",
-      "Тип подключения",
-      "Модуль для Windows",
-      "Способ логирования"
+      "Changed task уведомляет handler, он ставится в очередь и обычно выполняется в контрольной точке один раз по имени",
+      "Каждая task запускает все handlers своей роли до проверки changed status и вычисления условия `when`",
+      "Handler выполняется на controller при чтении inventory и изменяет variables для последующих plays",
+      "Failed task автоматически вызывает handler как rollback, даже если задача не содержит директиву `notify`"
     ],
     "answer": 0,
-    "explanation": "Handler срабатывает в конце плейбука, если notify вызван хотя бы раз. Классика: «скопировал конфиг → notify restart nginx». Запускается один раз даже при нескольких notify.",
+    "explanation": "Handler уведомляется через `notify`, обычно когда task имеет статус changed. Уведомления дедуплицируются по handler, а выполнение происходит после соответствующей секции tasks; `meta: flush_handlers` запускает очередь раньше. Handler не является автоматическим rollback и при аварийном завершении host может не выполниться.",
     "id": 10035
   },
   {
     "topic": "Linux",
     "level": "Middle",
-    "q": "Что такое Yandex Compute Cloud?",
+    "q": "Какую нагрузку обслуживает Yandex Compute Cloud?",
     "options": [
-      "Объектное хранилище",
-      "Сервис для создания и управления виртуальными машинами",
-      "База данных",
-      "DNS-сервис"
+      "Объекты в S3-compatible buckets с lifecycle rules, versioning и HTTP-доступом через storage API",
+      "Виртуальные машины, подключённые диски и образы с управлением вычислительными ресурсами через API",
+      "Авторитетные DNS-зоны и resource records с делегированием доменов на облачные name servers",
+      "Очереди сообщений с подтверждениями доставки и повторным чтением consumers после visibility timeout"
     ],
     "answer": 1,
-    "explanation": "Compute Cloud = IaaS: виртуальные машины, диски, образы. Аналог AWS EC2. Поддерживает прерываемые ВМ (дешевле на 60%).",
+    "explanation": "Compute Cloud — IaaS-сервис для жизненного цикла виртуальных машин и связанных дисков, snapshots и images. Сетевые интерфейсы подключаются к облачным подсетям, а доступ регулируется отдельными сетевыми и IAM-настройками. Цены и режимы VM лучше проверять по актуальной документации, а не запоминать фиксированный процент скидки.",
     "id": 10036
   },
   {
     "topic": "Linux",
     "level": "Middle",
-    "q": "Что такое Yandex Object Storage?",
+    "q": "Какая модель хранения используется в Yandex Object Storage?",
     "options": [
-      "Файловая система",
-      "Блочное хранилище для ВМ",
-      "S3-совместимое объектное хранилище для данных любого объёма",
-      "Реляционная база данных"
+      "POSIX-файловая система монтируется на VM и обеспечивает shared file locks между приложениями",
+      "Block device подключается к VM, получает filesystem и обслуживает произвольные sector writes",
+      "Объекты размещаются в buckets через S3-compatible API и адресуются ключами вместо block offsets",
+      "Реляционные таблицы распределяются по shards и поддерживают SQL joins и транзакции между строками"
     ],
     "answer": 2,
-    "explanation": "Object Storage — аналог AWS S3. Подходит для статики, бэкапов, логов. Интегрируется с CDN. Поддерживает версионирование и шифрование.",
+    "explanation": "Object Storage хранит объекты в buckets и предоставляет S3-compatible API. Это не POSIX filesystem и не block device: обновление части объекта обычно означает запись новой версии объекта. Политики доступа, versioning, lifecycle, encryption и публикацию настраивают отдельно для конкретного bucket и сценария.",
     "id": 10037
   },
   {
     "topic": "Linux",
     "level": "Middle",
-    "q": "Что такое Yandex VPC (Virtual Private Cloud)?",
+    "q": "Что объединяет сервис Yandex Virtual Private Cloud?",
     "options": [
-      "Тип виртуальной машины",
-      "Балансировщик нагрузки",
-      "Сервис мониторинга",
-      "Изолированная облачная сеть с подсетями, маршрутизацией и security groups"
+      "VM images, snapshots и instance templates, из которых создаются группы вычислительных instances",
+      "Container images, registry repositories и правила очистки старых tags и manifests по расписанию",
+      "Service accounts, role bindings и federation identities для доступа к ресурсам облачной иерархии",
+      "Cloud networks, zone-specific subnets, routes, addresses и security controls для сетевого обмена"
     ],
     "answer": 3,
-    "explanation": "VPC — ваш приватный дата-центр в облаке: сети, подсети, NAT, роутинг. Security Groups — stateful файрвол на уровне портов.",
+    "explanation": "VPC предоставляет сетевые примитивы облака: networks, subnets, routes, IP addresses, gateways и security groups согласно доступным возможностям сервиса. Подсеть относится к зоне доступности, а network объединяет подсети. Связность и отказоустойчивость зависят от маршрутов, адресации и архитектуры workloads.",
     "id": 10038
   },
   {
     "topic": "Linux",
     "level": "Middle",
-    "q": "Как работает Yandex IAM (Identity and Access Management)?",
+    "q": "Как IAM определяет доступ к ресурсам Yandex Cloud?",
     "options": [
-      "Ролевая модель: сервисные аккаунты, роли, федерации (SAML, OAuth)",
-      "Только через пароль",
-      "Только через SSH-ключи",
-      "IAM отсутствует в Yandex Cloud"
+      "Access binding назначает роль identity на ресурсе, а иерархия и состав роли определяют разрешённые действия",
+      "Каждый сервис читает локальный файл паролей VM и переносит Unix groups на облачные API permissions",
+      "Security group назначает пользователю сетевой порт, который затем становится permission для всех API",
+      "SSH public key превращается в облачную роль и наследуется дочерними folders после первого входа на VM"
     ],
     "answer": 0,
-    "explanation": "IAM: роли (editor, viewer, auditor), сервисные аккаунты для ВМ и функций, федерации с корпоративным SSO. Минимальные привилегии — принцип least privilege.",
+    "explanation": "IAM связывает identities — пользователей, service accounts и участников федераций — с ролями на ресурсах. Назначение на организации, облаке или folder может наследоваться дочерними ресурсами, поэтому область привязки важна. Принцип least privilege требует узких ролей, контролируемых credentials и регулярного аудита bindings.",
     "id": 10039
   },
   {
     "topic": "Kubernetes",
     "level": "Middle",
-    "q": "Что такое Yandex Managed Service for Kubernetes?",
+    "q": "Что берёт на себя Yandex Managed Service for Kubernetes?",
     "options": [
-      "Локальный minikube",
-      "Управляемый K8s: мастер-ноды обслуживает Yandex, worker-ноды — ваши",
-      "Платформа для CI/CD",
-      "Хранилище образов"
+      "Создаёт локальный single-node cluster внутри developer workstation и сохраняет его state в kubeconfig",
+      "Управляет control plane кластера, а пользователь настраивает node groups, workloads, доступ и обновления",
+      "Заменяет CI-system: собирает application source, запускает unit tests и публикует release artifacts",
+      "Хранит OCI images по repository names и выдаёт registry credentials через Kubernetes ImagePullSecret"
     ],
     "answer": 1,
-    "explanation": "Managed K8s = не нужно админить control plane. Автоскейлинг нод, интеграция с Container Registry, Load Balancer, CSI-драйвер для дисков.",
+    "explanation": "Managed Kubernetes предоставляет управляемый control plane и API кластера. Пользователь по-прежнему отвечает за node groups, workloads, RBAC, network policies, ресурсы и совместимость обновлений в пределах модели сервиса. Интеграции с registry, load balancers и storage не отменяют настройки этих компонентов.",
     "id": 10040
   },
   {
     "topic": "Linux",
     "level": "Junior",
-    "q": "Что такое Yandex Cloud Functions?",
+    "q": "Какую модель выполнения предлагает Yandex Cloud Functions?",
     "options": [
-      "Виртуальные машины",
-      "Корпоративная почта",
-      "Serverless: запуск кода по событию без управления серверами",
-      "Инструмент для миграции"
+      "Постоянная VM запускает systemd units и требует ручного выбора CPU, RAM, диска и стратегии patching",
+      "Managed database принимает SQL-запросы, а functions выполняются как stored procedures внутри storage engine",
+      "Код запускается по вызову или событию в управляемой среде, масштабируется и ограничивается параметрами функции",
+      "Container cluster распределяет pods по пользовательским nodes и ожидает управления control plane через kubectl"
     ],
     "answer": 2,
-    "explanation": "Cloud Functions = serverless (FaaS). Поддерживает Python, Node.js, Go, Java. Триггеры: HTTP, Object Storage, Message Queue, таймер. Плата только за выполнение.",
+    "explanation": "Cloud Functions — событийная serverless/FaaS-модель: платформа запускает версию функции по прямому вызову или настроенному trigger и управляет средой исполнения. Разработчик задаёт код, runtime-параметры, service account, сеть и limits. Поддерживаемые runtimes, triggers и тарификация меняются, их сверяют с текущей документацией.",
     "id": 10041
   },
   {
     "topic": "Linux",
     "level": "Middle",
-    "q": "Как организовать отказоустойчивость в Yandex Cloud?",
+    "q": "Как проектировать отказоустойчивое приложение в Yandex Cloud?",
     "options": [
-      "Никак — облако само всё делает",
-      "Купить два аккаунта",
-      "Только через ручное переключение",
-      "Размещать ВМ в разных зонах доступности, использовать Load Balancer, настроить автоскейлинг"
+      "Разместить компоненты на одной крупной VM и увеличить её disk size, чтобы исключить сетевые зависимости",
+      "Создать второй cloud account с копией кода, но оставить database и traffic endpoint в первой зоне",
+      "Переключать public IP вручную после сбоя и считать backup заменой health checks и recovery drills",
+      "Разнести replicas по failure domains, балансировать трафик и обеспечить health checks, data redundancy и recovery"
     ],
     "answer": 3,
-    "explanation": "Зоны доступности (AZ) — физически изолированные дата-центры. Application Load Balancer распределяет трафик. Instance Group с автоскейлингом автоматически заменяет упавшие ВМ.",
+    "explanation": "Отказоустойчивость строится end-to-end: несколько экземпляров в подходящих зонах, health checks и load balancing, отказоустойчивый data tier, backups и проверяемый recovery plan. Instance groups могут пересоздавать unhealthy VM, но возможности отдельных сервисов и межзонные ограничения нужно учитывать в архитектуре.",
     "id": 10042
   },
   {
     "topic": "CI/CD",
     "level": "Middle",
-    "q": "Как деплоить в Yandex Cloud через GitLab CI?",
+    "q": "Как безопаснее организовать deployment из GitLab CI в Yandex Cloud?",
     "options": [
-      "Сервисный аккаунт с правами editor + yc CLI в пайплайне + авторизация через SA key",
-      "Только вручную через веб-интерфейс",
-      "Только через Terraform",
-      "Деплой через FTP"
+      "Выдать отдельному service account минимальные роли, защитить credentials и запускать `yc` или Terraform из job",
+      "Передать runner роль администратора организации и сохранять постоянный key рядом с `.gitlab-ci.yml`",
+      "Разрешить public write API для целевого ресурса, чтобы pipeline обходился без identity и audit trail",
+      "Подключить runner по FTP к каждой VM и выполнять production-команды без environment rules и approval"
     ],
     "answer": 0,
-    "explanation": "1) Создать сервисный аккаунт и авторизованный ключ. 2) Сохранить ключ в GitLab Variables. 3) В CI: установить yc CLI, активировать профиль, деплоить. Альтернатива: Terraform с S3-бэкендом.",
+    "explanation": "Pipeline использует отдельную machine identity с минимальными ролями на нужной области. Credential передают через защищённый механизм GitLab или поддерживаемую федерацию, не коммитят в repository и регулярно ротируют. Deployment job дополнительно ограничивают protected branches/environments, approvals и audit; конкретный инструмент может быть `yc`, Terraform или API.",
     "id": 10043
   },
   {
     "topic": "Terraform",
     "level": "Middle",
-    "q": "Как использовать Terraform с Yandex Cloud?",
+    "q": "Как Terraform подключается к ресурсам Yandex Cloud?",
     "options": [
-      "Terraform не поддерживает Yandex Cloud",
-      "Провайдер yandex-cloud/yandex + авторизация через token или SA key",
-      "Только через AWS-провайдер",
-      "Только через веб-интерфейс"
+      "Через AWS provider с подменой region, после чего все Yandex API автоматически повторяют интерфейсы EC2",
+      "Через provider `yandex-cloud/yandex` и поддерживаемый способ аутентификации; backend state настраивается отдельно",
+      "Через локальный `yc` state, который заменяет Terraform backend и dependency graph при каждом plan",
+      "Через web console export, который запускает apply внутри browser session и хранит state в cookies"
     ],
     "answer": 1,
-    "explanation": "terraform { required_providers { yandex = { source = 'yandex-cloud/yandex' } } }. Авторизация: YC_TOKEN env var или service_account_key_file. State — в Object Storage с блокировкой через YDB.",
+    "explanation": "Конфигурация объявляет provider `yandex-cloud/yandex` и передаёт ему подходящие параметры проекта и authentication выбранным поддерживаемым способом. Хранение state — отдельная задача backend: credentials, encryption и locking зависят от его возможностей. Поэтому provider setup не следует смешивать с S3 backend или фиксированной схемой блокировок.",
     "id": 10044
   },
   {
     "topic": "Docker",
     "level": "Middle",
-    "q": "Что такое Yandex Container Registry?",
+    "q": "Для чего служит Yandex Container Registry?",
     "options": [
-      "Файловое хранилище",
-      "CI/CD система",
-      "Управляемый Docker-реестр для хранения и управления образами",
-      "Мониторинг контейнеров"
+      "Предоставляет shared POSIX volumes для pods и VM с directory locks и изменением файлов на месте",
+      "Запускает pipeline jobs из repository hooks и хранит console logs вместе с test reports и coverage",
+      "Хранит и раздаёт OCI/container images по repositories и tags с доступом, управляемым облачными permissions",
+      "Собирает application metrics по scrape targets и выполняет alert rules над временными рядами данных"
     ],
     "answer": 2,
-    "explanation": "Container Registry — аналог Docker Hub, но приватный. Интеграция с Managed K8s, сканирование уязвимостей, управление доступами через IAM.",
+    "explanation": "Container Registry — управляемое хранилище container images, совместимое с привычным registry workflow. Clients push и pull images по repository references; доступ регулируется IAM и credentials. Scanning, cleanup policies и интеграции зависят от текущих возможностей и конфигурации, поэтому registry не следует описывать как CI-систему или runtime.",
     "id": 10045
   },
   {
     "topic": "CI/CD",
     "level": "Junior",
-    "q": "Что такое CI (Continuous Integration)?",
+    "q": "Какую практику описывает Continuous Integration?",
     "options": [
-      "Инструмент для документации",
-      "Ручное тестирование раз в неделю",
-      "Система хранения Docker-образов",
-      "Практика частой интеграции кода с автосборкой и тестированием"
+      "Release собирают на рабочей станции перед квартальным окном и проверяют отдельным ручным checklist",
+      "Source code архивируют после каждой версии, а integration выполняют при подготовке production migration",
+      "Images публикуют в registry по расписанию, даже если source и automated checks не изменялись",
+      "Небольшие изменения часто объединяют в общей ветке и быстро проверяют автоматической сборкой и tests"
     ],
     "answer": 3,
-    "explanation": "CI — частая интеграция изменений в main. Каждый коммит триггерит сборку и тесты.",
+    "explanation": "CI сокращает размер и время жизни расходящихся изменений: разработчики часто интегрируют код, а automated build и tests дают быстрый feedback. Конкретный trigger и набор checks определяет pipeline; CI не гарантирует качество сама по себе и не равна автоматическому production deployment.",
     "id": 14043
   },
   {
     "topic": "CI/CD",
     "level": "Junior",
-    "q": "Что такое GitLab Runner?",
+    "q": "Какую роль выполняет GitLab Runner?",
     "options": [
-      "Агент, выполняющий задачи CI/CD из .gitlab-ci.yml",
-      "Веб-интерфейс GitLab",
-      "Плагин VS Code",
-      "Хранилище образов"
+      "Получает CI jobs от GitLab, исполняет их выбранным executor и возвращает logs, status и artifacts",
+      "Хранит Git repositories и принимает merge requests вместо server-side компонентов GitLab platform",
+      "Проверяет source code как IDE plugin и отправляет diagnostics в pipeline без регистрации у GitLab",
+      "Выступает container registry, подписывает manifests и раздаёт images Kubernetes nodes по OCI API"
     ],
     "answer": 0,
-    "explanation": "GitLab Runner — агент для запуска job. Исполнители: shell, docker, kubernetes, ssh.",
+    "explanation": "GitLab Runner регистрируется у GitLab, запрашивает подходящие jobs и выполняет их через настроенный executor и environment. Затем он передаёт trace, status, cache или artifacts согласно job config. Безопасность зависит от scope runner, executor isolation, tags, protected settings и доверия к запускаемому коду.",
     "id": 14044
   },
   {
     "topic": "CI/CD",
     "level": "Junior",
-    "q": "Где описывается пайплайн GitHub Actions?",
+    "q": "Где GitHub Actions ищет определения workflows?",
     "options": [
-      "Jenkinsfile",
-      ".github/workflows/*.yml",
-      "Dockerfile",
-      "package.json"
+      "В корневом `Jenkinsfile`, который GitHub преобразует в jobs при открытии pull request в repository",
+      "В YAML-файлах каталога `.github/workflows`, закоммиченных в repository и содержащих triggers и jobs",
+      "В `Dockerfile`, где инструкции `RUN` считаются steps, а stages автоматически становятся environments",
+      "В `package.json`, где scripts превращаются в hosted runners без отдельного workflow и permissions"
     ],
     "answer": 1,
-    "explanation": "Workflow-файлы в .github/workflows/. Триггеры: push, pull_request, schedule.",
+    "explanation": "Workflow — YAML-файл с расширением `.yml` или `.yaml` в `.github/workflows`. Он задаёт events, jobs, permissions, runners и steps. Остальные файлы могут вызываться из steps или reusable workflows, но сами по себе не становятся определением GitHub Actions pipeline.",
     "id": 14045
   },
   {
     "topic": "CI/CD",
     "level": "Junior",
-    "q": "Что такое артефакт в CI/CD?",
+    "q": "Что обычно называют job artifact в CI/CD?",
     "options": [
-      "Базовый образ ОС",
-      "Лог сборки",
-      "Файлы созданные на одном этапе и передаваемые дальше",
-      "Конфиг сервера"
+      "Mutable cache зависимостей, который jobs совместно перезаписывают и используют как release source of record",
+      "Полный checkout repository вместе с runner credentials, который автоматически передаётся каждой следующей stage",
+      "Файлы или reports, созданные job, загруженные CI-системой и доступные дальше по retention и dependency rules",
+      "Console trace runner, превращённый в filesystem layer job image и опубликованный под commit tag в registry"
     ],
     "answer": 2,
-    "explanation": "Артефакты — бинарники, отчёты тестов, Docker-образы. GitLab CI хранит в MinIO.",
+    "explanation": "Artifacts — явные outputs job: binaries, packages, test reports, coverage и другие файлы, которые CI загружает и хранит по retention policy. Передача downstream jobs зависит от конфигурации. Cache предназначен для ускорения, а container image обычно публикуют в registry; backend хранения artifacts определяется установкой CI, а не обязательно MinIO.",
     "id": 14046
   },
   {
     "topic": "CI/CD",
     "level": "Middle",
-    "q": "GitLab CI vs GitHub Actions?",
+    "q": "Как корректно сравнить конфигурацию GitLab CI и GitHub Actions?",
     "options": [
-      "Идентичны",
-      "GitLab CI без Docker",
-      "GitHub Actions без параллелизма",
-      "GitLab: один .gitlab-ci.yml; GitHub: множество workflow-файлов"
+      "GitLab CI исполняет jobs последовательно, а GitHub Actions не поддерживает dependencies между jobs",
+      "GitLab CI использует host shell, а GitHub Actions запускает steps в containers без выбора runner type",
+      "GitLab CI хранит config в UI, а GitHub Actions требует один YAML-файл в корне каждого repository",
+      "GitLab начинает с `.gitlab-ci.yml` и поддерживает includes, а GitHub обнаруживает workflows в `.github/workflows`"
     ],
     "answer": 3,
-    "explanation": "GitLab CI: stages+jobs в одном файле. GitHub Actions: отдельные файлы-воркфлоу.",
+    "explanation": "Обе системы описывают automated workflows в repository, поддерживают runners, containers, parallelism, dependencies, secrets и reusable configuration. У GitLab основной entry point — `.gitlab-ci.yml`, который может включать другие файлы; GitHub Actions обнаруживает несколько workflow-файлов в `.github/workflows`. Выбор зависит от platform integration, security model и эксплуатации runners.",
     "id": 14047
   },
   {

@@ -8,52 +8,46 @@
     186
   ],
   "issueBudget": {
-    "length-cue": 175,
-    "question-echo": 4,
-    "absolute-distractor": 82,
-    "duplicate-question": 4
+    "length-cue": 146,
+    "question-echo": 3,
+    "absolute-distractor": 74,
+    "duplicate-question": 2
   },
   "topics": {
     "Terraform": {
-      "length-cue": 5,
+      "length-cue": 1,
       "question-echo": 0,
-      "absolute-distractor": 13,
-      "duplicate-question": 3
+      "absolute-distractor": 10,
+      "duplicate-question": 1
     },
     "Linux": {
-      "length-cue": 30,
-      "question-echo": 1,
-      "absolute-distractor": 21,
+      "length-cue": 20,
+      "question-echo": 0,
+      "absolute-distractor": 19,
       "duplicate-question": 0
     },
     "Сети": {
-      "length-cue": 20,
+      "length-cue": 17,
       "question-echo": 1,
-      "absolute-distractor": 10,
+      "absolute-distractor": 9,
       "duplicate-question": 0
     },
     "Ansible": {
-      "length-cue": 26,
+      "length-cue": 22,
       "question-echo": 0,
-      "absolute-distractor": 14,
-      "duplicate-question": 0
-    },
-    "Kubernetes": {
-      "length-cue": 11,
-      "question-echo": 0,
-      "absolute-distractor": 3,
+      "absolute-distractor": 13,
       "duplicate-question": 0
     },
     "CI/CD": {
-      "length-cue": 13,
+      "length-cue": 7,
       "question-echo": 1,
-      "absolute-distractor": 1,
+      "absolute-distractor": 0,
       "duplicate-question": 1
     },
-    "Docker": {
-      "length-cue": 1,
+    "Kubernetes": {
+      "length-cue": 10,
       "question-echo": 0,
-      "absolute-distractor": 0,
+      "absolute-distractor": 3,
       "duplicate-question": 0
     },
     "Monitoring": {
@@ -77,19 +71,19 @@
   },
   "levels": {
     "Middle": {
-      "length-cue": 82,
+      "length-cue": 61,
       "question-echo": 0,
-      "absolute-distractor": 30,
-      "duplicate-question": 2
+      "absolute-distractor": 23,
+      "duplicate-question": 0
     },
     "Senior": {
-      "length-cue": 50,
-      "question-echo": 3,
-      "absolute-distractor": 41,
+      "length-cue": 47,
+      "question-echo": 2,
+      "absolute-distractor": 40,
       "duplicate-question": 1
     },
     "Junior": {
-      "length-cue": 43,
+      "length-cue": 38,
       "question-echo": 1,
       "absolute-distractor": 11,
       "duplicate-question": 1
