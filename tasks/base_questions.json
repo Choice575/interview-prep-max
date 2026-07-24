@@ -6924,450 +6924,450 @@
     "topic": "Terraform",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как реализовать multi-region деплой через Terraform?",
+    "q": "Как спроектировать multi-region deployment в Terraform?",
     "options": [
-      "Multiple provider aliases: provider \"aws\" { alias=\"us\", region=\"us-east-1\" } provider \"aws\" { alias=\"eu\", region=\"eu-west-1\" }; ресурсы с provider = aws.eu",
-      "Запустить terraform apply несколько раз с разными переменными",
-      "Multi-region требует отдельные .tf файлы для каждого региона",
-      "Terraform не поддерживает multi-region без модулей"
+      "Объявить явные provider aliases по регионам, передать их экземплярам модуля и при необходимости разделить state",
+      "Менять region у default provider перед каждым apply, сохраняя одинаковые resource addresses в общем state",
+      "Создать for_each по регионам и вычислять provider reference строкой для каждого экземпляра одного module block",
+      "Назначить регион каждому CLI workspace: Terraform автоматически переключит provider и изолирует зависимости"
     ],
     "answer": 0,
-    "explanation": "Multiple provider aliases для разных регионов/аккаунтов. Модуль с providers = { aws = aws.eu } позволяет переиспользовать один модуль для разных регионов. Нюанс: провайдер alias нельзя передать в for_each модулей (ограничение Terraform). Альтернатива: Terragrunt run_all."
+    "explanation": "Конфигурации провайдеров связываются статически: aliases объявляют в root module и явно передают через providers. Один module block с for_each не умеет динамически выбирать alias для каждого элемента, поэтому часто используют явные вызовы или отдельные root configurations; state разделяют по blast radius и операционным границам."
   },
   {
     "id": 482,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое provider meta-argument 'alias' и как использовать несколько конфигураций одного провайдера?",
+    "q": "Как используется alias у Terraform provider?",
     "options": [
-      "alias позволяет использовать разные версии одного провайдера",
-      "provider \"aws\" { alias = \"secondary\" region = \"us-west-2\" }; ресурс: provider = aws.secondary; позволяет управлять ресурсами в разных регионах/аккаунтах",
-      "alias работает только с AWS провайдером",
-      "Несколько конфигураций провайдера требуют разных Terraform workspace"
+      "Alias закрепляет отдельную версию provider plugin, поэтому default и aliased configurations обновляются независимо",
+      "Alias именует дополнительную конфигурацию; resource выбирает aws.secondary, а caller передаёт её child module",
+      "Alias экспортируется через output и может вычисляться выражением из имени региона во время plan или apply",
+      "Alias создаёт отдельный backend namespace, поэтому каждая конфигурация provider получает собственный state"
     ],
     "answer": 1,
-    "explanation": "provider alias: несколько блоков одного провайдера с уникальным alias. Провайдер без alias = default. resource \"aws_instance\" \"west\" { provider = aws.secondary }. Модули: передача через providers = { aws = aws.secondary }. Используется для multi-region, multi-account, multi-environment."
+    "explanation": "Provider block без alias задаёт default configuration, а блок с alias создаёт адрес вроде aws.secondary. Ресурс выбирает его через provider, caller передаёт через providers; child module объявляет ожидаемые aliases в configuration_aliases. Alias не выбирает версию provider и не создаёт workspace или state."
   },
   {
     "id": 483,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как Terraform определяет порядок создания ресурсов?",
+    "q": "Как Terraform определяет порядок операций над ресурсами?",
     "options": [
-      "Порядок определяется алфавитным порядком ресурсов в .tf файлах",
-      "Ресурсы создаются в порядке их объявления в main.tf",
-      "Terraform строит DAG (Directed Acyclic Graph) на основе явных depends_on и неявных ссылок; независимые ресурсы создаются параллельно",
-      "Порядок задаётся только через depends_on"
+      "Читает .tf файлы по имени и выполняет resource blocks сверху вниз, сохраняя этот порядок между запусками",
+      "Сортирует ресурсы по provider и type, а depends_on меняет порядок только внутри одного исходного файла",
+      "Строит dependency graph из ссылок и явных depends_on, затем параллельно обрабатывает независимые вершины",
+      "Использует порядок объектов в state; новые ресурсы добавляет в конец и применяет после уже известных объектов"
     ],
     "answer": 2,
-    "explanation": "Terraform анализирует reference expressions (aws_vpc.main.id → aws_subnet.main depends on aws_vpc.main) и строит DAG. Топологическая сортировка определяет порядок. Независимые ресурсы идут параллельно. depends_on добавляет явную зависимость (когда неявной нет)."
+    "explanation": "Terraform строит граф из ссылок в expressions, provider dependencies, явных depends_on и других lifecycle-связей. Топологический порядок соблюдает зависимости, а независимые вершины могут выполняться параллельно. Положение блока в файле не задаёт порядок создания."
   },
   {
     "id": 484,
     "topic": "Terraform",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Какие компромиссы между S3 backend с lock-файлом и HCP Terraform?",
+    "q": "Как сравнить S3 backend с lock-файлом и HCP Terraform?",
     "options": [
-      "S3 всегда даёт remote runs и policy enforcement без дополнительной настройки",
-      "Оба варианта идентичны по управлению доступом, операциям и стоимости",
-      "HCP Terraform не поддерживает locking, поэтому требует внешний lock-файл",
-      "S3 даёт больше самостоятельного контроля и настройки; HCP Terraform добавляет managed runs, UI, RBAC и policy-функции за дополнительную стоимость"
+      "S3 backend выполняет планы удалённо и предоставляет deployment UI, если включены bucket versioning и use_lockfile",
+      "HCP Terraform хранит только state, поэтому runs, права доступа и policy workflow остаются такими же, как с S3",
+      "HCP Terraform требует DynamoDB для блокировки, а S3 lock-файл одновременно заменяет IAM и шифрование state",
+      "S3 оставляет IAM, CI и эксплуатацию команде; HCP может добавить managed runs, UI, RBAC и policy по выбранному плану"
     ],
     "answer": 3,
-    "explanation": "S3 backend требует самостоятельно настроить IAM, encryption, versioning и use_lockfile. HCP Terraform управляет state/locking и добавляет remote runs, UI, RBAC и policy workflow; выбор зависит от требований контроля и стоимости."
+    "explanation": "Для S3 команда сама настраивает IAM, encryption, versioning, CI и use_lockfile; DynamoDB locking устарел. HCP Terraform управляет state и locking и может выполнять remote runs с UI, RBAC и policy-функциями, доступность которых зависит от тарифа. Выбор определяют контроль, compliance, интеграции и стоимость."
   },
   {
     "id": 485,
     "topic": "Terraform",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как корректно удалить ресурс из Terraform-управления без его физического удаления?",
+    "q": "Как прекратить управление ресурсом Terraform, не удаляя remote object?",
     "options": [
-      "terraform state rm удаляет из state без destroy; или removed block (1.7+) с destroy=false; затем удалить код ресурса",
-      "Добавить lifecycle { prevent_destroy = true }",
-      "Закомментировать код ресурса в .tf файле",
-      "Terraform всегда удаляет ресурс при удалении из конфигурации"
+      "Удалить binding через terraform state rm либо removed block с destroy = false и согласованно убрать resource block",
+      "Добавить prevent_destroy и удалить resource block: lifecycle останется в state и автоматически отменит destroy",
+      "Перенести resource в moved block без адреса to: Terraform воспримет пустую цель как отказ от управления",
+      "Оставить resource block и добавить import с тем же адресом: после apply объект исчезнет только из Terraform state"
     ],
     "answer": 0,
-    "explanation": "terraform state rm <address> удаляет запись из state — ресурс продолжает существовать в облаке. После этого удалить код ресурса (иначе plan захочет создать его заново). removed block { lifecycle { destroy = false } } — декларативный подход. prevent_destroy — защита от случайного удаления, не для управления."
+    "explanation": "terraform state rm делает операцию императивно; декларативный removed block с lifecycle { destroy = false } фиксирует намерение в коде. После state rm старый resource block также убирают до следующего plan, иначе Terraform предложит создать объект заново. Сначала сохраняют state backup и проверяют адрес экземпляра."
   },
   {
     "id": 486,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как реализовать conditional module calls в Terraform?",
+    "q": "Как условно создавать экземпляр Terraform module?",
     "options": [
-      "Использовать if-else блок вокруг module вызова",
-      "count = var.create_module ? 1 : 0 в module блоке; для for_each: for_each = var.enabled ? {this={}} : {}; обращение к outputs через module.name[0].output или try()",
-      "Conditional module calls не поддерживаются в Terraform",
-      "Использовать enabled = false параметр в module блоке"
+      "Обернуть module block в if expression; при false Terraform пропустит разбор source, inputs и provider mappings",
+      "Задать count как 0/1 либо for_each как пустую/непустую коллекцию и учитывать коллекцию в ссылках на outputs",
+      "Передать стандартный аргумент enabled = false: Terraform удалит ресурсы модуля независимо от его интерфейса",
+      "Условно изменить source на null: существующий экземпляр останется в state, но перестанет участвовать в plan"
     ],
     "answer": 1,
-    "explanation": "module \"vpc\" { count = var.create_vpc ? 1 : 0 source = './modules/vpc' }. Output: module.vpc[0].vpc_id. Проблема: count с for_each не смешиваются. for_each в module: каждый элемент создаёт независимый набор ресурсов. try(module.vpc[0].id, null) для safe reference."
+    "explanation": "Module blocks поддерживают count и for_each, как и resources. После count адрес и outputs становятся коллекцией, поэтому обращаются по индексу либо нормализуют результат, например через one(module.vpc[*].id). Переход между count и for_each меняет адреса и требует moved blocks или явной миграции state."
   },
   {
     "id": 487,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое Terraform state locking и как работает с S3 backend?",
+    "q": "Как state locking работает в актуальном Terraform S3 backend?",
     "options": [
-      "State locking шифрует state файл при хранении",
-      "Locking включается bucket versioning и не требует отдельных IAM permissions",
-      "use_lockfile создаёт объект .tflock и не допускает одновременную запись; осиротевший lock снимают force-unlock после проверки",
-      "Для S3 обязателен DynamoDB; встроенный lock-файл не поддерживается"
+      "Bucket versioning автоматически блокирует state на время plan, поэтому отдельные lock permissions не требуются",
+      "Lock хранится только в локальном .terraform, а S3 отклоняет конкурирующие записи по совпадению serial в state",
+      "use_lockfile создаёт объект .tflock; осиротевший lock снимают force-unlock лишь после проверки активных runs",
+      "Для S3 по-прежнему обязательна DynamoDB table, а встроенный lock-файл применяется только к local backend"
     ],
     "answer": 2,
-    "explanation": "Актуальный S3 backend включает locking через use_lockfile = true и объект <key>.tflock с отдельными IAM permissions. DynamoDB locking объявлен устаревшим и нужен только для совместимости при миграции."
+    "explanation": "use_lockfile = true включает блокировку объектом <key>.tflock и требует GetObject, PutObject и DeleteObject для него. DynamoDB locking объявлен устаревшим. force-unlock используют с lock ID только убедившись, что операция-владелец завершилась, иначе параллельная запись может повредить state."
   },
   {
     "id": 488,
     "topic": "Terraform",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как реализовать iterative refactoring Terraform кода без downtime инфраструктуры?",
+    "q": "Как проводить итеративный рефакторинг Terraform без лишнего пересоздания?",
     "options": [
-      "Сделать terraform destroy и пересоздать инфраструктуру с новым кодом",
-      "Использовать terraform taint для принудительного пересоздания",
-      "Рефакторинг возможен только для dev окружений",
-      "moved blocks для переименования, import blocks для добавления неуправляемых ресурсов, -refresh-only для обновления state, планомерное разделение крупных модулей"
+      "Сначала удалить старые addresses через state rm, затем применить новый код и импортировать сохранившиеся объекты",
+      "Пометить все изменяемые ресурсы terraform taint, чтобы provider сам выбрал безопасный порядок их замены",
+      "Объединить рефакторинг и upgrade provider в один apply: единый большой plan проще проверить на эквивалентность",
+      "Делать малые шаги, описывать смену addresses moved blocks и проверять, что plan не предлагает replace или destroy"
     ],
     "answer": 3,
-    "explanation": "Безопасный рефакторинг: moved block при переименовании/перемещении ресурсов, import block для ввода существующих ресурсов в управление, -refresh-only для синхронизации state. Принцип: каждый шаг должен дать нулевой diff в plan. Тестировать в dev → staging → prod."
+    "explanation": "Безопасный рефакторинг отделяют от функциональных изменений и выполняют короткими проверяемыми шагами. moved blocks сохраняют identity при переименовании или переносе; в особых случаях применяют terraform state mv. Нулевой destructive diff подтверждает адресную миграцию, но изменения immutable полей всё равно могут требовать отдельной rollout-стратегии."
   },
   {
     "id": 489,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Как организовать secrets injection в Terraform без хранения в state?",
+    "q": "Как передать секрет через Terraform, не сохраняя его значение в state?",
     "options": [
-      "Использовать поддерживаемые ephemeral values/resources или write-only arguments и сочетать их с sensitive для маскирования",
-      "Передавать секреты через terraform.tfvars файл в Git",
-      "Читать секрет обычным data source: любой его результат автоматически исключён из state",
-      "Установить sensitive = true: оно одновременно исключает значение из state и plan"
+      "Использовать ephemeral source и поддерживаемый provider write-only argument; sensitive добавить для сокрытия вывода",
+      "Пометить обычную variable как sensitive: Terraform заменит значение маркером и в plan, и в сохранённом state",
+      "Передать значение через TF_VAR в environment: переменные окружения никогда не сериализуются в resource state",
+      "Прочитать секрет обычным data source: результаты data blocks автоматически существуют только во время apply"
     ],
     "answer": 0,
-    "explanation": "Обычный data source и sensitive могут оставить значение в state. Ephemeral значения исключаются из state/plan, а write-only arguments не сохраняют переданное значение; поддержка зависит от версии Terraform и provider."
+    "explanation": "sensitive скрывает значение в интерфейсе, но само по себе не исключает его из state. Ephemeral values/resources не сохраняются, а write-only arguments позволяют provider принять значение без записи в plan и state. Это работает лишь там, где конкретная версия Terraform и provider поддерживают такой поток; иначе state нужно считать секретным."
   },
   {
     "id": 490,
     "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое Terraform module composition и как строить иерархию модулей?",
+    "q": "Что означает composition Terraform modules?",
     "options": [
-      "Module composition — вызов одного модуля из другого максимально глубоко",
-      "Составные модули (wrapper) вызывают базовые (resource) модули; разделение: resource modules (один тип ресурса) → service modules (бизнес-компонент) → root modules (окружение)",
-      "Модули нельзя вкладывать более чем на два уровня",
-      "Module composition работает только с Terraform Registry модулями"
+      "Child modules напрямую читают state друг друга, чтобы root module не передавал повторяющиеся identifiers через inputs",
+      "Root module связывает небольшие модули, передавая outputs одного в inputs другого и сохраняя явные интерфейсы",
+      "Wrapper module копирует resources зависимостей в свой state, поэтому downstream modules не зависят от providers",
+      "Registry объединяет несколько версий module в один вызов и выбирает реализацию по типам переданных variables"
     ],
     "answer": 1,
-    "explanation": "Иерархия: resource module (aws_security_group + rules) → service module (web: EC2 + SG + ALB) → environment module (dev: network + web + db). Преимущество: переиспользование на каждом уровне. Принципы: минимальные интерфейсы (variables), стабильные outputs, semantic versioning для публичных модулей."
+    "explanation": "При composition root module соединяет независимые capabilities: например, передаёт network ID из одного module в другой. Модули публикуют минимальные inputs/outputs, а не ищут соседей или их state неявно. Глубокие wrapper-иерархии повышают coupling, поэтому уровни добавляют только при ясной ответственности."
   },
   {
     "id": 491,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Чем cgroups v2 отличается от v1 и что такое unified hierarchy?",
+    "q": "Чем cgroups v2 отличается от cgroups v1?",
     "options": [
-      "cgroups v2 — просто новая версия с теми же принципами",
-      "cgroups v2 несовместимы с Docker контейнерами",
-      "v2: единая иерархия (один дерево вместо нескольких), atomic IO+memory контроль, pressure notifications (PSI), улучшенный memory.high vs memory.max",
-      "v2 использует только CPU контроллер"
+      "v2 сохраняет отдельную hierarchy для каждого controller, но переименовывает cpuacct и blkio в новые namespaces",
+      "v2 управляет только memory и pids, а CPU и I/O limits по-прежнему требуют параллельного mount cgroups v1",
+      "v2 использует unified hierarchy и согласованную delegation; memory.high throttles, memory.max задаёт hard limit",
+      "v2 автоматически распределяет ресурсы поровну между containers и не требует настройки controller files"
     ],
     "answer": 2,
-    "explanation": "cgroups v1: разные иерархии для CPU, memory, blkio. cgroups v2: одна иерархия для всех контроллеров, атомарный контроль. memory.high — throttling (swap), memory.max — OOM kill. PSI (Pressure Stall Information) показывает pressure по CPU/memory/IO. Kubernetes требует v2 для некоторых фич."
+    "explanation": "cgroups v2 объединяет controllers в одну hierarchy и задаёт более строгую модель membership и delegation. memory.high создаёт reclaim pressure и throttling без OOM, а memory.max служит жёстким пределом и при невозможности reclaim вызывает cgroup OOM. CPU, memory и I/O pressure доступны через PSI-файлы."
   },
   {
     "id": 492,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое eBPF и для каких задач он используется в DevOps?",
+    "q": "Для каких задач DevOps применяет eBPF?",
     "options": [
-      "eBPF — расширение bash для автоматизации системных задач",
-      "eBPF работает только в Linux kernel 5.15+",
-      "eBPF — это extended firewall для контейнеров",
-      "Программы в ядре Linux без модулей: трассировка (bpftrace), мониторинг (bcc/BCC tools), сетевое управление (XDP), security (seccomp), наблюдаемость без overhead"
+      "Для периодического чтения /proc из user space; eBPF объединяет метрики после завершения наблюдаемого процесса",
+      "Для загрузки произвольного kernel code без проверки; программа получает полный доступ к памяти ядра как module",
+      "Только для XDP packet filtering: tracing, profiling и runtime security используют отдельную от BPF подсистему",
+      "Для проверяемых программ в kernel hooks: tracing, profiling, networking, observability и security telemetry"
     ],
     "answer": 3,
-    "explanation": "eBPF позволяет безопасно выполнять программы в пространстве ядра без его модификации. DevOps: bpftool/bcc (execsnoop, tcpconnect, opensnoop), bpftrace для трассировки, Cilium для сетевой политики через eBPF, профилирование через perf+BPF, runtime security (Tetragon, Falco eBPF)."
+    "explanation": "Ядро проверяет eBPF program verifier-ом, затем выполняет её в разрешённом hook и обменивается данными через maps и ring buffers. bpftrace/BCC применяют для трассировки, Cilium — для networking, Tetragon и подобные средства — для security telemetry. Накладные расходы зависят от hook, частоты событий и программы."
   },
   {
     "id": 493,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работают Huge Pages в Linux и в чём разница THP vs explicit huge pages?",
+    "q": "Чем Transparent Huge Pages отличаются от hugetlb pages?",
     "options": [
-      "Huge Pages (2MB/1GB) снижают TLB miss. THP: ядро объединяет автоматически, возможен compaction overhead; explicit: фиксированные страницы в hugetlbfs, предсказуемо",
-      "Huge Pages — это просто большие файлы в /proc",
-      "THP всегда лучше explicit huge pages по производительности",
-      "Huge Pages поддерживаются только в RHEL"
+      "THP ядро продвигает и делит автоматически; hugetlb использует управляемый pool и явную поддержку приложения",
+      "THP всегда резервируются при boot, а hugetlb создаются из обычных страниц только после memory pressure",
+      "THP доступны лишь для file cache, а hugetlb применяются исключительно к anonymous memory внутри containers",
+      "Оба механизма имеют одинаковый lifecycle; различаются только пути статистики в /proc и названия mount options"
     ],
     "answer": 0,
-    "explanation": "THP (Transparent Huge Pages): автоматически, но вызывает compaction jitter — проблема для баз данных (MongoDB, Redis рекомендуют отключить). Explicit huge pages: /proc/sys/vm/nr_hugepages, hugetlbfs, предсказуемая задержка. 1GB pages: только boot-time. Проверка: /proc/meminfo (HugePages_Total/Free)."
+    "explanation": "Оба механизма уменьшают TLB pressure для больших working sets. THP прозрачно продвигает и может делить страницы, но compaction и лишнее потребление памяти способны давать latency spikes. hugetlb опирается на заранее управляемый pool и участие приложения, что повышает предсказуемость ценой резервирования и настройки."
   },
   {
     "id": 494,
     "topic": "Linux",
     "level": "Senior",
     "category": "scenario",
-    "q": "Процесс потребляет 100% CPU на одном ядре. Какие инструменты помогут найти горячий путь кода?",
+    "q": "Как найти hot path процесса, занявшего одно CPU core?",
     "options": [
-      "top, затем kill -9",
-      "perf record -g -p PID, затем perf report или flamegraph; strace для syscall overhead; perf stat для аппаратных счётчиков",
-      "htop с сортировкой по CPU",
-      "iostat -x для анализа CPU"
+      "Снять iostat и vmstat: их device и scheduler counters восстановят user-space call stacks конкретного thread",
+      "Найти busy thread, собрать perf call graph и изучить perf report или flame graph; отдельно проверить counters",
+      "Подключить strace без фильтров: последовательность syscalls всегда показывает функции с основным CPU временем",
+      "Увеличить scheduler priority процесса и сравнить load average; снижение очереди укажет имя горячей функции"
     ],
     "answer": 1,
-    "explanation": "perf record -g --call-graph dwarf -p PID собирает стеки. perf script | stackcollapse-perf.pl | flamegraph.pl генерирует SVG flamegraph. perf stat показывает IPC, cache-misses, branch-misses. Для eBPF: profile -F 99 -p PID из bcc tools. offcputime для анализа ожиданий."
+    "explanation": "Сначала находят thread через top -H или ps, затем perf record -g -p PID либо по TID собирает call stacks. perf report или flame graph показывает on-CPU path, а perf stat помогает увидеть IPC, cache misses и branches. strace полезен лишь когда стоимость связана с syscalls и сам может заметно искажать нагрузку."
   },
   {
     "id": 495,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое NUMA и как numactl влияет на производительность приложений?",
+    "q": "Как NUMA policy влияет на производительность процесса?",
     "options": [
-      "NUMA — стандарт сетевого взаимодействия",
-      "NUMA применяется только в виртуальных машинах",
-      "Non-Uniform Memory Access: разные задержки к памяти разных узлов. numactl --membind/--cpunodebind привязывает процесс к NUMA-узлу, снижая remote memory access",
-      "numactl ускоряет работу дисковой подсистемы"
+      "NUMA policy выбирает только CPU frequency governor, а размещение memory pages одинаково для всех sockets",
+      "numactl переносит process memory на самый свободный node при каждом context switch, устраняя remote access",
+      "CPU и memory nodes имеют разную locality; bind/interleave меняют размещение, которое проверяют numastat и perf",
+      "Привязка к одному NUMA node всегда ускоряет workload, даже если working set превышает доступную local memory"
     ],
     "answer": 2,
-    "explanation": "В NUMA-системах доступ к локальной памяти быстрее (latency ~70ns) vs remote (~140ns). numactl --membind=0 --cpunodebind=0 ./app привязывает к node0. numastat показывает numa_miss (remote allocations). Для баз данных и HPC критично. Ядро делает NUMA balancing автоматически (kernel.numa_balancing=1)."
+    "explanation": "В NUMA-системе локальная память обычно доступна быстрее удалённой. numactl задаёт CPU affinity и memory policy: bind, preferred или interleave. Эффект зависит от topology, threads и working set; слишком жёсткий bind может вызвать pressure. Проверяют numa_maps, numastat и workload latency, согласуя CPU и memory placement."
   },
   {
     "id": 496,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое CPU pinning и в каких случаях taskset/cset применяются в production?",
+    "q": "Когда CPU pinning оправдан в production?",
     "options": [
-      "CPU pinning блокирует процессор от использования другими процессами навсегда",
-      "taskset работает только с потоками, не процессами",
-      "CPU pinning применяется только в Docker контейнерах",
-      "taskset -c 2,3 привязывает процесс к ядрам 2 и 3; cpuset (cset) изолирует ядра от scheduler; применяется для latency-sensitive приложений (телеком, trading, RT)"
+      "Когда средняя CPU utilization высока: taskset увеличивает число доступных cores сверх лимита physical host",
+      "Для любого multithreaded service: affinity автоматически балансирует IRQ, memory и threads по всем NUMA nodes",
+      "Только для containers: обычный Linux process не поддерживает affinity без запуска внутри cpuset namespace",
+      "Для измеренной latency или cache-locality задачи; affinity согласуют с cpuset, NUMA, IRQ и резервом system work"
     ],
     "answer": 3,
-    "explanation": "taskset -c 0,1 -p PID устанавливает CPU affinity. cset shield --cpu=2-7 --kthread=on изолирует ядра от ядра ОС (irq, kthread перемещаются). isolcpus= в grub cmdline убирает ядра из планировщика. Применяется: DPDK, VPP, real-time ML inference, low-latency trading."
+    "explanation": "taskset задаёт affinity процесса или thread, а cpuset cgroup ограничивает допустимые CPU и memory nodes для группы. Pinning полезен в RT, packet processing и других измеренно latency-sensitive workloads, но уменьшает гибкость scheduler. Настройку проверяют под нагрузкой и согласуют с NUMA locality, IRQ affinity и системными потоками."
   },
   {
     "id": 497,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работают режимы журналирования ext4 (journal/ordered/writeback) и что выбрать для production?",
+    "q": "Как различаются data journaling modes ext4?",
     "options": [
-      "journal: данные+метаданные в журнал (безопаснее, медленнее); ordered: метаданные в журнал, данные flush до коммита (баланс); writeback: только метаданные (быстрее, риск corruption)",
-      "Все режимы идентичны по надёжности и производительности",
-      "writeback — единственный режим для SSD",
-      "ordered mode не поддерживается в ядре 5.x"
+      "journal пишет data и metadata в journal; ordered пишет data до metadata commit; writeback не гарантирует этот порядок",
+      "journal хранит только metadata, ordered журналирует каждую data block, а writeback отключает journal целиком",
+      "ordered и writeback дают одинаковые crash guarantees, но writeback меняет только частоту background flush",
+      "Режим выбирает block device автоматически при mount и приложение не может увидеть различия после power loss"
     ],
     "answer": 0,
-    "explanation": "ordered (default): данные записываются на диск до commit метаданных — защищает от inconsistency после краша. journal: двойная запись, максимальная защита. writeback: максимальная скорость, но при crash старые данные могут попасть в новые блоки. Для БД часто используют nobarrier+writeback с приложенческим fsync."
+    "explanation": "data=ordered — типичный default: metadata журналируются, а связанные data blocks уходят до их commit. data=journal журналирует и данные, но отключает delayed allocation и O_DIRECT. data=writeback не сохраняет такое упорядочение и после crash может показать stale data. В production выбор подтверждают durability-требованиями и тестами; barriers без доказанной защиты cache не отключают."
   },
   {
     "id": 498,
     "topic": "Linux",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "XFS vs ext4: когда выбирать каждую файловую систему?",
+    "q": "Как выбирать между XFS и ext4?",
     "options": [
-      "XFS всегда лучше ext4, нужно всегда использовать XFS",
-      "XFS: большие файлы, высокий параллелизм I/O, масштабируется до EB; ext4: небольшие файлы, простота, хорошо изучена, меньше RAM overhead",
-      "ext4 быстрее XFS на всех рабочих нагрузках",
-      "XFS не поддерживает snapshots и quotas"
+      "Выбирать XFS для любого SSD: его allocation groups гарантируют меньшую latency на каждой mixed-file workload",
+      "Сравнить workload и операции: XFS силён в масштабном parallel I/O, ext4 прост и широко изучен; учитывать resize",
+      "Выбирать ext4 для snapshots и reflink, а XFS — когда filesystem нужно регулярно уменьшать без unmount",
+      "Ориентироваться на максимальный volume size: recovery, tooling, support и характер файлов не влияют на выбор"
     ],
     "answer": 1,
-    "explanation": "XFS: excellent для streaming I/O, больших файлов (видео, backup), параллельных записей (журнал метаданных на allocation group level). ext4: хорош для mixed workload, меньше metadata overhead для маленьких файлов. XFS не умеет shrink online. btrfs: snapshots, compression, но production-риски при высокой нагрузке."
+    "explanation": "Универсального победителя нет: проверяют размер и число файлов, concurrency, latency, recovery time, backup tooling и поддержку дистрибутива. XFS хорошо масштабирует параллельные и крупные workloads и умеет online grow, но не shrink. ext4 знаком операционно и поддерживает offline shrink; конкретную производительность подтверждают репрезентативным benchmark."
   },
   {
     "id": 499,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое LVM thin provisioning и как оно работает?",
+    "q": "Как работает LVM thin provisioning?",
     "options": [
-      "Thin provisioning выделяет место заранее для всех LV",
-      "LVM thin provisioning — только для SSD дисков",
-      "Thin pool выделяет блоки LV по мере записи (overcommit); экономит место; поддерживает снапшоты через copy-on-write без предварительного резервирования",
-      "Thin LV нельзя увеличить после создания"
+      "Thin LV резервирует весь virtual size при создании, а thin pool хранит только отдельную копию его metadata",
+      "Thin pool сжимает повторяющиеся blocks, поэтому сумма physical writes не может превысить размер backing device",
+      "Thin pool выделяет blocks по записи и допускает overcommit; data и metadata usage нужно мониторить и расширять",
+      "Thin snapshot копирует исходный LV целиком в момент создания, но освобождает одинаковые extents после merge"
     ],
     "answer": 2,
-    "explanation": "lvcreate --type thin-pool -L 100G -n pool vg0; lvcreate --thin -V 200G -n data vg0/pool — overcommit 200GB из 100GB пула. Блоки выделяются при записи. lvs показывает DATA% и METADATA%. При переполнении pool_lv переходит в error/queue mode. Snapshots тонкие — занимают только изменения."
+    "explanation": "Thin LV получает большой virtual size без немедленного резервирования всех extents; blocks выделяются при записи. Snapshots разделяют существующие blocks и потребляют место по мере изменений. Overcommit требует alerts и auto-extension как для data, так и metadata pool: заполнение может остановить или повредить I/O workload."
   },
   {
     "id": 500,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Как SELinux enforcing mode влияет на работу контейнеров и как диагностировать отказы?",
+    "q": "Как диагностировать SELinux denial у контейнера?",
     "options": [
-      "SELinux всегда блокирует Docker контейнеры",
-      "SELinux не влияет на namespace-изолированные процессы",
-      "SELinux работает только с LXC, не Docker",
-      "SELinux назначает контекст (container_t) процессам контейнера; audit2allow анализирует AVC denials в /var/log/audit/audit.log; setsebool -P container_manage_cgroup on"
+      "Отключить labels для container runtime и считать успешный restart доказательством корректной host policy",
+      "Перевести host в permissive, сгенерировать audit2allow из всех событий и сразу установить полученный module",
+      "Изменить Unix mode volume на 0777: DAC permissions имеют приоритет и тем самым отменяют SELinux decision",
+      "Найти AVC в audit log, проверить process/file contexts и исправить label, volume option, boolean или policy"
     ],
     "answer": 3,
-    "explanation": "SELinux в enforcing mode: контейнеры получают контекст svirt_lxc_net_t (Docker) или container_t. ausearch -m avc -ts recent находит отказы. audit2allow -a -M mypol генерирует политику. --security-opt label=disable отключает SELinux для контейнера. Для Kubernetes: pod securityContext seLinuxOptions."
+    "explanation": "SELinux применяет MAC после обычных Unix permissions; контейнерные процессы и volumes должны иметь совместимые labels. Диагностику начинают с ausearch или sealert и сопоставления source/target contexts. Часто помогает корректное :z/:Z relabeling либо документированный boolean. audit2allow используют только после понимания denial, а не как автоматическое разрешение всего журнала."
   },
   {
     "id": 501,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Как настроить auditd для отслеживания критических событий безопасности?",
+    "q": "Как организовать полезный security audit через auditd?",
     "options": [
-      "auditctl -w /etc/passwd -p wa -k passwd_changes; правила в /etc/audit/rules.d/; aureport для отчётов; auditd интегрируется с SIEM через audisp",
-      "auditd — только для логирования входов пользователей",
-      "auditd заменяет syslog и journald полностью",
-      "auditd работает только на физических серверах"
+      "Хранить точечные rules в /etc/audit/rules.d, задавать keys, проверять загрузку и искать события ausearch/aureport",
+      "Включить audit всех open syscalls без filters: полный поток гарантирует расследование и не влияет на latency",
+      "Заменить journald и syslog сервисом auditd, чтобы application logs автоматически получили kernel audit fields",
+      "Добавлять правила только через auditctl после старта: runtime configuration переживает reboot и package upgrade"
     ],
     "answer": 0,
-    "explanation": "Правила: -w path -p rwxa (watch), -a always,exit -F arch=b64 -S open -k file_open (syscall). /etc/audit/rules.d/*.rules загружаются при старте. aureport -au показывает аутентификации. ausearch -k passwd_changes ищет по ключу. audisp-remote пересылает в централизованный сервер."
+    "explanation": "Правила выбирают по threat model: изменения identity files, privilege use, config и другие критичные syscalls. Persistent files загружают через augenrules или service tooling, используют arch, filters и keys, затем проверяют ausearch/aureport и forwarding. Слишком широкие правила создают шум и нагрузку; retention и защиту audit logs планируют отдельно."
   },
   {
     "id": 502,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое systemd socket activation и в каких сценариях это полезно?",
+    "q": "Что даёт systemd socket activation?",
     "options": [
-      "Socket activation — способ замедлить запуск сервисов",
-      "Systemd создаёт socket заранее, запускает сервис только при первом подключении; параллельный старт зависимых сервисов, zero-downtime restart, socket-based IPC",
-      "Socket activation работает только с Unix domain sockets",
-      "Socket activation несовместима с Docker"
+      "Service заранее открывает socket и передаёт его systemd после readiness, чтобы manager сохранил все sessions",
+      "Socket unit владеет listening FD и запускает service по трафику; pending connections могут ждать activation",
+      "Accept=yes объединяет все connections в один daemon, а Accept=no создаёт отдельный service instance на клиента",
+      "Механизм прозрачен для любого binary: systemd подменяет его bind и listen calls без поддержки со стороны service"
     ],
     "answer": 1,
-    "explanation": "myservice.socket создаётся до myservice.service. Соединения буферируются ядром. Сервис запускается lazily. Преимущества: быстрый boot (параллельный старт), автоматический restart без потери соединений (ядро держит socket). Примеры: dbus, systemd-journald, ssh socket activation."
+    "explanation": "systemd создаёт listening socket до service и передаёт file descriptor активированному процессу. Это позволяет lazy start и сохраняет ожидающие или новые connections при некоторых restart-сценариях. Сервис должен поддерживать socket activation; существующие принятые sessions не становятся автоматически zero-downtime. Accept=yes создаёт instance на соединение, Accept=no передаёт listening socket одному service."
   },
   {
     "id": 503,
     "topic": "Linux",
     "level": "Senior",
     "category": "scenario",
-    "q": "Приложение получает OOM kill. Как найти причину и предотвратить повторение?",
+    "q": "Как расследовать и устранить повторяющийся OOM kill?",
     "options": [
-      "Просто увеличить RAM сервера",
-      "Отключить OOM killer через kernel параметр",
-      "dmesg | grep -i 'oom\\|killed'; /proc/PID/status (VmRSS, VmSwap); oomadj (-1000 до 1000); vm.overcommit_memory; анализ memory leak через valgrind/heaptrack",
-      "OOM kill происходит только в контейнерах"
+      "Установить oom_score_adj = -1000 для процесса: защита выбранной жертвы устраняет нехватку памяти на host",
+      "Задать vm.overcommit_memory = 2 с произвольным ratio: OOM станет невозможен и workload сохранит throughput",
+      "Проверить kernel log и cgroup memory.events, сопоставить limits с usage/PSI и найти leak или неверный sizing",
+      "Увеличить swap до размера RAM: OOM killer учитывает только anonymous memory, поэтому больше не выберет процесс"
     ],
     "answer": 2,
-    "explanation": "dmesg показывает OOM killer log с указанием процесса и его rss. oom_score_adj: -1000 защищает от kill, +1000 — первый кандидат. /proc/sys/vm/overcommit_memory=2 запрещает overcommit. Для поиска leak: valgrind --tool=massif, heaptrack, или eBPF memleak из bcc tools."
+    "explanation": "Сначала различают global и memcg OOM по journalctl -k или dmesg и cgroup memory.events, затем смотрят memory.current/peak, limits, PSI, RSS/anonymous/file usage и логи runtime. Исправление может быть leak fix, корректный limit/request, снижение concurrency или capacity. oom_score_adj меняет выбор жертвы, а overcommit и swap имеют trade-offs и не заменяют диагностику."
   },
   {
     "id": 504,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работают network namespaces и как создать изолированную сетевую среду вручную?",
+    "q": "Как вручную соединить network namespace с host?",
     "options": [
-      "Network namespaces — это просто псевдонимы сетевых интерфейсов",
-      "Для network namespaces нужен kernel 6.0+",
-      "Network namespaces работают только с виртуальными интерфейсами",
-      "ip netns add myns создаёт namespace; ip link set eth0 netns myns перемещает интерфейс; veth pair для связи namespaces; основа изоляции контейнеров"
+      "Создать mount namespace и bind-mount /proc/net: сетевые interfaces автоматически получат отдельные addresses",
+      "Добавить второй address к host eth0 и выполнить ip netns exec: команда временно скроет остальные host routes",
+      "Переместить единственный host uplink в namespace, а kernel автоматически оставит его clone в root namespace",
+      "Создать netns и veth pair, перенести один конец, поднять lo, назначить addresses/routes и при нужде NAT на host"
     ],
     "answer": 3,
-    "explanation": "ip netns add ns1; ip link add veth0 type veth peer name veth1; ip link set veth1 netns ns1; ip netns exec ns1 ip addr add 10.0.0.1/24 dev veth1. Docker использует этот механизм: каждый контейнер — отдельный netns. /var/run/netns/ хранит named namespaces. unshare --net создаёт анонимный netns."
+    "explanation": "Network namespace имеет собственные interfaces, routes, firewall state и sockets. Для безопасной лабораторной связности создают veth pair: один конец остаётся на host, второй переносится через ip link set ... netns. Внутри поднимают loopback и veth, назначают адрес и route; forwarding/NAT добавляют явно, если нужен внешний доступ."
   },
   {
     "id": 505,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Как tc (traffic control) используется для управления полосой пропускания в Linux?",
+    "q": "Какие задачи решает Linux traffic control (tc)?",
     "options": [
-      "tc qdisc add dev eth0 root tbf rate 100mbit; HTB для иерархического shaping; netem для эмуляции задержки/потерь в тестах; fq_codel против буферного раздувания",
-      "tc — это команда для управления TCP timeouts",
-      "tc работает только на физических интерфейсах",
-      "tc заменяет iptables для фильтрации пакетов"
+      "Qdisc, classes и filters выполняют shaping/scheduling; TBF/HTB ограничивают rate, netem моделирует impairment",
+      "tc меняет TCP congestion control для отдельного process и заменяет socket options без настройки interfaces",
+      "Ingress и egress всегда формируют одинаково: любой qdisc задерживает уже принятые ingress packets на том же NIC",
+      "fq_codel задаёт firewall policy по пяти полям, а nftables распределяет bandwidth между очередями application"
     ],
     "answer": 0,
-    "explanation": "tc qdisc (queueing discipline): pfifo_fast (default), tbf (token bucket filter), htb (hierarchical token bucket), fq_codel. tc filter + tc class для классификации трафика. netem: tc qdisc add dev lo root netem delay 100ms loss 1% — для тестирования. Применяется в Kubernetes для network policies bandwidth."
+    "explanation": "tc управляет очередями interface: TBF и HTB ограничивают или распределяют скорость, fq_codel борется с queueing delay, filters классифицируют трафик, netem добавляет delay/loss для тестов. Egress shaping прямолинеен; для ingress часто применяют policing или redirect в IFB. Настройку проверяют tc -s и метриками drops, backlog и latency."
   },
   {
     "id": 506,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое strace и как его использовать для диагностики зависших процессов?",
+    "q": "Как strace помогает исследовать зависший процесс?",
     "options": [
-      "strace — анализатор статического кода",
-      "strace -p PID перехватывает системные вызовы; -T показывает время; -e trace=network,file фильтрует; зависший процесс часто застрял в futex, epoll_wait, read",
-      "strace работает только с Python приложениями",
-      "strace полностью заменён perf в современных ядрах"
+      "Строит user-space flame graph и показывает строки исходного кода, где thread расходует CPU между syscalls",
+      "Показывает syscalls, результаты и длительность; с -p/-f и filters можно найти blocking call и исследовать FD",
+      "Приостанавливает process на безопасной точке и проверяет mutex ownership без ptrace и заметных накладных расходов",
+      "Читает только завершённые calls из audit log, поэтому attach не влияет на timing и подходит для постоянного tracing"
     ],
     "answer": 1,
-    "explanation": "strace -p PID -T -e trace=all -f (follow forks). Зависший на futex: mutex deadlock. Зависший на read(fd=5): lsof -p PID | grep 'fd 5' покажет файл/socket. strace -c -p PID считает статистику syscalls. Накладные расходы strace значительны — использовать только для диагностики, не в production."
+    "explanation": "strace attach-ится через ptrace и показывает системные вызовы threads. Опции -f, -tt/-T и -e trace=... помогают увидеть долгий read, connect, futex или повторяющуюся ошибку; lsof и /proc/PID/fd связывают descriptor с объектом. epoll_wait или futex сами по себе могут быть нормой, поэтому вывод сопоставляют с дизайном процесса и учитывают overhead."
   },
   {
     "id": 507,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Как настроить sysctl параметры для высоконагруженного сетевого сервера?",
+    "q": "Как безопасно тюнить sysctl для нагруженного network service?",
     "options": [
-      "sysctl параметры не влияют на сетевую производительность",
-      "Нужно только увеличить net.ipv4.tcp_keepalive_time",
-      "net.core.somaxconn, net.ipv4.tcp_max_syn_backlog, net.ipv4.tcp_tw_reuse, net.core.rmem_max/wmem_max, net.ipv4.ip_local_port_range, vm.swappiness",
-      "Все sysctl параметры применяются только после перезагрузки"
+      "Скопировать набор максимальных значений somaxconn, buffers и port range: большие лимиты не требуют memory budget",
+      "Менять только tcp_tw_reuse: TIME_WAIT является основной причиной любой нехватки sockets и packet drops",
+      "Измерить bottleneck, согласовать app backlog и kernel limits, менять по одному параметру и наблюдать drops/latency",
+      "Выключить SYN cookies и увеличить keepalive time: это освобождает accept queue без влияния на failure detection"
     ],
     "answer": 2,
-    "explanation": "net.core.somaxconn=65535 (listen backlog). net.ipv4.tcp_max_syn_backlog=65535. net.ipv4.tcp_tw_reuse=1 (переиспользование TIME_WAIT). net.ipv4.ip_local_port_range='1024 65535'. net.core.rmem_max=134217728 (receive buffer). Сохранение: /etc/sysctl.d/99-custom.conf; sysctl --system."
+    "explanation": "Универсального sysctl-рецепта нет. Сначала смотрят ss -s, nstat, softnet, listen queue, retransmits, drops, CPU и memory. Затем согласуют application listen backlog с somaxconn, при необходимости SYN backlog, buffer ceilings или local port range. Изменения версионируют в /etc/sysctl.d, применяют поэтапно и проверяют нагрузочным тестом и rollback."
   },
   {
     "id": 508,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое AppArmor и как создать профиль для нового приложения?",
+    "q": "Как разработать AppArmor profile для нового приложения?",
     "options": [
-      "AppArmor — это антивирусная программа для Linux",
-      "AppArmor профили хранятся в /etc/selinux/",
-      "AppArmor и SELinux нельзя использовать на одной системе одновременно, но оба активны по умолчанию",
-      "AppArmor: MAC (Mandatory Access Control) через профили путей; aa-genprof генерирует профиль в complain mode; aa-logprof обновляет из логов; enforce mode блокирует нарушения"
+      "Скопировать профиль похожего binary и сразу включить enforce: path-based rules автоматически адаптируются к runtime paths",
+      "Выдать rwix на корень filesystem в complain mode, затем удалить complain flag без анализа собранных событий",
+      "Настроить labels файлов через restorecon: AppArmor принимает решения по SELinux type и игнорирует pathname rules",
+      "Начать с aa-genprof/complain, прогнать реальные сценарии, разобрать aa-logprof, сузить правила и проверить enforce"
     ],
     "answer": 3,
-    "explanation": "aa-genprof /path/to/app запускает приложение и обучается. aa-complain /path/to/app переводит в complain (log only). aa-enforce активирует. Профили в /etc/apparmor.d/. apparmor_status показывает активные профили. Docker использует AppArmor профиль docker-default для контейнеров."
+    "explanation": "AppArmor — path-based MAC: профиль описывает доступ к files, capabilities, network и другим ресурсам. Complain mode логирует нарушения и помогает собрать начальный набор, но обучение должно покрыть штатные сценарии и ошибки. Перед production правила ревьюят, убирают лишние разрешения, включают enforce и тестируют startup, reload, upgrades и log rotation."
   },
   {
     "id": 509,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает dm-crypt/LUKS и что такое key slots?",
+    "q": "Как связаны dm-crypt, LUKS и key slots?",
     "options": [
-      "LUKS header содержит 8 key slots для разных парольных фраз/ключей; dm-crypt создаёт виртуальный блочный девайс; cryptsetup luksAddKey добавляет slot; luks2 поддерживает argon2",
-      "LUKS шифрует только отдельные файлы, не разделы",
-      "dm-crypt работает только с ext4",
-      "LUKS требует специального оборудования TPM"
+      "dm-crypt шифрует blocks, LUKS хранит metadata; key slots оборачивают один volume key разными credentials",
+      "Каждый key slot шифрует отдельный диапазон blocks собственным data key, поэтому удаление slot требует reencrypt",
+      "LUKS хранит пароль в header открытым для dm-crypt, а TPM обязателен для проверки целостности при каждом read",
+      "dm-crypt управляет filesystem permissions, тогда как LUKS шифрует только имена файлов и directory metadata"
     ],
     "answer": 0,
-    "explanation": "cryptsetup luksFormat /dev/sdb (создаёт LUKS контейнер). luksOpen /dev/sdb myenc (маппинг). luksAddKey добавляет ключ в свободный slot (до 8 в LUKS1, до 32 в LUKS2). luksDump показывает состояние slots. LUKS2: argon2id для KDF (защита от brute force). Clevis/Tang для network-bound disk encryption."
+    "explanation": "LUKS описывает формат контейнера, KDF и key slots, а device-mapper target dm-crypt выполняет block encryption после unlock. Несколько slots позволяют разным passphrases или tokens получить один volume key без повторного шифрования данных. Header резервируют отдельно, новый ключ проверяют до удаления старого и никогда не удаляют последний рабочий slot."
   },
   {
     "id": 510,
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое inotify и fanotify, и как они используются для мониторинга файловой системы?",
+    "q": "Чем fanotify отличается от inotify?",
     "options": [
-      "inotify и fanotify — утилиты для defragmentации дисков",
-      "inotify: события на конкретных файлах/директориях (IN_CREATE, IN_MODIFY); fanotify: глобальный мониторинг FS с возможностью разрешать/запрещать доступ; основа антивирусов и file integrity monitoring",
-      "fanotify работает только в user space без kernel support",
-      "inotify доступен только для root"
+      "inotify перехватывает open до доступа, а fanotify сообщает только после close и не умеет permission events",
+      "inotify ставит watches на объекты; fanotify может следить за mount/filesystem и выдавать permission events",
+      "fanotify работает без kernel API через чтение journal, а inotify требует отдельный kernel module на каждый watch",
+      "Оба API гарантируют полный ordered event log: queue overflow и объединение одинаковых событий невозможны"
     ],
     "answer": 1,
-    "explanation": "inotify_add_watch(fd, '/etc', IN_CREATE|IN_MODIFY). inotifywait -m -r /etc/ отслеживает рекурсивно. fanotify: FAN_ACCESS, FAN_OPEN_PERM (может блокировать). Используется: auditd (fanotify backend), Inotify-based systemd path units, file sync tools (syncthing). Лимиты: /proc/sys/fs/inotify/max_user_watches."
+    "explanation": "inotify удобен для изменений конкретных файлов и каталогов, но recursive monitoring требует управлять watches, а очередь может переполниться. fanotify умеет широкие marks на mount или filesystem и permission events, поэтому подходит некоторым antivirus и FIM tools, часто с повышенными privileges. Оба API требуют обработки overflow, races и повторного сканирования."
   },
   {
     "id": 511,
