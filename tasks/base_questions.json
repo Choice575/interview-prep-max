@@ -7091,10 +7091,10 @@
     "category": "definition",
     "q": "Для каких задач DevOps применяет eBPF?",
     "options": [
-      "Для периодического чтения /proc из user space; eBPF объединяет метрики после завершения наблюдаемого процесса",
-      "Для загрузки произвольного kernel code без проверки; программа получает полный доступ к памяти ядра как module",
-      "Только для XDP packet filtering: tracing, profiling и runtime security используют отдельную от BPF подсистему",
-      "Для проверяемых программ в kernel hooks: tracing, profiling, networking, observability и security telemetry"
+      "Для периодического чтения /proc из user space; eBPF объединяет метрики после завершения процесса",
+      "Для загрузки произвольного kernel code без verifier; программа получает доступ к памяти как module",
+      "Для XDP packet filtering; tracing, profiling и runtime security используют отдельную подсистему",
+      "Для проверяемых программ в kernel hooks: tracing, profiling, networking и security telemetry"
     ],
     "answer": 3,
     "explanation": "Ядро проверяет eBPF program verifier-ом, затем выполняет её в разрешённом hook и обменивается данными через maps и ring buffers. bpftrace/BCC применяют для трассировки, Cilium — для networking, Tetragon и подобные средства — для security telemetry. Накладные расходы зависят от hook, частоты событий и программы."
@@ -7106,10 +7106,10 @@
     "category": "definition",
     "q": "Чем Transparent Huge Pages отличаются от hugetlb pages?",
     "options": [
-      "THP ядро продвигает и делит автоматически; hugetlb использует управляемый pool и явную поддержку приложения",
-      "THP всегда резервируются при boot, а hugetlb создаются из обычных страниц только после memory pressure",
-      "THP доступны лишь для file cache, а hugetlb применяются исключительно к anonymous memory внутри containers",
-      "Оба механизма имеют одинаковый lifecycle; различаются только пути статистики в /proc и названия mount options"
+      "THP ядро продвигает и делит динамически; hugetlb использует управляемый pool и поддержку приложения",
+      "THP резервируются при boot, а hugetlb создаются из обычных страниц после memory pressure",
+      "THP предназначены для file cache, а hugetlb применяются к anonymous memory внутри containers",
+      "Оба механизма имеют одинаковый lifecycle; различаются пути статистики и mount options"
     ],
     "answer": 0,
     "explanation": "Оба механизма уменьшают TLB pressure для больших working sets. THP прозрачно продвигает и может делить страницы, но compaction и лишнее потребление памяти способны давать latency spikes. hugetlb опирается на заранее управляемый pool и участие приложения, что повышает предсказуемость ценой резервирования и настройки."
@@ -7121,10 +7121,10 @@
     "category": "scenario",
     "q": "Как найти hot path процесса, занявшего одно CPU core?",
     "options": [
-      "Снять iostat и vmstat: их device и scheduler counters восстановят user-space call stacks конкретного thread",
-      "Найти busy thread, собрать perf call graph и изучить perf report или flame graph; отдельно проверить counters",
-      "Подключить strace без фильтров: последовательность syscalls всегда показывает функции с основным CPU временем",
-      "Увеличить scheduler priority процесса и сравнить load average; снижение очереди укажет имя горячей функции"
+      "Снять iostat и vmstat: device counters восстановят user-space call stacks конкретного thread",
+      "Найти busy thread, собрать perf call graph и изучить perf report или flame graph; проверить counters",
+      "Подключить strace без фильтров: последовательность syscalls восстановит функции с основным CPU временем",
+      "Повысить scheduler priority и сравнить load average; снижение очереди укажет имя горячей функции"
     ],
     "answer": 1,
     "explanation": "Сначала находят thread через top -H или ps, затем perf record -g -p PID либо по TID собирает call stacks. perf report или flame graph показывает on-CPU path, а perf stat помогает увидеть IPC, cache misses и branches. strace полезен лишь когда стоимость связана с syscalls и сам может заметно искажать нагрузку."
@@ -7136,10 +7136,10 @@
     "category": "definition",
     "q": "Как NUMA policy влияет на производительность процесса?",
     "options": [
-      "NUMA policy выбирает только CPU frequency governor, а размещение memory pages одинаково для всех sockets",
-      "numactl переносит process memory на самый свободный node при каждом context switch, устраняя remote access",
-      "CPU и memory nodes имеют разную locality; bind/interleave меняют размещение, которое проверяют numastat и perf",
-      "Привязка к одному NUMA node всегда ускоряет workload, даже если working set превышает доступную local memory"
+      "NUMA policy выбирает CPU frequency governor, а memory pages размещаются одинаково для разных sockets",
+      "numactl переносит process memory на свободный node при context switch, устраняя remote access",
+      "CPU и memory nodes имеют разную locality; bind/interleave меняют placement, проверяемый numastat и perf",
+      "Привязка к одному NUMA node ускоряет workload и при превышении доступной local memory"
     ],
     "answer": 2,
     "explanation": "В NUMA-системе локальная память обычно доступна быстрее удалённой. numactl задаёт CPU affinity и memory policy: bind, preferred или interleave. Эффект зависит от topology, threads и working set; слишком жёсткий bind может вызвать pressure. Проверяют numa_maps, numastat и workload latency, согласуя CPU и memory placement."
@@ -7151,10 +7151,10 @@
     "category": "definition",
     "q": "Когда CPU pinning оправдан в production?",
     "options": [
-      "Когда средняя CPU utilization высока: taskset увеличивает число доступных cores сверх лимита physical host",
-      "Для любого multithreaded service: affinity автоматически балансирует IRQ, memory и threads по всем NUMA nodes",
-      "Только для containers: обычный Linux process не поддерживает affinity без запуска внутри cpuset namespace",
-      "Для измеренной latency или cache-locality задачи; affinity согласуют с cpuset, NUMA, IRQ и резервом system work"
+      "При высокой CPU utilization: taskset увеличивает число доступных cores сверх лимита physical host",
+      "Для multithreaded service: affinity балансирует IRQ, memory и threads по NUMA nodes",
+      "Для containers: обычный Linux process не поддерживает affinity вне cpuset namespace",
+      "Для измеренной latency или cache-locality задачи; affinity согласуют с cpuset, NUMA, IRQ и system work"
     ],
     "answer": 3,
     "explanation": "taskset задаёт affinity процесса или thread, а cpuset cgroup ограничивает допустимые CPU и memory nodes для группы. Pinning полезен в RT, packet processing и других измеренно latency-sensitive workloads, но уменьшает гибкость scheduler. Настройку проверяют под нагрузкой и согласуют с NUMA locality, IRQ affinity и системными потоками."
@@ -7166,10 +7166,10 @@
     "category": "definition",
     "q": "Как различаются data journaling modes ext4?",
     "options": [
-      "journal пишет data и metadata в journal; ordered пишет data до metadata commit; writeback не гарантирует этот порядок",
-      "journal хранит только metadata, ordered журналирует каждую data block, а writeback отключает journal целиком",
-      "ordered и writeback дают одинаковые crash guarantees, но writeback меняет только частоту background flush",
-      "Режим выбирает block device автоматически при mount и приложение не может увидеть различия после power loss"
+      "journal пишет data и metadata в journal; ordered пишет data до metadata commit; writeback не гарантирует порядок",
+      "journal хранит metadata, ordered журналирует data blocks, а writeback отключает journal целиком",
+      "ordered и writeback дают равные crash guarantees, а отличаются частотой background flush",
+      "Режим выбирает block device при mount, и приложение не увидит различий после power loss"
     ],
     "answer": 0,
     "explanation": "data=ordered — типичный default: metadata журналируются, а связанные data blocks уходят до их commit. data=journal журналирует и данные, но отключает delayed allocation и O_DIRECT. data=writeback не сохраняет такое упорядочение и после crash может показать stale data. В production выбор подтверждают durability-требованиями и тестами; barriers без доказанной защиты cache не отключают."
@@ -7196,10 +7196,10 @@
     "category": "definition",
     "q": "Как работает LVM thin provisioning?",
     "options": [
-      "Thin LV резервирует весь virtual size при создании, а thin pool хранит только отдельную копию его metadata",
-      "Thin pool сжимает повторяющиеся blocks, поэтому сумма physical writes не может превысить размер backing device",
-      "Thin pool выделяет blocks по записи и допускает overcommit; data и metadata usage нужно мониторить и расширять",
-      "Thin snapshot копирует исходный LV целиком в момент создания, но освобождает одинаковые extents после merge"
+      "Thin LV резервирует virtual size при создании, а thin pool хранит отдельную копию его metadata",
+      "Thin pool сжимает повторяющиеся blocks, поэтому physical writes остаются в размере backing device",
+      "Thin pool выделяет blocks по записи и допускает overcommit; data и metadata usage мониторят и расширяют",
+      "Thin snapshot копирует исходный LV при создании, освобождая одинаковые extents после merge"
     ],
     "answer": 2,
     "explanation": "Thin LV получает большой virtual size без немедленного резервирования всех extents; blocks выделяются при записи. Snapshots разделяют существующие blocks и потребляют место по мере изменений. Overcommit требует alerts и auto-extension как для data, так и metadata pool: заполнение может остановить или повредить I/O workload."
@@ -7226,10 +7226,10 @@
     "category": "definition",
     "q": "Как организовать полезный security audit через auditd?",
     "options": [
-      "Хранить точечные rules в /etc/audit/rules.d, задавать keys, проверять загрузку и искать события ausearch/aureport",
-      "Включить audit всех open syscalls без filters: полный поток гарантирует расследование и не влияет на latency",
-      "Заменить journald и syslog сервисом auditd, чтобы application logs автоматически получили kernel audit fields",
-      "Добавлять правила только через auditctl после старта: runtime configuration переживает reboot и package upgrade"
+      "Хранить точечные rules в /etc/audit/rules.d, задавать keys, проверять загрузку и искать через ausearch",
+      "Включить audit open syscalls без filters: широкий поток обеспечит расследование без влияния на latency",
+      "Заменить journald и syslog сервисом auditd, чтобы application logs получили kernel audit fields",
+      "Добавлять правила через auditctl после старта: runtime configuration переживёт reboot и package upgrade"
     ],
     "answer": 0,
     "explanation": "Правила выбирают по threat model: изменения identity files, privilege use, config и другие критичные syscalls. Persistent files загружают через augenrules или service tooling, используют arch, filters и keys, затем проверяют ausearch/aureport и forwarding. Слишком широкие правила создают шум и нагрузку; retention и защиту audit logs планируют отдельно."
@@ -7256,10 +7256,10 @@
     "category": "scenario",
     "q": "Как расследовать и устранить повторяющийся OOM kill?",
     "options": [
-      "Установить oom_score_adj = -1000 для процесса: защита выбранной жертвы устраняет нехватку памяти на host",
-      "Задать vm.overcommit_memory = 2 с произвольным ratio: OOM станет невозможен и workload сохранит throughput",
+      "Установить oom_score_adj = -1000: защита выбранной жертвы устранит нехватку памяти на host",
+      "Задать vm.overcommit_memory = 2 с произвольным ratio: workload избежит OOM и сохранит throughput",
       "Проверить kernel log и cgroup memory.events, сопоставить limits с usage/PSI и найти leak или неверный sizing",
-      "Увеличить swap до размера RAM: OOM killer учитывает только anonymous memory, поэтому больше не выберет процесс"
+      "Увеличить swap до размера RAM: OOM killer перестанет выбирать процессы с anonymous memory"
     ],
     "answer": 2,
     "explanation": "Сначала различают global и memcg OOM по journalctl -k или dmesg и cgroup memory.events, затем смотрят memory.current/peak, limits, PSI, RSS/anonymous/file usage и логи runtime. Исправление может быть leak fix, корректный limit/request, снижение concurrency или capacity. oom_score_adj меняет выбор жертвы, а overcommit и swap имеют trade-offs и не заменяют диагностику."
@@ -7287,9 +7287,9 @@
     "q": "Какие задачи решает Linux traffic control (tc)?",
     "options": [
       "Qdisc, classes и filters выполняют shaping/scheduling; TBF/HTB ограничивают rate, netem моделирует impairment",
-      "tc меняет TCP congestion control для отдельного process и заменяет socket options без настройки interfaces",
-      "Ingress и egress всегда формируют одинаково: любой qdisc задерживает уже принятые ingress packets на том же NIC",
-      "fq_codel задаёт firewall policy по пяти полям, а nftables распределяет bandwidth между очередями application"
+      "tc меняет TCP congestion control процесса и заменяет socket options без настройки interfaces",
+      "Ingress и egress формируются одинаково: qdisc задерживает принятые ingress packets на том же NIC",
+      "fq_codel задаёт firewall policy по пяти полям, а nftables распределяет bandwidth между очередями"
     ],
     "answer": 0,
     "explanation": "tc управляет очередями interface: TBF и HTB ограничивают или распределяют скорость, fq_codel борется с queueing delay, filters классифицируют трафик, netem добавляет delay/loss для тестов. Egress shaping прямолинеен; для ingress часто применяют policing или redirect в IFB. Настройку проверяют tc -s и метриками drops, backlog и latency."

@@ -10,14 +10,14 @@
   "issueBudget": {
     "length-cue": 0,
     "question-echo": 0,
-    "absolute-distractor": 14,
+    "absolute-distractor": 4,
     "duplicate-question": 1
   },
   "topics": {
     "Linux": {
       "length-cue": 0,
       "question-echo": 0,
-      "absolute-distractor": 14,
+      "absolute-distractor": 4,
       "duplicate-question": 0
     },
     "CI/CD": {
@@ -31,7 +31,7 @@
     "Senior": {
       "length-cue": 0,
       "question-echo": 0,
-      "absolute-distractor": 14,
+      "absolute-distractor": 4,
       "duplicate-question": 0
     },
     "Junior": {
