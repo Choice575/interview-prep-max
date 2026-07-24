@@ -8,9 +8,9 @@
     186
   ],
   "issueBudget": {
-    "length-cue": 463,
-    "question-echo": 14,
-    "absolute-distractor": 240,
+    "length-cue": 441,
+    "question-echo": 13,
+    "absolute-distractor": 233,
     "duplicate-question": 5
   },
   "topics": {
@@ -39,9 +39,9 @@
       "duplicate-question": 0
     },
     "Docker": {
-      "length-cue": 40,
-      "question-echo": 3,
-      "absolute-distractor": 12,
+      "length-cue": 18,
+      "question-echo": 2,
+      "absolute-distractor": 5,
       "duplicate-question": 0
     },
     "Kubernetes": {
@@ -77,19 +77,19 @@
   },
   "levels": {
     "Middle": {
-      "length-cue": 166,
+      "length-cue": 158,
       "question-echo": 4,
-      "absolute-distractor": 80,
+      "absolute-distractor": 74,
       "duplicate-question": 2
     },
     "Senior": {
-      "length-cue": 216,
-      "question-echo": 8,
-      "absolute-distractor": 138,
+      "length-cue": 206,
+      "question-echo": 7,
+      "absolute-distractor": 137,
       "duplicate-question": 1
     },
     "Junior": {
-      "length-cue": 81,
+      "length-cue": 77,
       "question-echo": 2,
       "absolute-distractor": 22,
       "duplicate-question": 2

@@ -4674,450 +4674,450 @@
     "topic": "Docker",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое Docker-образ (image)?",
+    "q": "Как Docker-образ связан с запускаемым контейнером?",
     "options": [
-      "Запущенный экземпляр приложения в изолированной среде",
-      "Виртуальная машина с предустановленным Linux",
-      "Шаблон только для чтения, содержащий инструкции по созданию контейнера",
-      "Файл конфигурации для оркестратора"
+      "Контейнер сохраняет образ как изменяемый архив после первого запуска",
+      "Образ включает гостевое ядро, boot loader и виртуальное оборудование",
+      "Образ содержит неизменяемые слои и метаданные для создания контейнера",
+      "Образ фиксирует снимок памяти и процессов уже запущенного контейнера"
     ],
     "answer": 2,
-    "explanation": "Docker-образ — это неизменяемый шаблон, состоящий из набора слоёв файловой системы. На основе образа запускаются контейнеры. Образы хранятся в реестрах (Docker Hub, Nexus и т.д.)."
+    "explanation": "Образ — неизменяемый набор слоёв файловой системы и метаданных. При запуске Docker добавляет поверх него writable layer контейнера; несколько контейнеров могут использовать одни и те же нижние слои. Образ не содержит отдельного гостевого ядра и не является снимком работающих процессов."
   },
   {
     "id": 332,
     "topic": "Docker",
     "level": "Junior",
     "category": "definition",
-    "q": "Какая команда показывает все запущенные контейнеры?",
+    "q": "Какая команда Docker CLI выводит запущенные контейнеры?",
     "options": [
-      "docker images",
-      "docker list",
-      "docker ls containers",
-      "docker ps"
+      "docker image ls --filter status=running",
+      "docker compose ls --filter status=running",
+      "docker container inspect --all",
+      "docker container ls (или docker ps)"
     ],
     "answer": 3,
-    "explanation": "'docker ps' выводит список запущенных контейнеров. Чтобы увидеть все контейнеры (включая остановленные), используется флаг '-a': docker ps -a."
+    "explanation": "docker container ls и его alias docker ps по умолчанию показывают running containers. Флаг --all (-a) добавляет stopped containers. docker image ls работает с образами, а docker compose ls — с Compose projects."
   },
   {
     "id": 333,
     "topic": "Docker",
     "level": "Junior",
     "category": "definition",
-    "q": "Что делает инструкция EXPOSE в Dockerfile?",
+    "q": "Какой эффект имеет инструкция EXPOSE в Dockerfile?",
     "options": [
-      "Документирует порт, который приложение слушает внутри контейнера",
-      "Открывает порт на хост-машине автоматически",
-      "Запрещает доступ к порту снаружи",
-      "Пробрасывает порт через firewall"
+      "Записывает в метаданные ожидаемый порт и протокол приложения",
+      "Создаёт firewall rule хоста и разрешает входящий трафик на порт",
+      "Назначает host port и включает forwarding к интерфейсу контейнера",
+      "Проверяет доступность порта и обновляет health status контейнера"
     ],
     "answer": 0,
-    "explanation": "EXPOSE является исключительно документационной инструкцией — она сообщает разработчикам, какой порт использует приложение. Для реального проброса порта на хост используется флаг -p при запуске контейнера."
+    "explanation": "EXPOSE описывает, какой port/protocol контейнер намерен слушать; без указания протокола подразумевается TCP. Инструкция не публикует порт на хосте. Для публикации используют docker run -p/--publish или соответствующую настройку Compose."
   },
   {
     "id": 334,
     "topic": "Docker",
     "level": "Junior",
     "category": "definition",
-    "q": "Чем отличается COPY от ADD в Dockerfile?",
+    "q": "Какое различие между COPY и ADD в Dockerfile корректно?",
     "options": [
-      "COPY может копировать URL, ADD — только локальные файлы",
-      "ADD поддерживает URL и автоматическую распаковку tar-архивов, COPY — только локальные файлы",
-      "Они полностью идентичны",
-      "COPY работает быстрее из-за сжатия"
+      "COPY читает remote URL, а ADD принимает sources из build context",
+      "ADD принимает URL и Git и распаковывает local tar; COPY просто копирует",
+      "ADD использует build cache, а COPY пересобирает слой при каждом build",
+      "COPY создаёт image layer, а ADD меняет writable layer контейнера"
     ],
     "answer": 1,
-    "explanation": "ADD умеет скачивать файлы по URL и автоматически распаковывать .tar.gz архивы в целевую директорию. COPY — более простая и предсказуемая инструкция для копирования локальных файлов. Рекомендуется использовать COPY по умолчанию."
+    "explanation": "ADD может брать source из build context, URL или Git repository. Распознаваемый локальный tar archive он извлекает в destination; скачанный по URL archive автоматически не распаковывается. COPY предсказуемо копирует файлы и directories, в том числе из другого build stage через --from, поэтому его предпочитают для обычного копирования."
   },
   {
     "id": 335,
     "topic": "Docker",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое .dockerignore файл?",
+    "q": "На каком этапе применяется файл .dockerignore?",
     "options": [
-      "Список образов, которые нельзя запускать",
-      "Список заблокированных Docker-реестров",
-      "Файл для исключения файлов и директорий из контекста сборки",
-      "Конфигурация для игнорирования ошибок сборки"
+      "После build: удаляет matching paths из уже созданных image layers",
+      "При docker pull: скрывает указанные tags в локальном image store",
+      "До build: исключает matching paths из контекста для builder",
+      "При docker run: запрещает контейнеру читать host bind mounts"
     ],
     "answer": 2,
-    "explanation": ".dockerignore работает аналогично .gitignore — он исключает файлы из контекста сборки (build context), который отправляется Docker-демону. Это ускоряет сборку и предотвращает попадание чувствительных данных в образ."
+    "explanation": "Patterns из .dockerignore удаляют matching files и directories из build context до его передачи builder. Это уменьшает context и вероятность ненужной invalidation cache. Секреты всё равно следует передавать через BuildKit secret mounts, а не полагаться на ignore-файл как на механизм хранения секретов."
   },
   {
     "id": 336,
     "topic": "Docker",
     "level": "Junior",
     "category": "scenario",
-    "q": "Вы запустили контейнер и он сразу завершился. Как посмотреть его логи?",
+    "q": "Контейнер сразу завершился. Как прочитать захваченные Docker логи?",
     "options": [
-      "docker trace <container_id>",
-      "docker inspect <container_id>",
-      "docker events <container_id>",
-      "docker logs <container_id>"
+      "docker events --filter container=<id> --details",
+      "docker inspect <id> --format '{{json .Config}}'",
+      "docker container top <id> -eo pid,cmd",
+      "docker logs --tail 100 <id>"
     ],
     "answer": 3,
-    "explanation": "'docker logs' работает как для запущенных, так и для остановленных контейнеров. Флаги --tail N (последние N строк) и -f (follow, ждать новых записей) упрощают диагностику."
+    "explanation": "docker logs читает stdout и stderr контейнера через настроенный logging driver и работает после его остановки. Для причины завершения дополнительно проверяют State.ExitCode, State.Error и State.OOMKilled через docker inspect. Логи, которые приложение пишет лишь во внутренний файл, docker logs не покажет."
   },
   {
     "id": 337,
     "topic": "Docker",
     "level": "Junior",
     "category": "definition",
-    "q": "Какой сетевой режим использует Docker по умолчанию при создании контейнера?",
+    "q": "К какой сети подключается Linux-контейнер без флага --network?",
     "options": [
       "bridge",
-      "none",
       "host",
-      "overlay"
+      "overlay",
+      "none"
     ],
     "answer": 0,
-    "explanation": "По умолчанию Docker создаёт сеть типа 'bridge' (docker0). Контейнеры получают виртуальный IP и могут общаться через NAT. Host-режим убирает изоляцию сети, overlay — для Swarm-кластеров."
+    "explanation": "Docker Engine подключает такой контейнер к default bridge network. Для приложений обычно создают user-defined bridge: она даёт встроенное DNS-разрешение имён контейнеров и более явную изоляцию. host разделяет сетевое namespace хоста, none отключает сеть, а overlay связывает несколько daemon hosts."
   },
   {
     "id": 338,
     "topic": "Docker",
     "level": "Junior",
     "category": "definition",
-    "q": "Что делает команда docker build -t myapp:1.0 . ?",
+    "q": "Как интерпретировать docker build -t myapp:1.0 . ?",
     "options": [
-      "Запускает контейнер из образа myapp:1.0",
-      "Создаёт образ с тегом myapp:1.0 из Dockerfile в текущей директории",
-      "Обновляет существующий контейнер myapp",
-      "Публикует образ в Docker Hub"
+      "Запускает myapp:1.0 и монтирует текущую директорию в /app",
+      "Собирает image myapp:1.0 с текущей директорией как context",
+      "Меняет tag локального image на myapp:1.0 без выполнения build",
+      "Публикует myapp:1.0 в registry из текущего Docker context"
     ],
     "answer": 1,
-    "explanation": "Флаг -t задаёт имя и тег образа, точка (.) указывает контекст сборки (текущая директория). Docker ищет Dockerfile в этой директории и выполняет инструкции послойно."
+    "explanation": "-t задаёт имя и tag результата, а точка задаёт build context. Без -f builder ищет Dockerfile в корне context. Команда не запускает container и не выполняет push; современный builder может вернуть результат в local image store в зависимости от выбранного driver/output."
   },
   {
     "id": 339,
     "topic": "Docker",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое многоэтапная сборка (multi-stage build) и в чём её преимущество?",
+    "q": "Что характеризует multi-stage build в Dockerfile?",
     "options": [
-      "Возможность запустить несколько контейнеров одновременно",
-      "Параллельная сборка нескольких Dockerfile",
-      "Разделение сборки на этапы для создания минимального финального образа без сборочных зависимостей",
-      "Кэширование промежуточных слоёв между сборками"
+      "Один image запускается как несколько services в Compose dependency graph",
+      "Каждая RUN-команда делится на процессы, записываемые в общий layer",
+      "Несколько FROM stages передают выбранные artifacts в финальный stage",
+      "Layers нескольких registry images сливаются в writable layer контейнера"
     ],
     "answer": 2,
-    "explanation": "Multi-stage build позволяет использовать тяжёлый образ (с компилятором, SDK) на стадии сборки и скопировать только артефакты в минимальный финальный образ (alpine, distroless). Это уменьшает размер образа и attack surface."
+    "explanation": "Каждый FROM начинает новый stage. COPY --from переносит в последующий stage выбранные artifacts, поэтому build tools и промежуточные файлы можно не включать в runtime image. Stages не обязаны выполняться параллельно: BuildKit параллелит лишь независимые части build graph."
   },
   {
     "id": 340,
     "topic": "Docker",
     "level": "Middle",
     "category": "definition",
-    "q": "Чем отличаются Docker volumes от bind mounts?",
+    "q": "Какое operational-различие между volume и bind mount верно?",
     "options": [
-      "Разница только в синтаксисе команды",
-      "Bind mounts работают быстрее за счёт шифрования",
-      "Volumes не сохраняются после удаления контейнера, bind mounts — сохраняются",
-      "Volumes хранятся на хосте в /var/lib/docker/volumes, управляются Docker; bind mounts монтируют произвольный путь хоста"
+      "Bind mount управляется Docker, а volume требует path в source tree",
+      "Volume задаётся host path, а bind mount адресуется Docker-именем",
+      "Bind mount связан с image digest, а volume связан с container ID",
+      "Volume управляется Docker, а bind mount отображает выбранный host path"
     ],
     "answer": 3,
-    "explanation": "Docker volumes управляются демоном и хранятся в /var/lib/docker/volumes. Bind mounts напрямую монтируют путь хост-машины. Volumes предпочтительны для продакшена: они независимы от структуры хоста и поддерживают volume drivers."
+    "explanation": "Volume — persistent data store, который Docker создаёт и обслуживает вне writable layer контейнера; volume drivers могут размещать данные удалённо. Bind mount напрямую связывает file или directory хоста с container path и делает deployment зависимым от структуры этого хоста. Named volume сохраняется до явного удаления, а lifecycle anonymous volume зависит, в частности, от --rm; bind source управляется на самом хосте."
   },
   {
     "id": 341,
     "topic": "Docker",
     "level": "Middle",
     "category": "scenario",
-    "q": "Сборка Docker-образа занимает много времени из-за повторной установки зависимостей. Как оптимизировать кэширование слоёв?",
+    "q": "Изменение source code заставляет build повторно ставить зависимости. Что исправить?",
     "options": [
-      "Копировать файлы зависимостей (package.json, requirements.txt) до копирования остального кода",
-      "Использовать только одну инструкцию RUN для всех команд",
-      "Добавить --no-cache в команду docker build",
-      "Использовать ADD вместо COPY"
+      "Скопировать lockfiles, установить dependencies, затем скопировать source code",
+      "Скопировать repository целиком до install, чтобы получить общий checksum",
+      "Запускать docker build --no-cache при каждом изменении application code",
+      "Перенести установку dependencies после команды сборки приложения"
     ],
     "answer": 0,
-    "explanation": "Слои кэшируются только если инструкция и все предыдущие не изменились. Копируя сначала только файл зависимостей (COPY requirements.txt .) и устанавливая их, а потом копируя код, мы избегаем переустановки при изменении кода."
+    "explanation": "Cache invalidation распространяется на последующие build steps. Если сначала COPY package/lock files и выполнить install, изменения application source не инвалидируют dependency layer. Затем копируют остальной код. BuildKit cache mount дополнительно сохраняет package-manager cache даже при повторном выполнении install step."
   },
   {
     "id": 342,
     "topic": "Docker",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое BuildKit и какие преимущества он даёт?",
+    "q": "Какую роль выполняет BuildKit в современной Docker-сборке?",
     "options": [
-      "Инструмент для создания Kubernetes-образов",
-      "Улучшенный движок сборки Docker с параллельными стадиями, монтированием секретов и улучшенным кэшированием",
-      "Система мониторинга процессов сборки",
-      "Компилятор Go для Docker-демона"
+      "OCI runtime, который запускает containers и настраивает их cgroups",
+      "Builder с concurrent graph, selective context transfer и advanced mounts",
+      "Registry service, который подписывает tags перед каждым docker push",
+      "Compose scheduler, распределяющий services между daemon hosts"
     ],
     "answer": 1,
-    "explanation": "BuildKit (DOCKER_BUILDKIT=1) предоставляет: параллельное выполнение независимых стадий, монтирование секретов (--mount=type=secret) без сохранения в слое, SSH-агент, улучшенное кэширование и более информативный вывод."
+    "explanation": "BuildKit строит и оптимизирует build graph: пропускает unused stages/files, параллелит независимые ветви, передаёт изменившиеся части context и поддерживает cache, secret и SSH mounts. Он является default builder для Docker Desktop и Docker Engine при Linux container builds; инструкция DOCKER_BUILDKIT=1 больше не описывает обычный способ включения."
   },
   {
     "id": 343,
     "topic": "Docker",
     "level": "Middle",
     "category": "definition",
-    "q": "Как ограничить использование CPU и памяти для контейнера?",
+    "q": "Какие docker run flags задают CPU quota и жёсткий memory limit?",
     "options": [
-      "Через переменные окружения CPU_LIMIT и MEM_LIMIT",
-      "Только через docker-compose с параметром resources",
-      "Флагами --cpus и --memory при docker run",
-      "Через Dockerfile инструкцию RESOURCE"
+      "--env CPU_LIMIT=0.5 --env MEMORY_LIMIT=512m",
+      "--cpu-period=100000 --memory-reservation=512m",
+      "--cpus=0.5 --memory=512m",
+      "--restart=on-failure --shm-size=512m"
     ],
     "answer": 2,
-    "explanation": "Флаги --cpus=0.5 (половина ядра), --memory=512m ограничивают ресурсы через cgroups. --memory-swap контролирует использование swap. Без ограничений контейнер может потребить все ресурсы хоста."
+    "explanation": "--cpus задаёт долю доступного CPU через cgroup quota, а --memory — hard memory limit. --memory-reservation является soft limit и не заменяет --memory. --memory-swap задаёт общий предел memory+swap и требует аккуратной интерпретации относительно --memory. Переменные окружения сами не настраивают cgroups."
   },
   {
     "id": 344,
     "topic": "Docker",
     "level": "Middle",
     "category": "scenario",
-    "q": "Как настроить healthcheck для контейнера с веб-сервером?",
+    "q": "Какая строка Dockerfile задаёт проверку здоровья веб-сервиса?",
     "options": [
-      "Healthcheck настраивается только в docker-compose",
-      "MONITOR CMD wget http://localhost/health",
-      "CHECK HTTP localhost:80/health INTERVAL 30s",
+      "MONITOR --interval=30s HTTP http://localhost/health",
+      "EXPOSE 8080 HEALTH http://localhost:8080/health",
+      "CMD [\"curl\", \"-f\", \"http://localhost/health\"]",
       "HEALTHCHECK CMD curl -f http://localhost/health || exit 1"
     ],
     "answer": 3,
-    "explanation": "HEALTHCHECK CMD задаёт команду проверки состояния. Параметры: --interval (частота), --timeout (таймаут), --retries (число неудачных попыток до unhealthy). Статус виден в 'docker ps' и 'docker inspect'."
+    "explanation": "HEALTHCHECK запускает отдельную command probe и по её exit status переводит container в starting, healthy или unhealthy. --interval, --timeout, --start-period и --retries управляют расписанием. Обычный CMD задаёт основной process, а EXPOSE не проверяет доступность приложения."
   },
   {
     "id": 345,
     "topic": "Docker",
     "level": "Middle",
     "category": "definition",
-    "q": "Что делает инструкция ARG в Dockerfile в отличие от ENV?",
+    "q": "Как различаются ARG и ENV в Dockerfile?",
     "options": [
-      "ARG доступен только во время сборки образа, ENV — также во время выполнения контейнера",
-      "ENV используется для параметров сборки, ARG — для runtime-переменных",
-      "ARG шифрует переменные в слоях образа",
-      "Разница только в приоритете при конфликте имён"
+      "ARG имеет build scope, а ENV сохраняет значение в image и runtime environment",
+      "ENV имеет build scope, а ARG восстанавливается при каждом container start",
+      "ARG шифрует значение в build history, а ENV хранит его открыто",
+      "ARG выбирает storage driver, а ENV выбирает logging driver"
     ],
     "answer": 0,
-    "explanation": "ARG-переменные существуют только в процессе docker build и передаются через --build-arg. ENV-переменные сохраняются в образе и доступны при запуске контейнера. Использование ARG для секретов небезопасно — они видны в истории образа."
+    "explanation": "ARG объявляет build-time variable и сам по себе не создаёт runtime environment variable. ENV сохраняется в image configuration и наследуется контейнером, хотя docker run -e может его переопределить. Build args и ENV не подходят для секретов: значения могут сохраняться в image metadata, history или provenance; используют secret mounts."
   },
   {
     "id": 346,
     "topic": "Docker",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое container runtime (контейнерная среда выполнения) и как соотносятся Docker, containerd и runc?",
+    "q": "Как Docker Engine, containerd и runc участвуют в запуске Linux-контейнера?",
     "options": [
-      "Docker — единственная среда выполнения, containerd и runc — устаревшие альтернативы",
-      "Docker использует containerd как high-level runtime, containerd использует runc как low-level runtime для создания контейнеров",
-      "runc и containerd — конкурирующие реализации Docker API",
-      "containerd заменяет Docker полностью, runc — только для Windows"
+      "dockerd запускается внутри runc, а containerd хранит Dockerfile и credentials",
+      "dockerd делегирует lifecycle containerd, который вызывает OCI runtime вроде runc",
+      "runc предоставляет Docker API, а containerd преобразует calls в manifests",
+      "containerd реализует kernel namespaces, а runc доставляет images из registry"
     ],
     "answer": 1,
-    "explanation": "Docker (dockerd) → containerd (управление жизненным циклом) → runc (создание Linux-контейнеров через OCI-спецификацию). Kubernetes использует containerd напрямую, минуя dockerd. runc — эталонная реализация OCI Runtime Spec."
+    "explanation": "Docker Engine принимает high-level requests и использует containerd для управления images и lifecycle containers. containerd через shim вызывает OCI runtime, обычно runc, который создаёт process с namespaces, cgroups и root filesystem из OCI bundle. Kubernetes также может обращаться к containerd через CRI, не включая dockerd в этот путь."
   },
   {
     "id": 347,
     "topic": "Docker",
     "level": "Middle",
     "category": "scenario",
-    "q": "Команда docker stats показывает высокое потребление памяти контейнером. Как найти конкретные процессы внутри?",
+    "q": "docker stats показывает высокий memory usage. Как увидеть процессы контейнера?",
     "options": [
-      "docker inspect <id> --format '{{.State.Pid}}'",
-      "docker logs <id> --memory",
-      "docker exec <id> top или docker exec <id> ps aux",
-      "docker events <id> --filter memory"
+      "docker inspect <id> --format '{{.HostConfig.Memory}}' для списка RSS",
+      "docker logs <id> --details для сортировки stdout по memory usage",
+      "docker top <id>; при наличии tools — docker exec <id> ps или top",
+      "docker stats --no-stream <id> для таблицы PID и per-process RSS"
     ],
     "answer": 2,
-    "explanation": "docker exec позволяет выполнить команду внутри работающего контейнера. 'top', 'ps aux', 'cat /proc/meminfo' дадут информацию о процессах. docker stats показывает агрегированные метрики на уровне контейнера."
+    "explanation": "docker top показывает running processes контейнера без требования, чтобы ps был установлен в image. docker exec позволяет запустить ps/top, если эти utilities присутствуют, и посмотреть процесс изнутри namespaces. docker stats остаётся container-level метрикой, а HostConfig.Memory из inspect показывает настроенный limit, не RSS процессов."
   },
   {
     "id": 348,
     "topic": "Docker",
     "level": "Middle",
     "category": "definition",
-    "q": "Как работает overlay-сеть Docker и когда она используется?",
+    "q": "Что предоставляет overlay network driver в Docker Engine?",
     "options": [
-      "Для изоляции контейнеров без сетевого доступа",
-      "Для шифрования трафика между контейнерами на одном хосте",
-      "Для ускорения сети за счёт прямого доступа к сетевому стеку хоста",
-      "Для создания виртуальной сети поверх физической, объединяющей контейнеры на разных хостах в Docker Swarm"
+      "Local L2 bridge между containers одного daemon без multi-host control plane",
+      "Общий network namespace хоста с отключёнными NAT и port publishing",
+      "NFS-backed каталог с network configuration для каждого container",
+      "Distributed network поверх host networks для containers на разных daemons"
     ],
     "answer": 3,
-    "explanation": "Overlay-сеть использует VXLAN для туннелирования трафика между Docker-хостами в Swarm-кластере. Контейнеры на разных хостах общаются по IP как в одной сети. Шифрование опционально через --opt encrypted."
+    "explanation": "Overlay driver создаёт distributed network между несколькими Docker daemon hosts. Даже для standalone containers хосты должны участвовать в Swarm mode, чтобы установить overlay. Application traffic можно шифровать через --opt encrypted; это включает IPsec на уровне VXLAN и добавляет измеримый performance overhead."
   },
   {
     "id": 349,
     "topic": "Docker",
     "level": "Middle",
     "category": "scenario",
-    "q": "В docker-compose нужно задать зависимость запуска сервисов. Как это сделать правильно?",
+    "q": "Compose должен стартовать app после готовности database. Какая настройка подходит?",
     "options": [
-      "depends_on с condition: service_healthy для ожидания готовности",
-      "links: - db гарантирует порядок запуска",
-      "Порядок запуска определяется алфавитным порядком имён сервисов",
-      "Зависимости задаются через переменную WAIT_FOR в окружении"
+      "healthcheck у db и depends_on с condition: service_healthy у app",
+      "links: [db], поскольку DNS connectivity означает готовность database",
+      "Расположение db перед app в YAML, поскольку Compose соблюдает file order",
+      "restart: on-failure у app, поскольку restart ждёт готовность dependency"
     ],
     "answer": 0,
-    "explanation": "depends_on: db с condition: service_healthy ждёт пока healthcheck сервиса db не вернёт healthy. Без condition: service_healthy depends_on гарантирует только порядок запуска контейнеров, но не готовность приложения."
+    "explanation": "Короткий depends_on и condition: service_started ожидают запуск container, но не готовность приложения. condition: service_healthy ожидает successful healthcheck dependency перед созданием dependent service. Приложению всё равно полезны retries: dependency может стать недоступной уже после старта."
   },
   {
     "id": 350,
     "topic": "Docker",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое слои образа Docker и как они влияют на размер?",
+    "q": "Как filesystem layers влияют на размер Docker image?",
     "options": [
-      "Слои автоматически сжимаются и объединяются при push",
-      "Каждая инструкция Dockerfile создаёт новый слой; удалённые файлы остаются в предыдущих слоях",
-      "Каждый слой независим и содержит только добавленные файлы",
-      "Слои хранятся в оперативной памяти для ускорения запуска"
+      "Каждая Dockerfile instruction создаёт layer, а delete стирает parent bytes",
+      "RUN, COPY и ADD добавляют layers; later delete не стирает earlier layer data",
+      "FROM создаёт общий layer, а остальные instructions изменяют его in place",
+      "Layers находятся в RAM и compacted после остановки последнего container"
     ],
     "answer": 1,
-    "explanation": "Каждый RUN/COPY/ADD создаёт новый неизменяемый слой поверх предыдущего. Если в RUN вы скачиваете и затем удаляете файл в разных командах — он остаётся в промежуточном слое. Решение: объединять в одну RUN команду через &&."
+    "explanation": "Filesystem-changing instructions RUN, COPY и ADD создают immutable layers. Удаление в следующем layer скрывает path в итоговом view, но bytes остаются в нижнем layer и входят в image. Поэтому временные packages/files устанавливают и удаляют в одном RUN либо оставляют в build stage, не копируемом в runtime stage."
   },
   {
     "id": 351,
     "topic": "Docker",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает механизм copy-on-write (CoW) в overlay2 storage driver?",
+    "q": "Что происходит при первой записи в existing file через overlay2?",
     "options": [
-      "При запуске контейнера все слои образа копируются в writeable слой",
-      "CoW используется только при docker commit для сохранения изменений",
-      "Нижние слои образа доступны только для чтения; при изменении файла он копируется в верхний writeable слой контейнера",
-      "overlay2 не использует CoW, данные записываются напрямую в образ"
+      "Все image layers заранее копируются в upperdir перед запуском process",
+      "Изменение записывается в найденный lowerdir, сохраняя тот же inode",
+      "overlay2 выполняет copy_up целого файла в upperdir и меняет копию",
+      "Файл переносится в named volume, а lowerdir помечается writable"
     ],
     "answer": 2,
-    "explanation": "overlay2 монтирует нижние слои (lowerdir) только для чтения и создаёт верхний слой (upperdir) для записи. При модификации файла из lowerdir он копируется в upperdir (copy-on-write). Это обеспечивает изоляцию и экономию места."
+    "explanation": "Lower layers образа остаются read-only. При первой записи overlay2 делает copy_up всего файла из lowerdir в container upperdir и изменяет уже верхнюю копию; последующие writes идут туда же. Для большого файла даже небольшое первое изменение может добавить latency, потому что copy_up работает на уровне целого файла."
   },
   {
     "id": 352,
     "topic": "Docker",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как запустить контейнер с минимальными привилегиями для production?",
+    "q": "Какая комбинация даёт сильную стартовую изоляцию production-контейнера?",
     "options": [
-      "Использовать --privileged=false (флаг по умолчанию)",
-      "Использовать --security-opt=none для сброса всех профилей",
-      "Достаточно запустить контейнер от пользователя с uid > 1000",
-      "Комбинация: --user non-root, --read-only, --cap-drop=ALL, --cap-add только нужные, --no-new-privileges, seccomp-профиль"
+      "--privileged=false без изменения user, filesystem и capabilities",
+      "--user 1001 вместе с --cap-add=ALL и seccomp=unconfined",
+      "--user 1001 с writable root и mount Docker socket с хоста",
+      "--user 1001 --read-only --cap-drop=ALL --security-opt no-new-privileges"
     ],
     "answer": 3,
-    "explanation": "Defence in depth для контейнеров: запуск от non-root USER, --cap-drop ALL (удалить все capabilities) + --cap-add только необходимые (NET_BIND_SERVICE и т.д.), --read-only файловая система, --no-new-privileges (запрет escalation), кастомный seccomp-профиль."
+    "explanation": "Defense in depth начинает с non-root user, read-only root filesystem, удаления capabilities и запрета получения новых privileges. Нужные write paths дают через tmpfs/volumes, а отдельные capabilities возвращают точечно. Правильный Docker flag — --security-opt no-new-privileges[=true]; default или более строгий seccomp profile оставляют включённым."
   },
   {
     "id": 353,
     "topic": "Docker",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое Docker Content Trust (DCT) и как он обеспечивает безопасность образов?",
+    "q": "Что верно о Docker Content Trust (DCT) в 2026 году?",
     "options": [
-      "Механизм подписи образов на основе Notary, гарантирующий целостность и авторство образа",
-      "Шифрование данных контейнера во время выполнения",
-      "Система аутентификации для доступа к приватным реестрам",
-      "Проверка образов на вирусы перед загрузкой"
+      "DCT подписывает tags через Notary v1, но сервис выводится из эксплуатации",
+      "DCT шифрует image layers и заменяет Notary в новых Docker releases",
+      "DCT сканирует CVE и блокирует pull по vulnerability severity policy",
+      "DCT аутентифицирует registry users и обновляет access tokens"
     ],
     "answer": 0,
-    "explanation": "DCT (DOCKER_CONTENT_TRUST=1) использует The Update Framework (TUF) через Notary-сервер. Образы подписываются приватным ключом издателя. При pull проверяется подпись — гарантирует, что образ не изменён после публикации."
+    "explanation": "DCT применяет digital signatures к image tags через Notary v1 и позволяет клиенту проверить integrity и publisher. Однако Docker помечает DCT как retiring: hosted Notary v1 service at notary.docker.io должен отключиться 8 декабря 2026 года. Существующие deployments должны планировать migration на поддерживаемый signing workflow."
   },
   {
     "id": 354,
     "topic": "Docker",
     "level": "Senior",
     "category": "scenario",
-    "q": "Контейнер неожиданно завершается с OOMKilled. Как диагностировать и предотвратить?",
+    "q": "Контейнер завершился с OOMKilled. Какой план диагностики разумен?",
     "options": [
-      "OOMKilled нельзя диагностировать, нужно увеличить лимит памяти",
-      "docker inspect покажет OOMKilled=true; увеличить --memory лимит или оптимизировать приложение; настроить --memory-swap",
-      "Использовать --oom-kill-disable=true для отключения OOM killer",
-      "Переключиться на более новую версию образа"
+      "Отключить OOM killer и оставить текущий memory limit без profiling",
+      "Проверить State.OOMKilled и usage; найти leak/peak и обосновать memory/swap limits",
+      "Уменьшить memory reservation, чтобы kernel раньше освобождал page cache",
+      "Запустить с --privileged и снять cgroup limits до следующего release"
     ],
     "answer": 1,
-    "explanation": "docker inspect <id> --format '{{.State.OOMKilled}}' покажет true. Решения: увеличить --memory, профилировать приложение (memory leak?), настроить --memory-swap. Отключение OOM killer (--oom-kill-disable) опасно — может заморозить хост."
+    "explanation": "docker inspect показывает State.OOMKilled, ExitCode и configured limits; cgroup metrics и application profiling помогают отличить leak от допустимого peak. После измерений оптимизируют приложение или меняют --memory и --memory-swap. Docker не рекомендует обходить safeguards через --oom-kill-disable: это повышает риск нестабильности хоста."
   },
   {
     "id": 355,
     "topic": "Docker",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "В чём компромисс между использованием host-сети и bridge-сети для контейнера с высокой нагрузкой?",
+    "q": "Каков trade-off host и bridge networking на Linux Docker Engine?",
     "options": [
-      "Host-сеть несовместима с Linux-контейнерами",
-      "Bridge-сеть всегда быстрее из-за аппаратного ускорения",
-      "Host-сеть быстрее (нет overhead NAT/veth), но теряется сетевая изоляция; bridge безопаснее, но медленнее",
-      "Нет разницы в производительности, только в синтаксисе настройки"
+      "Host создаёт второй network stack, а bridge использует namespace хоста",
+      "Bridge обходит NAT и userland proxy, но занимает host ports напрямую",
+      "Host убирает NAT/proxy overhead, но разделяет network namespace и host ports",
+      "Режимы меняют DNS syntax, не влияя на isolation или packet path"
     ],
     "answer": 2,
-    "explanation": "Host-сеть убирает слой NAT и виртуальных интерфейсов (veth pairs), давая ~10-20% прирост производительности для сетевых приложений. Однако контейнер использует пространство имён сети хоста, что нарушает изоляцию и создаёт риски конфликта портов."
+    "explanation": "Host mode не создаёт container-specific network namespace и не требует NAT или userland proxy, поэтому может уменьшить overhead и удобен для большого диапазона ports. Цена — слабее network isolation и конфликты host ports; -p/--publish игнорируется. Размер выигрыша зависит от workload и измеряется benchmark, фиксированного процента нет."
   },
   {
     "id": 356,
     "topic": "Docker",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работают Linux capabilities в контексте Docker и зачем делать --cap-drop ALL?",
+    "q": "Зачем контейнеру применять --cap-drop=ALL перед точечным --cap-add?",
     "options": [
-      "Capabilities — это переменные окружения Linux для управления правами",
-      "--cap-drop ALL полностью изолирует контейнер от ядра",
-      "Docker capabilities работают только для root-контейнеров",
-      "Capabilities разделяют привилегии root на независимые единицы; --cap-drop ALL убирает все, --cap-add добавляет только нужные по принципу least privilege"
+      "Capabilities кодируют permissions как environment variables процесса",
+      "cap-drop отключает syscalls в seccomp profile для всего daemon host",
+      "cap-add назначает host UID, а cap-drop меняет container user name",
+      "Capabilities дробят root powers; drop-all и allowlist уменьшают privileges"
     ],
     "answer": 3,
-    "explanation": "Linux capabilities (CAP_NET_BIND_SERVICE, CAP_SYS_PTRACE и т.д.) дробят привилегии суперпользователя. По умолчанию Docker предоставляет ~14 capabilities. --cap-drop ALL + --cap-add только нужных реализует принцип минимальных привилегий."
+    "explanation": "Linux capabilities делят традиционные root privileges на отдельные units, например CAP_NET_BIND_SERVICE или CAP_SYS_PTRACE. Docker предоставляет ограниченный default set, который меняется вместе с платформой и версией. --cap-drop=ALL с точечным --cap-add строит явный least-privilege allowlist вместо зависимости от default set."
   },
   {
     "id": 357,
     "topic": "Docker",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как передать секреты в контейнер во время сборки (BuildKit secrets) без сохранения в слоях образа?",
+    "q": "Как BuildKit передаёт secret в один RUN step без записи в image layer?",
     "options": [
-      "Использовать RUN --mount=type=secret,id=mysecret cat /run/secrets/mysecret, запустить с --secret id=mysecret,src=./secret.txt",
-      "Передать через ARG --build-arg SECRET=value",
-      "Зашифровать секрет в Base64 и передать через ENV",
-      "Использовать COPY secret.txt /tmp/secret && RUN ... && RUN rm /tmp/secret"
+      "CLI --secret id=token,src=file и RUN --mount=type=secret,id=token",
+      "ARG TOKEN плюс --build-arg TOKEN=value и unset в следующем RUN",
+      "ENV TOKEN=<base64> плюс удаление variable в следующем image layer",
+      "COPY token /tmp/token, использование и RUN rm /tmp/token позднее"
     ],
     "answer": 0,
-    "explanation": "BuildKit secrets монтируют файл секрета в /run/secrets/ только на время выполнения RUN-инструкции. Секрет не сохраняется ни в одном слое образа. ARG/ENV сохраняются в истории образа и небезопасны для секретов."
+    "explanation": "docker build --secret передаёт source builder, а RUN --mount=type=secret временно предоставляет его этому build step, по умолчанию в /run/secrets/<id>. Build args и environment variables непригодны для secrets, поскольку сохраняются в final image metadata/history/provenance. COPY с последующим rm оставляет bytes в нижнем layer."
   },
   {
     "id": 358,
     "topic": "Docker",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое seccomp-профиль Docker и какой применяется по умолчанию?",
+    "q": "Как default seccomp profile ограничивает Linux-контейнер?",
     "options": [
-      "Профиль шифрования сетевого трафика контейнера",
-      "Фильтр системных вызовов ядра; по умолчанию Docker блокирует ~44 опасных syscall",
-      "Профиль производительности для оптимизации CPU контейнера",
-      "Конфигурация SELinux для контейнерных процессов"
+      "Шифрует container traffic через IPsec rules в network namespace",
+      "Работает как syscall allowlist и отклоняет неразрешённые kernel calls",
+      "Назначает CPU quota и memory limit через cgroup controllers",
+      "Задаёт SELinux labels для process и mounted filesystem paths"
     ],
     "answer": 1,
-    "explanation": "seccomp (Secure Computing Mode) фильтрует syscalls через BPF. Дефолтный профиль Docker блокирует ~44 опасных вызовов (reboot, kexec_load, ptrace и др.). Можно задать кастомный профиль: --security-opt seccomp=profile.json или unconfined."
+    "explanation": "Default seccomp profile — allowlist: для неразрешённых syscalls применяется SCMP_ACT_ERRNO, а разрешения могут зависеть от architecture и capabilities. Текущая документация говорит о десятках заблокированных calls из 300+, но точный набор не стоит зашивать как постоянный. Custom profile задают через --security-opt seccomp=profile.json; unconfined отключает эту защиту."
   },
   {
     "id": 359,
     "topic": "Docker",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Какой компромисс при использовании Docker volumes с NFS для stateful приложений в кластере?",
+    "q": "Как оценить NFS-backed Docker volume для stateful workload в кластере?",
     "options": [
-      "NFS volumes не поддерживаются в Docker",
-      "NFS volumes быстрее локального хранилища за счёт кэширования",
-      "Централизованное хранилище доступно всем узлам, но добавляет latency сети и single point of failure; требует настройки блокировок для БД",
-      "NFS volumes автоматически реплицируются между узлами"
+      "Docker Engine отклоняет NFS mounts при создании named volumes",
+      "NFS снижает write latency относительно local SSD при любом workload",
+      "Shared access упрощается, но latency, availability и locking semantics требуют проверки",
+      "Volume driver реплицирует NFS data между nodes независимо от NFS server"
     ],
     "answer": 2,
-    "explanation": "NFS даёт shared storage для stateful сервисов, но: сетевая задержка критична для БД, NFS-сервер — SPOF, проблемы с file locking для баз данных. Альтернативы: Ceph RBD, distributed block storage (Longhorn, Portworx)."
+    "explanation": "NFS даёт нескольким hosts доступ к общему filesystem, но добавляет network latency и зависит от availability NFS service и сети. Нужно проверить locking, consistency, UID/GID mapping, failover и поддержку конкретным приложением; не каждая database корректно работает на NFS. NFS не становится SPOF при грамотно реализованной HA architecture, поэтому это не безусловное свойство protocol."
   },
   {
     "id": 360,
     "topic": "Docker",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как эффективно уменьшить размер production-образа Python-приложения?",
+    "q": "Какая стратегия обычно уменьшает production image Python-приложения?",
     "options": [
-      "Использовать python:latest как базовый образ",
-      "Сжать образ командой docker compress",
-      "Удалить pip после установки зависимостей",
-      "Multi-stage build: сборка в python:3.11 → копирование в python:3.11-slim или distroless/python; --no-cache-dir pip, .dockerignore для тестов"
+      "Взять python:latest и выполнить upgrade всех OS packages в отдельном RUN",
+      "Скопировать source первым, затем компилировать dependencies при каждом build",
+      "Установить build tools и удалить их в более позднем Dockerfile layer",
+      "Собрать wheels в builder и установить их в совместимый slim runtime stage"
     ],
     "answer": 3,
-    "explanation": "Multi-stage: build stage (полный Python с gcc для компиляции) → runtime stage (slim/distroless без компилятора). pip install --no-cache-dir экономит кэш. .dockerignore исключает .git, __pycache__, tests. Итоговый образ уменьшается в 3-10 раз."
+    "explanation": "Builder stage содержит compiler и headers и выпускает wheels или готовый environment; runtime stage получает лишь нужные artifacts и runtime libraries. Stages должны быть ABI/platform-compatible. --no-cache-dir и .dockerignore уменьшают ненужные bytes/context. Удаление build tools в более позднем layer скрывает их, но не удаляет bytes из предыдущего layer."
   },
   {
     "id": 361,
