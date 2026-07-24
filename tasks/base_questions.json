@@ -1290,29 +1290,29 @@
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что значит agentless?",
+    "q": "Что означает agentless-модель Ansible?",
     "options": [
-      "Не нужен агент на целевых хостах",
-      "Нет сети",
-      "Нет inventory",
-      "Нет YAML"
+      "На managed host обычно не ставят постоянный Ansible agent: controller использует connection plugin",
+      "Controller выполняет playbook без network connection и передаёт изменения через общий диск",
+      "Inventory не используется, потому что controller автоматически обнаруживает каждый target",
+      "Modules не передаются на target, а все изменения выполняются внутри процесса controller"
     ],
     "answer": 0,
-    "explanation": "Ansible обычно работает по SSH без постоянного агента.",
+    "explanation": "Для Linux Ansible обычно подключается по SSH и временно запускает module на target; постоянный daemon Ansible там не нужен. При этом target может требовать Python, shell или другие runtime-компоненты конкретного module.",
     "id": 93
   },
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "На чём пишут playbook?",
+    "q": "В каком формате обычно описывают Ansible playbook?",
     "options": [
-      "JSON только",
-      "YAML",
-      "Bash",
-      "Go"
+      "В JSON-документе со специальной схемой, которую controller компилирует перед каждым запуском",
+      "В YAML, где plays, tasks, roles и variables представлены стандартными структурами данных",
+      "В Bash-скрипте, который source-ит inventory и вызывает modules как локальные binaries",
+      "В Go-коде, который собирается отдельно для архитектуры каждого managed host"
     ],
     "answer": 1,
-    "explanation": "Playbook — это YAML-файл.",
+    "explanation": "Playbooks используют YAML и должны соответствовать структуре данных Ansible. Jinja expressions допустимы в значениях, но файл не превращается в произвольную программу или shell script.",
     "id": 94
   },
   {
@@ -1346,43 +1346,43 @@
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что такое playbook?",
+    "q": "Что представляет собой Ansible playbook?",
     "options": [
-      "Сценарий автоматизации",
-      "Только роль",
-      "Только vault",
-      "Лог запуска"
+      "YAML-сценарий из plays, связывающих группы hosts с tasks, roles, variables и обработчиками",
+      "Каталог role без указания target hosts, порядка запуска и параметров подключения controller",
+      "Зашифрованный Vault-файл, содержащий credentials и автоматически выполняемые команды",
+      "Текстовый log завершённого запуска с результатом каждого module и изменённого host"
     ],
     "answer": 0,
-    "explanation": "Playbook объединяет plays и tasks.",
+    "explanation": "Playbook описывает один или несколько plays: target hosts, desired actions и orchestration. Он может подключать roles и task files, но сам определяет контекст и порядок выполнения.",
     "id": 97
   },
   {
     "topic": "Ansible",
     "level": "Junior",
-    "q": "Что такое role?",
+    "q": "Зачем Ansible использует roles?",
     "options": [
-      "Firewall",
-      "Структурированный способ переиспользовать automation-код",
-      "Тип DNS-записи",
-      "Команда shell"
+      "Чтобы фильтровать network traffic managed host по правилам addresses, ports и connection state",
+      "Чтобы упаковать reusable tasks, handlers, defaults, vars, templates и files в стандартную структуру",
+      "Чтобы создавать DNS records для controller и автоматически делегировать authoritative zones",
+      "Чтобы запускать shell commands без module interface и считать каждую команду идемпотентной"
     ],
     "answer": 1,
-    "explanation": "Role организует tasks, handlers, vars и другое.",
+    "explanation": "Role организует связанную автоматизацию и предоставляет понятный interface через defaults, variables и dependencies. Переиспользование не отменяет необходимости документировать inputs, поддерживаемые platforms и side effects.",
     "id": 98
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое idempotency?",
+    "q": "Что означает idempotency для Ansible task?",
     "options": [
-      "Удаление роли",
-      "Запуск один раз",
-      "Повторный запуск ведёт к тому же целевому состоянию",
-      "Тип inventory"
+      "Task удаляет установленную role после первого запуска, чтобы исключить повторное применение",
+      "Task выполняется controller один раз и затем пропускается независимо от состояния target",
+      "После достижения desired state повторный запуск с теми же inputs не вносит изменений",
+      "Task получает данные из dynamic inventory и поэтому не зависит от порядка target hosts"
     ],
     "answer": 2,
-    "explanation": "Это один из важнейших принципов Ansible.",
+    "explanation": "Идемпотентный module сравнивает текущее и желаемое состояние и сообщает changed лишь при реальном изменении. Общая идемпотентность также зависит от параметров, внешней среды и пользовательской логики.",
     "id": 99
   },
   {
@@ -1402,43 +1402,43 @@
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое handlers?",
+    "q": "Как работают handlers в Ansible?",
     "options": [
-      "Задачи, которые запускаются при notify после изменений",
-      "Только ошибки",
-      "Список серверов",
-      "Тип шаблона"
+      "Это именованные tasks, которые ставятся в очередь через notify и запускаются в точке handler flush",
+      "Это callbacks для обработки syntax errors до чтения inventory и построения списка hosts",
+      "Это группы managed hosts, автоматически созданные по результатам dynamic inventory plugin",
+      "Это шаблоны Jinja, выполняемые controller после render каждого configuration file"
     ],
     "answer": 0,
-    "explanation": "Обычно через handlers делают restart/reload.",
+    "explanation": "Task с результатом changed уведомляет handler по имени или listen topic. Уведомления дедуплицируются для host, а handler выполняется в предусмотренной точке flush; meta: flush_handlers может вызвать её раньше.",
     "id": 101
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "В каком случае выполняются handlers?",
+    "q": "Когда уведомлённый handler будет выполнен?",
     "options": [
-      "Всегда после каждого таска",
-      "Когда задача отправила notify из-за изменений",
-      "Только при reboot",
-      "Только в AWX"
+      "После каждой task независимо от changed status, чтобы синхронизировать состояние target",
+      "Если notifying task сообщила changed и выполнение дошло до соответствующей точки flush",
+      "После reboot managed host, когда controller снова обнаружит его через inventory plugin",
+      "При запуске из AWX, поскольку ansible-playbook CLI не поддерживает handler queue"
     ],
     "answer": 1,
-    "explanation": "Handler не должен срабатывать без необходимости.",
+    "explanation": "notify срабатывает при changed, а не при ok. По умолчанию handler запускается в определённых границах play; ошибки могут помешать запуску на host, если не использованы подходящие recovery-механизмы вроде force_handlers.",
     "id": 102
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "В чём минус shell/command модулей?",
+    "q": "Почему shell и command часто уступают специализированному Ansible module?",
     "options": [
-      "Они только для Windows",
-      "Они не умеют запускать команды",
-      "Они менее декларативны и хуже контролируют идемпотентность",
-      "Они заменяют handlers"
+      "Они поддерживают Windows connections, но не могут выполняться на Linux managed hosts",
+      "Они проверяют команды без запуска и поэтому не способны изменить состояние target system",
+      "Произвольная команда не описывает desired state, поэтому change detection и retries приходится задавать",
+      "Они автоматически уведомляют все handlers и тем самым выполняют лишние service restarts"
     ],
     "answer": 2,
-    "explanation": "Предпочтительнее использовать специализированные модули.",
+    "explanation": "Специализированный module понимает объект управления и обычно реализует check mode и idempotency. Для command или shell приходится вручную использовать changed_when, creates/removes и безопасную обработку входных данных.",
     "id": 103
   },
   {
@@ -1458,29 +1458,29 @@
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Зачем иногда отключают сбор facts?",
+    "q": "Когда разумно отключить gather_facts в play?",
     "options": [
-      "Чтобы ускорить выполнение, если они не нужны",
-      "Чтобы сломать playbook",
-      "Для DNS",
-      "Чтобы включить Vault"
+      "Когда play не использует facts и стоимость setup заметна на большом числе или медленных hosts",
+      "Когда нужно вызвать DNS resolver, поскольку facts блокируют исходящие network connections",
+      "Когда Vault должен расшифровать variables до чтения playbook и проверки его syntax",
+      "Когда controller требуется игнорировать inventory и выполнить tasks на localhost"
     ],
     "answer": 0,
-    "explanation": "На больших наборах хостов это может заметно ускорить запуск.",
+    "explanation": "gather_facts запускает setup перед tasks и создаёт сетевую и вычислительную работу на каждом host. Его можно пропустить, если данные не нужны, но references на ansible_facts тогда следует заменить или собирать выборочно.",
     "id": 105
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое ad-hoc команды?",
+    "q": "Что такое Ansible ad-hoc command?",
     "options": [
-      "Тип role",
-      "Разовые команды без полноценного playbook",
-      "Формат inventory",
-      "Служба Linux"
+      "Role dependency, которая подключается controller до загрузки tasks и defaults основной role",
+      "Одноразовый вызов module для выбранных hosts из CLI без создания полноценного playbook",
+      "Формат static inventory, где параметры host задаются как command-line flags процесса ssh",
+      "Служба managed host, которая принимает задания controller и хранит историю запусков"
     ],
     "answer": 1,
-    "explanation": "Удобны для быстрых единичных операций.",
+    "explanation": "Ad-hoc commands удобны для быстрых запросов и ограниченных операций, например ping или сбора факта. Повторяемую и проверяемую автоматизацию лучше фиксировать в playbook с review и version control.",
     "id": 106
   },
   {
