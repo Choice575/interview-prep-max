@@ -857,37 +857,17 @@ function markSeniorCaseDone(id){const p=lsGet('senior_case_prog',{});p[id]={stat
 
 // ═══ HOME ═══
 function updateStreakDisplay(){const sd=document.getElementById('streak-display');if(sd)sd.textContent='🔥 '+streak;}
-function renderHome(){
-  if(typeof InterviewCoachUI!=='undefined') InterviewCoachUI.render();
-  renderReadinessHome();
-  renderMasteryCards();
-  const s=streak,best=lsGet('streak_best',0);
-  const banner=document.getElementById('home-streak-banner');
-  if(s>0||best>0){banner.style.display='flex';}
-  document.getElementById('home-streak-num').textContent=streak;
-  document.getElementById('home-best-streak').textContent='Лучшая серия: '+best;
-  const hist=lsGet('history',[]);
-  const hc=document.getElementById('home-history');
-  if(!hist.length){hc.innerHTML='<p style="color:var(--text3);font-size:13px">История пуста. Начните экзамен!</p>';}else{
-  hc.innerHTML=hist.slice(0,5).map(h=>'<div class="history-item"><span style="color:var(--text3);font-size:11px">'+esc(h.date)+'</span><span>'+esc(h.topic||'')+'</span><span style="color:'+(h.correct?'var(--green)':'var(--red)')+'">'+(h.correct?'✅ Верно':'❌ Неверно')+'</span></div>').join('');}
-  // Пересоздаём Блиц и Mock Interview (чтобы не пропадали при перерендере)
-  setTimeout(()=>{
-    const qa=document.querySelector('.quick-actions');
-    if(!qa) return;
-    if(!document.getElementById('blitz-btn')){
-      const btn=document.createElement('button');btn.id='blitz-btn';btn.className='btn btn-outline';btn.style.cssText='background:var(--primary-dim);color:var(--primary-h);border-color:var(--primary)';btn.textContent='⚡ Блиц (5 мин)';btn.onclick=startBlitz;btn.setAttribute('aria-label','Блиц-опрос на 5 минут');qa.appendChild(btn);
-    }
-    if(!document.getElementById('mock-btn')){
-      const mockBtn=document.createElement('button');mockBtn.id='mock-btn';mockBtn.className='btn btn-outline';mockBtn.style.cssText='background:var(--primary-dim);color:var(--primary-h);border-color:var(--primary)';mockBtn.textContent='🎤 Mock Interview (30 мин)';mockBtn.onclick=startMockInterview;mockBtn.setAttribute('aria-label','Mock интервью на 30 минут');qa.appendChild(mockBtn);
-    }
-    if(!document.getElementById('diag-btn')){
-      const diagBtn=document.createElement('button');diagBtn.id='diag-btn';diagBtn.className='btn btn-outline';diagBtn.style.cssText='background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)';diagBtn.textContent='🔬 Диагностика';diagBtn.onclick=startDiagnostic;diagBtn.setAttribute('aria-label','Диагностический тест на 15 вопросов');qa.appendChild(diagBtn);
-    }
-    if(!document.getElementById('inc-btn')){
-      const incBtn=document.createElement('button');incBtn.id='inc-btn';incBtn.className='btn btn-outline';incBtn.style.cssText='background:var(--red-dim);color:var(--red);border-color:var(--red)';incBtn.textContent='🚨 Инцидент';incBtn.onclick=startIncidentSim;incBtn.setAttribute('aria-label','Симуляция инцидента');qa.appendChild(incBtn);
-    }
-  },100);
-}
+const homeUI=typeof IPMaxHomeUI!=='undefined'?IPMaxHomeUI.create({
+  get:(key,fallback)=>lsGet(key,fallback),getStreak:()=>streak,
+  getQuestionProgress:getQProg,getQuestions:getAllQ,getTopics:getAllTopics,
+  renderCoach:()=>{if(typeof InterviewCoachUI!=='undefined') InterviewCoachUI.render();},
+  renderReadiness:renderReadinessHome,
+  startMode,navigate:nav,startBlitz,startMockInterview,startDiagnostic,startIncident:startIncidentSim,
+  openTopic:topic=>{currentTopic=topic;nav('exam');}
+}):null;
+function requireHomeUI(){if(!homeUI) throw new Error('Модуль главной страницы не загружен.');return homeUI;}
+function renderHome(){return requireHomeUI().renderHome();}
+function renderMasteryCards(){return requireHomeUI().renderMasteryCards();}
 function startCoachFocus(topic,trainerPage,plan){
   if(!plan) return;
   resetCoachSelection();
@@ -915,21 +895,6 @@ function startCoachControlMode(plan){
   });
   currentTopic='all';currentLevel='all';currentCategory='all';currentMode='all';currentView='standard';interviewMode=true;cameFromStudy=false;
   nav('exam');
-}
-
-function renderMasteryCards(){
-  const qprog=getQProg(),allQ=getAllQ();
-  const topics=getAllTopics();
-  const icons=['⚡','🐧','🌐','📦','🐳','☸️','🔄','🔀','🔍'];
-  const colors=['var(--primary)','var(--green)','var(--blue)','var(--orange)','#38bdf8','#60a5fa','#fb923c','#f59e0b','#c084fc'];
-  const mc=document.getElementById('mastery-cards');
-  if(!mc) return;
-  mc.innerHTML=topics.slice(0,9).map((t,i)=>{
-    const tqs=allQ.filter(q=>q.topic===t);
-    const m=tqs.filter(q=>{const p=qprog[q.id];return p&&p.correct>p.wrong;}).length;
-    const pct=tqs.length?Math.round(m/tqs.length*100):0;
-    return '<button type="button" class="mastery-card" data-topic="'+t+'" onclick="currentTopic=this.getAttribute(\'data-topic\');nav(\'exam\')">'+'<div style="font-size:20px">'+(icons[i]||'📋')+'</div>'+'<div class="mastery-pct" style="color:'+(colors[i]||'var(--primary)')+'">'+pct+'%</div>'+'<div class="mastery-name">'+t+'</div>'+'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+m+'/'+tqs.length+'</div>'+'<div class="mastery-bar"><div class="mastery-fill" style="width:'+pct+'%;background:'+(colors[i]||'var(--primary)')+'"></div></div></button>';
-  }).join('');
 }
 
 // ═══ ANALYTICS ═══
@@ -1439,7 +1404,7 @@ document.addEventListener('keydown',function(e){
 
 // ═══ OFFLINE READINESS CHECK ═══
 async function checkOfflineReady(){
-  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./analytics-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./analytics-ui.js','./home-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','labs','tips','incidents','study_map','study_tests','senior_cases','best_practices'];
   tasks.forEach(t=>files.push('./tasks/'+t+'.json'));
   let ok=0,fail=0;const results=[];
@@ -1474,11 +1439,7 @@ function applyAppUpdate(){
 initApp();
 
 function toggleMasteryGrid(){
-  const grid=document.getElementById('mastery-cards');
-  const btn=document.getElementById('toggle-mastery-btn');
-  if(!grid||!btn) return;
-  if(grid.style.display==='none'){grid.style.display='';btn.textContent='📋 Скрыть все темы ▲';}
-  else{grid.style.display='none';btn.textContent='📋 Все темы ▼';}
+  return requireHomeUI().toggleMasteryGrid();
 }
 
 // ═══ INCIDENT SIMULATION ═══

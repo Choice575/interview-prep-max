@@ -71,6 +71,8 @@ test('serves only browser assets and blocks server-side files', async () => {
     assert.equal(progressIo.status, 200);
     const analyticsUi = await request(server, 'GET', '/analytics-ui.js');
     assert.equal(analyticsUi.status, 200);
+    const homeUi = await request(server, 'GET', '/home-ui.js');
+    assert.equal(homeUi.status, 200);
 
     for (const privatePath of ['/server.js', '/server/ai-service.js', '/.env', '/.git/config', '/package-lock.json']) {
       const result = await request(server, 'GET', privatePath);

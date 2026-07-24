@@ -1,3 +1,3 @@
 // Single source of truth for the application and offline cache version.
-self.IPMAX_VERSION = '12.10.0';
+self.IPMAX_VERSION = '12.11.0';
 self.IPMAX_CACHE_NAME = 'ipmax-v' + self.IPMAX_VERSION;

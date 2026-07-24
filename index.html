@@ -89,12 +89,12 @@
     <div class="sep"></div>
     <h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text2)">Быстрый старт</h3>
     <div class="quick-actions">
-      <button class="btn btn-primary" onclick="startMode('mix20')">⚡ Микс 20 вопросов</button>
-      <button class="btn btn-outline" onclick="startMode('mix10')">🎯 Микс 10</button>
-      <button class="btn btn-outline" onclick="startMode('smart')">🧠 Умный режим</button>
-      <button class="btn btn-outline" onclick="startMode('mistakes')">❌ Работа над ошибками</button>
-      <button class="btn btn-outline" onclick="nav('subnet')">🌐 Тренажёр подсетей</button>
-      <button class="btn btn-outline" onclick="nav('ts')">🔧 Troubleshooting</button>
+      <button class="btn btn-primary" data-home-action="startMode" data-home-value="mix20">⚡ Микс 20 вопросов</button>
+      <button class="btn btn-outline" data-home-action="startMode" data-home-value="mix10">🎯 Микс 10</button>
+      <button class="btn btn-outline" data-home-action="startMode" data-home-value="smart">🧠 Умный режим</button>
+      <button class="btn btn-outline" data-home-action="startMode" data-home-value="mistakes">❌ Работа над ошибками</button>
+      <button class="btn btn-outline" data-home-action="navigate" data-home-value="subnet">🌐 Тренажёр подсетей</button>
+      <button class="btn btn-outline" data-home-action="navigate" data-home-value="ts">🔧 Troubleshooting</button>
     </div>
     <div class="sep"></div>
     <h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text2)">Последние ответы</h3>
@@ -348,6 +348,7 @@
 <script src="./ai-coach.js"></script>
 <script src="./progress-io.js"></script>
 <script src="./analytics-ui.js"></script>
+<script src="./home-ui.js"></script>
 <script src="./coach-ui.js"></script>
 <script src="./app.js"></script>
 </body>

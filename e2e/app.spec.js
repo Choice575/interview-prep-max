@@ -31,6 +31,25 @@ test('builds a focused session from onboarding', async ({ page }) => {
   await expect(page.locator('#questions-container .q-card').first()).toBeVisible();
 });
 
+test('renders the extracted home UI and routes its actions', async ({ page }) => {
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+
+  await expect(page.locator('#mastery-cards .mastery-card')).toHaveCount(9);
+  await expect(page.locator('#blitz-btn')).toBeVisible();
+  expect(await page.locator('.quick-actions [onclick]').count()).toBe(0);
+
+  const firstCard = page.locator('#mastery-cards .mastery-card').first();
+  const topic = await firstCard.locator('.mastery-name').textContent();
+  await firstCard.click();
+  await expect(page.locator('#page-exam')).toHaveClass(/active/);
+  await expect(page.locator('#questions-container .q-card .q-meta .tag').first()).toHaveText(topic);
+
+  await page.locator('[data-page="home"]').click();
+  await page.locator('.quick-actions [data-home-value="mix10"]').click();
+  await expect(page.locator('#questions-container .q-card')).toHaveCount(10);
+});
+
 test('opens only due repetitions from the coach plan', async ({ page }) => {
   await setProgress(page, {
     ipmax_onboarding: profile,
@@ -181,7 +200,7 @@ test('exports a versioned progress backup through the extracted module', async (
   const backup = JSON.parse(Buffer.concat(chunks).toString('utf8'));
 
   expect(download.suggestedFilename()).toMatch(/^ipmax_\d{4}-\d{2}-\d{2}\.json$/);
-  expect(backup.version).toBe('12.10.0');
+  expect(backup.version).toBe('12.11.0');
   expect(backup.qprog['1']).toEqual({ correct: 2, wrong: 1 });
   expect(backup.onboarding.role).toBe(profile.role);
 });
