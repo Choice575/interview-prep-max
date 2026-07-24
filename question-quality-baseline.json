@@ -8,16 +8,16 @@
     186
   ],
   "issueBudget": {
-    "length-cue": 54,
+    "length-cue": 44,
     "question-echo": 1,
-    "absolute-distractor": 44,
+    "absolute-distractor": 43,
     "duplicate-question": 2
   },
   "topics": {
     "Linux": {
-      "length-cue": 15,
+      "length-cue": 5,
       "question-echo": 0,
-      "absolute-distractor": 17,
+      "absolute-distractor": 16,
       "duplicate-question": 0
     },
     "Сети": {
@@ -46,14 +46,8 @@
     }
   },
   "levels": {
-    "Middle": {
-      "length-cue": 21,
-      "question-echo": 0,
-      "absolute-distractor": 12,
-      "duplicate-question": 0
-    },
     "Senior": {
-      "length-cue": 25,
+      "length-cue": 21,
       "question-echo": 1,
       "absolute-distractor": 27,
       "duplicate-question": 1
@@ -63,6 +57,12 @@
       "question-echo": 0,
       "absolute-distractor": 5,
       "duplicate-question": 1
+    },
+    "Middle": {
+      "length-cue": 15,
+      "question-echo": 0,
+      "absolute-distractor": 11,
+      "duplicate-question": 0
     }
   }
 }
