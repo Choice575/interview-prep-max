@@ -5574,450 +5574,450 @@
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает CoreDNS в Kubernetes и что происходит при его отказе?",
+    "q": "Какова роль CoreDNS при обычной конфигурации кластера?",
     "options": [
-      "CoreDNS — опциональный компонент, Pod'ы общаются по IP без DNS",
-      "CoreDNS кэширует все DNS-запросы в etcd",
-      "CoreDNS — DNS-сервер кластера; разрешает Service имена. При отказе DNS-резолюция падает, сервисы не могут найти друг друга по имени",
-      "CoreDNS работает только для внешних DNS-запросов"
+      "CoreDNS хранит EndpointSlices и назначает ClusterIP addresses",
+      "CoreDNS проксирует Service traffic к Pods на transport layer",
+      "CoreDNS отвечает на cluster DNS names и forwards внешние queries",
+      "CoreDNS выдаёт Pod IP и поддерживает CNI routing tables"
     ],
     "answer": 2,
-    "explanation": "CoreDNS работает как DaemonSet/Deployment, Pod'ы имеют его IP в /etc/resolv.conf. Обрабатывает: <service>.<ns>.svc.cluster.local → ClusterIP. При отказе CoreDNS: service discovery ломается. Репликация CoreDNS критична. Диагностика: kubectl run -it --image=busybox -- nslookup kubernetes."
+    "explanation": "Обычно CoreDNS Pods работают за Service kube-dns, чей ClusterIP kubelet добавляет в resolv.conf Pods. Plugins формируют records для Services и Pods и могут forward-ить внешние queries. При недоступности DNS новые lookups по именам сбоят, но cached records, existing connections и обращения по известному IP могут продолжить работу."
   },
   {
     "id": 392,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как реализовать zero-downtime rolling update для stateless приложения?",
+    "q": "Что снижает риск downtime при Deployment rollout?",
     "options": [
-      "Использовать Recreate стратегию с PodDisruptionBudget",
-      "Использовать только blue-green deployment",
-      "Rolling update не поддерживает zero-downtime",
-      "RollingUpdate с maxUnavailable: 0, maxSurge: 1+, правильные readiness probe, preStop hook с sleep, minReadySeconds"
+      "Recreate strategy вместе с PDB и длинным termination grace",
+      "maxUnavailable: 100% и отключённые readiness probes",
+      "In-place update containers внутри уже запущенных Pods",
+      "Surge capacity, maxUnavailable: 0, readiness и graceful shutdown"
     ],
     "answer": 3,
-    "explanation": "Для zero-downtime: maxUnavailable: 0 (не убивать старые без замены), maxSurge: 1 (запустить новый до убийства старого), readiness probe гарантирует готовность, preStop: exec: command: ['sleep', '5'] даёт время на drain соединений, terminationGracePeriodSeconds."
+    "explanation": "maxUnavailable: 0 и положительный maxSurge сохраняют available capacity, readiness не пускает traffic к неготовой версии, а graceful shutdown должен прекратить readiness, drain-ить connections и завершиться в terminationGracePeriodSeconds. Это снижает риск, но не гарантирует zero downtime без capacity, backward compatibility и корректного поведения load balancer."
   },
   {
     "id": 393,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое NetworkPolicy и как она работает на уровне реализации?",
+    "q": "Когда NetworkPolicy реально ограничивает traffic?",
     "options": [
-      "NetworkPolicy декларирует разрешённый сетевой трафик между Pod'ами; реализацию обеспечивает CNI плагин (Calico/Cilium/Weave)",
-      "NetworkPolicy — это firewall правила на уровне ноды Kubernetes",
-      "NetworkPolicy встроена в kube-proxy и работает через iptables",
-      "NetworkPolicy работает только для трафика между Namespace"
+      "Когда policy выбирает Pods, а network plugin обеспечивает enforcement",
+      "Когда kube-proxy читает policy и создаёт Service NAT rules",
+      "После annotation firewall: enabled на соответствующем Namespace",
+      "Когда API server преобразует selectors в host security groups"
     ],
     "answer": 0,
-    "explanation": "NetworkPolicy — декларативные правила ingress/egress на основе podSelector, namespaceSelector, ipBlock. Без поддерживающего CNI (Flannel не поддерживает) политики игнорируются. Calico реализует через iptables/eBPF, Cilium — через eBPF. По умолчанию весь трафик разрешён."
+    "explanation": "NetworkPolicy задаёт L3/L4 ingress и egress rules, но enforcement выполняет совместимый network plugin или controller. Pod изначально non-isolated в каждом направлении; selecting policy делает его isolated для указанного direction. Разрешения всех применимых policies объединяются additive, а порядок objects значения не имеет."
   },
   {
     "id": 394,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое init-контейнер и когда он используется?",
+    "q": "Как ведут себя regular init containers?",
     "options": [
-      "Контейнер который запускается вместо основного при ошибке",
-      "Специальный контейнер, выполняющийся до старта основных контейнеров; для инициализации, ожидания зависимостей, предзаполнения данных",
-      "Контейнер с минимальным образом для ускорения запуска",
-      "Init-контейнер перезапускается вместе с основным контейнером"
+      "Стартуют после app containers и выполняются параллельно с ними",
+      "Выполняются последовательно до success перед app containers",
+      "Остаются активны с restartPolicy: Always весь lifecycle Pod",
+      "Заменяют failed app container и наследуют его readiness probe"
     ],
     "answer": 1,
-    "explanation": "Init containers запускаются последовательно перед main контейнерами. Если init container завершается с ошибкой — Pod рестартует. Кейсы: ожидание DB готовности, копирование конфигов, изменение sysctl, предзагрузка данных в shared volume."
+    "explanation": "Regular init containers запускаются по порядку, и каждый должен успешно завершиться до следующего и до старта app containers. Failed init container kubelet retry-ит согласно Pod restartPolicy; при Never Pod становится Failed. Native sidecar отличается: это init container с container-level restartPolicy: Always, который продолжает работать рядом с приложением."
   },
   {
     "id": 395,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое RBAC в Kubernetes и его основные объекты?",
+    "q": "Как соотносятся RBAC Role и ClusterRole?",
     "options": [
-      "RBAC управляет доступом контейнеров к ресурсам хоста",
-      "RBAC — это сетевые политики между namespace",
-      "Role-Based Access Control: Role/ClusterRole (правила), RoleBinding/ClusterRoleBinding (привязка к subjects)",
-      "Role и ClusterRole — одно и то же, разница только в namespace"
+      "Role задаёт CNI permissions; ClusterRole открывает host filesystem",
+      "Role связывает subjects; ClusterRoleBinding хранит namespace rules",
+      "Role содержит namespaced rules; ClusterRole non-namespaced и reusable",
+      "Role является user identity; ClusterRole представляет API group"
     ],
     "answer": 2,
-    "explanation": "Role — набор permissions в namespace. ClusterRole — cluster-wide. RoleBinding привязывает Role к Subject (User/Group/ServiceAccount) в namespace. ClusterRoleBinding — cluster-wide. ServiceAccount — идентичность Pod'а для обращения к Kubernetes API."
+    "explanation": "Role содержит permissions в одном Namespace. ClusterRole — non-namespaced rule set: он описывает cluster-scoped access или переиспользуемые namespaced permissions. RoleBinding выдаёт Role либо ClusterRole subjects внутри одного Namespace; ClusterRoleBinding выдаёт ClusterRole на cluster scope. Bindings добавляют права, но не меняют role rules."
   },
   {
     "id": 396,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Сравните CNI-плагины Flannel, Calico и Cilium для production Kubernetes-кластера.",
+    "q": "Как корректно выбирать между Flannel, Calico и Cilium?",
     "options": [
-      "Все CNI плагины функционально идентичны, разница только в производительности",
-      "Calico поддерживается только на bare-metal",
-      "Cilium несовместим с managed Kubernetes (EKS/GKE/AKS)",
-      "Flannel: простота, без NetworkPolicy; Calico: NetworkPolicy, BGP, производительный; Cilium: eBPF, L7 политики, встроенный LB, observability, лучшая производительность"
+      "По throughput benchmark, так как policy и routing features совпадают",
+      "Calico подходит bare metal, но не поддерживает overlay networking",
+      "Cilium требуется managed Kubernetes, поскольку заменяет Services",
+      "По dataplane, routing/policy, observability и операционным требованиям"
     ],
     "answer": 3,
-    "explanation": "Flannel: простейший, VXLAN, без NetworkPolicy. Calico: BGP или VXLAN, полный NetworkPolicy, GlobalNetworkPolicy, хорошая производительность. Cilium: eBPF замена iptables/kube-proxy, L7 aware (HTTP/gRPC), встроенный observability (Hubble), лучшая производительность и безопасность."
+    "explanation": "Flannel ориентирован на базовую Pod networking и сам не реализует Kubernetes NetworkPolicy. Calico сочетает networking и policy с BGP либо overlay modes. Cilium использует eBPF, предлагает policy и Hubble observability и может заменить kube-proxy. Совместимость managed platform, kernel requirements, team skills и измеренная нагрузка важнее универсального рейтинга."
   },
   {
     "id": 397,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "scenario",
-    "q": "Как дебажить Pod который не может скачать образ (ImagePullBackOff)?",
+    "q": "Что сначала проверить при ImagePullBackOff?",
     "options": [
-      "kubectl describe pod → Events: проверить имя образа, тег. Если приватный реестр — imagePullSecrets. kubectl get secret -n namespace для проверки credentials",
-      "Перезапустить Node",
-      "Изменить imagePullPolicy на Never",
-      "Удалить кэш образов на всех нодах"
+      "kubectl describe pod: Events, image ref, registry/auth и node errors",
+      "kubectl logs: stdout приложения до загрузки container image",
+      "kubectl rollout undo: credentials из предыдущего ReplicaSet",
+      "kubectl drain: перенос до node с cached version того же tag"
     ],
     "answer": 0,
-    "explanation": "Причины ImagePullBackOff: неверное имя/тег образа, отсутствие доступа к реестру, нет imagePullSecrets для приватного реестра. kubectl describe pod покажет точную ошибку в Events. Создать Secret типа docker-registry и указать в spec.imagePullSecrets."
+    "explanation": "Events из kubectl describe различают invalid reference, not found, unauthorized, rate limit, TLS, DNS и timeout. Затем сверяют registry/name/tag или digest, наличие imagePullSecrets и ServiceAccount, scope credentials и доступ node/runtime к registry. Сам kubectl get secret подтверждает существование object, но не валидность credential."
   },
   {
     "id": 398,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает Cluster Autoscaler и каковы его ограничения?",
+    "q": "Какой сигнал запускает scale-up Cluster Autoscaler?",
     "options": [
-      "CA увеличивает CPU/RAM существующих нод при нехватке ресурсов",
-      "CA добавляет/удаляет ноды в node group (AWS ASG, GCP MIG) при pending Pod'ах / простаивающих нодах; не работает мгновенно (2-10 мин)",
-      "CA работает только с Spot/Preemptible нодами",
-      "CA интегрируется с HPA для coordinated масштабирования"
+      "Высокий CPU running containers при отсутствии Pending Pods",
+      "Unschedulable Pods, которые может вместить configured node group",
+      "Прямой запрос HPA добавить VM для каждой новой replica",
+      "Storage pressure event от PVC dynamic provisioner"
     ],
     "answer": 1,
-    "explanation": "CA смотрит на Pending Pod'ы (не могут планироваться из-за ресурсов) → добавляет ноды. Удаляет ноды с <50% использованием, если Pod'ы можно переместить. Ограничения: cold start нод (2-5 мин), PodDisruptionBudget, local storage, anti-affinity могут блокировать удаление."
+    "explanation": "Cluster Autoscaler моделирует scheduling unschedulable Pods и увеличивает подходящую node group, если её template удовлетворяет requests и constraints. Scale-down рассматривает unneeded nodes, с которых Pods можно безопасно переместить. PDB, local storage, affinity, provider limits и node startup задерживают или блокируют действие; фиксированного времени и utilization threshold для всех установок нет."
   },
   {
     "id": 399,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое Ingress и Ingress Controller?",
+    "q": "Зачем Ingress resource нужен Ingress Controller?",
     "options": [
-      "Ingress — сервис типа LoadBalancer с HTTP-маршрутизацией",
-      "Ingress Controller управляет NetworkPolicy для входящего трафика",
-      "Ingress — ресурс с правилами HTTP/HTTPS маршрутизации; Ingress Controller (nginx/traefik) — реализует эти правила",
-      "Ingress автоматически устанавливается вместе с Kubernetes"
+      "Controller аутентифицирует users до сохранения Ingress API object",
+      "Controller преобразует NetworkPolicy в host firewall ingress rules",
+      "Controller читает Ingress rules и настраивает proxy/load balancer",
+      "Controller назначает Pod IP для Services из Ingress backends"
     ],
     "answer": 2,
-    "explanation": "Ingress ресурс декларирует правила (host/path → service). Ingress Controller (nginx-ingress, Traefik, HAProxy, AWS ALB) читает эти ресурсы и настраивает реальный прокси. Без Controller Ingress-ресурс бесполезен. Поддерживает TLS termination, redirects, rewrites."
+    "explanation": "Ingress object декларативно задаёт HTTP(S) host/path routes к Services, но data plane реализует выбранный Ingress Controller, и его capabilities различаются. Создание object без controller не даёт route. Kubernetes Ingress API frozen; для новых функций проект рекомендует Gateway API, хотя Ingress продолжает поддерживаться."
   },
   {
     "id": 400,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как настроить Pod Disruption Budget для обеспечения высокой доступности при обновлении нод?",
+    "q": "Что фактически ограничивает PodDisruptionBudget?",
     "options": [
-      "PDB автоматически создаётся для Deployment с replicas > 1",
-      "PDB задаётся в конфигурации HPA",
-      "PDB работает только во время rolling updates Deployment",
-      "kubectl create pdb myapp-pdb --selector=app=myapp --min-available=2 (или --max-unavailable=1); защищает от одновременного drain нескольких нод"
+      "Involuntary Pod losses из-за node crash или kernel panic",
+      "Deployment rollout через spec.strategy.rollingUpdate",
+      "Прямое удаление Pod requests, обходя Eviction API",
+      "Voluntary evictions через Eviction API при исчерпанном budget"
     ],
     "answer": 3,
-    "explanation": "PDB гарантирует минимальное число доступных Pod'ов при voluntary disruptions (kubectl drain, node upgrade). minAvailable: 2 — всегда минимум 2 Pod'а. maxUnavailable: 1 — одновременно недоступен максимум 1. Drain ноды будет ждать, пока PDB не позволит."
+    "explanation": "PDB с minAvailable или maxUnavailable заставляет Eviction API отклонить voluntary eviction, если она нарушит budget; kubectl drain обычно использует этот API. PDB не предотвращает involuntary failures или direct deletion и не ограничивает rolling updates самого Deployment/StatefulSet. Поэтому он помогает координировать disruption, но не гарантирует availability."
   },
   {
     "id": 401,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
-    "q": "Чем Job отличается от CronJob в Kubernetes?",
+    "q": "Как связаны Job и CronJob?",
     "options": [
-      "Job запускается один раз до успешного завершения; CronJob создаёт Job'ы по расписанию cron",
-      "CronJob запускается один раз, Job — по расписанию",
-      "Job используется только для batch-обработки больших данных",
-      "CronJob — это Job с автоматическим рестартом"
+      "Job доводит Pods до completion; CronJob создаёт Jobs по schedule",
+      "Job запускается по cron, CronJob повторяет containers одного Pod",
+      "CronJob является Deployment с restartPolicy: Always",
+      "Job хранит schedule, CronJob задаёт Pod parallelism"
     ],
     "answer": 0,
-    "explanation": "Job создаёт Pod'ы, следит за их успешным завершением (completions). Параллелизм через parallelism. CronJob создаёт Job'ы по cron-расписанию (schedule: '0 2 * * *'). concurrencyPolicy (Allow/Forbid/Replace) управляет перекрытием запусков."
+    "explanation": "Job controller создаёт один или несколько Pods и отслеживает требуемые completions с retries и parallelism. CronJob по schedule создаёт отдельные Job objects; concurrencyPolicy управляет перекрытием их запусков. Scheduling approximate, поэтому workload должен учитывать delayed или duplicate Job creation."
   },
   {
     "id": 402,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "definition",
-    "q": "Что такое sidecar-контейнер и паттерн ambassador?",
+    "q": "Чем различаются sidecar и ambassador pattern?",
     "options": [
-      "Sidecar — запасной контейнер для hot-standby; ambassador — внешний LB",
-      "Sidecar — дополнительный контейнер в Pod'е для cross-cutting concerns (логи, метрики, прокси); ambassador — специализированный sidecar-прокси для внешних сервисов",
-      "Sidecar работает только в service mesh",
-      "Ambassador — это тип Ingress Controller, не sidecar паттерн"
+      "Sidecar — standby replica; ambassador — cluster ingress controller",
+      "Sidecar shares Pod context; ambassador sidecar proxies app connections",
+      "Sidecar стартует на другой node; ambassador управляет Service DNS",
+      "Sidecar завершает init task; ambassador служит backup container"
     ],
     "answer": 1,
-    "explanation": "Sidecar разделяет Pod для separation of concerns: envoy/istio-proxy (mTLS, tracing), filebeat (логи), vault-agent (секреты). Ambassador sidecar проксирует исходящие запросы к внешним сервисам, упрощая конфигурацию сети для основного контейнера."
+    "explanation": "Sidecar — общий pattern для supporting container в том же Pod, sharing network and volumes с приложением. Native Kubernetes sidecar задаётся как init container с container restartPolicy: Always и продолжает работать рядом с app containers. Ambassador — частный proxy-sidecar pattern, скрывающий от приложения discovery, protocol или connection details внешней зависимости."
   },
   {
     "id": 403,
     "topic": "Kubernetes",
     "level": "Junior",
     "category": "scenario",
-    "q": "Как быстро посмотреть текущее потребление CPU и памяти всеми Pod'ами?",
+    "q": "Какая команда показывает recent CPU/memory snapshot Pods?",
     "options": [
-      "kubectl get pods --resources",
-      "kubectl describe nodes | grep Memory",
-      "kubectl top pods (требует metrics-server)",
-      "kubectl stats pods --all-namespaces"
+      "kubectl get pods -A --show-resources",
+      "kubectl describe pods -A --usage",
+      "kubectl top pods -A",
+      "kubectl metrics pods --current"
     ],
     "answer": 2,
-    "explanation": "kubectl top pods показывает текущее потребление CPU/memory. Требует установленного metrics-server. kubectl top nodes — для нод. --all-namespaces / -A — все namespace. --sort-by=memory для сортировки."
+    "explanation": "kubectl top pods -A запрашивает Metrics API, обычно предоставляемый metrics-server, и показывает недавний CPU/memory sample для autoscaling/debugging. Это не исторический или precision monitoring source: сразу после Pod startup metrics могут отсутствовать. kubectl top nodes показывает аналогичный snapshot nodes."
   },
   {
     "id": 404,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое StorageClass и зачем он нужен?",
+    "q": "Что определяет StorageClass?",
     "options": [
-      "Класс хранилища определяет тип нод для stateful приложений",
-      "StorageClass используется только для local хранилища",
-      "StorageClass — это шаблон для backup политик",
-      "StorageClass описывает provisioner (EBS, NFS, Ceph) и параметры; позволяет динамически создавать PV при запросе PVC"
+      "Node labels, разрешённые для размещения каждого stateful Pod",
+      "Backup schedule и retention для существующих PersistentVolumes",
+      "Filesystem quotas внутри каждого mounted volume",
+      "Provisioner и parameters для dynamic volume creation"
     ],
     "answer": 3,
-    "explanation": "StorageClass с provisioner (kubernetes.io/aws-ebs, driver.longhorn.io) и параметрами (type: gp3, replication: 2) позволяет dynamic provisioning: при создании PVC автоматически создаётся PV. reclaimPolicy: Retain/Delete определяет судьбу PV при удалении PVC."
+    "explanation": "StorageClass описывает storage implementation через provisioner, обычно CSI driver, и driver-specific parameters. PVC с class может запустить dynamic provisioning подходящего PV. Class также задаёт reclaimPolicy, volumeBindingMode и при поддержке driver allowVolumeExpansion; backup policy частью стандартного StorageClass API не является."
   },
   {
     "id": 405,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "scenario",
-    "q": "Как диагностировать проблемы с DNS-резолюцией внутри Pod'а?",
+    "q": "Какая последовательность помогает диагностировать DNS внутри Pod?",
     "options": [
-      "kubectl exec pod -- nslookup kubernetes; kubectl exec pod -- cat /etc/resolv.conf; kubectl logs -n kube-system coredns-xxx; проверить NetworkPolicy блокировки порта 53",
-      "Перезапустить CoreDNS Deployment",
-      "Изменить dnsPolicy на Default",
-      "DNS проблемы решаются только перезапуском кластера"
+      "Test lookup; inspect resolv.conf; check CoreDNS и port 53 policy",
+      "Переключить dnsPolicy: Default и пропустить cluster DNS checks",
+      "Restart CoreDNS до проверки, затронуты ли соседние Pods",
+      "Пересоздать cluster network для очистки cached DNS records"
     ],
     "answer": 0,
-    "explanation": "Диагностика: nslookup/dig внутри Pod'а. /etc/resolv.conf показывает nameserver (должен быть ClusterIP CoreDNS). Логи CoreDNS покажут ошибки. NetworkPolicy может блокировать UDP/TCP 53 к CoreDNS. dnsPolicy: ClusterFirst (default), None (кастомный dnsConfig)."
+    "explanation": "Из Pod или debug container проверяют short и FQDN lookup, затем resolv.conf: nameserver, search domains и ndots. После этого сверяют kube-dns Service/EndpointSlices, CoreDNS readiness/logs/config и NetworkPolicy для UDP/TCP 53. Сравнение нескольких Pods и nodes отделяет app dnsConfig от cluster или node-local DNS проблемы."
   },
   {
     "id": 406,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое resource requests и limits и почему важно их устанавливать?",
+    "q": "Чем различаются resource requests и limits?",
     "options": [
-      "Requests — максимальное потребление, limits — минимальное",
-      "Requests — гарантированные ресурсы (влияют на планирование); limits — максимально допустимые (превышение → OOMKill/CPU throttle)",
-      "Limits устанавливаются только для memory, requests — только для CPU",
-      "Без requests и limits Pod не запустится"
+      "Requests ограничивают runtime usage; limits помогают scheduler",
+      "Scheduler учитывает requests; kernel/runtime enforce limits",
+      "Requests применимы к memory, limits — к CPU resources",
+      "Оба поля выделяют fixed physical cores и RAM для container"
     ],
     "answer": 1,
-    "explanation": "Requests используются scheduler'ом для планирования (размещает Pod на ноде с достаточными свободными resources). Limits ограничивают потребление: превышение CPU → throttling (не убивает), превышение memory → OOMKill. Без limits контейнер может потребить все ресурсы ноды."
+    "explanation": "Scheduler размещает Pod по сумме requests, а container может использовать больше request при свободной capacity. CPU limit enforced throttling, memory limit — reactive OOM kill при pressure. Если указан limit без request и admission не задал default, Kubernetes копирует limit в request. Limit не делает приложение устойчивым, а request не является жёстким runtime cap."
   },
   {
     "id": 407,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "definition",
-    "q": "Как работает Kubernetes admission controller и что такое ValidatingWebhook?",
+    "q": "Где срабатывают admission и ValidatingWebhook?",
     "options": [
-      "Admission controller проверяет аутентификацию пользователей API-сервера",
-      "ValidatingWebhook используется только для проверки сертификатов",
-      "Admission controller перехватывает запросы к API после авторизации; ValidatingWebhook вызывает внешний HTTP endpoint для валидации/отклонения ресурса",
-      "Admission controllers работают только на etcd уровне"
+      "До authentication, заменяя API server identity checks",
+      "После etcd commit, откатывая invalid stored resources",
+      "После authorization до persistence; webhook принимает или отклоняет",
+      "В kubelet при создании процесса container runtime"
     ],
     "answer": 2,
-    "explanation": "Admission controller — плагин API-сервера, перехватывающий запросы после authn/authz. MutatingAdmissionWebhook изменяет объект (inject sidecar). ValidatingAdmissionWebhook отклоняет невалидные объекты. Используется: OPA Gatekeeper, Kyverno, cert-manager для мутации Pod'ов."
+    "explanation": "API request проходит authentication и authorization, затем mutating admission, повторную validation schema и validating admission до persistence. ValidatingAdmissionWebhook отправляет AdmissionReview на configured HTTPS endpoint и может allow или reject, но не mutate object. Timeout, failurePolicy, selectors и защита webhook availability требуют осторожной настройки."
   },
   {
     "id": 408,
     "topic": "Kubernetes",
     "level": "Junior",
     "category": "definition",
-    "q": "Что делает команда kubectl port-forward?",
+    "q": "Что создаёт kubectl port-forward?",
     "options": [
-      "Создаёт постоянный Service типа NodePort",
-      "Перенаправляет трафик между двумя Service внутри кластера",
-      "Настраивает firewall правила на нодах кластера",
-      "Пробрасывает порт локальной машины в Pod/Service для временного доступа без создания Service"
+      "Long-lived NodePort Service с port на каждой node",
+      "CNI route между Services, сохранённый в cluster state",
+      "Firewall rule, остающийся после завершения kubectl",
+      "Session-bound local TCP forwarding к выбранному Pod port"
     ],
     "answer": 3,
-    "explanation": "kubectl port-forward pod/mypod 8080:80 создаёт туннель: localhost:8080 → pod:80. Полезно для отладки без Ingress/Service. Работает через API-сервер, не прямое соединение. Соединение активно пока команда запущена."
+    "explanation": "kubectl port-forward pod/mypod 8080:80 слушает local address и пересылает TCP connections к Pod через control-plane path. Для service/deployment kubectl выбирает подходящий Pod; session завершается, если выбранный Pod исчезает или процесс kubectl остановлен. Это debug-доступ, а не persistent production exposure."
   },
   {
     "id": 409,
     "topic": "Kubernetes",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "В чём компромисс использования KEDA вместо стандартного HPA для автомасштабирования?",
+    "q": "Каков главный trade-off KEDA по сравнению с direct HPA?",
     "options": [
-      "KEDA: масштабирование по внешним метрикам (Kafka lag, SQS, cron), scale-to-zero; HPA: встроен, проще, CPU/memory метрики; KEDA добавляет CRD и зависимость",
-      "KEDA всегда лучше HPA, нет компромиссов",
-      "KEDA заменяет HPA полностью, они несовместимы",
-      "KEDA работает только с Deployment, HPA — с любыми ресурсами"
+      "Event scalers и scale-to-zero ценой controllers, CRDs и operations",
+      "Меньше CPU usage ценой удаления HPA scaling behavior",
+      "Поддержка Deployment ценой потери StatefulSet scaling",
+      "Native API metrics ценой обязательного cloud provider"
     ],
     "answer": 0,
-    "explanation": "KEDA (Kubernetes Event Driven Autoscaler) расширяет HPA: поддерживает 50+ scalers (Kafka, RabbitMQ, Prometheus, cron), умеет scale-to-zero. HPA встроен, без доп. компонент. KEDA создаёт HPA объекты под капотом. Выбор: KEDA при event-driven нагрузке, HPA — для простых CPU/memory сценариев."
+    "explanation": "KEDA ScaledObject добавляет event-source adapters, polling, authentication и activation для scale 0↔1; для 1↔N KEDA обычно создаёт HPA и предоставляет ему external metrics. Это удобно для queue/event workloads, но добавляет CRDs, controllers, metrics service, credentials и failure modes. Direct HPA проще, если нужные resource/custom metrics уже доступны."
   },
   {
     "id": 410,
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "scenario",
-    "q": "Нода перешла в NotReady статус. Какова процедура диагностики?",
+    "q": "С чего начать диагностику Node NotReady?",
     "options": [
-      "Немедленно удалить ноду и добавить новую",
-      "kubectl describe node → Conditions/Events; SSH на ноду → journalctl -u kubelet; проверить diskPressure/memoryPressure/PIDPressure; systemctl status containerd",
-      "Перезапустить control plane",
-      "Выполнить kubectl drain node --ignore-daemonsets"
+      "Удалить Node object, чтобы controller пересоздал host",
+      "Проверить Conditions/Events/Lease, затем kubelet, runtime, disk и network",
+      "Restart control plane до проверки node-local services",
+      "Drain node и считать успешные evictions доказательством причины"
     ],
     "answer": 1,
-    "explanation": "kubectl describe node покажет Conditions (DiskPressure, MemoryPressure, NetworkUnavailable). SSH + journalctl -u kubelet -f покажет ошибки kubelet. Частые причины: диск заполнен, containerd не работает, сетевые проблемы, OOM на ноде, сертификаты истекли."
+    "explanation": "kubectl describe node и NodeLease показывают, когда control plane перестал получать heartbeats и какие Conditions/Events были перед этим. На host проверяют kubelet logs/status, container runtime, disk/inodes, memory/PIDs, network path к API server, time и certificates. Cordon/drain может быть безопасной mitigation, но не заменяет root-cause diagnosis."
   },
   {
     "id": 411,
     "topic": "CI/CD",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое CI/CD и в чём разница между Continuous Integration и Continuous Deployment?",
+    "q": "Чем Continuous Delivery отличается от Continuous Deployment?",
     "options": [
-      "CI и CD — синонимы для автоматической сборки",
-      "CI отвечает за деплой, CD — за тестирование",
-      "CI — автоматическая сборка/тестирование при push; CD (Delivery) — деплой в staging; CD (Deployment) — автоматический деплой в production",
-      "CD используется только для облачных приложений"
+      "Delivery автоматизирует tests; Deployment выполняет source merges",
+      "Delivery означает staging; Deployment означает production environment",
+      "Delivery держит release deployable; Deployment автоматически ships passing changes",
+      "Delivery применим к libraries; Deployment применим к services"
     ],
     "answer": 2,
-    "explanation": "CI (Continuous Integration): merge → сборка → тесты → быстрая обратная связь. Continuous Delivery: код всегда готов к деплою, но деплой в prod — ручной. Continuous Deployment: каждый успешный пайплайн автоматически деплоится в production. Граница между Delivery и Deployment — наличие ручного approvals."
+    "explanation": "Continuous Integration часто объединяет изменения и быстро проверяет build/tests. Continuous Delivery поддерживает каждое прошедшее изменение в releasable state, но production release может требовать business decision или approval. Continuous Deployment убирает этот ручной release gate и автоматически доставляет прошедшее изменение production users."
   },
   {
     "id": 412,
     "topic": "CI/CD",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое артефакт в контексте CI/CD пайплайна?",
+    "q": "Что называют artifact в CI pipeline?",
     "options": [
-      "Логи выполнения пайплайна",
-      "Код коммита, запустившего пайплайн",
-      "Переменные окружения пайплайна",
-      "Файлы, созданные на одном этапе пайплайна и передаваемые на следующий (jar, zip, Docker-образ, отчёты тестов)"
+      "Runner log stream, доступный пока выполняется job process",
+      "Source commit reference, создавший pipeline execution",
+      "Protected variable, injected в job environment",
+      "Produced file, package или report для storage/downstream jobs"
     ],
     "answer": 3,
-    "explanation": "Артефакты — выходные данные job'а: скомпилированные бинари, Docker-образы, отчёты о тестировании, coverage-отчёты. GitLab CI хранит их в MinIO, GitHub Actions — в blob storage. Артефакты позволяют не пересобирать код на каждом этапе."
+    "explanation": "Artifact — materialized output job: binary, package, generated site, test report, SBOM или archive. CI system хранит artifact с retention и передаёт downstream jobs либо публикует во внешнее repository/registry. Container image обычно относится к тому же build output, но распространяется через image registry, а не обязательно через CI artifact store."
   },
   {
     "id": 413,
     "topic": "CI/CD",
     "level": "Junior",
     "category": "definition",
-    "q": "Что такое .gitlab-ci.yml и как он организован?",
+    "q": "Какова роль .gitlab-ci.yml?",
     "options": [
-      "YAML-файл в корне репозитория, описывающий stages и jobs пайплайна GitLab CI",
-      "Файл конфигурации GitLab-сервера",
-      "Файл для настройки Git hooks",
-      "Конфигурация доступа к GitLab Registry"
+      "Определяет pipeline jobs, dependencies, rules и execution config",
+      "Настраивает GitLab database, LDAP и backup schedule",
+      "Устанавливает Git hooks в local clone каждого contributor",
+      "Выдаёт registry credentials project и runner processes"
     ],
     "answer": 0,
-    "explanation": ".gitlab-ci.yml определяет: stages (порядок выполнения), jobs (конкретные задачи в stages), image (Docker-образ), script (команды), artifacts, cache, rules/only/except. GitLab CI автоматически парсит этот файл при push."
+    "explanation": ".gitlab-ci.yml описывает jobs и их scripts, images, variables, rules, artifacts, cache и execution relationships. Stages задают coarse order, а needs может построить DAG и запустить job раньше завершения stage. include позволяет собирать configuration из нескольких files/templates; GitLab валидирует итоговый merged config при создании pipeline."
   },
   {
     "id": 414,
     "topic": "CI/CD",
     "level": "Middle",
     "category": "definition",
-    "q": "Как работает механизм кэширования в GitLab CI?",
+    "q": "Чем GitLab CI cache отличается от artifacts?",
     "options": [
-      "Кэш автоматически сохраняет весь рабочий директорий между job'ами",
-      "cache: paths определяет директории для сохранения между pipeline-запусками; key определяет идентификатор кэша (например, по lock-файлу)",
-      "Кэш передаётся между job'ами как артефакт",
-      "Кэш доступен только между job'ами одного stage"
+      "Cache хранит build output гарантированно; artifacts — best-effort dependencies",
+      "Cache reuses dependencies между jobs/pipelines; artifacts передают job outputs",
+      "Artifacts остаются на runner; cache хранится GitLab без срока",
+      "Cache и artifacts имеют один lifecycle, backend и restore semantics"
     ],
     "answer": 1,
-    "explanation": "Кэш сохраняется на runner'е между запусками пайплайна (не между job'ами — для этого artifacts). cache: key: files: [package-lock.json] создаёт кэш с ключом из хэша lock-файла. При изменении зависимостей кэш автоматически инвалидируется."
+    "explanation": "Cache ускоряет jobs повторным использованием downloaded dependencies; jobs и subsequent pipelines могут получить его при совпавшем key и доступном runner/distributed backend. Cache не должен быть authoritative build output. Artifacts создаёт job, GitLab хранит их с retention и передаёт later jobs. cache:key:files помогает invalidation по lockfiles."
   },
   {
     "id": 415,
     "topic": "CI/CD",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое GitLab CI rules и как они отличаются от only/except?",
+    "q": "Как GitLab CI обрабатывает rules?",
     "options": [
-      "Они полностью идентичны, разница только в синтаксисе",
-      "Only/except — рекомендуемый подход, rules — устаревший",
-      "Rules — более новый и гибкий механизм: условия (if, changes, exists), позволяют задавать when и allow_failure",
-      "Rules работают только для trigger-пайплайнов"
+      "Все matching rules объединяются в итоговую job configuration",
+      "Rules идут после scripts и читают созданные dotenv variables",
+      "Rules проверяются по порядку; first match задаёт inclusion и attributes",
+      "only/except добавляют fallback к rules внутри одной job"
     ],
     "answer": 2,
-    "explanation": "rules: - if: '$CI_COMMIT_BRANCH == \"main\"' when: manual — гибкие условия. changes: [src/**] — запуск только при изменении файлов. exists: [Dockerfile] — наличие файла. only/except — устаревший подход с меньшими возможностями. Нельзя смешивать rules и only/except."
+    "explanation": "GitLab evaluates rules до jobs и останавливается на первом match; rule может задать when, allow_failure и variables. if, changes и exists комбинируют условия. only/except остаются, но не развиваются как rules и не смешиваются с rules в одной job. Неосторожная final when rule может создать одновременно push и merge-request pipelines."
   },
   {
     "id": 416,
     "topic": "CI/CD",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое GitHub Actions matrix strategy?",
+    "q": "Что делает GitHub Actions strategy.matrix?",
     "options": [
-      "Инструмент для матричного тестирования производительности",
-      "Стратегия для последовательного выполнения шагов",
-      "Matrix — это коллекция secrets для разных окружений",
-      "Позволяет запускать job в нескольких вариантах параллельно: по версиям языка, ОС, конфигурациям"
+      "Упорядочивает steps одной job по dependency graph",
+      "Группирует environment secrets по branch и target",
+      "Сравнивает runner performance и выбирает fastest host",
+      "Разворачивает одну job в runs для комбинаций значений"
     ],
     "answer": 3,
-    "explanation": "strategy: matrix: node: [14, 16, 18] os: [ubuntu, windows] запустит 6 параллельных job'ов. exclude исключает конкретные комбинации. include добавляет дополнительные переменные к комбинациям. fail-fast: false позволяет продолжать при сбое одной комбинации."
+    "explanation": "strategy.matrix формирует job run для каждой комбинации variables, например OS и runtime version. include расширяет combinations, exclude удаляет выбранные, fail-fast управляет отменой siblings после failure, а max-parallel ограничивает concurrency. Runs не обязаны стартовать одновременно: это зависит от runner capacity и limits."
   },
   {
     "id": 417,
     "topic": "CI/CD",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое GitOps и как работает ArgoCD?",
+    "q": "Как Argo CD реализует GitOps reconciliation?",
     "options": [
-      "GitOps: Git как единственный источник истины для инфраструктуры; ArgoCD sync loop сравнивает состояние кластера с Git и применяет diff",
-      "GitOps — хранение скриптов деплоя в Git-репозитории",
-      "ArgoCD — это CI система, заменяющая Jenkins",
-      "GitOps используется только для Terraform конфигураций"
+      "Сравнивает declared Git state с cluster и syncs вручную или автоматически",
+      "Выполняет CI builds и commits binaries обратно в app branch",
+      "Считает live cluster source и перезаписывает Git после drift",
+      "Запускает imperative scripts без сохранённого desired state"
     ],
     "answer": 0,
-    "explanation": "GitOps: всё состояние системы декларировано в Git, изменения через PR. ArgoCD постоянно сравнивает desired state (Git) с actual state (кластер). При diff — автоматически синхронизирует. Поддерживает Helm, Kustomize, plain YAML. App-of-apps паттерн для управления множеством приложений."
+    "explanation": "Argo CD renders desired manifests из Git source через plain YAML, Helm, Kustomize и другие integrations, сравнивает их с live resources и показывает drift. Sync может быть manual либо automated с self-heal/prune policies. CI build и image publication обычно остаются вне Argo CD; Git должен получить новую desired revision явным процессом."
   },
   {
     "id": 418,
     "topic": "CI/CD",
     "level": "Middle",
     "category": "tradeoff",
-    "q": "Сравните стратегии деплоя Blue-Green и Canary. Когда использовать каждую?",
+    "q": "Каков основной trade-off Blue-Green и Canary?",
     "options": [
-      "Blue-Green: всегда лучше, Canary: устаревший подход",
-      "Blue-Green: instant switch, простой rollback, требует 2x ресурсов; Canary: постепенный rollout, раннее обнаружение проблем на % трафика, сложнее реализовать",
-      "Canary требует больше ресурсов, чем Blue-Green",
-      "Blue-Green — только для баз данных, Canary — для stateless"
+      "Blue-Green меняет traffic sample; Canary переключает environment целиком",
+      "Blue-Green даёт switch ценой capacity; Canary снижает exposure ценой routing/metrics",
+      "Canary убирает schema compatibility; Blue-Green требует migration",
+      "Стратегии имеют одну traffic model и различаются YAML syntax"
     ],
     "answer": 1,
-    "explanation": "Blue-Green: два окружения, мгновенное переключение DNS/LB. Простой rollback — переключить обратно. Требует двойных ресурсов. Canary: 5% → 25% → 100% трафика, обнаружение ошибок до полного rollout, меньше риска. Сложнее при DB-миграциях. Blue-Green — для критических систем с чётким rollback."
+    "explanation": "Blue-Green держит old/new environments и переключает router, поэтому rollback быстрый, но parallel capacity и state synchronization могут стоить дорого. Canary постепенно увеличивает exposure новой version, требуя измеримых success criteria, traffic segmentation и automation. Обе стратегии нуждаются в backward-compatible data/schema change для безопасного rollback."
   },
   {
     "id": 419,
     "topic": "CI/CD",
     "level": "Middle",
     "category": "scenario",
-    "q": "Как безопасно хранить и использовать секреты в GitHub Actions?",
+    "q": "Какой подход безопаснее для GitHub Actions credentials?",
     "options": [
-      "Хранить в переменных окружения в .env файле в репозитории",
-      "Зашифровать секрет Base64 и хранить в переменной окружения",
-      "Settings → Secrets → Actions; использовать ${{ secrets.MY_SECRET }} в workflow; не выводить в logs; использовать environments для разделения окружений",
-      "Использовать только self-hosted runners для работы с секретами"
+      "Commit .env, encrypted открытым repository public key",
+      "Encode credential как Base64 внутри workflow YAML",
+      "Scoped Actions secrets или OIDC, environment gates и least permissions",
+      "Поместить credential в step output для передачи later jobs"
     ],
     "answer": 2,
-    "explanation": "GitHub Actions Secrets шифруются и маскируются в логах. Environment secrets доступны только для конкретных environments (с optional reviewers). Для production-секретов использовать HashiCorp Vault или AWS Secrets Manager с OIDC-аутентификацией вместо долгосрочных credentials."
+    "explanation": "Repository, organization и environment secrets нужно scope-ить, а environment protection rules могут требовать review. Для cloud access OIDC выдаёт short-lived token вместо stored long-lived key; GITHUB_TOKEN получает минимальные permissions. Masking — defense in depth, не гарантия: secret не передают untrusted code, logs/artifacts или shell через unsafe interpolation."
   },
   {
     "id": 420,
     "topic": "CI/CD",
     "level": "Middle",
     "category": "definition",
-    "q": "Что такое DinD (Docker-in-Docker) и какие проблемы с безопасностью он создаёт?",
+    "q": "Каков security trade-off traditional DinD в CI?",
     "options": [
-      "Запуск Docker-контейнеров внутри виртуальной машины",
-      "DinD используется только для тестирования Docker-образов",
-      "DinD — безопасная альтернатива обычной сборке Docker",
-      "Запуск Docker-демона внутри CI-контейнера для сборки образов; требует --privileged, что даёт полный доступ к хост-ядру"
+      "Использует host daemon с read-only доступом к Docker socket",
+      "Запускает containers в VM, изолированной от runner kernel",
+      "Подписывает images во вложенном registry без privileges",
+      "Nested daemon обычно требует privileged container, ослабляя isolation"
     ],
     "answer": 3,
-    "explanation": "DinD запускает вложенный dockerd, требует --privileged флаг (полный доступ к хосту). Проблемы: безопасность, нестабильность вложенного daemon, нет кэша между запусками. Альтернативы: kaniko (без привилегий), buildah, img, docker socket mount (тоже небезопасен)."
+    "explanation": "Traditional Docker-in-Docker запускает отдельный dockerd в CI container и обычно требует privileged mode для nested mounts, cgroups и networking. Это резко расширяет capabilities/devices и уменьшает boundary с runner host, хотя не означает автоматический host compromise. Rootless BuildKit, Buildah или managed builders уменьшают privileges; mounting host Docker socket тоже даёт высокорисковый daemon control."
   },
   {
     "id": 421,
