@@ -1,6 +1,6 @@
 {
-  "version": "4.0.0",
-  "title": "Study Tests: DevOps Plan v4 Weeks 1-32",
+  "version": "5.1.0",
+  "title": "Study Tests: DevOps + AI Curriculum v5.1 Weeks 1-32",
   "language": "ru",
   "purpose": "Мини-тесты по дням и пятничные тесты для вкладки «Учёба» в Interview Prep Max.",
   "grading": {
@@ -8,11 +8,16 @@
       "maxScore": 5,
       "passScore": 4,
       "reviewScore": 3,
+      "questionCount": {
+        "min": 3,
+        "max": 5,
+        "recommended": 5
+      },
       "format": "Открытые вопросы. Пользователь отвечает своими словами."
     },
     "weeklyTest": {
       "maxScore": 100,
-      "passScore": 75,
+      "passScore": 70,
       "reviewScore": 60,
       "parts": [
         "practice",

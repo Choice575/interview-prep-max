@@ -140,6 +140,7 @@ function recordQuestionResult(question,input){
   }
   if(input?.daily!==false){const today=IPMaxDate.localDateKey(now);const daily=lsGet('daily',{});daily[today]=(daily[today]||0)+1;lsSet('daily',daily);}
   recordSkillEvent({source:input?.source||'exam',topic:question.topic,skill:question.topic,score:result.score,possible:1,durationSeconds:input?.responseSeconds,at:now});
+  recordCoachControlAttempt(question,result,input,now);
   return result;
 }
 function recordTrainerResult(source,topic,correct,skill){recordSkillEvent({source,topic,skill:skill||topic,score:correct?1:0,possible:1});}
@@ -150,7 +151,7 @@ function isValidOnboardingDate(date){
   return IPMaxDate.isValidDateKey(date);
 }
 function normalizeOnboardingProfile(value){
-  if(!isRecord(value)||!ONBOARDING_ROLES.includes(value.role)||!ONBOARDING_LEVELS.includes(value.level)) return null;
+  if(!value||typeof value!=='object'||Array.isArray(value)||!ONBOARDING_ROLES.includes(value.role)||!ONBOARDING_LEVELS.includes(value.level)) return null;
   const date=value.date===undefined?'':value.date;
   if(!isValidOnboardingDate(date)) return null;
   return {role:value.role,level:value.level,date,completedAt:typeof value.completedAt==='string'?value.completedAt:''};
@@ -174,18 +175,43 @@ function getCoachPlan(){
   if(!profile||typeof InterviewCoach==='undefined'||typeof InterviewCoach.buildPlan!=='function') return null;
   return InterviewCoach.buildPlan({questions:getAllQ(),progress:getQProg(),skillEvents:getSkillEvents(),profile,now:Date.now()});
 }
-function pluralDays(value){
-  const lastTwo=value%100,last=value%10;
-  if(lastTwo>10&&lastTwo<20) return 'дней';
-  if(last===1) return 'день';
-  if(last>1&&last<5) return 'дня';
-  return 'дней';
+function getCoachJournal(){
+  const notes=lsGet('coach_journal',[]);
+  return Array.isArray(notes)&&typeof InterviewCoach!=='undefined'?notes.filter(InterviewCoach.isJournalEntry):[];
 }
-function formatInterviewTiming(daysUntil){
-  if(daysUntil===null) return 'Дата интервью не задана';
-  if(daysUntil<0) return 'Дата интервью уже прошла';
-  if(daysUntil===0) return 'Интервью сегодня';
-  return 'Интервью через '+daysUntil+' '+pluralDays(daysUntil);
+function getCoachControlSession(){
+  if(typeof IPMaxAICoach==='undefined'||typeof IPMaxAICoach.normaliseControlSession!=='function') return null;
+  return IPMaxAICoach.normaliseControlSession(lsGet('coach_control',null));
+}
+function recordCoachControlAttempt(question,result,input,now){
+  if(input?.source!=='exam'||!Array.isArray(coachQuestionIds)||!coachQuestionIds.map(String).includes(String(question.id))) return;
+  const session=getCoachControlSession();
+  if(!session||session.attempts.some(attempt=>attempt.questionId===String(question.id))) return;
+  session.attempts.push({questionId:String(question.id),topic:question.topic,score:result.score,responseSeconds:input?.responseSeconds||0,at:now});
+  if(session.attempts.length>=session.questionIds.length) session.completedAt=now;
+  lsSet('coach_control',session);
+}
+function requestCoachAIReview(){
+  if(typeof IPMaxAICoach==='undefined') return Promise.reject(new Error('Модуль AI-разбора не загружен.'));
+  const payload=IPMaxAICoach.buildReviewPayload({plan:getCoachPlan(),profile:getOnboardingProfile(),session:getCoachControlSession()});
+  return IPMaxAICoach.review(payload,{url:'./api/ai/review',timeoutMs:15000});
+}
+function setCoachProfile(profile){
+  if(!appStorage||typeof appStorage.setMany!=='function') return false;
+  return appStorage.setMany({onboarding:profile,onboarding_complete:true}).ok;
+}
+function configureCoachUI(){
+  if(typeof InterviewCoachUI==='undefined'||typeof InterviewCoach==='undefined') return false;
+  InterviewCoachUI.configure({
+    coach:InterviewCoach,escape:esc,getPlan:getCoachPlan,getProfile:getOnboardingProfile,
+    normaliseProfile:normalizeOnboardingProfile,setProfile:setCoachProfile,
+    getJournal:getCoachJournal,setJournal:notes=>lsSet('coach_journal',notes),getTopics:getAllTopics,
+    getControlSession:getCoachControlSession,requestAiReview:requestCoachAIReview,
+    openModal:openAccessibleModal,closeModal:closeAccessibleModal,refresh:renderHome,
+    startFocus:startCoachFocus,startReview:startCoachReviewMode,startControl:startCoachControlMode,
+    now:()=>Date.now(),alert:message=>alert(message),confirm:message=>confirm(message)
+  });
+  return true;
 }
 
 // Динамический список тем (из данных, а не захардкожен)
@@ -202,9 +228,8 @@ let interviewMode=false;
 let cameFromStudy=false;
 let updateReloadPending=false;
 let coachSessionLimit=0;
+let coachQuestionIds=null;
 let currentPracticeTopic='';
-const QUESTION_BATCH_SIZE=60;
-let questionRenderLimit=QUESTION_BATCH_SIZE;
 
 // ═══ NAV ═══
 const PAGE_TITLES={home:'Главная',study:'Учёба',practices:'Best Practices',exam:'Экзамен',analytics:'Аналитика',
@@ -214,6 +239,7 @@ const PAGE_TITLES={home:'Главная',study:'Учёба',practices:'Best Prac
   git:'Git-тренажёр',regex:'Regex-тренажёр',tips:'Советы'};
 function nav(page){
   stopActiveSessions();
+  if(page!=='exam') coachQuestionIds=null;
   if(page!=='exam'&&page!=='study'){cameFromStudy=false;interviewMode=false;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i=>{i.classList.remove('active');i.removeAttribute('aria-current');});
@@ -241,7 +267,8 @@ function nav(page){
   if(page==='git') renderGit();
   if(page==='regex') renderRegex();
 }
-function startMode(m){coachSessionLimit=0;currentMode=m;document.querySelectorAll('#mode-chips .chip').forEach(c=>c.classList.remove('active'));nav('exam');}
+function resetCoachSelection(){coachSessionLimit=0;coachQuestionIds=null;}
+function startMode(m){resetCoachSelection();currentMode=m;document.querySelectorAll('#mode-chips .chip').forEach(c=>c.classList.remove('active'));nav('exam');}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebar-overlay').classList.toggle('open');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');}
 document.getElementById('sidebar-overlay').onclick=closeSidebar;
@@ -325,10 +352,10 @@ document.addEventListener('keydown',function(e){
 });
 
 // ═══ TAGS ═══
-const TAG_MAP={Terraform:'tf',Linux:'lx','Сети':'net',Ansible:'ans',Docker:'docker',Kubernetes:'k8s','CI/CD':'cicd',Git:'git',Regex:'rx',Monitoring:'mon',Cloud:'cloud',Security:'sec'};
-function ttag(t){return '<span class="tag tag-'+(TAG_MAP[t]||'tf')+'">'+esc(t)+'</span>';}
-function ltag(l){const m={Junior:'jr',Middle:'md',Senior:'sr'};return '<span class="tag tag-'+(m[l]||'jr')+'">'+esc(l)+'</span>';}
-function ctag(c){if(!c||c==='definition') return '';const lbl={scenario:'Сценарий',tradeoff:'Trade-off',output:'Анализ вывода'};const cls={scenario:'sc',tradeoff:'tr',output:'out'};return '<span class="tag tag-'+(cls[c]||'sc')+'">'+esc(lbl[c]||c)+'</span>';}
+function requireExamUIModule(){if(typeof IPMaxExamUI==='undefined') throw new Error('Модуль экзамена не загружен.');return IPMaxExamUI;}
+function ttag(t){return requireExamUIModule().topicTag(t);}
+function ltag(l){return requireExamUIModule().levelTag(l);}
+function ctag(c){return requireExamUIModule().categoryTag(c);}
 
 // ═══ SYNTAX HIGHLIGHTING ═══
 function highlightDockerfile(code){return esc(code).replace(/^(FROM\s+.+)$/gm,'<span style="color:#c084fc">$1</span>').replace(/^(RUN\s+.+)$/gm,'<span style="color:#fbbf24">$1</span>').replace(/^(COPY|ADD)\s+(.+)$/gm,'<span style="color:#38bdf8">$1</span> <span style="color:#a5b4fc">$2</span>').replace(/^(CMD|ENTRYPOINT)\s+(.+)$/gm,'<span style="color:#4ade80">$1</span> <span style="color:#fde68a">$2</span>').replace(/^(WORKDIR|EXPOSE|ENV|USER|HEALTHCHECK)\s+(.+)$/gm,'<span style="color:#fb923c">$1</span> <span style="color:#cbd5e1">$2</span>').replace(/^(#.+)$/gm,'<span style="color:#64748b">$1</span>').replace(/--([a-z-]+)/g,'<span style="color:#f59e0b">--$1</span>');}
@@ -336,12 +363,12 @@ function highlightYAML(code){return esc(code).replace(/^(\s*)([a-z_][a-z_0-9]*):
 function highlightHCL(code){return esc(code).replace(/(resource|data|variable|output|provider|module|terraform)\s+"([^"]+)"/g,'<span style="color:#c084fc">$1</span> <span style="color:#4ade80">"$2"</span>').replace(/(resource|data|variable|output|provider|module|terraform)\s+/g,'<span style="color:#c084fc">$1</span> ').replace(/=\s*(true|false)/g,'= <span style="color:#f59e0b">$1</span>').replace(/(#.+)$/gm,'<span style="color:#64748b">$1</span>').replace(/"([^"]*)"/g,'<span style="color:#4ade80">"$1"</span>');}
 
 // ═══ EXAM ═══
-function resetQuestionRenderLimit(){questionRenderLimit=QUESTION_BATCH_SIZE;}
-function setMode(m,el){coachSessionLimit=0;currentMode=m;resetQuestionRenderLimit();setChip('mode-chips',el);clearTInterval();renderQuestions();}
+function resetQuestionRenderLimit(){requireExamUI().resetRenderLimit();}
+function setMode(m,el){resetCoachSelection();currentMode=m;resetQuestionRenderLimit();setChip('mode-chips',el);clearTInterval();renderQuestions();}
 function setView(v,el){currentView=v;resetQuestionRenderLimit();setChip('view-chips',el);clearTInterval();renderQuestions();}
-function setTopic(t,el){coachSessionLimit=0;currentTopic=t;resetQuestionRenderLimit();setChip('topic-chips',el);renderQuestions();}
-function setLevel(l,el){coachSessionLimit=0;currentLevel=l;resetQuestionRenderLimit();setChip('level-chips',el);renderQuestions();}
-function setCategory(c,el){coachSessionLimit=0;currentCategory=c;resetQuestionRenderLimit();setChip('cat-chips',el);renderQuestions();}
+function setTopic(t,el){resetCoachSelection();currentTopic=t;resetQuestionRenderLimit();setChip('topic-chips',el);renderQuestions();}
+function setLevel(l,el){resetCoachSelection();currentLevel=l;resetQuestionRenderLimit();setChip('level-chips',el);renderQuestions();}
+function setCategory(c,el){resetCoachSelection();currentCategory=c;resetQuestionRenderLimit();setChip('cat-chips',el);renderQuestions();}
 function setTimer(s,el){timerSecs=s;setChip('timer-chips',el);}
 function setChip(groupId,el){document.querySelectorAll('#'+groupId+' .chip').forEach(c=>{c.classList.remove('active');c.removeAttribute('aria-pressed');});if(el){el.classList.add('active');el.setAttribute('aria-pressed','true');}}
 function clearMistakes(){if(confirm('Сбросить все ошибки?')){lsSet('mistakes',{});resetQuestionRenderLimit();renderQuestions();}}
@@ -355,128 +382,37 @@ function toggleInterviewMode(){
   resetQuestionRenderLimit();renderQuestions();
 }
 
-function filterQs(){
-  let qs=getAllQ();
-  if(currentTopic!=='all') qs=qs.filter(q=>q.topic===currentTopic);
-  if(currentLevel!=='all') qs=qs.filter(q=>q.level===currentLevel);
-  if(currentCategory!=='all') qs=qs.filter(q=>(q.category||'definition')===currentCategory);
-  const s=document.getElementById('exam-search')?.value?.toLowerCase()||'';
-  if(s) qs=qs.filter(q=>q.q.toLowerCase().includes(s)||(q.options||[]).some(o=>o.toLowerCase().includes(s)));
-  const mistakes=getMistakes();const qprog=getQProg();
-  if(currentMode==='mistakes'){
-    qs=qs.filter(q=>mistakes[q.id]);
-    if(!qs.length){document.getElementById('questions-container').innerHTML='<div class="empty-state"><div class="icon">✅</div><p>Ошибок нет — отличная работа!</p><button class="btn btn-primary btn-sm" onclick="currentMode=\'all\';renderQuestions()">Показать все вопросы</button></div>';return qs;}
+const examUI=requireExamUIModule().create({
+  getQuestions:getAllQ,getQuestionProgress:getQProg,getMistakes,
+  getFilters:()=>({
+    coachQuestionIds,topic:currentTopic,level:currentLevel,category:currentCategory,mode:currentMode,
+    search:document.getElementById('exam-search')?.value||'',coachSessionLimit
+  }),
+  getView:()=>currentView,getTimerSeconds:()=>timerSecs,
+  getStudyMode:()=>document.getElementById('study-mode-cb')?.checked||cameFromStudy,
+  getInterviewMode:()=>interviewMode&&!cameFromStudy,
+  getActiveQuestions:()=>activeQuestions,setActiveQuestions:questions=>{activeQuestions=questions;},
+  getSingleIndex:()=>singleIdx,resetSingleIndex:()=>{singleIdx=0;},
+  randomize:shuffle,clearTimer:clearTInterval,renderFreeform,startTimer,
+  markQuestionStarted:(id,at)=>{questionStartTime[id]=at;},answer:pick,now:()=>Date.now(),
+  resetMistakesMode:()=>{
+    currentMode='all';
+    setChip('mode-chips',document.querySelector('#mode-chips .chip'));
+    resetQuestionRenderLimit();renderQuestions();
   }
-  if(currentMode==='smart'||currentMode==='srs'){
-    const now=Date.now();
-    if(currentMode==='srs'){
-      // Только вопросы, которые пора повторить
-      qs=qs.filter(q=>{const p=qprog[q.id];return p&&p.nextReviewAt&&p.nextReviewAt<=now;});
-    } else {
-      // Умный: ошибки + давно не видел + низкий процент
-      qs=qs.filter(q=>{const p=qprog[q.id];if(!p) return true;const r=p.correct/(p.correct+p.wrong);const age=(now-(p.lastSeen||0))/3600000;return r<0.7||age>24;});
-    }
-  }
-  if(coachSessionLimit>0&&(currentMode==='smart'||currentMode==='srs')) qs=shuffle(qs).slice(0,coachSessionLimit);
-  if(['mix10','mix20','mix30'].includes(currentMode)){
-    const n={mix10:10,mix20:20,mix30:30}[currentMode];
-    qs=shuffle(qs).slice(0,n);
-  }
-  return qs;
-}
-
-function renderQuestions(){
-  clearTInterval();
-  const qs=filterQs();activeQuestions=qs;
-  const cont=document.getElementById('questions-container');
-  const sc=document.getElementById('single-controls');
-  const pi=document.getElementById('progress-info');
-  const sb=document.getElementById('seg-bar');
-  if(!qs.length){cont.innerHTML='<div class="empty-state"><div class="icon">🔍</div><p>Нет вопросов для выбранных фильтров</p></div>';sc.style.display='none';sb.style.display='none';pi.innerHTML='';return;}
-  const qprog=getQProg();const total=qs.length;
-  let ok=0,err=0;
-  qs.forEach(q=>{const p=qprog[q.id];if(p){if(p.correct>p.wrong)ok++;else if(p.wrong>0)err++;}});
-  sb.style.display='flex';
-  sb.innerHTML='<div class="seg-ok" style="width:'+(ok/total*100)+'%"></div><div class="seg-err" style="width:'+(err/total*100)+'%"></div><div class="seg-none" style="width:'+((total-ok-err)/total*100)+'%"></div>';
-  pi.innerHTML='<span style="font-size:12px;color:var(--text2)">Показано: <b>'+total+'</b> | ✅ '+ok+' | ❌ '+err+' | ⭕ '+(total-ok-err)+'</span>';
-  if(currentView==='flashcard'){renderFlashcards(qs);sc.style.display='none';return;}
-  if(currentView==='freeform'){renderFreeform();sc.style.display='none';return;}
-  if(currentView==='single'){singleIdx=0;renderSingle();sc.style.display='block';return;}
-  sc.style.display='none';
-  const visible=qs.slice(0,questionRenderLimit);
-  questionRenderLimit=visible.length;
-  cont.innerHTML=visible.map(q=>renderQCard(q,false)).join('')+renderLoadMoreQuestions(qs.length);
-  bindLoadMoreQuestions();
-}
-
-function renderLoadMoreQuestions(total){
-  if(questionRenderLimit>=total) return '';
-  return '<div id="questions-load-more" style="text-align:center;padding:18px"><button type="button" class="btn btn-outline">Показать ещё '+Math.min(QUESTION_BATCH_SIZE,total-questionRenderLimit)+' · '+questionRenderLimit+'/'+total+'</button></div>';
-}
-function bindLoadMoreQuestions(){
-  document.querySelector('#questions-load-more button')?.addEventListener('click',loadMoreQuestions);
-}
-function loadMoreQuestions(){
-  const cont=document.getElementById('questions-container');
-  if(!cont) return;
-  document.getElementById('questions-load-more')?.remove();
-  const start=questionRenderLimit;
-  const end=Math.min(start+QUESTION_BATCH_SIZE,activeQuestions.length);
-  const questions=activeQuestions.slice(start,end);
-  questionRenderLimit=end;
-  const html=currentView==='flashcard'?renderFlashcardMarkup(questions):questions.map(q=>renderQCard(q,false)).join('');
-  cont.insertAdjacentHTML('beforeend',html+renderLoadMoreQuestions(activeQuestions.length));
-  bindLoadMoreQuestions();
-}
-
-function updateQuestionProgressSummary(){
-  const pi=document.getElementById('progress-info');
-  const sb=document.getElementById('seg-bar');
-  if(!pi||!sb||!activeQuestions.length||sb.style.display==='none') return;
-  const qprog=getQProg();const total=activeQuestions.length;
-  let ok=0,err=0;
-  activeQuestions.forEach(q=>{const p=qprog[q.id];if(p){if(p.correct>p.wrong)ok++;else if(p.wrong>0)err++;}});
-  sb.innerHTML='<div class="seg-ok" style="width:'+(ok/total*100)+'%"></div><div class="seg-err" style="width:'+(err/total*100)+'%"></div><div class="seg-none" style="width:'+((total-ok-err)/total*100)+'%"></div>';
-  pi.innerHTML='<span style="font-size:12px;color:var(--text2)">Показано: <b>'+total+'</b> | ✅ '+ok+' | ❌ '+err+' | ⭕ '+(total-ok-err)+'</span>';
-}
-
-function renderQCard(q,sMode){
-  const mistakes=getMistakes();const qprog=getQProg();const qp=qprog[q.id]||{correct:0,wrong:0};
-  const L=['A','B','C','D','E'];const opts=(q.options||[]);
-  const order=[...Array(opts.length).keys()];
-  for(let i=order.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[order[i],order[j]]=[order[j],order[i]];}
-  const studyMode=document.getElementById('study-mode-cb')?.checked||cameFromStudy;
-  const isInterview=interviewMode&&!studyMode&&!cameFromStudy;
-  questionStartTime[q.id]=Date.now();
-  return '<div class="q-card" id="qcard-'+q.id+'">'+
-    '<div class="q-meta">'+ttag(q.topic)+ltag(q.level)+ctag(q.category)+
-    '<span class="q-num">#'+q.id+(mistakes[q.id]?' ❌':'')+
-    ' <span style="color:var(--text3)">✅'+qp.correct+' ❌'+qp.wrong+'</span></span>'+
-    (sMode&&timerSecs?'<span class="q-timer" id="timer-'+q.id+'">'+timerSecs+'с</span>':'')+
-    '</div>'+
-    '<div class="q-text">'+esc(q.q)+'</div>'+
-    '<div class="q-options">'+
-    order.map((origIdx,visPos)=>'<button type="button" class="q-opt" id="opt-'+q.id+'-'+visPos+'" data-orig-idx="'+origIdx+'" data-answer="'+q.answer+'" onclick="pick('+q.id+','+origIdx+','+q.answer+')"><span class="opt-letter">'+L[visPos]+'</span><span>'+esc(opts[origIdx])+'</span></button>').join('')+
-    '</div>'+
-    (q.explanation&&studyMode?'<div class="q-explanation">💡 '+esc(q.explanation)+buildWhyWrong(q,opts)+'</div>':'')+
-    '<div id="qexpl-'+q.id+'" style="display:none" class="q-explanation"></div>'+
-    (isInterview?'<div class="q-interview-note">🎤 Режим собеседования — отвечайте развёрнуто, без подсказок</div>':'')+
-    '</div>';
-}
-
-function buildWhyWrong(q,opts){
-  if(!q.explanation||!opts) return '';
-  const correctIdx=q.answer;
-  const wrongOpts=opts.filter((_,i)=>i!==correctIdx);
-  if(!wrongOpts.length) return '';
-  return '<div class="q-why-wrong"><div style="font-size:11px;font-weight:700;color:var(--text3);margin-top:8px;margin-bottom:4px">❓ Почему остальные варианты неверны:</div>'+
-    wrongOpts.map(o=>'<div style="font-size:12px;color:var(--text2);margin-bottom:2px">• '+esc(o.slice(0,80))+(o.length>80?'…':'')+'</div>').join('')+'</div>';
-}
+});
+function requireExamUI(){if(!examUI) throw new Error('Модуль экзамена не инициализирован.');return examUI;}
+function filterQs(){return requireExamUI().filterCurrentQuestions();}
+function renderQuestions(){return requireExamUI().renderQuestions();}
+function loadMoreQuestions(){return requireExamUI().loadMoreQuestions();}
+function updateQuestionProgressSummary(){return requireExamUI().updateProgressSummary();}
+function renderQCard(q,sMode){return requireExamUI().renderQuestionCard(q,sMode);}
 
 function pick(qid,chosen,correct){
   const card=document.getElementById('qcard-'+qid);
   if(!card||card.querySelector('.q-opt.correct-opt')) return;
-  const q=getAllQ().find(x=>x.id===qid);
+  const q=getAllQ().find(x=>String(x.id)===String(qid));
+  if(!q) return;
   const opts=card.querySelectorAll('.q-opt');
   opts.forEach(o=>{o.classList.add('disabled');const oi=parseInt(o.getAttribute('data-orig-idx'));if(oi===correct)o.classList.add('correct-opt');else if(oi===chosen)o.classList.add('wrong-opt');});
   const ok=chosen===correct;
@@ -494,10 +430,7 @@ function pick(qid,chosen,correct){
 function pageActive(p){return document.getElementById('page-'+p)?.classList.contains('active');}
 
 function renderSingle(){
-  const q=activeQuestions[singleIdx];if(!q) return;
-  document.getElementById('questions-container').innerHTML=renderQCard(q,true);
-  document.getElementById('single-counter').textContent=(singleIdx+1)+' / '+activeQuestions.length;
-  if(timerSecs>0) startTimer(q.id,timerSecs);
+  return requireExamUI().renderSingle();
 }
 function singleNext(){clearTInterval();if(singleIdx<activeQuestions.length-1){singleIdx++;renderSingle();}}
 function singlePrev(){clearTInterval();if(singleIdx>0){singleIdx--;renderSingle();}}
@@ -510,22 +443,7 @@ function startTimer(qid,secs){
   };
   tick();timerInterval=setInterval(tick,1000);
 }
-function autoFail(qid){const q=getAllQ().find(x=>x.id===qid);if(!q) return;const c=document.getElementById('qcard-'+qid);if(!c||c.querySelector('.q-opt.correct-opt')) return;pick(qid,-1,q.answer);}
-
-function renderFlashcardMarkup(qs){
-  return qs.map(q=>
-    '<div class="flashcard" id="fc-'+q.id+'" onclick="flipCard('+q.id+')"><div class="flashcard-inner"><div class="fc-front"><div class="q-meta" style="justify-content:center;margin-bottom:10px">'+ttag(q.topic)+ltag(q.level)+'</div><p>'+esc(q.q)+'</p><div style="margin-top:10px;font-size:11px;color:var(--text3)">Нажмите для ответа</div></div>'+
-    '<div class="fc-back"><div style="font-weight:700;color:var(--primary-h);margin-bottom:8px">✅ '+esc((q.options||[])[q.answer]||'')+'</div>'+(q.explanation?'<p style="font-size:13px;color:var(--text2)">'+esc(q.explanation)+'</p>':'')+
-    '</div></div></div>'
-  ).join('');
-}
-function renderFlashcards(qs){
-  const visible=qs.slice(0,questionRenderLimit);
-  questionRenderLimit=visible.length;
-  document.getElementById('questions-container').innerHTML=renderFlashcardMarkup(visible)+renderLoadMoreQuestions(qs.length);
-  bindLoadMoreQuestions();
-}
-function flipCard(id){document.getElementById('fc-'+id)?.classList.toggle('flipped');}
+function autoFail(qid){const q=getAllQ().find(x=>String(x.id)===String(qid));if(!q) return;const c=document.getElementById('qcard-'+qid);if(!c||c.querySelector('.q-opt.correct-opt')) return;pick(qid,-1,q.answer);}
 
 // ═══ FREEFORM MODE (ответ без вариантов) ═══
 let freeformIdx=0, freeformQs=[], freeformAnswers={};
@@ -827,211 +745,64 @@ function markSeniorCaseDone(id){const p=lsGet('senior_case_prog',{});p[id]={stat
 
 // ═══ HOME ═══
 function updateStreakDisplay(){const sd=document.getElementById('streak-display');if(sd)sd.textContent='🔥 '+streak;}
-function renderHome(){
-  renderDailyPlan();
-  renderReadinessHome();
-  renderMasteryCards();
-  const s=streak,best=lsGet('streak_best',0);
-  const banner=document.getElementById('home-streak-banner');
-  if(s>0||best>0){banner.style.display='flex';}
-  document.getElementById('home-streak-num').textContent=streak;
-  document.getElementById('home-best-streak').textContent='Лучшая серия: '+best;
-  const hist=lsGet('history',[]);
-  const hc=document.getElementById('home-history');
-  if(!hist.length){hc.innerHTML='<p style="color:var(--text3);font-size:13px">История пуста. Начните экзамен!</p>';}else{
-  hc.innerHTML=hist.slice(0,5).map(h=>'<div class="history-item"><span style="color:var(--text3);font-size:11px">'+esc(h.date)+'</span><span>'+esc(h.topic||'')+'</span><span style="color:'+(h.correct?'var(--green)':'var(--red)')+'">'+(h.correct?'✅ Верно':'❌ Неверно')+'</span></div>').join('');}
-  // Пересоздаём Блиц и Mock Interview (чтобы не пропадали при перерендере)
-  setTimeout(()=>{
-    const qa=document.querySelector('.quick-actions');
-    if(!qa) return;
-    if(!document.getElementById('blitz-btn')){
-      const btn=document.createElement('button');btn.id='blitz-btn';btn.className='btn btn-outline';btn.style.cssText='background:var(--primary-dim);color:var(--primary-h);border-color:var(--primary)';btn.textContent='⚡ Блиц (5 мин)';btn.onclick=startBlitz;btn.setAttribute('aria-label','Блиц-опрос на 5 минут');qa.appendChild(btn);
-    }
-    if(!document.getElementById('mock-btn')){
-      const mockBtn=document.createElement('button');mockBtn.id='mock-btn';mockBtn.className='btn btn-outline';mockBtn.style.cssText='background:var(--primary-dim);color:var(--primary-h);border-color:var(--primary)';mockBtn.textContent='🎤 Mock Interview (30 мин)';mockBtn.onclick=startMockInterview;mockBtn.setAttribute('aria-label','Mock интервью на 30 минут');qa.appendChild(mockBtn);
-    }
-    if(!document.getElementById('diag-btn')){
-      const diagBtn=document.createElement('button');diagBtn.id='diag-btn';diagBtn.className='btn btn-outline';diagBtn.style.cssText='background:var(--yellow-dim);color:var(--yellow);border-color:var(--yellow)';diagBtn.textContent='🔬 Диагностика';diagBtn.onclick=startDiagnostic;diagBtn.setAttribute('aria-label','Диагностический тест на 15 вопросов');qa.appendChild(diagBtn);
-    }
-    if(!document.getElementById('inc-btn')){
-      const incBtn=document.createElement('button');incBtn.id='inc-btn';incBtn.className='btn btn-outline';incBtn.style.cssText='background:var(--red-dim);color:var(--red);border-color:var(--red)';incBtn.textContent='🚨 Инцидент';incBtn.onclick=startIncidentSim;incBtn.setAttribute('aria-label','Симуляция инцидента');qa.appendChild(incBtn);
-    }
-  },100);
-}
-function renderDailyPlan(){
-  const el=document.getElementById('daily-plan-card');const c=document.getElementById('daily-plan-content');
-  if(!el||!c) return;
-  el.style.display='block';
-  const plan=getCoachPlan();
-  if(!plan){
-    c.innerHTML='<div class="coach-empty"><span>Укажите цель подготовки, чтобы получить персональный план.</span><button type="button" class="btn btn-primary btn-sm" data-modal-trigger="onboarding-modal" onclick="editOnboarding()">Настроить цель</button></div>';
-    return;
-  }
-  const focus=plan.focus;
-  const focusName=focus?esc(focus.topic):'Общий повтор';
-  const focusDetail=focus?(focus.practiceCount?focus.practiceScore+'% практика · '+focus.accuracy+'% тесты':focus.accuracy+'% точность · '+focus.coverage+'% охват'):'Начните с базового микса вопросов';
-  const focusAction=focus?' data-coach-topic="'+escAttr(focus.topic)+'" data-coach-page="'+escAttr(focus.action?.page||'')+'" onclick="startCoachSession(this.dataset.coachTopic,this.dataset.coachPage)"':'';
-  c.innerHTML='<div class="coach-head"><div><div class="coach-role">'+esc(plan.roleLabel)+' · '+esc(plan.level)+'</div><div class="coach-date">'+formatInterviewTiming(plan.daysUntil)+'</div></div>'+
-    '<button type="button" class="btn-icon" title="Изменить цель подготовки" aria-label="Изменить цель подготовки" data-modal-trigger="onboarding-modal" onclick="editOnboarding()">⚙</button></div>'+
-    '<div class="coach-metrics"><div class="coach-metric"><b>'+plan.sessionSize+'</b><span>вопросов сегодня</span></div><div class="coach-metric"><b>'+plan.dueCount+'</b><span>SRS к повторению</span></div><div class="coach-metric"><b>'+plan.targetAccuracy+'%</b><span>целевая точность</span></div></div>'+
-    '<div class="coach-focus"><span class="coach-focus-kicker">Главный фокус</span><strong>'+focusName+'</strong><span>'+focusDetail+'</span></div>'+
-    '<div class="coach-actions"><button type="button" class="btn btn-primary btn-sm"'+focusAction+'>Начать фокус</button>'+
-    '<button type="button" class="btn btn-outline btn-sm" onclick="startCoachReview()"'+(plan.dueCount?'':' disabled title="Нет повторений на сегодня"')+'>Повторить SRS ('+plan.dueCount+')</button></div>';
-}
-function startCoachSession(topic,trainerPage){
-  const plan=getCoachPlan();
+const homeUI=typeof IPMaxHomeUI!=='undefined'?IPMaxHomeUI.create({
+  get:(key,fallback)=>lsGet(key,fallback),getStreak:()=>streak,
+  getQuestionProgress:getQProg,getQuestions:getAllQ,getTopics:getAllTopics,
+  renderCoach:()=>{if(typeof InterviewCoachUI!=='undefined') InterviewCoachUI.render();},
+  renderReadiness:renderReadinessHome,
+  startMode,navigate:nav,startBlitz,startMockInterview,startDiagnostic,startIncident:startIncidentSim,
+  openTopic:topic=>{currentTopic=topic;nav('exam');}
+}):null;
+function requireHomeUI(){if(!homeUI) throw new Error('Модуль главной страницы не загружен.');return homeUI;}
+function renderHome(){return requireHomeUI().renderHome();}
+function renderMasteryCards(){return requireHomeUI().renderMasteryCards();}
+function startCoachFocus(topic,trainerPage,plan){
   if(!plan) return;
-  if(trainerPage){coachSessionLimit=0;nav(trainerPage);return;}
+  resetCoachSelection();
+  if(trainerPage){nav(trainerPage);return;}
   if(!getAllQ().some(q=>q.topic===topic)){alert('Для выбранной темы пока нет вопросов.');return;}
   coachSessionLimit=plan.sessionSize;
   currentTopic=topic;currentLevel='all';currentCategory='all';currentMode='smart';currentView='standard';interviewMode=false;cameFromStudy=false;
   nav('exam');
 }
-function startCoachReview(){
-  const plan=getCoachPlan();
+function startCoachReviewMode(plan){
   if(!plan||!plan.dueCount){alert('На сегодня нет запланированных повторений.');return;}
+  resetCoachSelection();
   coachSessionLimit=Math.min(plan.sessionSize,plan.dueCount);
   currentTopic='all';currentLevel='all';currentCategory='all';currentMode='srs';currentView='standard';interviewMode=false;cameFromStudy=false;
   nav('exam');
 }
-
-function renderMasteryCards(){
-  const qprog=getQProg(),allQ=getAllQ();
-  const topics=getAllTopics();
-  const icons=['⚡','🐧','🌐','📦','🐳','☸️','🔄','🔀','🔍'];
-  const colors=['var(--primary)','var(--green)','var(--blue)','var(--orange)','#38bdf8','#60a5fa','#fb923c','#f59e0b','#c084fc'];
-  const mc=document.getElementById('mastery-cards');
-  if(!mc) return;
-  mc.innerHTML=topics.slice(0,9).map((t,i)=>{
-    const tqs=allQ.filter(q=>q.topic===t);
-    const m=tqs.filter(q=>{const p=qprog[q.id];return p&&p.correct>p.wrong;}).length;
-    const pct=tqs.length?Math.round(m/tqs.length*100):0;
-    return '<button type="button" class="mastery-card" data-topic="'+t+'" onclick="currentTopic=this.getAttribute(\'data-topic\');nav(\'exam\')">'+'<div style="font-size:20px">'+(icons[i]||'📋')+'</div>'+'<div class="mastery-pct" style="color:'+(colors[i]||'var(--primary)')+'">'+pct+'%</div>'+'<div class="mastery-name">'+t+'</div>'+'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+m+'/'+tqs.length+'</div>'+'<div class="mastery-bar"><div class="mastery-fill" style="width:'+pct+'%;background:'+(colors[i]||'var(--primary)')+'"></div></div></button>';
-  }).join('');
+function startCoachControlMode(plan){
+  const ids=plan?.controlSession?.questionIds;
+  if(!Array.isArray(ids)||!ids.length){alert('Пока недостаточно вопросов для контрольной сессии.');return;}
+  resetCoachSelection();
+  coachQuestionIds=ids;
+  lsSet('coach_control',{
+    id:'control-'+Date.now(),startedAt:Date.now(),completedAt:null,
+    questionIds:ids.map(String),topics:Array.isArray(plan.controlSession.topics)?plan.controlSession.topics:[],attempts:[]
+  });
+  currentTopic='all';currentLevel='all';currentCategory='all';currentMode='all';currentView='standard';interviewMode=true;cameFromStudy=false;
+  nav('exam');
 }
 
 // ═══ ANALYTICS ═══
-function renderAnalytics(){
-  const stats=lsGet('stats',{total:0,correct:0});const qprog=getQProg(),allQ=getAllQ(),mistakes=getMistakes();
-  if(!stats.total){
-    document.getElementById('stat-cards').innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="icon">📊</div><p>Статистика появится после первых ответов</p><button class="btn btn-primary btn-sm" onclick="nav(\'exam\')">⚡ Начать экзамен</button><button class="btn btn-outline btn-sm" onclick="startDiagnostic()" style="margin-left:8px">🔬 Пройти диагностику</button></div>';
-    return;
-  }
-  const pct=stats.total?Math.round(stats.correct/stats.total*100):0;
-  let totalTime=0,totalCount=0;
-  Object.values(qprog).forEach(p=>{if(p.times){p.times.forEach(t=>{totalTime+=t;totalCount++;});}});
-  const avgTime=totalCount?Math.round(totalTime/totalCount):0;
-  document.getElementById('stat-cards').innerHTML=[
-    {v:stats.total,l:'Всего ответов',c:'var(--primary)'},{v:stats.correct,l:'Правильных',c:'var(--green)'},
-    {v:stats.total-stats.correct,l:'Неправильных',c:'var(--red)'},{v:pct+'%',l:'Точность',c:'var(--yellow)'},
-    {v:Object.keys(mistakes).length,l:'В ошибках',c:'var(--red)'},{v:lsGet('streak_best',0),l:'Лучшая серия',c:'var(--orange)'},
-    {v:avgTime+'с',l:'Среднее время ответа',c:'var(--primary-h)'}
-  ].map(s=>'<div class="stat-card"><div class="stat-val" style="color:'+s.c+'">'+s.v+'</div><div class="stat-label">'+s.l+'</div></div>').join('');
-  const hist=lsGet('history',[]);
-  document.getElementById('history-list').innerHTML=hist.length?hist.map(h=>'<div class="history-item"><span style="color:var(--text3);font-size:11px">'+esc(h.date)+'</span><span class="tag '+(TAG_MAP[h.topic]?'tag-'+(TAG_MAP[h.topic]):'tag-tf')+'">'+esc(h.topic||'')+'</span><span style="color:'+(h.correct?'var(--green)':'var(--red)')+'">'+(h.correct?'✅':'❌')+'</span></div>').join(''):'<p style="color:var(--text3);font-size:13px;padding:10px">Нет данных</p>';
-  let ok=0,err=0;const tot=allQ.length;
-  allQ.forEach(q=>{const p=qprog[q.id];if(p){if(p.correct>p.wrong)ok++;else if(p.wrong>0)err++;}});
-  document.getElementById('analytics-seg-bar').innerHTML='<div class="seg-ok" style="width:'+(ok/tot*100)+'%"></div><div class="seg-err" style="width:'+(err/tot*100)+'%"></div><div class="seg-none" style="width:'+((tot-ok-err)/tot*100)+'%"></div>';
-  document.getElementById('analytics-seg-label').textContent='✅ Изучено: '+ok+' | ❌ Ошибки: '+err+' | ⭕ Не отвечено: '+(tot-ok-err)+' из '+tot;
-  drawRadar();renderTimeChart();renderCategoryStats();renderWeakSpots();renderGradeReadiness();renderReadinessScore();renderNextQuestions();
+const analyticsUI=typeof IPMaxAnalyticsUI!=='undefined'?IPMaxAnalyticsUI.create({
+  get:(key,fallback)=>lsGet(key,fallback),getQuestionProgress:getQProg,getQuestions:getAllQ,getMistakes,getTopics:getAllTopics,
+  escape:esc,tagMap:requireExamUIModule().TOPIC_CLASSES,localDateKey:timestamp=>IPMaxDate.localDateKey(timestamp),
+  startExam:()=>nav('exam'),startDiagnostic,
+  startQuestion:question=>startAnalyticsQuestions([question]),
+  startQuestions:startAnalyticsQuestions
+}):null;
+function requireAnalyticsUI(){if(!analyticsUI) throw new Error('Модуль аналитики не загружен.');return analyticsUI;}
+function startAnalyticsQuestions(questions){
+  const ids=(Array.isArray(questions)?questions:[]).map(question=>question&&question.id).filter(id=>id!==undefined&&id!==null);
+  if(!ids.length) return;
+  resetCoachSelection();coachQuestionIds=ids;
+  currentTopic='all';currentLevel='all';currentCategory='all';currentMode='all';currentView='standard';interviewMode=false;cameFromStudy=false;
+  nav('exam');
 }
-function drawRadar(){
-  const canvas=document.getElementById('radarCanvas');if(!canvas) return;const ctx=canvas.getContext('2d');
-  const qprog=getQProg(),allQ=getAllQ();const topics=getAllTopics().slice(0,8);const N=topics.length;
-  const scores=topics.map(t=>{const tqs=allQ.filter(q=>q.topic===t);if(!tqs.length) return 0;return tqs.filter(q=>{const p=qprog[q.id];return p&&p.correct>p.wrong;}).length/tqs.length;});
-  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,R=Math.min(W,H)/2-36;
-  const dark=document.documentElement.getAttribute('data-theme')!=='light';
-  ctx.clearRect(0,0,W,H);
-  const ang=i=>i*2*Math.PI/N-Math.PI/2;
-  for(let r=1;r<=5;r++){ctx.beginPath();for(let i=0;i<N;i++){const a=ang(i),rv=r*R/5;i===0?ctx.moveTo(cx+Math.cos(a)*rv,cy+Math.sin(a)*rv):ctx.lineTo(cx+Math.cos(a)*rv,cy+Math.sin(a)*rv);}ctx.closePath();ctx.strokeStyle=dark?'#2e3348':'#e2e8f0';ctx.lineWidth=1;ctx.stroke();}
-  for(let i=0;i<N;i++){ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(ang(i))*R,cy+Math.sin(ang(i))*R);ctx.strokeStyle=dark?'#2e3348':'#e2e8f0';ctx.stroke();}
-  ctx.beginPath();scores.forEach((s,i)=>{const a=ang(i),r=s*R;i===0?ctx.moveTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r):ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);});ctx.closePath();ctx.fillStyle='rgba(99,102,241,.25)';ctx.fill();ctx.strokeStyle='#6366f1';ctx.lineWidth=2;ctx.stroke();
-  ctx.textAlign='center';ctx.font='bold 10px Inter';ctx.fillStyle=dark?'#94a3b8':'#475569';
-  topics.forEach((t,i)=>{const a=ang(i);ctx.fillText(t,cx+Math.cos(a)*(R+28),cy+Math.sin(a)*(R+28)+4);});
-  scores.forEach((s,i)=>{const a=ang(i),r=s*R;ctx.beginPath();ctx.arc(cx+Math.cos(a)*r,cy+Math.sin(a)*r,4,0,Math.PI*2);ctx.fillStyle='#6366f1';ctx.fill();});
-}
-function renderTimeChart(){
-  const daily=lsGet('daily',{});const bars=document.getElementById('act-bars');const totalEl=document.getElementById('act-total');if(!bars) return;
-  const days=14;const today=new Date();let maxVal=1,total=0;const data=[];
-  for(let i=days-1;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);const key=IPMaxDate.localDateKey(d.getTime());const cnt=daily[key]||0;data.push({key,cnt,label:d.toLocaleDateString('ru',{day:'numeric',month:'numeric'})});if(cnt>maxVal)maxVal=cnt;total+=cnt;}
-  bars.innerHTML=data.map(d=>{const h=Math.max(2,Math.round(d.cnt/maxVal*68));return '<div class="ab-wrap"><div class="ab-cnt">'+(d.cnt||'')+'</div><div class="ab-fill" style="height:'+h+'px"></div><div class="ab-lbl">'+d.label+'</div></div>';}).join('');
-  if(totalEl) totalEl.textContent='Всего за 14 дней: '+total+' ответов';
-}
-function renderCategoryStats(){
-  const el=document.getElementById('cat-stat-rows');if(!el) return;const qprog=getQProg(),allQ=getAllQ();
-  const cats=[{id:'definition',label:'Определение'},{id:'scenario',label:'Сценарий'},{id:'tradeoff',label:'Trade-off'}];
-  el.innerHTML=cats.map(c=>{const qs=allQ.filter(q=>(q.category||'definition')===c.id);if(!qs.length) return '';const ok=qs.filter(q=>{const p=qprog[q.id];return p&&p.correct>p.wrong;}).length;const pct=Math.round(ok/qs.length*100);return '<div class="cat-row"><div class="cat-row-lbl">'+c.label+' ('+qs.length+')</div><div class="cat-row-bar"><div class="cat-row-fill" style="width:'+pct+'%"></div></div><div class="cat-row-pct">'+pct+'%</div></div>';}).join('');
-}
-function renderWeakSpots(){
-  const el=document.getElementById('weak-spots-list');if(!el) return;const qprog=getQProg(),allQ=getAllQ();
-  const weak=allQ.map(q=>{const p=qprog[q.id];if(!p||p.wrong===0) return null;const total=p.correct+p.wrong;if(total<2) return null;return {q,wrong:p.wrong,total,pct:Math.round(p.wrong/total*100)};}).filter(Boolean).sort((a,b)=>b.pct-a.pct).slice(0,5);
-  if(!weak.length){el.innerHTML='<p style="font-size:12px;color:var(--text3)">Ответьте хотя бы на 2 вопроса, чтобы увидеть слабые места.</p>';return;}
-  el.innerHTML=weak.map(w=>'<div class="weak-item"><span class="weak-pct">'+w.pct+'%</span><span class="weak-txt" title="'+esc(w.q.q)+'">'+esc(w.q.q.slice(0,60))+(w.q.q.length>60?'…':'')+'</span><span style="font-size:10px;color:var(--text3)">'+w.wrong+'/'+w.total+'</span></div>').join('');
-}
-
-// ═══ GRADE READINESS ═══
-function renderGradeReadiness(){
-  const el=document.getElementById('weak-spots-list');if(!el) return;
-  const qprog=getQProg(),allQ=getAllQ();
-  const grades={Junior:{qs:[],ok:0},Middle:{qs:[],ok:0},Senior:{qs:[],ok:0}};
-  allQ.forEach(q=>{const lvl=q.level||'Junior';if(grades[lvl]){grades[lvl].qs.push(q);const p=qprog[q.id];if(p&&p.correct>p.wrong)grades[lvl].ok++;}});
-  // Добавляем карточку после weak-spots
-  const card=document.getElementById('grade-readiness-card');
-  const container=document.getElementById('analytics-three');
-  if(!container||card) return;
-  const div=document.createElement('div');div.className='card';div.id='grade-readiness-card';
-  div.innerHTML='<div class="card-title">🎯 Готовность по грейдам</div>'+
-    Object.entries(grades).map(([g,d])=>{
-      const pct=d.qs.length?Math.round(d.ok/d.qs.length*100):0;
-      const barClr=pct>=70?'var(--green)':pct>=40?'var(--yellow)':'var(--red)';
-      return '<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">'+g+'</span><span style="color:var(--text2)">'+d.ok+'/'+d.qs.length+' ('+pct+'%)</span></div><div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+barClr+';border-radius:3px"></div></div></div>';
-    }).join('')+
-    '<div style="font-size:11px;color:var(--text3);margin-top:8px">Оценка: ≥70% Junior → готов к Middle, ≥70% Middle → готов к Senior</div>';
-  container.appendChild(div);
-}
-
-function renderReadinessScore(){
-  const el=document.getElementById('readiness-content');if(!el) return;
-  const qprog=getQProg(),allQ=getAllQ();
-  const answered=allQ.filter(q=>{const p=qprog[q.id];return p&&(p.correct+p.wrong)>0;});
-  if(!answered.length){el.innerHTML='<p style="color:var(--text3);font-size:13px">Ответьте хотя бы на 10 вопросов для оценки готовности.</p>';return;}
-  const ok=answered.filter(q=>{const p=qprog[q.id];return p&&p.correct>p.wrong;});
-  const score=Math.round(ok.length/answered.length*100);
-  const tier=score>=80?'🟢 Высокая':score>=50?'🟡 Средняя':'🔴 Низкая';
-  const tip=score>=80?'Можно пробовать собеседование Middle':score>=50?'Закройте слабые темы и повторите ошибки':'Сосредоточьтесь на базовых темах и регулярной практике';
-  el.innerHTML='<div style="font-size:48px;font-weight:800;color:var(--primary-h);margin-bottom:6px">'+score+'%</div>'+
-    '<div style="font-size:16px;font-weight:700;margin-bottom:8px">'+tier+'</div>'+
-    '<div style="font-size:12px;color:var(--text2);max-width:300px;margin:0 auto">'+tip+'</div>'+
-    '<div style="font-size:11px;color:var(--text3);margin-top:8px">'+ok.length+'/'+answered.length+' вопросов освоено</div>';
-}
-
-function renderNextQuestions(){
-  const el=document.getElementById('next-questions-list');if(!el) return;
-  const qprog=getQProg(),allQ=getAllQ();
-  const weak=allQ.filter(q=>{const p=qprog[q.id];return !p||p.wrong>=p.correct;});
-  if(!weak.length){
-    el.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 0">Все вопросы освоены! Пройдите Senior Simulator.</p>';
-    return;
-  }
-  const byTopic={};weak.forEach(q=>{byTopic[q.topic]=(byTopic[q.topic]||[]);byTopic[q.topic].push(q);});
-  const pick=[];const topics=Object.keys(byTopic).sort((a,b)=>byTopic[a].length-byTopic[b].length);
-  for(const t of topics){
-    const qs=byTopic[t];pick.push(qs[Math.floor(Math.random()*qs.length)]);
-    if(pick.length>=10) break;
-  }
-  el.innerHTML=pick.map((q,i)=>'<button type="button" class="weak-item" data-next-question="'+i+'" style="width:100%;cursor:pointer;border:0">'+
-    '<span style="font-size:11px;color:var(--text3);min-width:20px">#'+(i+1)+'</span>'+
-    '<span class="weak-txt" title="'+esc(q.q)+'" style="text-align:left">'+esc(q.q.slice(0,70))+(q.q.length>70?'…':'')+'</span>'+
-    '<span style="font-size:10px;color:var(--primary-h)">'+esc(q.topic)+'</span></button>').join('')+
-    '<div style="text-align:center;margin-top:8px"><button class="btn btn-primary btn-sm" onclick="currentMode=\'mix10\';nav(\'exam\')">⚡ Пройти эти 10</button></div>';
-  el.querySelectorAll('[data-next-question]').forEach(button=>{
-    const question=pick[Number(button.dataset.nextQuestion)];
-    button.addEventListener('click',()=>{
-      currentTopic=question.topic;currentLevel='all';currentMode='all';nav('exam');
-    });
-  });
-}
-
+function renderAnalytics(){return requireAnalyticsUI().renderAnalytics();}
+function renderReadinessHome(){return requireAnalyticsUI().renderReadinessHome();}
 // ═══ SUBNET ═══
 let subnetDone={};
 function calcSubnet(ip,prefix){
@@ -1150,32 +921,6 @@ function renderPortQ(){const undone=PORTS_TASKS.filter(p=>!ptDone[p.id]);if(!und
 function checkPort(){const inp=document.getElementById('pt-inp');const fb=document.getElementById('pt-feedback');const val=parseInt(inp.value);const correct=ptCurrent.port;const ok=val===correct;recordTrainerResult('ports','Сети',ok,'Ports');if(ok){ptDone[ptCurrent.id]=1;lsSet('pt_prog',ptDone);fb.style.display='block';fb.innerHTML='<span style="color:var(--green);font-weight:700">✅ Верно! '+correct+'</span>';updatePtProg();setTimeout(renderPortQ,800);}else{fb.style.display='block';fb.innerHTML='<span style="color:var(--red);font-weight:700">❌ '+ptCurrent.service+' → порт <b>'+correct+'</b>, не '+val+'</span>';inp.value='';inp.focus();}}
 function skipPort(){const fb=document.getElementById('pt-feedback');fb.style.display='block';fb.innerHTML='<span style="color:var(--yellow)">💡 '+ptCurrent.service+' → порт <b>'+ptCurrent.port+'</b></span>';setTimeout(renderPortQ,1200);}
 function updatePtProg(){const done=Object.keys(ptDone).length;document.getElementById('pt-pb').style.width=(done/PORTS_TASKS.length*100)+'%';document.getElementById('pt-score-lbl').textContent=done+' / '+PORTS_TASKS.length+' портов';}
-
-// ═══ ONBOARDING ═══
-function saveOnboarding(){
-  const role=document.getElementById('onb-role').value;
-  const level=document.getElementById('onb-level').value;
-  const date=document.getElementById('onb-date').value;
-  const profile=normalizeOnboardingProfile({role,level,date,completedAt:new Date().toISOString()});
-  if(!profile){alert('Проверьте дату интервью.');return;}
-  lsSet('onboarding',profile);
-  lsSet('onboarding_complete',true);
-  closeAccessibleModal('onboarding-modal');
-  renderHome();
-}
-function skipOnboarding(){
-  if(!getOnboardingProfile()) lsSet('onboarding',{role:'DevOps',level:'Middle',date:'',completedAt:new Date().toISOString()});
-  lsSet('onboarding_complete',true);
-  closeAccessibleModal('onboarding-modal');
-  renderHome();
-}
-function editOnboarding(){
-  const profile=getOnboardingProfile()||{role:'DevOps',level:'Middle',date:''};
-  document.getElementById('onb-role').value=profile.role;
-  document.getElementById('onb-level').value=profile.level;
-  document.getElementById('onb-date').value=profile.date;
-  openAccessibleModal('onboarding-modal','#onb-role');
-}
 
 // ═══ GIT TRAINER ═══
 let gitDone={};
@@ -1446,142 +1191,38 @@ function endDiagnostic(){
     '<button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
 }
 
-// ═══ EXPORT / IMPORT (с APP_VERSION) ═══
-const IMPORT_MAX_BYTES=2*1024*1024;
-const IMPORT_MAX_DEPTH=10;
-const IMPORT_MAX_NODES=50000;
-const IMPORT_RECORD_KEYS=['mistakes','stats','qprog','ts_scores','cmd_prog','code_prog','subnet_prog','git_prog','regex_prog','ans_prog','df_prog','k8s_prog','pt_prog','labs_prog','daily','study_progress','study_answers','senior_case_prog'];
-const IMPORT_ARRAY_KEYS=['history','custom','skill_events'];
-function exportProgress(){
-  const onboarding=getOnboardingProfile();
-  const data={
-    version: APP_VERSION, exportDate: new Date().toISOString(),
-    mistakes:lsGet('mistakes',{}),stats:lsGet('stats',{}),history:lsGet('history',[]),
-    qprog:lsGet('qprog',{}),streak_best:lsGet('streak_best',0),custom:lsGet('custom',[]),
-    ts_scores:lsGet('ts_scores',{}),cmd_prog:lsGet('cmd_prog',{}),code_prog:lsGet('code_prog',{}),
-    subnet_prog:lsGet('subnet_prog',{}),git_prog:lsGet('git_prog',{}),regex_prog:lsGet('regex_prog',{}),
-    ans_prog:lsGet('ans_prog',{}),df_prog:lsGet('df_prog',{}),k8s_prog:lsGet('k8s_prog',{}),pt_prog:lsGet('pt_prog',{}),labs_prog:lsGet('labs_prog',{}),
-    daily:lsGet('daily',{}),study_progress:lsGet('study_progress',{}),study_position:lsGet('study_position',{week:1,day:1}),
-    study_answers:lsGet('study_answers',{}),senior_case_prog:lsGet('senior_case_prog',{}),skill_events:getSkillEvents(),
-    onboarding:onboarding||undefined,onboarding_complete:!!onboarding
-  };
-  const text=JSON.stringify(data,null,2);
-  // Файл
-  const blob=new Blob([text],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ipmax_'+IPMaxDate.localDateKey()+'.json';a.click();URL.revokeObjectURL(a.href);
-  // Буфер обмена
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>{}).catch(()=>{});}
-  else{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);}
-  alert('✅ Прогресс скопирован в буфер обмена и сохранён в файл!');
-}
-function importProgress(inp){
-  const file=inp.files[0];if(!file) return;
-  if(file.size>IMPORT_MAX_BYTES){alert('Ошибка: файл прогресса больше 2 МБ.');inp.value='';return;}
-  const reader=new FileReader();
-  reader.onload=e=>{try{importProgressText(e.target.result);}catch(err){alert('Ошибка: '+err.message);}};
-  reader.readAsText(file);inp.value='';
-}
-function importProgressText(text){
-  if(typeof text!=='string'||new Blob([text]).size>IMPORT_MAX_BYTES) throw new Error('данные прогресса больше 2 МБ.');
-  importProgressData(JSON.parse(text));
-}
-function pasteProgressFromClipboard(){
-  const manualPaste=()=>{const text=prompt('Вставьте JSON прогресса:');if(text){try{importProgressText(text);}catch(e){alert('Ошибка JSON: '+e.message);}}};
-  if(!navigator.clipboard||!navigator.clipboard.readText){manualPaste();return;}
-  navigator.clipboard.readText().then(text=>{try{importProgressText(text);}catch(e){alert('Ошибка JSON: '+e.message);}},manualPaste);
-}
-function isRecord(value){return !!value&&typeof value==='object'&&!Array.isArray(value);}
-function validateBoundedImportValue(value,path,depth,state){
-  state.nodes++;if(state.nodes>IMPORT_MAX_NODES) throw new Error('Слишком много значений в импорте.');
-  if(value===null||typeof value==='boolean') return;
-  if(typeof value==='number'){if(!Number.isFinite(value)) throw new Error('Некорректное число в '+path+'.');return;}
-  if(typeof value==='string'){if(value.length>20000) throw new Error('Слишком длинная строка в '+path+'.');return;}
-  if(depth>=IMPORT_MAX_DEPTH) throw new Error('Слишком глубокая структура в '+path+'.');
-  if(Array.isArray(value)){
-    if(value.length>5000) throw new Error('Слишком большой список в '+path+'.');
-    value.forEach((item,index)=>validateBoundedImportValue(item,path+'['+index+']',depth+1,state));return;
+// ═══ EXPORT / IMPORT ═══
+const progressIO=typeof IPMaxProgressIO!=='undefined'?IPMaxProgressIO.create({
+  version:APP_VERSION,now:()=>Date.now(),dateKey:()=>IPMaxDate.localDateKey(),
+  get:(key,fallback)=>lsGet(key,fallback),setMany:entries=>appStorage&&typeof appStorage.setMany==='function'?appStorage.setMany(entries):{ok:false},
+  getBaseQuestions:()=>BASE_QUESTIONS,getOnboardingProfile,getSkillEvents,getCoachJournal,getCoachControlSession,
+  normaliseProfile:normalizeOnboardingProfile,isSkillEvent:ProgressTracker.isSkillEvent,eventLimit:ProgressTracker.EVENT_LIMIT,
+  isJournalEntry:InterviewCoach.isJournalEntry,journalLimit:InterviewCoach.JOURNAL_LIMIT,
+  normaliseControlSession:IPMaxAICoach.normaliseControlSession,alert:message=>alert(message),prompt:message=>prompt(message),
+  onImported:()=>{
+    streak=lsGet('streak_best',0);buildTopicFilters();
+    document.getElementById('sb-counter').textContent='DevOps Edition · '+getAllQ().length+' вопросов';nav('home');
   }
-  if(!isRecord(value)) throw new Error('Недопустимое значение в '+path+'.');
-  const keys=Object.keys(value);if(keys.length>5000) throw new Error('Слишком много полей в '+path+'.');
-  keys.forEach(key=>{
-    if(['__proto__','prototype','constructor'].includes(key)) throw new Error('Недопустимое поле '+path+'.'+key+'.');
-    validateBoundedImportValue(value[key],path+'.'+key,depth+1,state);
-  });
-}
-function validateCustomQuestions(questions){
-  if(questions.length>1000) return false;
-  const ids=new Set(BASE_QUESTIONS.map(q=>q.id));
-  return questions.every(q=>{
-    if(!isRecord(q)||!Number.isSafeInteger(q.id)||q.id<1||ids.has(q.id)) return false;
-    ids.add(q.id);
-    return typeof q.topic==='string'&&q.topic.trim().length>0&&q.topic.length<=80&&
-      ['Junior','Middle','Senior'].includes(q.level)&&
-      typeof q.q==='string'&&q.q.trim().length>0&&q.q.length<=4000&&
-      Array.isArray(q.options)&&q.options.length>=2&&q.options.length<=6&&q.options.every(o=>typeof o==='string'&&o.trim().length>0&&o.length<=2000)&&
-      Number.isInteger(q.answer)&&q.answer>=0&&q.answer<q.options.length&&
-      (!('explanation' in q)||typeof q.explanation==='string')&&
-      (!('category' in q)||['definition','scenario','tradeoff','output'].includes(q.category));
-  });
-}
-function validateQuestionProgress(progress){
-  const numeric=['correct','wrong','lastSeen','ease','interval','repetitions','nextReviewAt'];
-  return Object.entries(progress).every(([id,item])=>/^\d+$/.test(id)&&isRecord(item)&&
-    numeric.every(key=>!(key in item)||(Number.isFinite(item[key])&&item[key]>=0))&&
-    (!('times' in item)||(Array.isArray(item.times)&&item.times.length<=100&&item.times.every(value=>Number.isFinite(value)&&value>=0)))&&
-    (!('lastSource' in item)||(typeof item.lastSource==='string'&&item.lastSource.length<=40)));
-}
-function validateHistory(history){
-  return history.length<=1000&&history.every(item=>isRecord(item)&&typeof item.date==='string'&&item.date.length<=100&&typeof item.topic==='string'&&item.topic.length<=80&&typeof item.correct==='boolean');
-}
-function validateProgressImport(data){
-  if(!isRecord(data)) throw new Error('Файл прогресса должен содержать JSON-объект.');
-  validateBoundedImportValue(data,'progress',0,{nodes:0});
-  const invalid=[];
-  IMPORT_RECORD_KEYS.forEach(key=>{if(key in data&&!isRecord(data[key])) invalid.push(key);});
-  IMPORT_ARRAY_KEYS.forEach(key=>{if(key in data&&!Array.isArray(data[key])) invalid.push(key);});
-  if('version' in data&&(typeof data.version!=='string'||data.version.length>40)) invalid.push('version');
-  if('streak_best' in data&&(!Number.isFinite(data.streak_best)||data.streak_best<0)) invalid.push('streak_best');
-  if('stats' in data&&isRecord(data.stats)&&(
-    ('total' in data.stats&&(!Number.isFinite(data.stats.total)||data.stats.total<0))||
-    ('correct' in data.stats&&(!Number.isFinite(data.stats.correct)||data.stats.correct<0))||
-    (Number.isFinite(data.stats.total)&&Number.isFinite(data.stats.correct)&&data.stats.correct>data.stats.total)
-  )) invalid.push('stats');
-  if('qprog' in data&&isRecord(data.qprog)&&!validateQuestionProgress(data.qprog)) invalid.push('qprog');
-  if('history' in data&&Array.isArray(data.history)&&!validateHistory(data.history)) invalid.push('history');
-  if('study_position' in data&&(!isRecord(data.study_position)||!Number.isInteger(data.study_position.week)||!Number.isInteger(data.study_position.day)||data.study_position.week<1||data.study_position.week>100||data.study_position.day<1||data.study_position.day>31)) invalid.push('study_position');
-  if('onboarding' in data&&!normalizeOnboardingProfile(data.onboarding)) invalid.push('onboarding');
-  if('onboarding_complete' in data&&typeof data.onboarding_complete!=='boolean') invalid.push('onboarding_complete');
-  if(Array.isArray(data.custom)&&!validateCustomQuestions(data.custom)) invalid.push('custom');
-  if(Array.isArray(data.skill_events)&&typeof ProgressTracker!=='undefined'&&!data.skill_events.every(ProgressTracker.isSkillEvent)) invalid.push('skill_events');
-  if(invalid.length) throw new Error('Некорректные поля: '+[...new Set(invalid)].join(', ')+'.');
-  return data;
-}
-function importProgressData(rawData){
-  const data=validateProgressImport(rawData);
-  if(!data.version){alert('⚠️ Старый формат без версии. Импортированы только проверенные поля.');}
-  const entries={};
-  IMPORT_RECORD_KEYS.forEach(key=>{if(key in data) entries[key]=data[key];});
-  IMPORT_ARRAY_KEYS.forEach(key=>{if(key in data) entries[key]=key==='skill_events'&&typeof ProgressTracker!=='undefined'?data[key].slice(-ProgressTracker.EVENT_LIMIT):data[key];});
-  if('streak_best' in data) entries.streak_best=data.streak_best;
-  if('study_position' in data) entries.study_position=data.study_position;
-  if('onboarding' in data) entries.onboarding=normalizeOnboardingProfile(data.onboarding);
-  if('onboarding_complete' in data) entries.onboarding_complete=data.onboarding_complete;
-  else if('onboarding' in data) entries.onboarding_complete=true;
-  const result=appStorage&&typeof appStorage.setMany==='function'?appStorage.setMany(entries):{ok:false};
-  if(!result.ok){
-    if(result.rollbackFailed&&result.rollbackFailed.length) throw new Error('Не удалось сохранить импорт и полностью восстановить прежний прогресс. Не закрывайте страницу и экспортируйте текущие данные.');
-    throw new Error('Не удалось сохранить импорт. Прежний прогресс восстановлен.');
-  }
-  streak=lsGet('streak_best',0);
-  buildTopicFilters();
-  document.getElementById('sb-counter').textContent='DevOps Edition · '+getAllQ().length+' вопросов';
-  alert('✅ Прогресс импортирован v'+(data.version||'?')+'!');
-  nav('home');
-}
+}):null;
+function requireProgressIO(){if(!progressIO) throw new Error('Модуль импорта и экспорта не загружен.');return progressIO;}
+function exportProgress(){return requireProgressIO().exportProgress();}
+function importProgress(input){return requireProgressIO().importProgress(input);}
+function importProgressText(text){return requireProgressIO().importProgressText(text);}
+function importProgressData(data){return requireProgressIO().importProgressData(data);}
+function validateProgressImport(data){return requireProgressIO().validateProgressImport(data);}
+function pasteProgressFromClipboard(){return requireProgressIO().pasteProgressFromClipboard();}
 
 // ═══ INIT ═══
 async function initApp(){
   await loadAllData();
+
+  if(appStorage&&typeof appStorage.migrate==='function'){
+    const migration=appStorage.migrate({curriculumVersion:STUDY_MAP&&STUDY_MAP.version||'5.1.0'});
+    if(!migration.ok) console.warn('Progress migration failed; existing data was preserved.',migration.error);
+    else if(migration.migrated) console.info('Progress storage migrated to curriculum '+migration.curriculumVersion+'.');
+  }
+
+  configureCoachUI();
 
   // Обновляем счётчик вопросов динамически
   document.getElementById('sb-counter').textContent = 'DevOps Edition · '+getAllQ().length+' вопросов';
@@ -1657,7 +1298,7 @@ document.addEventListener('keydown',function(e){
 
 // ═══ OFFLINE READINESS CHECK ═══
 async function checkOfflineReady(){
-  const files=['./','./index.html','./styles.css','./version.js','./storage.js','./progress.js','./coach.js','./app.js','./interview-prep-max.webmanifest'];
+  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','labs','tips','incidents','study_map','study_tests','senior_cases','best_practices'];
   tasks.forEach(t=>files.push('./tasks/'+t+'.json'));
   let ok=0,fail=0;const results=[];
@@ -1691,27 +1332,8 @@ function applyAppUpdate(){
 // Запуск
 initApp();
 
-function renderReadinessHome(){
-  const el=document.getElementById('daily-plan-card');if(!el) return;
-  const qprog=getQProg(),allQ=getAllQ();
-  const answered=allQ.filter(q=>{const p=qprog[q.id];return p&&(p.correct+p.wrong)>0;});
-  if(!answered.length) return;
-  const ok=answered.filter(q=>{const p=qprog[q.id];return p&&p.correct>p.wrong;});
-  const score=Math.round(ok.length/answered.length*100);
-  const tier=score>=80?'🟢':score>=50?'🟡':'🔴';
-  const c=document.getElementById('daily-plan-content');
-  if(!document.getElementById('home-readiness')){
-    const div=document.createElement('div');div.id='home-readiness';div.className='home-readiness-row';
-    div.innerHTML='<span>🎯 Готовность</span><span class="home-readiness-score">'+tier+' '+score+'%</span>';
-    c.appendChild(div);
-  }
-}
 function toggleMasteryGrid(){
-  const grid=document.getElementById('mastery-cards');
-  const btn=document.getElementById('toggle-mastery-btn');
-  if(!grid||!btn) return;
-  if(grid.style.display==='none'){grid.style.display='';btn.textContent='📋 Скрыть все темы ▲';}
-  else{grid.style.display='none';btn.textContent='📋 Все темы ▼';}
+  return requireHomeUI().toggleMasteryGrid();
 }
 
 // ═══ INCIDENT SIMULATION ═══

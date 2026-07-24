@@ -1,8 +1,13 @@
 {
-  "version": "4.0.0",
-  "title": "DevOps Plan v4 Middle+/Senior: Weeks 1-32 Study Map",
+  "version": "5.1.0",
+  "title": "Учебный план DevOps + AI v5.1: 32 недели",
   "profile": "devops",
   "language": "ru",
+  "sourceDocument": "devops_learning_plan_v5.1.md",
+  "status": "active",
+  "durationWeeks": 32,
+  "weeklyHours": "5-8",
+  "targetOutcome": "Готовность к собеседованиям Junior+/начального Middle, практическая база уровня Middle по отдельным темам и Senior-track мышление в учебных инцидентах.",
   "weeklyRhythm": {
     "monday": "Новая тема и базовая практика",
     "tuesday": "Углубление и работа с выводом команд",
@@ -31,6 +36,18 @@
       "goal": "Уверенно работать в файловой системе Linux, понимать права, владельцев, группы и типовые ошибки доступа.",
       "productionLayer": "Ошибки доступа, права директорий против прав файлов, безопасные изменения прав, диагностика Permission denied.",
       "artifact": "Мини-скрипт или чек-лист проверки доступа к конфигу сервиса.",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "объяснить абсолютный и относительный путь",
+        "прочитать `ls -la` и вычислить права",
+        "исправить доступ без `chmod 777`",
+        "запустить и объяснить `check_system.sh`"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "Prompt Engineering",
+        "result": "Prompt Engineering: 5 промптов для объяснения Linux-вывода без слепого копирования."
+      },
       "seniorChallenge": {
         "title": "Сервис не читает конфиг после изменения прав",
         "task": "По выводу ls -la и тексту ошибки определить минимальное безопасное исправление без chmod 777.",
@@ -198,6 +215,18 @@
       "goal": "Диагностировать доступность сервиса по слоям: DNS, TCP, TLS, HTTP, приложение.",
       "productionLayer": "Timeout, connection refused, HTTP 502/503, DNS failure, ICMP-блокировка, базовая CIDR-математика.",
       "artifact": "Дерево диагностики: сайт не открывается или API возвращает ошибку.",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "рассчитать `/26`: 64 адреса, 62 usable",
+        "объяснить отличие HEAD от GET",
+        "различить DNS, TCP и HTTP-сбой",
+        "запустить `network_check.sh` и прочитать коды возврата"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "HTTP/API для tool calling",
+        "result": "HTTP/API для tool calling: GET, HEAD, POST, headers, body, JSON."
+      },
       "seniorChallenge": {
         "title": "Сайт недоступен у части пользователей",
         "task": "Составить порядок проверок и объяснить, какие симптомы указывают на DNS, сеть, TLS или backend.",
@@ -371,6 +400,18 @@
       "goal": "Управлять процессами, понимать сигналы, читать логи systemd и безопасно работать по SSH.",
       "productionLayer": "Restart loop, failed unit, SIGTERM/SIGKILL/SIGTSTP, journalctl, SSH hardening.",
       "artifact": "Скрипт process_check.sh и runbook диагностики упавшего systemd-сервиса.",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "различить процесс, job, PID и PPID",
+        "объяснить, что `Ctrl+Z` посылает SIGTSTP",
+        "использовать `fg`, `bg`, `kill` осознанно",
+        "найти ошибку unit через `journalctl -u`"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "Фоновые сервисы для автоматизации",
+        "result": "Фоновые сервисы для автоматизации: безопасный запуск n8n/агента как сервиса."
+      },
       "seniorChallenge": {
         "title": "Backend падает каждые 30 секунд",
         "task": "По systemctl status и journalctl определить причину, предложить срочное восстановление и постоянное исправление.",
@@ -544,6 +585,18 @@
       "goal": "Работать с ветками, коммитами, конфликтами, pull request и безопасным откатом изменений.",
       "productionLayer": "Protected branches, revert vs reset, rebase conflicts, release tags, безопасный rollback кода.",
       "artifact": "Репозиторий с ветками, PR-процессом, решенным конфликтом и документированным rollback-сценарием.",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "создать ветку и осмысленный commit",
+        "разрешить учебный конфликт",
+        "выбрать `revert` для публичной истории",
+        "объяснить назначение protected branch"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "n8n/Make",
+        "result": "n8n/Make: webhook на событие Git и уведомление без изменения production."
+      },
       "seniorChallenge": {
         "title": "Плохой коммит попал в main",
         "task": "Выбрать между revert, reset, force push и rollback release; объяснить последствия для команды.",
@@ -718,6 +771,18 @@
       "goal": "Освоить тему: Bash-скрипты для DevOps на уровне Middle base с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "Exit codes, stderr/stdout, cron, idempotent scripts, lock files",
       "artifact": "health-check script с кодами возврата для мониторинга",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "использовать `$?` и собственные exit codes",
+        "разделять stdout и stderr",
+        "обработать пустой ввод и ошибку команды",
+        "повторный запуск не портит данные"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "AI как рецензент Bash",
+        "result": "AI как рецензент Bash: объяснение диффа и поиск рисков, решение принимает человек."
+      },
       "seniorChallenge": {
         "title": "Health-check молчит при падении сервиса",
         "task": "Разобрать production-ситуацию: Health-check молчит при падении сервиса. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -884,6 +949,23 @@
       "goal": "Освоить тему: Docker basics в production-ключе на уровне Middle с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "Logs, exec, inspect, restart policy, resource limits",
       "artifact": "контейнер приложения с logs/exec/inspect и restart policy",
+      "curriculumVersion": "5.1.0",
+      "prerequisites": [
+        "Завершены Git и Bash",
+        "Понятны процессы, порты и переменные окружения",
+        "`health_check.sh` возвращает корректные exit codes"
+      ],
+      "completionCriteria": [
+        "объяснить image и container",
+        "найти причину через `docker logs` и `inspect`",
+        "ограничить ресурсы контейнера",
+        "проверить healthcheck"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "Анатомия AI-агента",
+        "result": "Анатомия AI-агента; контейнеризация простого webhook без LLM."
+      },
       "seniorChallenge": {
         "title": "Контейнер стартует и сразу падает",
         "task": "Разобрать production-ситуацию: Контейнер стартует и сразу падает. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -1050,6 +1132,18 @@
       "goal": "Освоить тему: Dockerfile и сборка образов на уровне Middle с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "Размер образа, cache, non-root user, .dockerignore, secrets at build time",
       "artifact": "multi-stage Dockerfile с non-root пользователем и .dockerignore",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "объяснить каждый слой Dockerfile",
+        "использовать multi-stage там, где это оправдано",
+        "запускать приложение от non-root",
+        "не помещать секреты в image layers"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "Codex CLI",
+        "result": "Codex CLI: сгенерировать вариант Dockerfile, вручную проверить каждую строку."
+      },
       "seniorChallenge": {
         "title": "Образ слишком большой и запускается от root",
         "task": "Разобрать production-ситуацию: Образ слишком большой и запускается от root. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -1217,6 +1311,18 @@
       "goal": "Освоить тему: Docker Compose, reverse proxy, TLS basics на уровне Middle с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "depends_on limitations, healthcheck, networks, env/secrets, 502 upstream",
       "artifact": "compose-стенд app + db + nginx с healthcheck и диагностикой 502",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "объяснить DNS-имена сервисов Compose",
+        "отличить порядок запуска от готовности",
+        "проверить backend из сети Compose",
+        "не хранить реальные секреты в Git"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "n8n status workflow",
+        "result": "n8n status workflow: webhook → проверка сервисов → структурированный отчёт."
+      },
       "seniorChallenge": {
         "title": "Nginx отдаёт 502 в Compose-сети",
         "task": "Разобрать production-ситуацию: Nginx отдаёт 502 в Compose-сети. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -1385,6 +1491,18 @@
       "goal": "Освоить тему: CI/CD: основы pipeline на уровне Middle с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "GitLab CI stages, cache vs artifacts, variables, manual jobs",
       "artifact": "pipeline lint/test/build/artifact",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "объяснить каждую stage",
+        "различить cache и artifact",
+        "передавать один проверенный artifact дальше и публиковать неизменяемый image",
+        "pipeline падает при провале обязательного теста"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "AI-проверка конфигурации pipeline как необязательный non-blocking job.",
+        "result": "AI-проверка конфигурации pipeline как необязательный non-blocking job."
+      },
       "seniorChallenge": {
         "title": "Pipeline деплоит старый artifact",
         "task": "Разобрать production-ситуацию: Pipeline деплоит старый artifact. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -1553,6 +1671,18 @@
       "goal": "Освоить тему: CI/CD: deployment, rollback, environments на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "Environments, protected variables, release tags, rollback strategy",
       "artifact": "deploy с manual approval и rollback-путём",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "использовать неизменяемый тег релиза",
+        "отделить staging от production и объяснить stages/agent/credentials в Jenkinsfile",
+        "выполнить smoke-test после deploy",
+        "реально проверить rollback"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "AI-анализ лога падения с обязательной ручной проверкой выводов.",
+        "result": "AI-анализ лога падения с обязательной ручной проверкой выводов."
+      },
       "seniorChallenge": {
         "title": "После релиза выросли 500, нужен rollback за 5 минут",
         "task": "Разобрать production-ситуацию: После релиза выросли 500, нужен rollback за 5 минут. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -1720,6 +1850,31 @@
       "goal": "Освоить тему: Terraform basics на уровне Middle с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "plan/apply, provider, variables, outputs, state hygiene",
       "artifact": "простая инфраструктура в коде с variables/outputs/state",
+      "curriculumVersion": "5.1.0",
+      "prerequisites": [
+        "Docker/Compose-стек запускается по README",
+        "CI создаёт проверенный artifact",
+        "Rollback релиза реально проверен"
+      ],
+      "completionCriteria": [
+        "прочитать plan до apply и сравнить результат Terraform/OpenTofu",
+        "использовать variables и outputs",
+        "не коммитить state и секреты",
+        "выполнить destroy учебных ресурсов"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "Ollama 1.5B как локальный сервис",
+        "result": "Ollama 1.5B как локальный сервис; Terraform-шаблон облачного инстанса без обязательного apply."
+      },
+      "technologyStatus": {
+        "preferred": [
+          "Terraform",
+          "OpenTofu"
+        ],
+        "legacy": [],
+        "note": "Terraform и OpenTofu изучаются вместе на совместимом HCL-фундаменте."
+      },
       "seniorChallenge": {
         "title": "Terraform plan удаляет ресурс перед apply",
         "task": "Разобрать production-ситуацию: Terraform plan удаляет ресурс перед apply. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -1885,6 +2040,18 @@
       "goal": "Освоить тему: Terraform modules, remote state, drift на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "State lock, drift detection, import, provider pinning, workspaces",
       "artifact": "module + remote state + drift check",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "объяснить remote state и locking в Yandex Object Storage",
+        "обнаружить drift через plan",
+        "создать учебную VM, проверить её и выполнить `destroy` без оставшихся платных ресурсов",
+        "не снимать lock без проверки активного apply"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "Qdrant в Docker как отдельный сервис",
+        "result": "Qdrant в Docker как отдельный сервис; IaC описывает окружение, не бизнес-логику RAG."
+      },
       "seniorChallenge": {
         "title": "Terraform apply заблокирован после падения CI",
         "task": "Разобрать production-ситуацию: Terraform apply заблокирован после падения CI. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -2051,6 +2218,18 @@
       "goal": "Освоить тему: Ansible basics на уровне Middle с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "become, idempotency, handlers, check mode, templates",
       "artifact": "inventory + playbook с handlers и check mode",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "запустить `--check` там, где поддерживается",
+        "использовать handler только при изменении",
+        "шаблонизировать конфиг",
+        "второй запуск даёт `changed=0` где ожидается"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "n8n workflow с условиями",
+        "result": "n8n workflow с условиями; Ansible устанавливает зависимости и сервис."
+      },
       "seniorChallenge": {
         "title": "Playbook каждый раз показывает changed",
         "task": "Разобрать production-ситуацию: Playbook каждый раз показывает changed. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -2218,6 +2397,18 @@
       "goal": "Освоить тему: Ansible roles, vault, zero-downtime basics на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "rolling deploy, serial, handlers, vault, inventory by environment",
       "artifact": "role + vault + rolling update",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "роль имеет defaults/tasks/handlers/templates",
+        "секрет отсутствует в открытом Git",
+        "`serial` ограничивает одновременный rollout",
+        "rollback описан и проверяем"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "Роль развёртывания Ollama 1.5B или n8n",
+        "result": "Роль развёртывания Ollama 1.5B или n8n; секреты только через Vault."
+      },
       "seniorChallenge": {
         "title": "Обновить nginx без одновременной остановки всех серверов",
         "task": "Разобрать production-ситуацию: Обновить nginx без одновременной остановки всех серверов. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -2386,6 +2577,23 @@
       "goal": "Освоить тему: PostgreSQL для DevOps: база на уровне Middle с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "pg_dump, pg_restore, max_connections, logs, slow queries",
       "artifact": "установка PostgreSQL, backup/restore, роли и подключения",
+      "curriculumVersion": "5.1.0",
+      "prerequisites": [
+        "Понятны volumes и persistent data",
+        "Секреты не хранятся в Git",
+        "Есть опыт чтения логов контейнера"
+      ],
+      "completionCriteria": [
+        "создать минимально привилегированную роль",
+        "сделать backup",
+        "восстановить его в отдельную БД",
+        "найти ошибки подключения в логах"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "pgvector",
+        "result": "pgvector: назначение и ограничения без построения полного RAG."
+      },
       "seniorChallenge": {
         "title": "PostgreSQL: too many clients",
         "task": "Разобрать production-ситуацию: PostgreSQL: too many clients. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -2554,6 +2762,18 @@
       "goal": "Освоить тему: PostgreSQL: WAL, PITR, replication basics на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "RPO/RTO, replication lag, backup validation, restore drills",
       "artifact": "backup strategy с RPO/RTO и restore drill",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "объяснить RPO и RTO",
+        "показать, что backup читается",
+        "оценить replication lag",
+        "задокументировать restore drill"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "RAG на pgvector",
+        "result": "RAG на pgvector: документ → embedding → поиск → ответ с цитатой; маленький набор данных."
+      },
       "seniorChallenge": {
         "title": "Нужно восстановиться на момент до ошибочного DELETE",
         "task": "Разобрать production-ситуацию: Нужно восстановиться на момент до ошибочного DELETE. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -2720,6 +2940,24 @@
       "goal": "Освоить тему: Kubernetes basics на уровне Middle с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "rollout, rollback, logs, describe, events",
       "artifact": "Deployment/Service/ConfigMap/Secret с rollout/rollback",
+      "curriculumVersion": "5.1.0",
+      "prerequisites": [
+        "Освоены Docker и Compose",
+        "Понятны DNS, reverse proxy и TLS",
+        "CI/CD собирает неизменяемый image",
+        "Понятны CPU/RAM limits и healthcheck"
+      ],
+      "completionCriteria": [
+        "прочитать `kubectl describe` и events",
+        "проверить logs текущего и прошлого контейнера",
+        "выполнить rollout/rollback",
+        "не хранить секрет в открытом YAML"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "AI-дополнение недели 17",
+        "result": "Развернуть простой AI/webhook-сервис как Deployment, без тяжёлой модели в кластере."
+      },
       "seniorChallenge": {
         "title": "Pod CrashLoopBackOff после релиза",
         "task": "Разобрать production-ситуацию: Pod CrashLoopBackOff после релиза. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -2887,6 +3125,28 @@
       "goal": "Освоить тему: Kubernetes networking and ingress на уровне Middle с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "CoreDNS, NetworkPolicy basics, ingress 502/404/TLS",
       "artifact": "Service + Ingress + диагностика CoreDNS",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "сопоставить selector и labels",
+        "проверить endpoints",
+        "различить 404 маршрута и 502 backend; объяснить отличие Ingress от Gateway API",
+        "описать поток DNS → Gateway → HTTPRoute → Service → Pod"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "Сервис агента доступен через Gateway API",
+        "result": "Сервис агента доступен через Gateway API; tool endpoints ограничены NetworkPolicy."
+      },
+      "technologyStatus": {
+        "preferred": [
+          "Gateway API"
+        ],
+        "legacy": [
+          "Ingress",
+          "ingress-nginx"
+        ],
+        "note": "Ingress изучается для существующих систем; ingress-nginx не используется в новой production-лаборатории после завершения поддержки в марте 2026."
+      },
       "seniorChallenge": {
         "title": "Service есть, но Ingress отдаёт 502",
         "task": "Разобрать production-ситуацию: Service есть, но Ingress отдаёт 502. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -3055,6 +3315,25 @@
       "goal": "Освоить тему: Kubernetes resources and reliability на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "readiness/liveness/startup probes, OOMKilled, evictions",
       "artifact": "requests/limits/probes/HPA basics",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "выбрать правильный тип probe",
+        "объяснить OOMKilled",
+        "задать реалистичные requests/limits",
+        "выполнить Helm upgrade и rollback без 503"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "Метрики AI-сервиса",
+        "result": "Метрики AI-сервиса: latency, errors и ограничение ресурсов; token usage только при API-модели."
+      },
+      "technologyStatus": {
+        "preferred": [
+          "Helm"
+        ],
+        "legacy": [],
+        "note": "Обязательны chart, values, upgrade, history и rollback."
+      },
       "seniorChallenge": {
         "title": "Rolling update даёт 503 из-за readinessProbe",
         "task": "Разобрать production-ситуацию: Rolling update даёт 503 из-за readinessProbe. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -3222,6 +3501,28 @@
       "goal": "Освоить тему: Monitoring: Prometheus and Grafana на уровне Middle с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "Метрики CPU/RAM/HTTP, cardinality, scrape failures",
       "artifact": "dashboard с CPU/RAM/HTTP метриками",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "проверить target в Prometheus и объяснить место VictoriaMetrics",
+        "не создавать метки с высокой cardinality",
+        "построить рабочий dashboard",
+        "связать метрику с симптомом и восстановить изменённый вручную ресурс через Argo CD"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "Мониторинг AI-компонента",
+        "result": "Мониторинг AI-компонента: latency, error rate, request count; без раскрытия prompt/секретов."
+      },
+      "technologyStatus": {
+        "preferred": [
+          "Prometheus",
+          "Grafana",
+          "VictoriaMetrics",
+          "Argo CD"
+        ],
+        "legacy": [],
+        "note": "Argo CD обязателен для sync, drift и self-heal; VictoriaMetrics — российски релевантная альтернатива backend метрик."
+      },
       "seniorChallenge": {
         "title": "Метрика пропала после релиза",
         "task": "Разобрать production-ситуацию: Метрика пропала после релиза. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -3387,6 +3688,28 @@
       "goal": "Освоить тему: Logging: Loki или ELK/OpenSearch на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "structured logs, log retention, correlation id, noisy logs",
       "artifact": "централизованный сбор и поиск логов",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "найти запрос по correlation ID",
+        "исключить секреты из логов",
+        "настроить разумный retention и объяснить миграцию с Promtail на Alloy",
+        "подтвердить вывод исходными строками логов"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "Агент-суммаризатор логов только на очищенных данных",
+        "result": "Агент-суммаризатор логов только на очищенных данных; итог всегда содержит ссылки на исходные события."
+      },
+      "technologyStatus": {
+        "preferred": [
+          "Grafana Alloy",
+          "Loki"
+        ],
+        "legacy": [
+          "Promtail"
+        ],
+        "note": "Grafana Alloy — основной сборщик для новой Loki-лаборатории; Promtail завершил жизненный цикл 2 марта 2026."
+      },
       "seniorChallenge": {
         "title": "500 ошибки есть, метрики молчат",
         "task": "Разобрать production-ситуацию: 500 ошибки есть, метрики молчат. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -3552,6 +3875,25 @@
       "goal": "Освоить тему: Alerting, SLO, incident response на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "Alert fatigue, severity, escalation, SLO/SLI, error budget",
       "artifact": "алерты, severity, incident report",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "алерт сообщает симптом и действие",
+        "найти один запрос по trace ID в traces и связанных логах; различить root cause и symptom",
+        "назначить severity",
+        "написать проверяемые action items"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "AI-дополнение недели 22",
+        "result": "AI-помощник формирует черновик timeline, но не выполняет remediation без человека."
+      },
+      "technologyStatus": {
+        "preferred": [
+          "OpenTelemetry"
+        ],
+        "legacy": [],
+        "note": "Обязательна связка traces, metrics и logs."
+      },
       "seniorChallenge": {
         "title": "Алерты шумят, реальный инцидент пропущен",
         "task": "Разобрать production-ситуацию: Алерты шумят, реальный инцидент пропущен. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -3718,6 +4060,18 @@
       "goal": "Освоить тему: Security baseline на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "SSH hardening, secrets, least privilege, image scanning, RBAC",
       "artifact": "SSH hardening, secrets, least privilege",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "удалить секрет из текущей конфигурации",
+        "ротировать скомпрометированный ключ",
+        "применить least privilege",
+        "прогнать image/config scan, создать SBOM, подписать image и проверить подпись"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "Vault для API-ключей AI",
+        "result": "Vault для API-ключей AI; model gateway; запрет autonomous production access."
+      },
       "seniorChallenge": {
         "title": "Секрет попал в pipeline logs",
         "task": "Разобрать production-ситуацию: Секрет попал в pipeline logs. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -3887,6 +4241,18 @@
       "goal": "Освоить тему: Capstone v1: production-like service на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
       "productionLayer": "Deploy, rollback, backup, healthcheck, alerting",
       "artifact": "сервис с deploy, rollback, backup, healthcheck, alerting",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "сервис запускается по README",
+        "rollback реально работает",
+        "backup реально восстанавливается",
+        "есть минимум 3 алерта и postmortem"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "Опциональный AI-компонент",
+        "result": "Опциональный AI-компонент: анализ статуса или логов с безопасными границами."
+      },
       "seniorChallenge": {
         "title": "Game day: сервис сломан, восстановить по runbook",
         "task": "Разобрать production-ситуацию: Game day: сервис сломан, восстановить по runbook. Собрать evidence, найти root cause, предложить mitigation, fix и prevention.",
@@ -4056,6 +4422,25 @@
       "goal": "Освоить тему: Production networking на уровне Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
       "productionLayer": "L3/L4/L7, HAProxy, Nginx, certificates, packet path",
       "artifact": "packet path, firewall, VPN, TLS chain",
+      "curriculumVersion": "5.1.0",
+      "prerequisites": [
+        "Capstone v1 разворачивается по README",
+        "Rollback проверен",
+        "Backup восстановлен в отдельное окружение",
+        "Работают мониторинг, логи и минимум три алерта",
+        "Написаны runbook и postmortem"
+      ],
+      "completionCriteria": [
+        "нарисовать packet path",
+        "различить routing, NAT и firewall",
+        "проверить MTU/TLS гипотезы",
+        "зафиксировать безопасный rollback правил"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "AI-дополнение недели 25",
+        "result": "AI строит черновик дерева диагностики из обезличенных фактов, команды выбирает инженер."
+      },
       "seniorChallenge": {
         "title": "Часть пользователей видит timeout, часть 200 OK",
         "task": "Разобрать production-ситуацию: Часть пользователей видит timeout, часть 200 OK. Собрать evidence, оценить impact, найти root cause, предложить mitigation, fix, rollback и prevention.",
@@ -4224,6 +4609,18 @@
       "goal": "Освоить тему: Load balancing and HA edge на уровне Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
       "productionLayer": "Keepalived, VRRP, active/passive, failover testing",
       "artifact": "HAProxy/Nginx + health checks + failover test",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "обосновать L4 или L7",
+        "проверить health checks",
+        "симулировать отказ одного узла",
+        "измерить время переключения"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "AI-дополнение недели 26",
+        "result": "AI сравнивает логи балансировщика до/после отказа, вывод подтверждается метриками."
+      },
       "seniorChallenge": {
         "title": "Выбор L4/L7 балансировки и active/passive",
         "task": "Разобрать production-ситуацию: Выбор L4/L7 балансировки и active/passive. Собрать evidence, оценить impact, найти root cause, предложить mitigation, fix, rollback и prevention.",
@@ -4392,6 +4789,18 @@
       "goal": "Освоить тему: PostgreSQL production на уровне Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
       "productionLayer": "WAL archive, streaming replication, PITR, failover limits",
       "artifact": "WAL archive + replication + restore drill",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "восстановить БД в изолированное окружение",
+        "измерить фактический RPO/RTO",
+        "оценить replication lag",
+        "описать ограничения автоматического failover"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "AI суммаризирует lag/ошибки, но не инициирует failover.",
+        "result": "AI суммаризирует lag/ошибки, но не инициирует failover."
+      },
       "seniorChallenge": {
         "title": "Restore drill показал, что backup не восстанавливается",
         "task": "Разобрать production-ситуацию: Restore drill показал, что backup не восстанавливается. Собрать evidence, оценить impact, найти root cause, предложить mitigation, fix, rollback и prevention.",
@@ -4558,6 +4967,18 @@
       "goal": "Освоить тему: PostgreSQL migration and performance на уровне Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
       "productionLayer": "locks, long transactions, indexes, slow queries, vacuum basics",
       "artifact": "план миграции без долгих lock и диагностика slow queries",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "найти blocker и blocked session",
+        "оценить риск DDL",
+        "подготовить совместимый rollout",
+        "иметь проверяемый rollback"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "AI-рецензия плана миграции",
+        "result": "AI-рецензия плана миграции; финальное решение по блокировкам принимает инженер."
+      },
       "seniorChallenge": {
         "title": "Миграция заблокировала таблицу в рабочее время",
         "task": "Разобрать production-ситуацию: Миграция заблокировала таблицу в рабочее время. Собрать evidence, оценить impact, найти root cause, предложить mitigation, fix, rollback и prevention.",
@@ -4723,6 +5144,18 @@
       "goal": "Освоить тему: Self-managed Kubernetes architecture на уровне Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
       "productionLayer": "etcd backup, kubelet, API server, CNI, cluster upgrade plan",
       "artifact": "план обновления control plane с etcd backup",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "объяснить роль etcd и quorum",
+        "создать/проверить snapshot где возможно",
+        "описать порядок upgrade",
+        "предусмотреть rollback и контроль здоровья"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "AI-дополнение недели 29",
+        "result": "AI помогает сопоставить симптомы компонентам control plane без автоматических изменений."
+      },
       "seniorChallenge": {
         "title": "План обновления кластера с rollback",
         "task": "Разобрать production-ситуацию: План обновления кластера с rollback. Собрать evidence, оценить impact, найти root cause, предложить mitigation, fix, rollback и prevention.",
@@ -4889,6 +5322,18 @@
       "goal": "Освоить тему: Kubernetes storage and HA workloads на уровне Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
       "productionLayer": "StatefulSet, storage failure, backup for volumes",
       "artifact": "PV/PVC/CSI/StatefulSet backup considerations",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "объяснить PV, PVC и StorageClass",
+        "проверить сохранность после пересоздания Pod",
+        "описать backup тома",
+        "обосновать Longhorn против Ceph"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "AI формирует runbook проверки данных, но не заменяет backup.",
+        "result": "AI формирует runbook проверки данных, но не заменяет backup."
+      },
       "seniorChallenge": {
         "title": "Pod переехал на другую node и потерял данные",
         "task": "Разобрать production-ситуацию: Pod переехал на другую node и потерял данные. Собрать evidence, оценить impact, найти root cause, предложить mitigation, fix, rollback и prevention.",
@@ -5055,6 +5500,18 @@
       "goal": "Освоить тему: Observability and incident management на уровне Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
       "productionLayer": "MTTR, MTTD, on-call, severity, blameless postmortem",
       "artifact": "incident timeline, runbook, postmortem, action items",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "собрать evidence из метрик и логов",
+        "отделить mitigation от permanent fix",
+        "посчитать MTTD/MTTR",
+        "назначить владельцев и сроки action items"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "AI собирает черновик timeline и action items, человек проверяет причинность.",
+        "result": "AI собирает черновик timeline и action items, человек проверяет причинность."
+      },
       "seniorChallenge": {
         "title": "Полный postmortem production-инцидента",
         "task": "Разобрать production-ситуацию: Полный postmortem production-инцидента. Собрать evidence, оценить impact, найти root cause, предложить mitigation, fix, rollback и prevention.",
@@ -5224,6 +5681,18 @@
       "goal": "Освоить тему: Production capstone на уровне Middle+/Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
       "productionLayer": "HA, backup, restore, monitoring, security, rollback, incident drill",
       "artifact": "финальный production-like проект и защита",
+      "curriculumVersion": "5.1.0",
+      "completionCriteria": [
+        "развернуть систему по документации",
+        "выполнить rollback",
+        "восстановить данные из backup",
+        "пройти mock interview и объяснить trade-offs"
+      ],
+      "aiTrack": {
+        "optional": true,
+        "title": "AI DevOps Portfolio",
+        "result": "AI DevOps Portfolio: безопасный агент как часть системы, наблюдаемость и ограничения доступа."
+      },
       "seniorChallenge": {
         "title": "Финальный сценарий: сервис упал, БД деградирует",
         "task": "Разобрать production-ситуацию: Финальный сценарий: сервис упал, БД деградирует. Собрать evidence, оценить impact, найти root cause, предложить mitigation, fix, rollback и prevention.",

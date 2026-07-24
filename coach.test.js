@@ -28,7 +28,10 @@ test('increases session volume before the interview and counts repetitions', () 
     profile: { role: 'Cloud', level: 'Senior', date: '2026-07-25' }, now: localNoon
   });
   assert.equal(plan.daysUntil, 4);
-  assert.equal(plan.sessionSize, 20);
+  assert.equal(plan.baseSessionSize, 20);
+  assert.equal(plan.sessionSize, 25);
+  assert.equal(plan.weeklyReview.status, 'behind');
+  assert.equal(plan.weeklyReview.extraQuestions, 5);
   assert.equal(plan.dueCount, 1);
   assert.equal(plan.targetAccuracy, 80);
 });
@@ -57,4 +60,60 @@ test('includes practical trainer signals and can recommend a trainer-only skill'
   const git = plan.topicStats.find(stat => stat.topic === 'Git');
   assert.equal(git.practiceScore, 100);
   assert.deepEqual(git.action, { type: 'trainer', page: 'git' });
+});
+
+test('summarizes weekly activity and compares it with the previous week', () => {
+  const now = Date.UTC(2026, 6, 21, 12);
+  const review = coach.buildWeeklyReview({
+    now,
+    plan: { daysUntil: 30, sessionSize: 10 },
+    skillEvents: [
+      { at: now - 86400000, topic: 'Linux', score: 1, possible: 1 },
+      { at: now - 3 * 86400000, topic: 'Linux', score: 0.5, possible: 1 },
+      { at: now - 10 * 86400000, topic: 'Linux', score: 0, possible: 1 }
+    ]
+  });
+  assert.equal(review.recent.attempts, 2);
+  assert.equal(review.recent.activeDays, 2);
+  assert.equal(review.recent.accuracy, 75);
+  assert.equal(review.accuracyDelta, 75);
+  assert.equal(review.status, 'building');
+  assert.equal(review.adjustedSessionSize, 10);
+});
+
+test('builds a unique adaptive control session across priority topics', () => {
+  const session = coach.buildControlSession({
+    questions: [
+      { id: 1, topic: 'Linux', level: 'Middle' },
+      { id: 2, topic: 'Linux', level: 'Middle' },
+      { id: 3, topic: 'Terraform', level: 'Middle' },
+      { id: 4, topic: 'Terraform', level: 'Middle' },
+      { id: 5, topic: 'Cloud', level: 'Middle' }
+    ],
+    progress: { 1: { correct: 0, wrong: 2 }, 3: { correct: 0, wrong: 1 } },
+    plan: {
+      targetLevels: ['Middle'],
+      topicStats: [
+        { topic: 'Linux', action: { type: 'questions' } },
+        { topic: 'Terraform', action: { type: 'questions' } }
+      ]
+    },
+    size: 4,
+    now: Date.UTC(2026, 6, 21)
+  });
+  assert.equal(session.size, 4);
+  assert.equal(new Set(session.questionIds.map(String)).size, 4);
+  assert.ok(session.topics.includes('Linux'));
+  assert.ok(session.topics.includes('Terraform'));
+  assert.ok(session.questionIds.includes(1));
+  assert.ok(session.questionIds.includes(3));
+});
+
+test('normalizes journal entries and rejects incomplete notes', () => {
+  const now = Date.UTC(2026, 6, 21);
+  const notes = coach.appendJournalEntry([], { topic: 'Linux', note: 'Повторить диагностику DNS' }, now);
+  assert.equal(notes.length, 1);
+  assert.equal(notes[0].topic, 'Linux');
+  assert.equal(coach.isJournalEntry(notes[0]), true);
+  assert.deepEqual(coach.appendJournalEntry(notes, { topic: '', note: '' }, now + 1), notes);
 });

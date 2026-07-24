@@ -15,6 +15,9 @@ const KNOWN_CATEGORIES = ['definition', 'scenario', 'tradeoff', 'output'];
 const KNOWN_STUDY_TYPES = ['incident', 'diagnostic', 'tradeoff', 'rollback', 'postmortem'];
 const KNOWN_TRAINERS = ['exam', 'analytics', 'subnet', 'ts', 'cmd', 'labs', 'code', 'ansible', 'dockerfile', 'k8s', 'ports', 'git', 'regex', 'tips'];
 const APP_VERSION = '12.0.0';
+const CURRICULUM_VERSION = '5.1.0';
+const STUDY_PREREQUISITE_WEEKS = new Set([6, 11, 15, 17, 25]);
+const STUDY_TECHNOLOGY_STATUS_WEEKS = new Set([11, 18, 19, 20, 21, 22]);
 
 let errors = 0, warnings = 0;
 
@@ -321,10 +324,41 @@ if (seniorCases) {
 
 if (studyMap) {
   const weeks = Array.isArray(studyMap.weeks) ? studyMap.weeks : [];
+  if (studyMap.version !== CURRICULUM_VERSION) err(`study_map.json: expected curriculum ${CURRICULUM_VERSION}`);
+  if (weeks.length !== 32) err(`study_map.json: expected 32 weeks, found ${weeks.length}`);
   if (!Array.isArray(studyMap.weeks)) err('study_map.json: нет массива weeks');
   ok(`Загружено ${weeks.length} учебных недель`);
+  const weekNumbers = new Set();
   weeks.forEach(w => {
     const prefix = `StudyWeek#${w.week || '?'}`;
+    if (Number.isInteger(w.week)) {
+      if (weekNumbers.has(w.week)) err(`${prefix}: duplicate week number`);
+      weekNumbers.add(w.week);
+    }
+    if (w.curriculumVersion !== studyMap.version) err(`${prefix}: curriculumVersion must match study_map version`);
+    if (typeof w.artifact !== 'string' || !w.artifact.trim()) err(`${prefix}: artifact must be a non-empty string`);
+    if (!Array.isArray(w.completionCriteria) || w.completionCriteria.length !== 4 ||
+      w.completionCriteria.some(item => typeof item !== 'string' || !item.trim())) {
+      err(`${prefix}: completionCriteria must contain exactly four non-empty items`);
+    }
+    if (!w.aiTrack || typeof w.aiTrack !== 'object' || Array.isArray(w.aiTrack) || w.aiTrack.optional !== true ||
+      typeof w.aiTrack.title !== 'string' || !w.aiTrack.title.trim() ||
+      typeof w.aiTrack.result !== 'string' || !w.aiTrack.result.trim()) {
+      err(`${prefix}: aiTrack must define optional=true, title and result`);
+    }
+    if (STUDY_PREREQUISITE_WEEKS.has(w.week) && (!Array.isArray(w.prerequisites) || w.prerequisites.length === 0)) {
+      err(`${prefix}: prerequisites are required before this curriculum block`);
+    }
+    if (w.prerequisites && (!Array.isArray(w.prerequisites) || w.prerequisites.some(item => typeof item !== 'string' || !item.trim()))) {
+      err(`${prefix}: prerequisites must be an array of non-empty strings`);
+    }
+    if (STUDY_TECHNOLOGY_STATUS_WEEKS.has(w.week) && !w.technologyStatus) {
+      err(`${prefix}: technologyStatus is required for fast-changing tools`);
+    }
+    if (w.technologyStatus && (
+      !Array.isArray(w.technologyStatus.preferred) || w.technologyStatus.preferred.length === 0 ||
+      !Array.isArray(w.technologyStatus.legacy) || typeof w.technologyStatus.note !== 'string' || !w.technologyStatus.note.trim()
+    )) err(`${prefix}: technologyStatus must define preferred, legacy and note`);
     if (!w.week) err(`${prefix}: нет week`);
     if (!w.title) err(`${prefix}: нет title`);
     if (!Array.isArray(w.days)) err(`${prefix}: days должен быть массивом`);
@@ -347,6 +381,9 @@ if (studyMap) {
       filters.topic.forEach(t => { if (!KNOWN_TOPICS.includes(t)) warn(`${prefix}: questionFilters.topic неизвестная тема "${t}"`); });
     }
   });
+  for (let week = 1; week <= 32; week++) {
+    if (!weekNumbers.has(week)) err(`study_map.json: missing week ${week}`);
+  }
 }
 
 if (studyTests) {
