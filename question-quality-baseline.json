@@ -8,22 +8,16 @@
     186
   ],
   "issueBudget": {
-    "length-cue": 60,
+    "length-cue": 54,
     "question-echo": 1,
-    "absolute-distractor": 51,
+    "absolute-distractor": 44,
     "duplicate-question": 2
   },
   "topics": {
-    "Terraform": {
-      "length-cue": 1,
-      "question-echo": 0,
-      "absolute-distractor": 10,
-      "duplicate-question": 1
-    },
     "Linux": {
-      "length-cue": 20,
+      "length-cue": 15,
       "question-echo": 0,
-      "absolute-distractor": 19,
+      "absolute-distractor": 17,
       "duplicate-question": 0
     },
     "Сети": {
@@ -38,6 +32,12 @@
       "absolute-distractor": 13,
       "duplicate-question": 0
     },
+    "Terraform": {
+      "length-cue": 0,
+      "question-echo": 0,
+      "absolute-distractor": 5,
+      "duplicate-question": 1
+    },
     "CI/CD": {
       "length-cue": 0,
       "question-echo": 0,
@@ -47,21 +47,21 @@
   },
   "levels": {
     "Middle": {
-      "length-cue": 23,
+      "length-cue": 21,
       "question-echo": 0,
-      "absolute-distractor": 15,
+      "absolute-distractor": 12,
       "duplicate-question": 0
     },
     "Senior": {
       "length-cue": 25,
       "question-echo": 1,
-      "absolute-distractor": 29,
+      "absolute-distractor": 27,
       "duplicate-question": 1
     },
     "Junior": {
-      "length-cue": 12,
+      "length-cue": 8,
       "question-echo": 0,
-      "absolute-distractor": 7,
+      "absolute-distractor": 5,
       "duplicate-question": 1
     }
   }
