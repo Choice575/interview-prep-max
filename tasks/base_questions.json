@@ -1486,57 +1486,57 @@
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Как обработать 100 однотипных сущностей?",
+    "q": "Как применить один Ansible task к набору однотипных сущностей?",
     "options": [
-      "Только shell script",
-      "Создать 100 playbook",
-      "Использовать loop",
-      "Нельзя"
+      "Сгенерировать shell script с отдельной командой для элемента и не использовать module results",
+      "Создать отдельный playbook для элемента и запускать файлы последовательно через controller",
+      "Передать список в loop, обращаться к текущему item и использовать подходящий idempotent module",
+      "Скопировать task много раз, чтобы каждый экземпляр имел собственное имя и changed status"
     ],
     "answer": 2,
-    "explanation": "Циклы — стандартный подход для однотипных задач.",
+    "explanation": "loop повторяет task по данным и предоставляет item или заданную loop_var. Для сложных наборов используют словари, filters, include_tasks и labels, сохраняя идемпотентность выбранного module.",
     "id": 107
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "В чём разница между vars и defaults в role?",
+    "q": "Чем role defaults отличаются от role vars?",
     "options": [
-      "defaults только для Windows",
-      "Никакой",
-      "vars только для Linux",
-      "defaults слабее по приоритету, vars сильнее"
+      "Defaults загружаются для Windows targets, а vars применяются controller при Linux connection",
+      "Оба каталога имеют одинаковый precedence и различаются соглашением об именовании файлов",
+      "Vars доступны при check mode, а defaults читаются при обычном изменяющем запуске playbook",
+      "Defaults имеют низкий precedence для переопределяемых inputs, role vars — значительно более высокий"
     ],
     "answer": 3,
-    "explanation": "Это важный вопрос про precedence.",
+    "explanation": "Defaults подходят для публичных значений role, которые пользователь должен легко переопределять. Role vars имеют высокий precedence и потому хуже подходят для настраиваемого interface; точный порядок сверяют с variable precedence.",
     "id": 108
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Что такое serial?",
+    "q": "Как keyword serial влияет на Ansible play?",
     "options": [
-      "Пошаговый rollout партиями, а не сразу на все хосты",
-      "Шифрование vault",
-      "Тип handler",
-      "DNS-запись"
+      "Делит target hosts на batches указанного размера или доли и выполняет play по партиям",
+      "Шифрует variables для каждой task и передаёт отдельный Vault password каждому host",
+      "Превращает notified handler в обычную task и запускает его сразу после изменения",
+      "Создаёт DNS SRV record для каждой группы inventory и выбирает порядок hosts по priority"
     ],
     "answer": 0,
-    "explanation": "Serial нужен для более безопасных раскаток.",
+    "explanation": "serial ограничивает число hosts в текущей batch и полезен для rolling changes. Его сочетают с health checks, max_fail_percentage, any_errors_fatal и осознанной стратегией, поскольку batch сама по себе не проверяет здоровье сервиса.",
     "id": 109
   },
   {
     "topic": "Ansible",
     "level": "Middle",
-    "q": "Когда template лучше copy?",
+    "q": "Когда module template уместнее copy?",
     "options": [
-      "Когда файл бинарный",
-      "Когда файл зависит от переменных",
-      "Никогда",
-      "Когда нужен ping"
+      "Когда binary artifact нужно перенести без преобразования и проверить его checksum на target",
+      "Когда текстовый файл нужно отрендерить через Jinja с variables и управляемым контекстом",
+      "Когда controller проверяет network reachability target и не создаёт файлов на filesystem",
+      "Когда source уже содержит финальный статический текст и не зависит от host или environment"
     ],
     "answer": 1,
-    "explanation": "template + Jinja2 даёт гибкую генерацию конфигов.",
+    "explanation": "template рендерит Jinja на controller, поэтому подходит для конфигурации с variables и conditions. Для статического файла проще copy; секретные данные требуют отдельной защиты независимо от выбранного module.",
     "id": 110
   },
   {
@@ -1556,85 +1556,85 @@
   {
     "topic": "Ansible",
     "level": "Senior",
-    "q": "Что делать, если в templates оказался пароль в открытом виде?",
+    "q": "Что делать после обнаружения открытого пароля в Ansible template?",
     "options": [
-      "Сжать файл",
-      "Оставить как есть",
-      "Положить в README",
-      "Вынести секрет и использовать Vault/переменные"
+      "Сжать template и оставить архив в repository, чтобы поисковые scanners не читали строку",
+      "Удалить строку новым commit и продолжить использовать credential до планового maintenance",
+      "Перенести пароль в README с ограниченным доступом и подставлять его через lookup plugin",
+      "Отозвать или ротировать credential, проверить использование и подключить защищённый secret source"
     ],
     "answer": 3,
-    "explanation": "Секреты нельзя хранить открыто в шаблонах.",
+    "explanation": "Раскрытый secret нельзя считать безопасным после удаления из текущего файла: он мог попасть в Git history, logs и artifacts. Сначала прекращают его действие и проверяют audit, затем чистят следы и предотвращают повторение.",
     "id": 112
   },
   {
     "topic": "Ansible",
     "level": "Senior",
-    "q": "Что такое Molecule?",
+    "q": "Для чего применяют Molecule при разработке Ansible content?",
     "options": [
-      "Инструмент для тестирования ролей",
-      "Тип inventory",
-      "Менеджер пакетов",
-      "Драйвер ядра"
+      "Для описания test scenarios: создать environment, применить role, проверить результат и удалить resources",
+      "Для генерации dynamic inventory production из DNS records и cloud billing reports",
+      "Для установки OS packages на controller без package manager целевой операционной системы",
+      "Для загрузки kernel driver, который ускоряет SSH connections к большому числу targets"
     ],
     "answer": 0,
-    "explanation": "Molecule помогает проверять роли в тестовой среде.",
+    "explanation": "Molecule организует lifecycle тестового scenario и интегрируется с drivers, provisioners и verifiers. Конкретная среда может быть container, VM или cloud; тест должен проверять convergence и по возможности idempotence.",
     "id": 113
   },
   {
     "topic": "Ansible",
     "level": "Senior",
-    "q": "Что такое magic variables?",
+    "q": "Что называют magic variables в Ansible?",
     "options": [
-      "Секретные переменные Vault",
-      "Специальные встроенные переменные, например inventory_hostname",
-      "Переменные DNS",
-      "Переменные tfstate"
+      "Зашифрованные Vault values, которые автоматически становятся plaintext на managed host",
+      "Встроенный execution context, например inventory_hostname, hostvars, groups и ansible_play_hosts",
+      "DNS variables resolver, содержащие address и TTL каждого имени из inventory",
+      "Terraform state outputs, которые Ansible загружает без inventory plugin или lookup"
     ],
     "answer": 1,
-    "explanation": "Это важная часть повседневной работы с Ansible.",
+    "explanation": "Magic variables создаёт Ansible для сведений о текущем inventory, play и execution. Они отличаются от gathered facts и пользовательских vars; менять их как обычные inputs не следует.",
     "id": 114
   },
   {
     "topic": "Ansible",
     "level": "Senior",
-    "q": "Какие флаги полезны при отладке упавшего playbook?",
+    "q": "Какие параметры CLI помогают разбирать сбой Ansible playbook?",
     "options": [
-      "--fmt",
-      "-rf /",
-      "-v, --check, --step",
-      "--lock"
+      "--fmt и --compile для форматирования YAML и сборки playbook в executable binary",
+      "-rf и --purge для удаления temporary files со всех managed hosts перед повтором",
+      "-vvv, --check/--diff, --step, --start-at-task и --limit для контекста и сужения запуска",
+      "--lock и --unlock для блокировки inventory на время диагностики параллельных процессов"
     ],
     "answer": 2,
-    "explanation": "Они помогают анализировать ход выполнения и поведение задач.",
+    "explanation": "Verbosity показывает connection и module details, limit и start-at-task уменьшают scope, step подтверждает tasks. Check/diff прогнозируют изменения там, где modules это поддерживают, и не являются полной гарантией обычного запуска.",
     "id": 115
   },
   {
     "topic": "Ansible",
     "level": "Senior",
-    "q": "Зачем команде Git/Galaxy/AWX/Tower в работе с Ansible?",
+    "q": "Какие командные задачи закрывают Git, Galaxy и automation controller?",
     "options": [
-      "Для работы с inode",
-      "Для DNS резолва",
-      "Для замены Linux",
-      "Для совместной разработки, публикации и управления запусками"
+      "Git управляет inode, Galaxy выполняет DNS recursion, controller заменяет kernel managed host",
+      "Git хранит runtime logs, Galaxy маршрутизирует traffic, controller компилирует Linux packages",
+      "Git выдаёт SSH certificates, Galaxy создаёт VPC, controller преобразует YAML в Terraform state",
+      "Git версионирует код, Galaxy распространяет content, controller управляет jobs, RBAC и schedules"
     ],
     "answer": 3,
-    "explanation": "Это часто спрашивают как вопрос про командные практики.",
+    "explanation": "Version control обеспечивает review и историю, Galaxy или private hub — поставку collections и roles, AWX/Automation Controller — централизованные credentials, inventories, jobs, RBAC, schedules и audit. Эти функции дополняют друг друга.",
     "id": 116
   },
   {
     "topic": "Ansible",
     "level": "Senior",
-    "q": "Чем Collection отличается от Role?",
+    "q": "Чем Ansible Collection отличается от Role?",
     "options": [
-      "Collection шире и может включать роли, модули, плагины",
-      "Ничем",
-      "Role всегда больше",
-      "Collection — это inventory"
+      "Collection — пакет namespace/name с roles, modules, plugins, playbooks и metadata; Role уже по scope",
+      "Они являются двумя именами одного каталога и устанавливаются в одинаковый runtime path",
+      "Role включает несколько collections и определяет namespace для modules внешних vendors",
+      "Collection хранит inventory hosts, но не может включать executable plugins или roles"
     ],
     "answer": 0,
-    "explanation": "Collection — более крупная единица упаковки.",
+    "explanation": "Role организует reusable automation вокруг tasks, handlers, vars, templates и files. Collection — единица распространения более широкого content с namespace, versioning и dependencies.",
     "id": 117
   },
   {
