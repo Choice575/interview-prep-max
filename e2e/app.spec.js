@@ -164,6 +164,28 @@ test('imports a validated personal profile through the file control', async ({ p
   await expect(page.locator('.coach-role')).toContainText('Cloud Engineer');
 });
 
+test('exports a versioned progress backup through the extracted module', async ({ page }) => {
+  await setProgress(page, {
+    ipmax_onboarding: profile,
+    ipmax_onboarding_complete: true,
+    ipmax_qprog: { 1: { correct: 2, wrong: 1 } }
+  });
+  await page.goto('/');
+  page.once('dialog', dialog => dialog.dismiss());
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Копировать прогресс' }).click();
+  const download = await downloadPromise;
+  const stream = await download.createReadStream();
+  const chunks = [];
+  for await (const chunk of stream) chunks.push(chunk);
+  const backup = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+
+  expect(download.suggestedFilename()).toMatch(/^ipmax_\d{4}-\d{2}-\d{2}\.json$/);
+  expect(backup.version).toBe('12.9.0');
+  expect(backup.qprog['1']).toEqual({ correct: 2, wrong: 1 });
+  expect(backup.onboarding.role).toBe(profile.role);
+});
+
 test('rejects malformed progress without replacing existing data', async ({ page }) => {
   await setProgress(page, {
     ipmax_onboarding: profile,

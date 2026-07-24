@@ -151,7 +151,7 @@ function isValidOnboardingDate(date){
   return IPMaxDate.isValidDateKey(date);
 }
 function normalizeOnboardingProfile(value){
-  if(!isRecord(value)||!ONBOARDING_ROLES.includes(value.role)||!ONBOARDING_LEVELS.includes(value.level)) return null;
+  if(!value||typeof value!=='object'||Array.isArray(value)||!ONBOARDING_ROLES.includes(value.role)||!ONBOARDING_LEVELS.includes(value.level)) return null;
   const date=value.date===undefined?'':value.date;
   if(!isValidOnboardingDate(date)) return null;
   return {role:value.role,level:value.level,date,completedAt:typeof value.completedAt==='string'?value.completedAt:''};
@@ -1442,146 +1442,26 @@ function endDiagnostic(){
     '<button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
 }
 
-// ═══ EXPORT / IMPORT (с APP_VERSION) ═══
-const IMPORT_MAX_BYTES=2*1024*1024;
-const IMPORT_MAX_DEPTH=10;
-const IMPORT_MAX_NODES=50000;
-const IMPORT_RECORD_KEYS=['mistakes','stats','qprog','ts_scores','cmd_prog','code_prog','subnet_prog','git_prog','regex_prog','ans_prog','df_prog','k8s_prog','pt_prog','labs_prog','daily','study_progress','study_answers','senior_case_prog','coach_control'];
-const IMPORT_ARRAY_KEYS=['history','custom','skill_events','coach_journal'];
-function exportProgress(){
-  const onboarding=getOnboardingProfile();
-  const data={
-    version: APP_VERSION, exportDate: new Date().toISOString(),
-    mistakes:lsGet('mistakes',{}),stats:lsGet('stats',{}),history:lsGet('history',[]),
-    qprog:lsGet('qprog',{}),streak_best:lsGet('streak_best',0),custom:lsGet('custom',[]),
-    ts_scores:lsGet('ts_scores',{}),cmd_prog:lsGet('cmd_prog',{}),code_prog:lsGet('code_prog',{}),
-    subnet_prog:lsGet('subnet_prog',{}),git_prog:lsGet('git_prog',{}),regex_prog:lsGet('regex_prog',{}),
-    ans_prog:lsGet('ans_prog',{}),df_prog:lsGet('df_prog',{}),k8s_prog:lsGet('k8s_prog',{}),pt_prog:lsGet('pt_prog',{}),labs_prog:lsGet('labs_prog',{}),
-    daily:lsGet('daily',{}),study_progress:lsGet('study_progress',{}),study_position:lsGet('study_position',{week:1,day:1}),
-    study_answers:lsGet('study_answers',{}),senior_case_prog:lsGet('senior_case_prog',{}),skill_events:getSkillEvents(),coach_journal:getCoachJournal(),coach_control:getCoachControlSession()||undefined,
-    onboarding:onboarding||undefined,onboarding_complete:!!onboarding
-  };
-  const text=JSON.stringify(data,null,2);
-  // Файл
-  const blob=new Blob([text],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ipmax_'+IPMaxDate.localDateKey()+'.json';a.click();URL.revokeObjectURL(a.href);
-  // Буфер обмена
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>{}).catch(()=>{});}
-  else{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);}
-  alert('✅ Прогресс скопирован в буфер обмена и сохранён в файл!');
-}
-function importProgress(inp){
-  const file=inp.files[0];if(!file) return;
-  if(file.size>IMPORT_MAX_BYTES){alert('Ошибка: файл прогресса больше 2 МБ.');inp.value='';return;}
-  const reader=new FileReader();
-  reader.onload=e=>{try{importProgressText(e.target.result);}catch(err){alert('Ошибка: '+err.message);}};
-  reader.readAsText(file);inp.value='';
-}
-function importProgressText(text){
-  if(typeof text!=='string'||new Blob([text]).size>IMPORT_MAX_BYTES) throw new Error('данные прогресса больше 2 МБ.');
-  importProgressData(JSON.parse(text));
-}
-function pasteProgressFromClipboard(){
-  const manualPaste=()=>{const text=prompt('Вставьте JSON прогресса:');if(text){try{importProgressText(text);}catch(e){alert('Ошибка JSON: '+e.message);}}};
-  if(!navigator.clipboard||!navigator.clipboard.readText){manualPaste();return;}
-  navigator.clipboard.readText().then(text=>{try{importProgressText(text);}catch(e){alert('Ошибка JSON: '+e.message);}},manualPaste);
-}
-function isRecord(value){return !!value&&typeof value==='object'&&!Array.isArray(value);}
-function validateBoundedImportValue(value,path,depth,state){
-  state.nodes++;if(state.nodes>IMPORT_MAX_NODES) throw new Error('Слишком много значений в импорте.');
-  if(value===null||typeof value==='boolean') return;
-  if(typeof value==='number'){if(!Number.isFinite(value)) throw new Error('Некорректное число в '+path+'.');return;}
-  if(typeof value==='string'){if(value.length>20000) throw new Error('Слишком длинная строка в '+path+'.');return;}
-  if(depth>=IMPORT_MAX_DEPTH) throw new Error('Слишком глубокая структура в '+path+'.');
-  if(Array.isArray(value)){
-    if(value.length>5000) throw new Error('Слишком большой список в '+path+'.');
-    value.forEach((item,index)=>validateBoundedImportValue(item,path+'['+index+']',depth+1,state));return;
+// ═══ EXPORT / IMPORT ═══
+const progressIO=typeof IPMaxProgressIO!=='undefined'?IPMaxProgressIO.create({
+  version:APP_VERSION,now:()=>Date.now(),dateKey:()=>IPMaxDate.localDateKey(),
+  get:(key,fallback)=>lsGet(key,fallback),setMany:entries=>appStorage&&typeof appStorage.setMany==='function'?appStorage.setMany(entries):{ok:false},
+  getBaseQuestions:()=>BASE_QUESTIONS,getOnboardingProfile,getSkillEvents,getCoachJournal,getCoachControlSession,
+  normaliseProfile:normalizeOnboardingProfile,isSkillEvent:ProgressTracker.isSkillEvent,eventLimit:ProgressTracker.EVENT_LIMIT,
+  isJournalEntry:InterviewCoach.isJournalEntry,journalLimit:InterviewCoach.JOURNAL_LIMIT,
+  normaliseControlSession:IPMaxAICoach.normaliseControlSession,alert:message=>alert(message),prompt:message=>prompt(message),
+  onImported:()=>{
+    streak=lsGet('streak_best',0);buildTopicFilters();
+    document.getElementById('sb-counter').textContent='DevOps Edition · '+getAllQ().length+' вопросов';nav('home');
   }
-  if(!isRecord(value)) throw new Error('Недопустимое значение в '+path+'.');
-  const keys=Object.keys(value);if(keys.length>5000) throw new Error('Слишком много полей в '+path+'.');
-  keys.forEach(key=>{
-    if(['__proto__','prototype','constructor'].includes(key)) throw new Error('Недопустимое поле '+path+'.'+key+'.');
-    validateBoundedImportValue(value[key],path+'.'+key,depth+1,state);
-  });
-}
-function validateCustomQuestions(questions){
-  if(questions.length>1000) return false;
-  const ids=new Set(BASE_QUESTIONS.map(q=>q.id));
-  return questions.every(q=>{
-    if(!isRecord(q)||!Number.isSafeInteger(q.id)||q.id<1||ids.has(q.id)) return false;
-    ids.add(q.id);
-    return typeof q.topic==='string'&&q.topic.trim().length>0&&q.topic.length<=80&&
-      ['Junior','Middle','Senior'].includes(q.level)&&
-      typeof q.q==='string'&&q.q.trim().length>0&&q.q.length<=4000&&
-      Array.isArray(q.options)&&q.options.length>=2&&q.options.length<=6&&q.options.every(o=>typeof o==='string'&&o.trim().length>0&&o.length<=2000)&&
-      Number.isInteger(q.answer)&&q.answer>=0&&q.answer<q.options.length&&
-      (!('explanation' in q)||typeof q.explanation==='string')&&
-      (!('category' in q)||['definition','scenario','tradeoff','output'].includes(q.category));
-  });
-}
-function validateQuestionProgress(progress){
-  const numeric=['correct','wrong','lastSeen','ease','interval','repetitions','nextReviewAt'];
-  return Object.entries(progress).every(([id,item])=>/^\d+$/.test(id)&&isRecord(item)&&
-    numeric.every(key=>!(key in item)||(Number.isFinite(item[key])&&item[key]>=0))&&
-    (!('times' in item)||(Array.isArray(item.times)&&item.times.length<=100&&item.times.every(value=>Number.isFinite(value)&&value>=0)))&&
-    (!('lastSource' in item)||(typeof item.lastSource==='string'&&item.lastSource.length<=40)));
-}
-function validateHistory(history){
-  return history.length<=1000&&history.every(item=>isRecord(item)&&typeof item.date==='string'&&item.date.length<=100&&typeof item.topic==='string'&&item.topic.length<=80&&typeof item.correct==='boolean');
-}
-function validateProgressImport(data){
-  if(!isRecord(data)) throw new Error('Файл прогресса должен содержать JSON-объект.');
-  validateBoundedImportValue(data,'progress',0,{nodes:0});
-  const invalid=[];
-  IMPORT_RECORD_KEYS.forEach(key=>{if(key in data&&!isRecord(data[key])) invalid.push(key);});
-  IMPORT_ARRAY_KEYS.forEach(key=>{if(key in data&&!Array.isArray(data[key])) invalid.push(key);});
-  if('version' in data&&(typeof data.version!=='string'||data.version.length>40)) invalid.push('version');
-  if('streak_best' in data&&(!Number.isFinite(data.streak_best)||data.streak_best<0)) invalid.push('streak_best');
-  if('stats' in data&&isRecord(data.stats)&&(
-    ('total' in data.stats&&(!Number.isFinite(data.stats.total)||data.stats.total<0))||
-    ('correct' in data.stats&&(!Number.isFinite(data.stats.correct)||data.stats.correct<0))||
-    (Number.isFinite(data.stats.total)&&Number.isFinite(data.stats.correct)&&data.stats.correct>data.stats.total)
-  )) invalid.push('stats');
-  if('qprog' in data&&isRecord(data.qprog)&&!validateQuestionProgress(data.qprog)) invalid.push('qprog');
-  if('history' in data&&Array.isArray(data.history)&&!validateHistory(data.history)) invalid.push('history');
-  if('study_position' in data&&(!isRecord(data.study_position)||!Number.isInteger(data.study_position.week)||!Number.isInteger(data.study_position.day)||data.study_position.week<1||data.study_position.week>100||data.study_position.day<1||data.study_position.day>31)) invalid.push('study_position');
-  if('onboarding' in data&&!normalizeOnboardingProfile(data.onboarding)) invalid.push('onboarding');
-  if('onboarding_complete' in data&&typeof data.onboarding_complete!=='boolean') invalid.push('onboarding_complete');
-  if(Array.isArray(data.custom)&&!validateCustomQuestions(data.custom)) invalid.push('custom');
-  if(Array.isArray(data.skill_events)&&typeof ProgressTracker!=='undefined'&&!data.skill_events.every(ProgressTracker.isSkillEvent)) invalid.push('skill_events');
-  if(Array.isArray(data.coach_journal)&&(typeof InterviewCoach==='undefined'||!data.coach_journal.every(InterviewCoach.isJournalEntry))) invalid.push('coach_journal');
-  if('coach_control' in data&&(typeof IPMaxAICoach==='undefined'||!IPMaxAICoach.normaliseControlSession(data.coach_control))) invalid.push('coach_control');
-  if(invalid.length) throw new Error('Некорректные поля: '+[...new Set(invalid)].join(', ')+'.');
-  return data;
-}
-function importProgressData(rawData){
-  const data=validateProgressImport(rawData);
-  if(!data.version){alert('⚠️ Старый формат без версии. Импортированы только проверенные поля.');}
-  const entries={};
-  IMPORT_RECORD_KEYS.forEach(key=>{if(key in data) entries[key]=data[key];});
-  if('coach_control' in data&&typeof IPMaxAICoach!=='undefined') entries.coach_control=IPMaxAICoach.normaliseControlSession(data.coach_control);
-  IMPORT_ARRAY_KEYS.forEach(key=>{
-    if(!(key in data)) return;
-    if(key==='skill_events'&&typeof ProgressTracker!=='undefined') entries[key]=data[key].slice(-ProgressTracker.EVENT_LIMIT);
-    else if(key==='coach_journal'&&typeof InterviewCoach!=='undefined') entries[key]=data[key].slice(-InterviewCoach.JOURNAL_LIMIT);
-    else entries[key]=data[key];
-  });
-  if('streak_best' in data) entries.streak_best=data.streak_best;
-  if('study_position' in data) entries.study_position=data.study_position;
-  if('onboarding' in data) entries.onboarding=normalizeOnboardingProfile(data.onboarding);
-  if('onboarding_complete' in data) entries.onboarding_complete=data.onboarding_complete;
-  else if('onboarding' in data) entries.onboarding_complete=true;
-  const result=appStorage&&typeof appStorage.setMany==='function'?appStorage.setMany(entries):{ok:false};
-  if(!result.ok){
-    if(result.rollbackFailed&&result.rollbackFailed.length) throw new Error('Не удалось сохранить импорт и полностью восстановить прежний прогресс. Не закрывайте страницу и экспортируйте текущие данные.');
-    throw new Error('Не удалось сохранить импорт. Прежний прогресс восстановлен.');
-  }
-  streak=lsGet('streak_best',0);
-  buildTopicFilters();
-  document.getElementById('sb-counter').textContent='DevOps Edition · '+getAllQ().length+' вопросов';
-  alert('✅ Прогресс импортирован v'+(data.version||'?')+'!');
-  nav('home');
-}
+}):null;
+function requireProgressIO(){if(!progressIO) throw new Error('Модуль импорта и экспорта не загружен.');return progressIO;}
+function exportProgress(){return requireProgressIO().exportProgress();}
+function importProgress(input){return requireProgressIO().importProgress(input);}
+function importProgressText(text){return requireProgressIO().importProgressText(text);}
+function importProgressData(data){return requireProgressIO().importProgressData(data);}
+function validateProgressImport(data){return requireProgressIO().validateProgressImport(data);}
+function pasteProgressFromClipboard(){return requireProgressIO().pasteProgressFromClipboard();}
 
 // ═══ INIT ═══
 async function initApp(){
@@ -1663,7 +1543,7 @@ document.addEventListener('keydown',function(e){
 
 // ═══ OFFLINE READINESS CHECK ═══
 async function checkOfflineReady(){
-  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','labs','tips','incidents','study_map','study_tests','senior_cases','best_practices'];
   tasks.forEach(t=>files.push('./tasks/'+t+'.json'));
   let ok=0,fail=0;const results=[];

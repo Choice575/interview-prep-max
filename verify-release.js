@@ -25,9 +25,10 @@ const storageScriptIndex = html.indexOf('<script src="./storage.js"></script>');
 const progressScriptIndex = html.indexOf('<script src="./progress.js"></script>');
 const coachScriptIndex = html.indexOf('<script src="./coach.js"></script>');
 const aiCoachScriptIndex = html.indexOf('<script src="./ai-coach.js"></script>');
+const progressIoScriptIndex = html.indexOf('<script src="./progress-io.js"></script>');
 const coachUiScriptIndex = html.indexOf('<script src="./coach-ui.js"></script>');
 const appScriptIndex = html.indexOf('<script src="./app.js"></script>');
-expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && aiCoachScriptIndex > coachScriptIndex && coachUiScriptIndex > aiCoachScriptIndex && appScriptIndex > coachUiScriptIndex, 'index.html должен загружать version.js, date.js, storage.js, progress.js, coach.js, ai-coach.js, coach-ui.js и app.js в этом порядке');
+expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && aiCoachScriptIndex > coachScriptIndex && progressIoScriptIndex > aiCoachScriptIndex && coachUiScriptIndex > progressIoScriptIndex && appScriptIndex > coachUiScriptIndex, 'index.html должен загружать version.js, date.js, storage.js, progress.js, coach.js, ai-coach.js, progress-io.js, coach-ui.js и app.js в этом порядке');
 expect(manifest.start_url === './' && manifest.scope === './', 'manifest должен использовать относительные start_url и scope');
 
 const requiredIcons = [
@@ -57,7 +58,7 @@ dataFiles.forEach(file => expect(fs.existsSync(path.join(root, file)), `отсу
 const assetsBlock = sw.match(/const ASSETS = \[([\s\S]*?)\];/);
 expect(!!assetsBlock, 'не найден ASSETS в sw.js');
 const assets = assetsBlock ? [...assetsBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
-['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
+['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
   expect(assets.includes(file), `offline-кеш не содержит ${file}`);
 });
 dataFiles.forEach(file => expect(assets.includes('./' + file), `offline-кеш не содержит ./${file}`));
