@@ -8,79 +8,11 @@
     186
   ],
   "issueBudget": {
-    "length-cue": 116,
-    "question-echo": 2,
-    "absolute-distractor": 67,
-    "duplicate-question": 2
+    "length-cue": 0,
+    "question-echo": 0,
+    "absolute-distractor": 0,
+    "duplicate-question": 0
   },
-  "topics": {
-    "Terraform": {
-      "length-cue": 1,
-      "question-echo": 0,
-      "absolute-distractor": 10,
-      "duplicate-question": 1
-    },
-    "Linux": {
-      "length-cue": 20,
-      "question-echo": 0,
-      "absolute-distractor": 19,
-      "duplicate-question": 0
-    },
-    "Сети": {
-      "length-cue": 17,
-      "question-echo": 1,
-      "absolute-distractor": 9,
-      "duplicate-question": 0
-    },
-    "Ansible": {
-      "length-cue": 22,
-      "question-echo": 0,
-      "absolute-distractor": 13,
-      "duplicate-question": 0
-    },
-    "Monitoring": {
-      "length-cue": 11,
-      "question-echo": 0,
-      "absolute-distractor": 6,
-      "duplicate-question": 0
-    },
-    "Cloud": {
-      "length-cue": 23,
-      "question-echo": 1,
-      "absolute-distractor": 6,
-      "duplicate-question": 0
-    },
-    "Security": {
-      "length-cue": 22,
-      "question-echo": 0,
-      "absolute-distractor": 4,
-      "duplicate-question": 0
-    },
-    "CI/CD": {
-      "length-cue": 0,
-      "question-echo": 0,
-      "absolute-distractor": 0,
-      "duplicate-question": 1
-    }
-  },
-  "levels": {
-    "Middle": {
-      "length-cue": 46,
-      "question-echo": 0,
-      "absolute-distractor": 21,
-      "duplicate-question": 0
-    },
-    "Senior": {
-      "length-cue": 38,
-      "question-echo": 1,
-      "absolute-distractor": 35,
-      "duplicate-question": 1
-    },
-    "Junior": {
-      "length-cue": 32,
-      "question-echo": 1,
-      "absolute-distractor": 11,
-      "duplicate-question": 1
-    }
-  }
+  "topics": {},
+  "levels": {}
 }
