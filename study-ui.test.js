@@ -35,6 +35,16 @@ test('formats only valid roadmap review dates', () => {
   assert.equal(StudyUI.formatReviewDate(), '');
 });
 
+test('renders a verifiable daily result safely', () => {
+  const markup = StudyUI.renderExpectedResult('Команда <check> выполнена & вывод сохранён');
+
+  assert.match(markup, /Проверяемый результат/);
+  assert.match(markup, /study-expected-result/);
+  assert.match(markup, /Команда &lt;check&gt; выполнена &amp; вывод сохранён/);
+  assert.equal(StudyUI.renderExpectedResult(''), '');
+  assert.equal(StudyUI.renderExpectedResult(null), '');
+});
+
 test('renders the production layer and prerequisites safely', () => {
   const markup = StudyUI.renderWeekContext({
     productionLayer: 'Gateway < Service',

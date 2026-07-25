@@ -20,6 +20,7 @@ const STRICT = process.argv.includes('--strict') || /^(1|true)$/i.test(String(pr
 const STUDY_PREREQUISITE_WEEKS = new Set([6, 11, 15, 17, 25]);
 const STUDY_TECHNOLOGY_STATUS_WEEKS = new Set([11, 18, 19, 20, 21, 22, 30]);
 const STUDY_TECHNOLOGY_STATUS_FIELDS = ['current', 'preferred', 'legacy', 'eol', 'overviewOnly', 'optional'];
+const STUDY_RESULT_EVIDENCE_PATTERN = /вывод|evidence|не ниже 70\/100/i;
 const KNOWN_SECRET_PATTERNS = [
   ['private key', /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/i],
   ['AWS access key', /\bAKIA[0-9A-Z]{16}\b/],
@@ -398,6 +399,7 @@ if (studyMap) {
   if (!Array.isArray(studyMap.weeks)) err('study_map.json: нет массива weeks');
   ok(`Загружено ${weeks.length} учебных недель`);
   const weekNumbers = new Set();
+  const expectedResults = new Set();
   weeks.forEach(w => {
     const prefix = `StudyWeek#${w.week || '?'}`;
     if (!Number.isInteger(w.week) || w.week < 1 || w.week > 32) {
@@ -465,9 +467,20 @@ if (studyMap) {
           if (dayNumbers.has(d.day)) err(`${dp}: duplicate day number`);
           dayNumbers.add(d.day);
         }
-        ['title', 'level', 'objective'].forEach(field => {
+        ['title', 'level', 'objective', 'expectedResult'].forEach(field => {
           if (!isNonEmptyString(d[field])) err(`${dp}: ${field} must be a non-empty string`);
         });
+        if (isNonEmptyString(d.expectedResult) && d.expectedResult.trim().length < 80) {
+          err(`${dp}: expectedResult must describe a verifiable outcome`);
+        }
+        if (isNonEmptyString(d.expectedResult) && !STUDY_RESULT_EVIDENCE_PATTERN.test(d.expectedResult)) {
+          err(`${dp}: expectedResult must name observable evidence or the weekly score threshold`);
+        }
+        if (isNonEmptyString(d.expectedResult)) {
+          const normalizedResult = d.expectedResult.trim().toLowerCase();
+          if (expectedResults.has(normalizedResult)) err(`${dp}: expectedResult duplicates another study day`);
+          expectedResults.add(normalizedResult);
+        }
         validateStringArray(d.practice, dp, 'practice');
         validateStringArray(d.pitfalls, dp, 'pitfalls');
         if (Object.prototype.hasOwnProperty.call(d, 'weeklyTest')) {

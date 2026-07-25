@@ -26,6 +26,15 @@
     return match ? `${match[3]}.${match[2]}.${match[1]}` : '';
   }
 
+  function renderExpectedResult(value, escapeHtml) {
+    const result = String(value || '').trim();
+    if (!result) return '';
+    const esc = typeof escapeHtml === 'function' ? escapeHtml : defaultEscape;
+    return '<div class="study-expected-result">' +
+      '<div class="study-outcome-label">Проверяемый результат</div>' +
+      '<p>' + esc(result) + '</p></div>';
+  }
+
   function renderWeekContext(week, escapeHtml) {
     if (!week || typeof week !== 'object' || Array.isArray(week)) return '';
     const esc = typeof escapeHtml === 'function' ? escapeHtml : defaultEscape;
@@ -132,5 +141,5 @@
       '</section>';
   }
 
-  return { STATUS_GROUPS, formatReviewDate, renderWeekContext, renderWeekOutcome, renderAITrack, renderTechnologyStatus };
+  return { STATUS_GROUPS, formatReviewDate, renderExpectedResult, renderWeekContext, renderWeekOutcome, renderAITrack, renderTechnologyStatus };
 });

@@ -667,8 +667,10 @@ function renderStudyDays(week,activeDay){
   }).join('')+'</div>';
 }
 function renderStudyToday(day){
+  const expectedResult=typeof IPMaxStudyUI!=='undefined'?IPMaxStudyUI.renderExpectedResult(day.expectedResult,esc):'';
   document.getElementById('study-today').innerHTML=
     '<section class="study-card"><h3>Сегодня</h3><div class="study-goal">'+esc(day.objective||'')+'</div>'+
+    expectedResult+
     '<h4>Практика</h4><div class="study-command-list">'+(day.practice||[]).map(c=>'<span class="study-command">'+esc(c)+'</span>').join('')+'</div>'+
     '<h4>Типовые ошибки</h4><ul class="study-list">'+(day.pitfalls||[]).map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul>'+
     '<div class="study-actions"><button class="btn btn-outline btn-sm" onclick="setStudyDayStatus(getStudyPosition().week,getStudyPosition().day,\'in_progress\')">Начал</button>'+

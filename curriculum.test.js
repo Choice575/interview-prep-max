@@ -92,3 +92,16 @@ test('uses study_tests.json as the only mini-test source', () => {
   });
   assert.equal(new Set(linkedIds).size, 160);
 });
+
+test('defines a distinct verifiable result for every study day', () => {
+  const studyMap = readTask('study_map.json');
+  const expectedResults = studyMap.weeks.flatMap(week => week.days.map(day => day.expectedResult));
+
+  assert.equal(expectedResults.length, 160);
+  expectedResults.forEach(result => {
+    assert.equal(typeof result, 'string');
+    assert.ok(result.length >= 80);
+    assert.match(result, /вывод|evidence|не ниже 70\/100/);
+  });
+  assert.equal(new Set(expectedResults).size, expectedResults.length);
+});

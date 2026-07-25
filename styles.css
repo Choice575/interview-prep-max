@@ -343,6 +343,9 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans
 .study-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
 .study-card h3{font-size:15px;font-weight:800;margin-bottom:10px}
 .study-card h4{font-size:13px;font-weight:800;margin:14px 0 8px;color:var(--text2)}
+.study-expected-result{position:relative;margin-top:14px;padding:13px 14px 13px 16px;border:1px solid color-mix(in srgb,var(--green) 35%,var(--border));border-radius:8px;background:linear-gradient(135deg,color-mix(in srgb,var(--green-dim) 70%,var(--bg3)),var(--bg3))}
+.study-expected-result::before{content:'';position:absolute;left:0;top:11px;bottom:11px;width:3px;border-radius:0 3px 3px 0;background:var(--green)}
+.study-expected-result p{margin-top:5px;font-size:13px;font-weight:650;line-height:1.55;color:var(--text)}
 .study-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 .study-list li{margin-left:18px;font-size:13px;color:var(--text2);line-height:1.55}
 .study-command-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
