@@ -14,7 +14,6 @@ const KNOWN_LEVELS = ['Junior', 'Middle', 'Senior', 'Junior+', 'Middle+', 'Senio
 const KNOWN_CATEGORIES = ['definition', 'scenario', 'tradeoff', 'output'];
 const KNOWN_STUDY_TYPES = ['incident', 'diagnostic', 'tradeoff', 'rollback', 'postmortem'];
 const KNOWN_TRAINERS = ['exam', 'analytics', 'subnet', 'ts', 'cmd', 'labs', 'code', 'ansible', 'dockerfile', 'k8s', 'ports', 'git', 'regex', 'tips'];
-const APP_VERSION = '12.0.0';
 const CURRICULUM_VERSION = '5.1.0';
 const STRICT = process.argv.includes('--strict') || /^(1|true)$/i.test(String(process.env.CI || ''));
 const STUDY_PREREQUISITE_WEEKS = new Set([6, 11, 15, 17, 25]);

@@ -1338,7 +1338,7 @@ document.addEventListener('keydown',function(e){
 
 // ═══ OFFLINE READINESS CHECK ═══
 async function checkOfflineReady(){
-  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','labs','tips','incidents','study_map','study_tests','senior_cases','best_practices'];
   tasks.forEach(t=>files.push('./tasks/'+t+'.json'));
   let ok=0,fail=0;const results=[];

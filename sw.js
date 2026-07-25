@@ -1,8 +1,9 @@
 importScripts('./version.js');
 const CACHE_NAME = self.IPMAX_CACHE_NAME;
+const CACHE_PREFIX = self.IPMAX_CACHE_PREFIX;
 
 const ASSETS = [
-  './', './index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './analytics-ui.js', './home-ui.js', './exam-ui.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png',
+  './', './index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './analytics-ui.js', './home-ui.js', './exam-ui.js', './study-ui.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png',
   './tasks/base_questions.json', './tasks/ts.json', './tasks/subnet.json',
   './tasks/cmd.json', './tasks/code.json', './tasks/git.json', './tasks/regex.json',
   './tasks/ansible_pb.json', './tasks/dockerfile.json', './tasks/k8s.json', './tasks/ports.json',
@@ -19,8 +20,10 @@ self.addEventListener('message', event => {
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))));
-  self.clients.claim();
+  event.waitUntil(Promise.all([
+    caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME).map(key => caches.delete(key)))),
+    self.clients.claim()
+  ]));
 });
 
 self.addEventListener('fetch', event => {

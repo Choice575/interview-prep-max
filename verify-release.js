@@ -11,13 +11,19 @@ const version = read('version.js');
 const app = read('app.js');
 const sw = read('sw.js');
 const html = read('index.html');
+const changelog = read('CHANGELOG.md');
 const manifest = JSON.parse(read('interview-prep-max.webmanifest'));
 
-expect(/self\.IPMAX_VERSION\s*=\s*'\d+\.\d+\.\d+'/.test(version), 'version.js должен содержать semver IPMAX_VERSION');
-expect(/self\.IPMAX_CACHE_NAME\s*=\s*'ipmax-v'\s*\+\s*self\.IPMAX_VERSION/.test(version), 'имя offline-кеша должно строиться из IPMAX_VERSION');
+const versionMatch = version.match(/self\.IPMAX_VERSION\s*=\s*'(\d+\.\d+\.\d+)'/);
+const appVersion = versionMatch && versionMatch[1];
+expect(!!appVersion, 'version.js должен содержать semver IPMAX_VERSION');
+expect(/self\.IPMAX_CACHE_PREFIX\s*=\s*'ipmax-v'/.test(version), 'version.js должен задавать собственный префикс offline-кеша');
+expect(/self\.IPMAX_CACHE_NAME\s*=\s*self\.IPMAX_CACHE_PREFIX\s*\+\s*self\.IPMAX_VERSION/.test(version), 'имя offline-кеша должно строиться из префикса и IPMAX_VERSION');
+expect(!!appVersion && changelog.includes(`## v${appVersion} (`), 'CHANGELOG должен начинаться с записи текущей версии');
 expect(/const APP_VERSION\s*=\s*self\.IPMAX_VERSION\s*\|\|\s*'dev'/.test(app), 'app.js должен использовать IPMAX_VERSION из version.js');
 expect(/importScripts\('\.\/version\.js'\);/.test(sw), 'sw.js должен импортировать version.js');
 expect(/const CACHE_NAME\s*=\s*self\.IPMAX_CACHE_NAME;/.test(sw), 'sw.js должен использовать IPMAX_CACHE_NAME');
+expect(/const CACHE_PREFIX\s*=\s*self\.IPMAX_CACHE_PREFIX;/.test(sw), 'sw.js должен использовать собственный префикс при очистке кешей');
 
 const versionScriptIndex = html.indexOf('<script src="./version.js"></script>');
 const dateScriptIndex = html.indexOf('<script src="./date.js"></script>');
@@ -29,9 +35,10 @@ const progressIoScriptIndex = html.indexOf('<script src="./progress-io.js"></scr
 const analyticsUiScriptIndex = html.indexOf('<script src="./analytics-ui.js"></script>');
 const homeUiScriptIndex = html.indexOf('<script src="./home-ui.js"></script>');
 const examUiScriptIndex = html.indexOf('<script src="./exam-ui.js"></script>');
+const studyUiScriptIndex = html.indexOf('<script src="./study-ui.js"></script>');
 const coachUiScriptIndex = html.indexOf('<script src="./coach-ui.js"></script>');
 const appScriptIndex = html.indexOf('<script src="./app.js"></script>');
-expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && aiCoachScriptIndex > coachScriptIndex && progressIoScriptIndex > aiCoachScriptIndex && analyticsUiScriptIndex > progressIoScriptIndex && homeUiScriptIndex > analyticsUiScriptIndex && examUiScriptIndex > homeUiScriptIndex && coachUiScriptIndex > examUiScriptIndex && appScriptIndex > coachUiScriptIndex, 'index.html должен загружать browser-модули до app.js в установленном порядке');
+expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && aiCoachScriptIndex > coachScriptIndex && progressIoScriptIndex > aiCoachScriptIndex && analyticsUiScriptIndex > progressIoScriptIndex && homeUiScriptIndex > analyticsUiScriptIndex && examUiScriptIndex > homeUiScriptIndex && studyUiScriptIndex > examUiScriptIndex && coachUiScriptIndex > studyUiScriptIndex && appScriptIndex > coachUiScriptIndex, 'index.html должен загружать browser-модули до app.js в установленном порядке');
 expect(manifest.start_url === './' && manifest.scope === './', 'manifest должен использовать относительные start_url и scope');
 
 const requiredIcons = [
@@ -61,7 +68,7 @@ dataFiles.forEach(file => expect(fs.existsSync(path.join(root, file)), `отсу
 const assetsBlock = sw.match(/const ASSETS = \[([\s\S]*?)\];/);
 expect(!!assetsBlock, 'не найден ASSETS в sw.js');
 const assets = assetsBlock ? [...assetsBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
-['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './analytics-ui.js', './home-ui.js', './exam-ui.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
+['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './analytics-ui.js', './home-ui.js', './exam-ui.js', './study-ui.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
   expect(assets.includes(file), `offline-кеш не содержит ${file}`);
 });
 dataFiles.forEach(file => expect(assets.includes('./' + file), `offline-кеш не содержит ./${file}`));
@@ -72,4 +79,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Release integrity check passed: ${dataFiles.length} data files and ${assets.length} cached assets.`);
+console.log(`Release ${appVersion} integrity check passed: ${dataFiles.length} data files and ${assets.length} cached assets.`);

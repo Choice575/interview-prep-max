@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "test": "node --test date.test.js progress.test.js progress-io.test.js analytics-ui.test.js home-ui.test.js exam-ui.test.js study-ui.test.js storage.test.js coach.test.js ai-coach.test.js server.test.js coach-flow.integration.test.js app-shell.integration.test.js question-quality.test.js best-practices.test.js curriculum.test.js validate.test.js",
+    "test": "node --test date.test.js progress.test.js progress-io.test.js analytics-ui.test.js home-ui.test.js exam-ui.test.js study-ui.test.js storage.test.js coach.test.js ai-coach.test.js server.test.js coach-flow.integration.test.js app-shell.integration.test.js question-quality.test.js best-practices.test.js curriculum.test.js release.test.js validate.test.js",
+    "verify:release": "node validate.js --strict && node verify-release.js && node --test release.test.js",
     "quality:questions": "node question-quality.js --check",
     "quality:questions:report": "node question-quality.js",
     "quality:questions:baseline": "node question-quality.js --write-baseline",
