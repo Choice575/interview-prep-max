@@ -83,6 +83,27 @@
       artifactMarkup + criteriaMarkup + '</section>';
   }
 
+  function renderAITrack(track, escapeHtml) {
+    if (!track || typeof track !== 'object' || Array.isArray(track)) return '';
+    const esc = typeof escapeHtml === 'function' ? escapeHtml : defaultEscape;
+    const title = String(track.title || '').trim();
+    const result = String(track.result || '').trim();
+    if (!title && !result) return '';
+    const optional = track.optional === true;
+    const visibleTitle = title || 'AI-дополнение недели';
+    const resultMarkup = result && result !== title
+      ? '<p class="study-ai-result"><span>Результат</span>' + esc(result) + '</p>'
+      : '';
+
+    return '<section class="study-card study-ai-track">' +
+      '<div class="study-ai-mark" aria-hidden="true"><span>AI</span></div>' +
+      '<div class="study-ai-content"><div class="study-ai-head"><span>AI-трек</span>' +
+        (optional ? '<strong>Опционально</strong>' : '') + '</div>' +
+        '<h3>' + esc(visibleTitle) + '</h3>' + resultMarkup +
+        (optional ? '<p class="study-ai-policy">Не влияет на завершение DevOps-недели</p>' : '') +
+      '</div></section>';
+  }
+
   function renderTechnologyStatus(status, escapeHtml) {
     if (!status || typeof status !== 'object' || Array.isArray(status)) return '';
     const esc = typeof escapeHtml === 'function' ? escapeHtml : defaultEscape;
@@ -111,5 +132,5 @@
       '</section>';
   }
 
-  return { STATUS_GROUPS, formatReviewDate, renderWeekContext, renderWeekOutcome, renderTechnologyStatus };
+  return { STATUS_GROUPS, formatReviewDate, renderWeekContext, renderWeekOutcome, renderAITrack, renderTechnologyStatus };
 });

@@ -83,6 +83,28 @@ test('renders artifact-only outcomes and omits malformed outcomes', () => {
   assert.equal(StudyUI.renderWeekOutcome({ completionCriteria: [] }), '');
 });
 
+test('renders an optional AI track without making it a completion gate', () => {
+  const markup = StudyUI.renderAITrack({
+    optional: true,
+    title: 'AI <review>',
+    result: 'Безопасный gateway & audit log',
+  });
+
+  assert.match(markup, /AI-трек/);
+  assert.match(markup, /Опционально/);
+  assert.match(markup, /AI &lt;review&gt;/);
+  assert.match(markup, /Безопасный gateway &amp; audit log/);
+  assert.match(markup, /Не влияет на завершение DevOps-недели/);
+});
+
+test('omits duplicate AI results and malformed tracks', () => {
+  const markup = StudyUI.renderAITrack({ optional: true, title: 'Non-blocking review', result: 'Non-blocking review' });
+
+  assert.doesNotMatch(markup, /study-ai-result/);
+  assert.equal(StudyUI.renderAITrack(null), '');
+  assert.equal(StudyUI.renderAITrack({}), '');
+});
+
 test('omits an empty or malformed technology status', () => {
   assert.equal(StudyUI.renderTechnologyStatus(null), '');
   assert.equal(StudyUI.renderTechnologyStatus([]), '');

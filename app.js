@@ -643,6 +643,7 @@ function renderStudy(){
   renderStudyDays(week,day.day);
   renderStudyToday(day);
   renderStudyWeekOutcome(week);
+  renderStudyAITrack(week);
   renderStudyMiniTest(mini,weekly,day.day===5);
   renderStudyProgress(week);
   renderStudyTrainers(week);
@@ -698,6 +699,11 @@ function setStudyCriterion(weekNumber,index,isComplete){
   progress[key]=completed;
   lsSet('study_progress',progress);
   renderStudyWeekOutcome(week);
+}
+function renderStudyAITrack(week){
+  const el=document.getElementById('study-ai-track');
+  if(!el)return;
+  el.innerHTML=typeof IPMaxStudyUI!=='undefined'?IPMaxStudyUI.renderAITrack(week.aiTrack,esc):'';
 }
 function renderStudyMiniTest(test,weekly,showWeekly){
   const el=document.getElementById('study-test');
