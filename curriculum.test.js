@@ -48,3 +48,25 @@ test('exposes measurable V5.1 fields without changing stable week numbers', () =
   assert.deepEqual(prerequisiteWeeks, [6, 11, 15, 17, 25]);
   assert.deepEqual(lifecycleWeeks, [11, 18, 19, 20, 21, 22]);
 });
+
+test('uses study_tests.json as the only mini-test source', () => {
+  const studyMap = readTask('study_map.json');
+  const studyTests = readTask('study_tests.json');
+  const testsById = new Map(studyTests.miniTests.map(miniTest => [miniTest.id, miniTest]));
+  const linkedIds = [];
+
+  assert.equal(studyTests.miniTests.length, 160);
+  assert.equal(testsById.size, 160);
+  studyMap.weeks.forEach(week => {
+    week.days.forEach(day => {
+      assert.equal(Object.hasOwn(day, 'miniTest'), false);
+      assert.equal(typeof day.miniTestId, 'string');
+      const miniTest = testsById.get(day.miniTestId);
+      assert.ok(miniTest, `missing ${day.miniTestId}`);
+      assert.equal(miniTest.week, week.week);
+      assert.equal(miniTest.day, day.day);
+      linkedIds.push(day.miniTestId);
+    });
+  });
+  assert.equal(new Set(linkedIds).size, 160);
+});

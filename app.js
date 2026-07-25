@@ -620,7 +620,10 @@ function getStudyProgress(){return lsGet('study_progress',{});}
 function setStudyDayStatus(week,day,status){const p=getStudyProgress();p['w'+week+'d'+day]=status;lsSet('study_progress',p);renderStudy();}
 function getStudyWeek(week){return (STUDY_MAP?.weeks||[]).find(w=>w.week===week);}
 function getStudyDay(week,day){const w=getStudyWeek(week);return w?(w.days||[]).find(d=>d.day===day):null;}
-function getMiniTest(week,day){return (STUDY_TESTS?.miniTests||[]).find(t=>t.week===week&&t.day===day);}
+function getMiniTest(week,day){
+  const testId=getStudyDay(week,day)?.miniTestId;
+  return testId?(STUDY_TESTS?.miniTests||[]).find(t=>t.id===testId):null;
+}
 function getWeeklyTest(week){return (STUDY_TESTS?.weeklyTests||[]).find(t=>t.week===week);}
 function getSeniorCaseList(){return Array.isArray(SENIOR_CASES)?SENIOR_CASES:(SENIOR_CASES?.cases||[]);}
 function getSeniorCasesForDay(week,day){return getSeniorCaseList().filter(c=>c.week===week&&(!c.day||c.day===day));}

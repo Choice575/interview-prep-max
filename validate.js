@@ -431,6 +431,43 @@ if (studyTests) {
   });
 }
 
+if (studyMap && studyTests) {
+  const miniTests = Array.isArray(studyTests.miniTests) ? studyTests.miniTests : [];
+  const miniTestsById = new Map();
+  const linkedTestIds = new Set();
+
+  miniTests.forEach(test => {
+    if (!test.id) return;
+    if (miniTestsById.has(test.id)) err(`study_tests.json: duplicate mini-test id ${test.id}`);
+    miniTestsById.set(test.id, test);
+  });
+
+  (studyMap.weeks || []).forEach(week => {
+    (week.days || []).forEach(day => {
+      const prefix = `StudyWeek#${week.week || '?'}/Day#${day.day || '?'}`;
+      if (Object.prototype.hasOwnProperty.call(day, 'miniTest')) {
+        err(`${prefix}: embedded miniTest is forbidden; use miniTestId`);
+      }
+      if (typeof day.miniTestId !== 'string' || !day.miniTestId.trim()) {
+        err(`${prefix}: miniTestId must be a non-empty string`);
+        return;
+      }
+      if (linkedTestIds.has(day.miniTestId)) err(`${prefix}: miniTestId ${day.miniTestId} is linked more than once`);
+      linkedTestIds.add(day.miniTestId);
+      const miniTest = miniTestsById.get(day.miniTestId);
+      if (!miniTest) {
+        err(`${prefix}: miniTestId ${day.miniTestId} does not exist`);
+      } else if (miniTest.week !== week.week || miniTest.day !== day.day) {
+        err(`${prefix}: miniTestId ${day.miniTestId} points to week ${miniTest.week}, day ${miniTest.day}`);
+      }
+    });
+  });
+
+  miniTestsById.forEach((test, id) => {
+    if (!linkedTestIds.has(id)) err(`MiniTest#${id}: test is not linked from study_map.json`);
+  });
+}
+
 // ═══ Итог ═══
 console.log(`\n${'═'.repeat(50)}`);
 console.log(`Проверка завершена: ${errors} ошибок, ${warnings} предупреждений`);
