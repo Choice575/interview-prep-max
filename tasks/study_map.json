@@ -1642,11 +1642,17 @@
         "result": "Ollama 1.5B как локальный сервис; Terraform-шаблон облачного инстанса без обязательного apply."
       },
       "technologyStatus": {
+        "current": [],
         "preferred": [
           "Terraform",
           "OpenTofu"
         ],
         "legacy": [],
+        "eol": [],
+        "overviewOnly": [],
+        "optional": [],
+        "lastReviewed": "2026-07-25",
+        "source": "Terraform and OpenTofu Documentation",
         "note": "Terraform и OpenTofu изучаются вместе на совместимом HCL-фундаменте."
       },
       "seniorChallenge": {
@@ -2737,13 +2743,20 @@
         "result": "Сервис агента доступен через Gateway API; tool endpoints ограничены NetworkPolicy."
       },
       "technologyStatus": {
+        "current": [],
         "preferred": [
           "Gateway API"
         ],
         "legacy": [
-          "Ingress",
+          "Ingress"
+        ],
+        "eol": [
           "ingress-nginx"
         ],
+        "overviewOnly": [],
+        "optional": [],
+        "lastReviewed": "2026-07-25",
+        "source": "Kubernetes Documentation; Kubernetes Blog: Ingress NGINX Retirement",
         "note": "Ingress изучается для существующих систем; ingress-nginx не используется в новой production-лаборатории после завершения поддержки в марте 2026."
       },
       "seniorChallenge": {
@@ -2902,10 +2915,16 @@
         "result": "Метрики AI-сервиса: latency, errors и ограничение ресурсов; token usage только при API-модели."
       },
       "technologyStatus": {
+        "current": [],
         "preferred": [
           "Helm"
         ],
         "legacy": [],
+        "eol": [],
+        "overviewOnly": [],
+        "optional": [],
+        "lastReviewed": "2026-07-25",
+        "source": "Helm Documentation",
         "note": "Обязательны chart, values, upgrade, history и rollback."
       },
       "seniorChallenge": {
@@ -3063,13 +3082,21 @@
         "result": "Мониторинг AI-компонента: latency, error rate, request count; без раскрытия prompt/секретов."
       },
       "technologyStatus": {
-        "preferred": [
+        "current": [
           "Prometheus",
-          "Grafana",
-          "VictoriaMetrics",
+          "Grafana"
+        ],
+        "preferred": [
           "Argo CD"
         ],
         "legacy": [],
+        "eol": [],
+        "overviewOnly": [],
+        "optional": [
+          "VictoriaMetrics"
+        ],
+        "lastReviewed": "2026-07-25",
+        "source": "Prometheus, Grafana, VictoriaMetrics and Argo CD Documentation",
         "note": "Argo CD обязателен для sync, drift и self-heal; VictoriaMetrics — российски релевантная альтернатива backend метрик."
       },
       "seniorChallenge": {
@@ -3225,13 +3252,23 @@
         "result": "Агент-суммаризатор логов только на очищенных данных; итог всегда содержит ссылки на исходные события."
       },
       "technologyStatus": {
-        "preferred": [
-          "Grafana Alloy",
+        "current": [
           "Loki"
         ],
-        "legacy": [
+        "preferred": [
+          "Grafana Alloy",
+          "OpenTelemetry Collector"
+        ],
+        "legacy": [],
+        "eol": [
           "Promtail"
         ],
+        "overviewOnly": [],
+        "optional": [
+          "ELK/OpenSearch"
+        ],
+        "lastReviewed": "2026-07-25",
+        "source": "Grafana Loki, Grafana Alloy and OpenTelemetry Documentation",
         "note": "Grafana Alloy — основной сборщик для новой Loki-лаборатории; Promtail завершил жизненный цикл 2 марта 2026."
       },
       "seniorChallenge": {
@@ -3387,10 +3424,16 @@
         "result": "AI-помощник формирует черновик timeline, но не выполняет remediation без человека."
       },
       "technologyStatus": {
+        "current": [],
         "preferred": [
           "OpenTelemetry"
         ],
         "legacy": [],
+        "eol": [],
+        "overviewOnly": [],
+        "optional": [],
+        "lastReviewed": "2026-07-25",
+        "source": "OpenTelemetry Documentation",
         "note": "Обязательна связка traces, metrics и logs."
       },
       "seniorChallenge": {
@@ -4632,6 +4675,21 @@
         "optional": true,
         "title": "AI формирует runbook проверки данных, но не заменяет backup.",
         "result": "AI формирует runbook проверки данных, но не заменяет backup."
+      },
+      "technologyStatus": {
+        "current": [],
+        "preferred": [],
+        "legacy": [],
+        "eol": [],
+        "overviewOnly": [
+          "Ceph"
+        ],
+        "optional": [
+          "Longhorn"
+        ],
+        "lastReviewed": "2026-07-25",
+        "source": "Longhorn and Ceph Documentation",
+        "note": "Longhorn используется только при доступных ресурсах; Ceph остаётся обзорной темой в локальной учебной среде."
       },
       "seniorChallenge": {
         "title": "Pod переехал на другую node и потерял данные",

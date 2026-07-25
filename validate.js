@@ -17,7 +17,8 @@ const KNOWN_TRAINERS = ['exam', 'analytics', 'subnet', 'ts', 'cmd', 'labs', 'cod
 const APP_VERSION = '12.0.0';
 const CURRICULUM_VERSION = '5.1.0';
 const STUDY_PREREQUISITE_WEEKS = new Set([6, 11, 15, 17, 25]);
-const STUDY_TECHNOLOGY_STATUS_WEEKS = new Set([11, 18, 19, 20, 21, 22]);
+const STUDY_TECHNOLOGY_STATUS_WEEKS = new Set([11, 18, 19, 20, 21, 22, 30]);
+const STUDY_TECHNOLOGY_STATUS_FIELDS = ['current', 'preferred', 'legacy', 'eol', 'overviewOnly', 'optional'];
 
 let errors = 0, warnings = 0;
 
@@ -355,10 +356,31 @@ if (studyMap) {
     if (STUDY_TECHNOLOGY_STATUS_WEEKS.has(w.week) && !w.technologyStatus) {
       err(`${prefix}: technologyStatus is required for fast-changing tools`);
     }
-    if (w.technologyStatus && (
-      !Array.isArray(w.technologyStatus.preferred) || w.technologyStatus.preferred.length === 0 ||
-      !Array.isArray(w.technologyStatus.legacy) || typeof w.technologyStatus.note !== 'string' || !w.technologyStatus.note.trim()
-    )) err(`${prefix}: technologyStatus must define preferred, legacy and note`);
+    if (w.technologyStatus) {
+      const statusValues = [];
+      STUDY_TECHNOLOGY_STATUS_FIELDS.forEach(field => {
+        const values = w.technologyStatus[field];
+        if (!Array.isArray(values)) {
+          err(`${prefix}: technologyStatus.${field} must be an array`);
+          return;
+        }
+        values.forEach(value => {
+          if (typeof value !== 'string' || !value.trim()) err(`${prefix}: technologyStatus.${field} contains an empty value`);
+          else statusValues.push(value);
+        });
+      });
+      if (statusValues.length === 0) err(`${prefix}: technologyStatus must classify at least one technology`);
+      if (new Set(statusValues).size !== statusValues.length) err(`${prefix}: a technology cannot have multiple statuses`);
+      if (typeof w.technologyStatus.lastReviewed !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(w.technologyStatus.lastReviewed)) {
+        err(`${prefix}: technologyStatus.lastReviewed must use YYYY-MM-DD`);
+      }
+      if (typeof w.technologyStatus.source !== 'string' || !w.technologyStatus.source.trim()) {
+        err(`${prefix}: technologyStatus.source must name a control source`);
+      }
+      if (typeof w.technologyStatus.note !== 'string' || !w.technologyStatus.note.trim()) {
+        err(`${prefix}: technologyStatus.note must explain the classification`);
+      }
+    }
     if (!w.week) err(`${prefix}: нет week`);
     if (!w.title) err(`${prefix}: нет title`);
     if (!Array.isArray(w.days)) err(`${prefix}: days должен быть массивом`);

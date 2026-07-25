@@ -46,7 +46,29 @@ test('exposes measurable V5.1 fields without changing stable week numbers', () =
     assert.ok(week.aiTrack.result);
   });
   assert.deepEqual(prerequisiteWeeks, [6, 11, 15, 17, 25]);
-  assert.deepEqual(lifecycleWeeks, [11, 18, 19, 20, 21, 22]);
+  assert.deepEqual(lifecycleWeeks, [11, 18, 19, 20, 21, 22, 30]);
+});
+
+test('classifies fast-changing technologies with review metadata', () => {
+  const studyMap = readTask('study_map.json');
+  const fields = ['current', 'preferred', 'legacy', 'eol', 'overviewOnly', 'optional'];
+  const statuses = new Map(studyMap.weeks.filter(week => week.technologyStatus).map(week => [week.week, week.technologyStatus]));
+
+  statuses.forEach(status => {
+    const classified = fields.flatMap(field => {
+      assert.ok(Array.isArray(status[field]), `${field} must be an array`);
+      return status[field];
+    });
+    assert.equal(new Set(classified).size, classified.length);
+    assert.match(status.lastReviewed, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(status.source);
+    assert.ok(status.note);
+  });
+  assert.deepEqual(statuses.get(18).preferred, ['Gateway API']);
+  assert.deepEqual(statuses.get(18).legacy, ['Ingress']);
+  assert.deepEqual(statuses.get(18).eol, ['ingress-nginx']);
+  assert.deepEqual(statuses.get(21).eol, ['Promtail']);
+  assert.deepEqual(statuses.get(30).overviewOnly, ['Ceph']);
 });
 
 test('uses study_tests.json as the only mini-test source', () => {
