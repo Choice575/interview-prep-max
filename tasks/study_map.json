@@ -1330,15 +1330,15 @@
     },
     {
       "week": 9,
-      "title": "CI/CD: основы pipeline",
+      "title": "CI/CD: pipeline и registry",
       "targetLevel": "Middle",
       "mainTopics": [
         "CI/CD",
         "Git"
       ],
-      "goal": "Освоить тему: CI/CD: основы pipeline на уровне Middle с упором на диагностику, rollback и сопровождение.",
-      "productionLayer": "GitLab CI stages, cache vs artifacts, variables, manual jobs",
-      "artifact": "pipeline lint/test/build/artifact",
+      "goal": "Настроить lint, test, build, artifact и публикацию неизменяемого image в GitLab Container Registry или Harbor.",
+      "productionLayer": "GitLab CI; stages; cache против artifacts; immutable tags; retention; service account; Harbor/Nexus как self-hosted registry.",
+      "artifact": "week09/ci-basics/ с рабочим pipeline и registry",
       "curriculumVersion": "5.1.0",
       "completionCriteria": [
         "объяснить каждую stage",
@@ -1395,8 +1395,8 @@
           "day": 1,
           "title": "Новая тема и базовая практика",
           "level": "Middle",
-          "objective": "Новая тема и базовая практика по теме: CI/CD: основы pipeline.",
-          "expectedResult": "По теме «CI/CD: основы pipeline» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Новая тема и базовая практика по теме: CI/CD: pipeline и registry.",
+          "expectedResult": "По теме «CI/CD: pipeline и registry» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
           "practice": [
             "прочитать цель недели",
             "выполнить базовую команду/конфиг",
@@ -1414,8 +1414,8 @@
           "day": 2,
           "title": "Углубление и работа с выводом",
           "level": "Middle",
-          "objective": "Углубление и работа с выводом по теме: CI/CD: основы pipeline.",
-          "expectedResult": "По теме «CI/CD: основы pipeline» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Углубление и работа с выводом по теме: CI/CD: pipeline и registry.",
+          "expectedResult": "По теме «CI/CD: pipeline и registry» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
           "practice": [
             "получить подробный вывод",
             "найти ключевые поля",
@@ -1433,8 +1433,8 @@
           "day": 3,
           "title": "Production-слой и типовые ошибки",
           "level": "Middle",
-          "objective": "Production-слой и типовые ошибки по теме: CI/CD: основы pipeline.",
-          "expectedResult": "По теме «CI/CD: основы pipeline» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Production-слой и типовые ошибки по теме: CI/CD: pipeline и registry.",
+          "expectedResult": "По теме «CI/CD: pipeline и registry» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
           "practice": [
             "смоделировать типовую ошибку",
             "найти root cause",
@@ -1452,8 +1452,8 @@
           "day": 4,
           "title": "Мини-инцидент или сквозной проект",
           "level": "Middle",
-          "objective": "Мини-инцидент или сквозной проект по теме: CI/CD: основы pipeline.",
-          "expectedResult": "По теме «CI/CD: основы pipeline» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Мини-инцидент или сквозной проект по теме: CI/CD: pipeline и registry.",
+          "expectedResult": "По теме «CI/CD: pipeline и registry» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
           "practice": [
             "собрать evidence",
             "сформулировать гипотезы",
@@ -1471,8 +1471,8 @@
           "day": 5,
           "title": "Итог недели и Senior Challenge",
           "level": "Middle",
-          "objective": "Итог недели и Senior Challenge по теме: CI/CD: основы pipeline.",
-          "expectedResult": "Артефакт недели «pipeline lint/test/build/artifact» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Итог недели и Senior Challenge по теме: CI/CD: pipeline и registry.",
+          "expectedResult": "Артефакт недели «week09/ci-basics/ с рабочим pipeline и registry» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
           "practice": [
             "выполнить итоговую задачу",
             "ответить на мини-тест",
@@ -1490,15 +1490,15 @@
     },
     {
       "week": 10,
-      "title": "CI/CD: deployment, rollback, environments",
+      "title": "CI/CD: deployment, Jenkins и rollback",
       "targetLevel": "Middle+",
       "mainTopics": [
         "CI/CD",
         "Git"
       ],
-      "goal": "Освоить тему: CI/CD: deployment, rollback, environments на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
-      "productionLayer": "Environments, protected variables, release tags, rollback strategy",
-      "artifact": "deploy с manual approval и rollback-путём",
+      "goal": "Выполнять управляемый deploy через staging и approval, проверять smoke test и быстро откатывать плохой релиз.",
+      "productionLayer": "Protected variables; smoke test; rollback; совместимость миграций; declarative Jenkinsfile как enterprise/legacy pipeline.",
+      "artifact": "week10/cd/ со staging, approval, минимальным Jenkinsfile и rollback-runbook",
       "curriculumVersion": "5.1.0",
       "completionCriteria": [
         "использовать неизменяемый тег релиза",
@@ -1555,8 +1555,8 @@
           "day": 1,
           "title": "Новая тема и базовая практика",
           "level": "Middle+",
-          "objective": "Новая тема и базовая практика по теме: CI/CD: deployment, rollback, environments.",
-          "expectedResult": "По теме «CI/CD: deployment, rollback, environments» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Новая тема и базовая практика по теме: CI/CD: deployment, Jenkins и rollback.",
+          "expectedResult": "По теме «CI/CD: deployment, Jenkins и rollback» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
           "practice": [
             "прочитать цель недели",
             "выполнить базовую команду/конфиг",
@@ -1574,8 +1574,8 @@
           "day": 2,
           "title": "Углубление и работа с выводом",
           "level": "Middle+",
-          "objective": "Углубление и работа с выводом по теме: CI/CD: deployment, rollback, environments.",
-          "expectedResult": "По теме «CI/CD: deployment, rollback, environments» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Углубление и работа с выводом по теме: CI/CD: deployment, Jenkins и rollback.",
+          "expectedResult": "По теме «CI/CD: deployment, Jenkins и rollback» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
           "practice": [
             "получить подробный вывод",
             "найти ключевые поля",
@@ -1593,8 +1593,8 @@
           "day": 3,
           "title": "Production-слой и типовые ошибки",
           "level": "Middle+",
-          "objective": "Production-слой и типовые ошибки по теме: CI/CD: deployment, rollback, environments.",
-          "expectedResult": "По теме «CI/CD: deployment, rollback, environments» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Production-слой и типовые ошибки по теме: CI/CD: deployment, Jenkins и rollback.",
+          "expectedResult": "По теме «CI/CD: deployment, Jenkins и rollback» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
           "practice": [
             "смоделировать типовую ошибку",
             "найти root cause",
@@ -1612,8 +1612,8 @@
           "day": 4,
           "title": "Мини-инцидент или сквозной проект",
           "level": "Middle+",
-          "objective": "Мини-инцидент или сквозной проект по теме: CI/CD: deployment, rollback, environments.",
-          "expectedResult": "По теме «CI/CD: deployment, rollback, environments» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Мини-инцидент или сквозной проект по теме: CI/CD: deployment, Jenkins и rollback.",
+          "expectedResult": "По теме «CI/CD: deployment, Jenkins и rollback» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
           "practice": [
             "собрать evidence",
             "сформулировать гипотезы",
@@ -1631,8 +1631,8 @@
           "day": 5,
           "title": "Итог недели и Senior Challenge",
           "level": "Middle+",
-          "objective": "Итог недели и Senior Challenge по теме: CI/CD: deployment, rollback, environments.",
-          "expectedResult": "Артефакт недели «deploy с manual approval и rollback-путём» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Итог недели и Senior Challenge по теме: CI/CD: deployment, Jenkins и rollback.",
+          "expectedResult": "Артефакт недели «week10/cd/ со staging, approval, минимальным Jenkinsfile и rollback-runbook» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
           "practice": [
             "выполнить итоговую задачу",
             "ответить на мини-тест",
@@ -1650,14 +1650,14 @@
     },
     {
       "week": 11,
-      "title": "Terraform basics",
+      "title": "Terraform/OpenTofu basics",
       "targetLevel": "Middle",
       "mainTopics": [
         "Terraform"
       ],
-      "goal": "Освоить тему: Terraform basics на уровне Middle с упором на диагностику, rollback и сопровождение.",
-      "productionLayer": "plan/apply, provider, variables, outputs, state hygiene",
-      "artifact": "простая инфраструктура в коде с variables/outputs/state",
+      "goal": "Описывать инфраструктуру HCL и безопасно сравнивать plan Terraform и OpenTofu до apply.",
+      "productionLayer": "HCL; providers; variables; outputs; plan/apply; state hygiene; совместимость Terraform/OpenTofu.",
+      "artifact": "week11/terraform-basics/ без секретов в state/Git, проверенный Terraform и OpenTofu",
       "curriculumVersion": "5.1.0",
       "prerequisites": [
         "Docker/Compose-стек запускается по README",
@@ -1731,8 +1731,8 @@
           "day": 1,
           "title": "Новая тема и базовая практика",
           "level": "Middle",
-          "objective": "Новая тема и базовая практика по теме: Terraform basics.",
-          "expectedResult": "По теме «Terraform basics» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Новая тема и базовая практика по теме: Terraform/OpenTofu basics.",
+          "expectedResult": "По теме «Terraform/OpenTofu basics» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
           "practice": [
             "прочитать цель недели",
             "выполнить базовую команду/конфиг",
@@ -1750,8 +1750,8 @@
           "day": 2,
           "title": "Углубление и работа с выводом",
           "level": "Middle",
-          "objective": "Углубление и работа с выводом по теме: Terraform basics.",
-          "expectedResult": "По теме «Terraform basics» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Углубление и работа с выводом по теме: Terraform/OpenTofu basics.",
+          "expectedResult": "По теме «Terraform/OpenTofu basics» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
           "practice": [
             "получить подробный вывод",
             "найти ключевые поля",
@@ -1769,8 +1769,8 @@
           "day": 3,
           "title": "Production-слой и типовые ошибки",
           "level": "Middle",
-          "objective": "Production-слой и типовые ошибки по теме: Terraform basics.",
-          "expectedResult": "По теме «Terraform basics» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Production-слой и типовые ошибки по теме: Terraform/OpenTofu basics.",
+          "expectedResult": "По теме «Terraform/OpenTofu basics» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
           "practice": [
             "смоделировать типовую ошибку",
             "найти root cause",
@@ -1788,8 +1788,8 @@
           "day": 4,
           "title": "Мини-инцидент или сквозной проект",
           "level": "Middle",
-          "objective": "Мини-инцидент или сквозной проект по теме: Terraform basics.",
-          "expectedResult": "По теме «Terraform basics» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Мини-инцидент или сквозной проект по теме: Terraform/OpenTofu basics.",
+          "expectedResult": "По теме «Terraform/OpenTofu basics» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
           "practice": [
             "собрать evidence",
             "сформулировать гипотезы",
@@ -1807,8 +1807,8 @@
           "day": 5,
           "title": "Итог недели и Senior Challenge",
           "level": "Middle",
-          "objective": "Итог недели и Senior Challenge по теме: Terraform basics.",
-          "expectedResult": "Артефакт недели «простая инфраструктура в коде с variables/outputs/state» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Итог недели и Senior Challenge по теме: Terraform/OpenTofu basics.",
+          "expectedResult": "Артефакт недели «week11/terraform-basics/ без секретов в state/Git, проверенный Terraform и OpenTofu» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
           "practice": [
             "выполнить итоговую задачу",
             "ответить на мини-тест",
@@ -1826,14 +1826,14 @@
     },
     {
       "week": 12,
-      "title": "Terraform modules, remote state, drift",
+      "title": "Terraform/OpenTofu modules, remote state и Yandex Cloud",
       "targetLevel": "Middle+",
       "mainTopics": [
         "Terraform"
       ],
-      "goal": "Освоить тему: Terraform modules, remote state, drift на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
-      "productionLayer": "State lock, drift detection, import, provider pinning, workspaces",
-      "artifact": "module + remote state + drift check",
+      "goal": "Использовать modules и remote state, создать минимальную инфраструктуру в Yandex Cloud и удалить её после проверки.",
+      "productionLayer": "Modules; Yandex Object Storage backend; locking; drift; provider pinning; стоимость и обязательный destroy.",
+      "artifact": "week12/yandex-cloud-iac/ с сетью, VM, remote state, расчётом стоимости и destroy",
       "curriculumVersion": "5.1.0",
       "completionCriteria": [
         "объяснить remote state и locking в Yandex Object Storage",
@@ -1889,8 +1889,8 @@
           "day": 1,
           "title": "Новая тема и базовая практика",
           "level": "Middle+",
-          "objective": "Новая тема и базовая практика по теме: Terraform modules, remote state, drift.",
-          "expectedResult": "По теме «Terraform modules, remote state, drift» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Новая тема и базовая практика по теме: Terraform/OpenTofu modules, remote state и Yandex Cloud.",
+          "expectedResult": "По теме «Terraform/OpenTofu modules, remote state и Yandex Cloud» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
           "practice": [
             "прочитать цель недели",
             "выполнить базовую команду/конфиг",
@@ -1908,8 +1908,8 @@
           "day": 2,
           "title": "Углубление и работа с выводом",
           "level": "Middle+",
-          "objective": "Углубление и работа с выводом по теме: Terraform modules, remote state, drift.",
-          "expectedResult": "По теме «Terraform modules, remote state, drift» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Углубление и работа с выводом по теме: Terraform/OpenTofu modules, remote state и Yandex Cloud.",
+          "expectedResult": "По теме «Terraform/OpenTofu modules, remote state и Yandex Cloud» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
           "practice": [
             "получить подробный вывод",
             "найти ключевые поля",
@@ -1927,8 +1927,8 @@
           "day": 3,
           "title": "Production-слой и типовые ошибки",
           "level": "Middle+",
-          "objective": "Production-слой и типовые ошибки по теме: Terraform modules, remote state, drift.",
-          "expectedResult": "По теме «Terraform modules, remote state, drift» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Production-слой и типовые ошибки по теме: Terraform/OpenTofu modules, remote state и Yandex Cloud.",
+          "expectedResult": "По теме «Terraform/OpenTofu modules, remote state и Yandex Cloud» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
           "practice": [
             "смоделировать типовую ошибку",
             "найти root cause",
@@ -1946,8 +1946,8 @@
           "day": 4,
           "title": "Мини-инцидент или сквозной проект",
           "level": "Middle+",
-          "objective": "Мини-инцидент или сквозной проект по теме: Terraform modules, remote state, drift.",
-          "expectedResult": "По теме «Terraform modules, remote state, drift» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Мини-инцидент или сквозной проект по теме: Terraform/OpenTofu modules, remote state и Yandex Cloud.",
+          "expectedResult": "По теме «Terraform/OpenTofu modules, remote state и Yandex Cloud» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
           "practice": [
             "собрать evidence",
             "сформулировать гипотезы",
@@ -1965,8 +1965,8 @@
           "day": 5,
           "title": "Итог недели и Senior Challenge",
           "level": "Middle+",
-          "objective": "Итог недели и Senior Challenge по теме: Terraform modules, remote state, drift.",
-          "expectedResult": "Артефакт недели «module + remote state + drift check» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Итог недели и Senior Challenge по теме: Terraform/OpenTofu modules, remote state и Yandex Cloud.",
+          "expectedResult": "Артефакт недели «week12/yandex-cloud-iac/ с сетью, VM, remote state, расчётом стоимости и destroy» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
           "practice": [
             "выполнить итоговую задачу",
             "ответить на мини-тест",
@@ -2790,15 +2790,15 @@
     },
     {
       "week": 18,
-      "title": "Kubernetes networking and ingress",
+      "title": "Kubernetes networking, Ingress и Gateway API",
       "targetLevel": "Middle",
       "mainTopics": [
         "Kubernetes",
         "Сети"
       ],
-      "goal": "Освоить тему: Kubernetes networking and ingress на уровне Middle с упором на диагностику, rollback и сопровождение.",
-      "productionLayer": "CoreDNS, NetworkPolicy basics, ingress 502/404/TLS",
-      "artifact": "Service + Ingress + диагностика CoreDNS",
+      "goal": "Настроить Service, внутренний DNS и Gateway API; понимать Ingress как существующий legacy-подход.",
+      "productionLayer": "CoreDNS; NetworkPolicy; GatewayClass/Gateway/HTTPRoute; TLS; 404/502; ingress-nginx EOL.",
+      "artifact": "week18/k8s-networking/ с Gateway API, HTTPRoute, TLS и схемой трафика",
       "curriculumVersion": "5.1.0",
       "completionCriteria": [
         "сопоставить selector и labels",
@@ -2872,8 +2872,8 @@
           "day": 1,
           "title": "Новая тема и базовая практика",
           "level": "Middle",
-          "objective": "Новая тема и базовая практика по теме: Kubernetes networking and ingress.",
-          "expectedResult": "По теме «Kubernetes networking and ingress» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Новая тема и базовая практика по теме: Kubernetes networking, Ingress и Gateway API.",
+          "expectedResult": "По теме «Kubernetes networking, Ingress и Gateway API» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
           "practice": [
             "прочитать цель недели",
             "выполнить базовую команду/конфиг",
@@ -2891,8 +2891,8 @@
           "day": 2,
           "title": "Углубление и работа с выводом",
           "level": "Middle",
-          "objective": "Углубление и работа с выводом по теме: Kubernetes networking and ingress.",
-          "expectedResult": "По теме «Kubernetes networking and ingress» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Углубление и работа с выводом по теме: Kubernetes networking, Ingress и Gateway API.",
+          "expectedResult": "По теме «Kubernetes networking, Ingress и Gateway API» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
           "practice": [
             "получить подробный вывод",
             "найти ключевые поля",
@@ -2910,8 +2910,8 @@
           "day": 3,
           "title": "Production-слой и типовые ошибки",
           "level": "Middle",
-          "objective": "Production-слой и типовые ошибки по теме: Kubernetes networking and ingress.",
-          "expectedResult": "По теме «Kubernetes networking and ingress» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Production-слой и типовые ошибки по теме: Kubernetes networking, Ingress и Gateway API.",
+          "expectedResult": "По теме «Kubernetes networking, Ingress и Gateway API» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
           "practice": [
             "смоделировать типовую ошибку",
             "найти root cause",
@@ -2929,8 +2929,8 @@
           "day": 4,
           "title": "Мини-инцидент или сквозной проект",
           "level": "Middle",
-          "objective": "Мини-инцидент или сквозной проект по теме: Kubernetes networking and ingress.",
-          "expectedResult": "По теме «Kubernetes networking and ingress» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Мини-инцидент или сквозной проект по теме: Kubernetes networking, Ingress и Gateway API.",
+          "expectedResult": "По теме «Kubernetes networking, Ingress и Gateway API» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
           "practice": [
             "собрать evidence",
             "сформулировать гипотезы",
@@ -2948,8 +2948,8 @@
           "day": 5,
           "title": "Итог недели и Senior Challenge",
           "level": "Middle",
-          "objective": "Итог недели и Senior Challenge по теме: Kubernetes networking and ingress.",
-          "expectedResult": "Артефакт недели «Service + Ingress + диагностика CoreDNS» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Итог недели и Senior Challenge по теме: Kubernetes networking, Ingress и Gateway API.",
+          "expectedResult": "Артефакт недели «week18/k8s-networking/ с Gateway API, HTTPRoute, TLS и схемой трафика» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
           "practice": [
             "выполнить итоговую задачу",
             "ответить на мини-тест",
@@ -2967,15 +2967,15 @@
     },
     {
       "week": 19,
-      "title": "Kubernetes resources and reliability",
+      "title": "Kubernetes reliability и Helm",
       "targetLevel": "Middle+",
       "mainTopics": [
         "Kubernetes",
         "Monitoring"
       ],
-      "goal": "Освоить тему: Kubernetes resources and reliability на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
-      "productionLayer": "readiness/liveness/startup probes, OOMKilled, evictions",
-      "artifact": "requests/limits/probes/HPA basics",
+      "goal": "Настроить probes, requests/limits, HPA и упаковать приложение в Helm chart с проверенным rollback.",
+      "productionLayer": "readiness/liveness/startup; OOMKilled; eviction; Helm values/template/upgrade/history/rollback; rollout 503.",
+      "artifact": "week19/k8s-helm/ с chart, values окружений, нагрузочным тестом и Helm rollback",
       "curriculumVersion": "5.1.0",
       "completionCriteria": [
         "выбрать правильный тип probe",
@@ -3045,8 +3045,8 @@
           "day": 1,
           "title": "Новая тема и базовая практика",
           "level": "Middle+",
-          "objective": "Новая тема и базовая практика по теме: Kubernetes resources and reliability.",
-          "expectedResult": "По теме «Kubernetes resources and reliability» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Новая тема и базовая практика по теме: Kubernetes reliability и Helm.",
+          "expectedResult": "По теме «Kubernetes reliability и Helm» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
           "practice": [
             "прочитать цель недели",
             "выполнить базовую команду/конфиг",
@@ -3064,8 +3064,8 @@
           "day": 2,
           "title": "Углубление и работа с выводом",
           "level": "Middle+",
-          "objective": "Углубление и работа с выводом по теме: Kubernetes resources and reliability.",
-          "expectedResult": "По теме «Kubernetes resources and reliability» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Углубление и работа с выводом по теме: Kubernetes reliability и Helm.",
+          "expectedResult": "По теме «Kubernetes reliability и Helm» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
           "practice": [
             "получить подробный вывод",
             "найти ключевые поля",
@@ -3083,8 +3083,8 @@
           "day": 3,
           "title": "Production-слой и типовые ошибки",
           "level": "Middle+",
-          "objective": "Production-слой и типовые ошибки по теме: Kubernetes resources and reliability.",
-          "expectedResult": "По теме «Kubernetes resources and reliability» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Production-слой и типовые ошибки по теме: Kubernetes reliability и Helm.",
+          "expectedResult": "По теме «Kubernetes reliability и Helm» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
           "practice": [
             "смоделировать типовую ошибку",
             "найти root cause",
@@ -3102,8 +3102,8 @@
           "day": 4,
           "title": "Мини-инцидент или сквозной проект",
           "level": "Middle+",
-          "objective": "Мини-инцидент или сквозной проект по теме: Kubernetes resources and reliability.",
-          "expectedResult": "По теме «Kubernetes resources and reliability» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Мини-инцидент или сквозной проект по теме: Kubernetes reliability и Helm.",
+          "expectedResult": "По теме «Kubernetes reliability и Helm» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
           "practice": [
             "собрать evidence",
             "сформулировать гипотезы",
@@ -3121,8 +3121,8 @@
           "day": 5,
           "title": "Итог недели и Senior Challenge",
           "level": "Middle+",
-          "objective": "Итог недели и Senior Challenge по теме: Kubernetes resources and reliability.",
-          "expectedResult": "Артефакт недели «requests/limits/probes/HPA basics» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Итог недели и Senior Challenge по теме: Kubernetes reliability и Helm.",
+          "expectedResult": "Артефакт недели «week19/k8s-helm/ с chart, values окружений, нагрузочным тестом и Helm rollback» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
           "practice": [
             "выполнить итоговую задачу",
             "ответить на мини-тест",
@@ -3140,14 +3140,14 @@
     },
     {
       "week": 20,
-      "title": "Monitoring: Prometheus and Grafana",
+      "title": "Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD",
       "targetLevel": "Middle",
       "mainTopics": [
         "Monitoring"
       ],
-      "goal": "Освоить тему: Monitoring: Prometheus and Grafana на уровне Middle с упором на диагностику, rollback и сопровождение.",
-      "productionLayer": "Метрики CPU/RAM/HTTP, cardinality, scrape failures",
-      "artifact": "dashboard с CPU/RAM/HTTP метриками",
+      "goal": "Собирать метрики, строить dashboard и синхронизировать Kubernetes-приложение через Argo CD.",
+      "productionLayer": "Prometheus/Grafana; VictoriaMetrics; labels/cardinality; Git source of truth; Argo CD sync, health, drift/self-heal.",
+      "artifact": "week20/gitops-monitoring/ с dashboard, тремя метриками, Argo CD Application и drift test",
       "curriculumVersion": "5.1.0",
       "completionCriteria": [
         "проверить target в Prometheus и объяснить место VictoriaMetrics",
@@ -3220,8 +3220,8 @@
           "day": 1,
           "title": "Новая тема и базовая практика",
           "level": "Middle",
-          "objective": "Новая тема и базовая практика по теме: Monitoring: Prometheus and Grafana.",
-          "expectedResult": "По теме «Monitoring: Prometheus and Grafana» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Новая тема и базовая практика по теме: Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD.",
+          "expectedResult": "По теме «Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
           "practice": [
             "прочитать цель недели",
             "выполнить базовую команду/конфиг",
@@ -3239,8 +3239,8 @@
           "day": 2,
           "title": "Углубление и работа с выводом",
           "level": "Middle",
-          "objective": "Углубление и работа с выводом по теме: Monitoring: Prometheus and Grafana.",
-          "expectedResult": "По теме «Monitoring: Prometheus and Grafana» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Углубление и работа с выводом по теме: Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD.",
+          "expectedResult": "По теме «Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
           "practice": [
             "получить подробный вывод",
             "найти ключевые поля",
@@ -3258,8 +3258,8 @@
           "day": 3,
           "title": "Production-слой и типовые ошибки",
           "level": "Middle",
-          "objective": "Production-слой и типовые ошибки по теме: Monitoring: Prometheus and Grafana.",
-          "expectedResult": "По теме «Monitoring: Prometheus and Grafana» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Production-слой и типовые ошибки по теме: Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD.",
+          "expectedResult": "По теме «Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
           "practice": [
             "смоделировать типовую ошибку",
             "найти root cause",
@@ -3277,8 +3277,8 @@
           "day": 4,
           "title": "Мини-инцидент или сквозной проект",
           "level": "Middle",
-          "objective": "Мини-инцидент или сквозной проект по теме: Monitoring: Prometheus and Grafana.",
-          "expectedResult": "По теме «Monitoring: Prometheus and Grafana» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Мини-инцидент или сквозной проект по теме: Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD.",
+          "expectedResult": "По теме «Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
           "practice": [
             "собрать evidence",
             "сформулировать гипотезы",
@@ -3296,8 +3296,8 @@
           "day": 5,
           "title": "Итог недели и Senior Challenge",
           "level": "Middle",
-          "objective": "Итог недели и Senior Challenge по теме: Monitoring: Prometheus and Grafana.",
-          "expectedResult": "Артефакт недели «dashboard с CPU/RAM/HTTP метриками» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Итог недели и Senior Challenge по теме: Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD.",
+          "expectedResult": "Артефакт недели «week20/gitops-monitoring/ с dashboard, тремя метриками, Argo CD Application и drift test» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
           "practice": [
             "выполнить итоговую задачу",
             "ответить на мини-тест",
@@ -3315,14 +3315,14 @@
     },
     {
       "week": 21,
-      "title": "Logging: Loki или ELK/OpenSearch",
+      "title": "Логи: Loki, Grafana Alloy и OpenTelemetry",
       "targetLevel": "Middle+",
       "mainTopics": [
         "Monitoring"
       ],
-      "goal": "Освоить тему: Logging: Loki или ELK/OpenSearch на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
-      "productionLayer": "structured logs, log retention, correlation id, noisy logs",
-      "artifact": "централизованный сбор и поиск логов",
+      "goal": "Централизованно собирать и искать structured logs через Grafana Alloy или OpenTelemetry Collector.",
+      "productionLayer": "Structured logs; correlation ID; retention; Grafana Alloy/OTel pipelines; миграция с Promtail EOL.",
+      "artifact": "week21/logging/ с Alloy/OTel collector, structured logs и запросами диагностики",
       "curriculumVersion": "5.1.0",
       "completionCriteria": [
         "найти запрос по correlation ID",
@@ -3397,8 +3397,8 @@
           "day": 1,
           "title": "Новая тема и базовая практика",
           "level": "Middle+",
-          "objective": "Новая тема и базовая практика по теме: Logging: Loki или ELK/OpenSearch.",
-          "expectedResult": "По теме «Logging: Loki или ELK/OpenSearch» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Новая тема и базовая практика по теме: Логи: Loki, Grafana Alloy и OpenTelemetry.",
+          "expectedResult": "По теме «Логи: Loki, Grafana Alloy и OpenTelemetry» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
           "practice": [
             "прочитать цель недели",
             "выполнить базовую команду/конфиг",
@@ -3416,8 +3416,8 @@
           "day": 2,
           "title": "Углубление и работа с выводом",
           "level": "Middle+",
-          "objective": "Углубление и работа с выводом по теме: Logging: Loki или ELK/OpenSearch.",
-          "expectedResult": "По теме «Logging: Loki или ELK/OpenSearch» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Углубление и работа с выводом по теме: Логи: Loki, Grafana Alloy и OpenTelemetry.",
+          "expectedResult": "По теме «Логи: Loki, Grafana Alloy и OpenTelemetry» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
           "practice": [
             "получить подробный вывод",
             "найти ключевые поля",
@@ -3435,8 +3435,8 @@
           "day": 3,
           "title": "Production-слой и типовые ошибки",
           "level": "Middle+",
-          "objective": "Production-слой и типовые ошибки по теме: Logging: Loki или ELK/OpenSearch.",
-          "expectedResult": "По теме «Logging: Loki или ELK/OpenSearch» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Production-слой и типовые ошибки по теме: Логи: Loki, Grafana Alloy и OpenTelemetry.",
+          "expectedResult": "По теме «Логи: Loki, Grafana Alloy и OpenTelemetry» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
           "practice": [
             "смоделировать типовую ошибку",
             "найти root cause",
@@ -3454,8 +3454,8 @@
           "day": 4,
           "title": "Мини-инцидент или сквозной проект",
           "level": "Middle+",
-          "objective": "Мини-инцидент или сквозной проект по теме: Logging: Loki или ELK/OpenSearch.",
-          "expectedResult": "По теме «Logging: Loki или ELK/OpenSearch» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Мини-инцидент или сквозной проект по теме: Логи: Loki, Grafana Alloy и OpenTelemetry.",
+          "expectedResult": "По теме «Логи: Loki, Grafana Alloy и OpenTelemetry» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
           "practice": [
             "собрать evidence",
             "сформулировать гипотезы",
@@ -3473,8 +3473,8 @@
           "day": 5,
           "title": "Итог недели и Senior Challenge",
           "level": "Middle+",
-          "objective": "Итог недели и Senior Challenge по теме: Logging: Loki или ELK/OpenSearch.",
-          "expectedResult": "Артефакт недели «централизованный сбор и поиск логов» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Итог недели и Senior Challenge по теме: Логи: Loki, Grafana Alloy и OpenTelemetry.",
+          "expectedResult": "Артефакт недели «week21/logging/ с Alloy/OTel collector, structured logs и запросами диагностики» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
           "practice": [
             "выполнить итоговую задачу",
             "ответить на мини-тест",
@@ -3492,14 +3492,14 @@
     },
     {
       "week": 22,
-      "title": "Alerting, SLO, incident response",
+      "title": "OpenTelemetry, алерты и incident response",
       "targetLevel": "Middle+",
       "mainTopics": [
         "Monitoring"
       ],
-      "goal": "Освоить тему: Alerting, SLO, incident response на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
-      "productionLayer": "Alert fatigue, severity, escalation, SLO/SLI, error budget",
-      "artifact": "алерты, severity, incident report",
+      "goal": "Связать traces, metrics и logs через OpenTelemetry Collector, создать алерты и провести учебный инцидент.",
+      "productionLayer": "OTel Collector pipelines; trace ID; alert routing; severity; SLO/error budget; timeline и postmortem.",
+      "artifact": "week22/otel-incident/ с Collector, trace ID в логах, alerts, timeline и postmortem",
       "curriculumVersion": "5.1.0",
       "completionCriteria": [
         "алерт сообщает симптом и действие",
@@ -3567,8 +3567,8 @@
           "day": 1,
           "title": "Новая тема и базовая практика",
           "level": "Middle+",
-          "objective": "Новая тема и базовая практика по теме: Alerting, SLO, incident response.",
-          "expectedResult": "По теме «Alerting, SLO, incident response» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Новая тема и базовая практика по теме: OpenTelemetry, алерты и incident response.",
+          "expectedResult": "По теме «OpenTelemetry, алерты и incident response» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
           "practice": [
             "прочитать цель недели",
             "выполнить базовую команду/конфиг",
@@ -3586,8 +3586,8 @@
           "day": 2,
           "title": "Углубление и работа с выводом",
           "level": "Middle+",
-          "objective": "Углубление и работа с выводом по теме: Alerting, SLO, incident response.",
-          "expectedResult": "По теме «Alerting, SLO, incident response» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Углубление и работа с выводом по теме: OpenTelemetry, алерты и incident response.",
+          "expectedResult": "По теме «OpenTelemetry, алерты и incident response» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
           "practice": [
             "получить подробный вывод",
             "найти ключевые поля",
@@ -3605,8 +3605,8 @@
           "day": 3,
           "title": "Production-слой и типовые ошибки",
           "level": "Middle+",
-          "objective": "Production-слой и типовые ошибки по теме: Alerting, SLO, incident response.",
-          "expectedResult": "По теме «Alerting, SLO, incident response» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Production-слой и типовые ошибки по теме: OpenTelemetry, алерты и incident response.",
+          "expectedResult": "По теме «OpenTelemetry, алерты и incident response» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
           "practice": [
             "смоделировать типовую ошибку",
             "найти root cause",
@@ -3624,8 +3624,8 @@
           "day": 4,
           "title": "Мини-инцидент или сквозной проект",
           "level": "Middle+",
-          "objective": "Мини-инцидент или сквозной проект по теме: Alerting, SLO, incident response.",
-          "expectedResult": "По теме «Alerting, SLO, incident response» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Мини-инцидент или сквозной проект по теме: OpenTelemetry, алерты и incident response.",
+          "expectedResult": "По теме «OpenTelemetry, алерты и incident response» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
           "practice": [
             "собрать evidence",
             "сформулировать гипотезы",
@@ -3643,8 +3643,8 @@
           "day": 5,
           "title": "Итог недели и Senior Challenge",
           "level": "Middle+",
-          "objective": "Итог недели и Senior Challenge по теме: Alerting, SLO, incident response.",
-          "expectedResult": "Артефакт недели «алерты, severity, incident report» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Итог недели и Senior Challenge по теме: OpenTelemetry, алерты и incident response.",
+          "expectedResult": "Артефакт недели «week22/otel-incident/ с Collector, trace ID в логах, alerts, timeline и postmortem» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
           "practice": [
             "выполнить итоговую задачу",
             "ответить на мини-тест",
@@ -3662,15 +3662,15 @@
     },
     {
       "week": 23,
-      "title": "Security baseline",
+      "title": "Security и software supply chain",
       "targetLevel": "Middle+",
       "mainTopics": [
         "Security",
         "Linux"
       ],
-      "goal": "Освоить тему: Security baseline на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
-      "productionLayer": "SSH hardening, secrets, least privilege, image scanning, RBAC",
-      "artifact": "SSH hardening, secrets, least privilege",
+      "goal": "Усилить Linux, Docker, CI/CD и Kubernetes, создать SBOM и проверить происхождение подписанного image.",
+      "productionLayer": "Least privilege; Trivy; Syft SBOM; Cosign sign/verify; secret scanning; version pinning; RBAC; rotation.",
+      "artifact": "week23/security/ с Trivy scan, SBOM, Cosign sign/verify и исправленным pipeline",
       "curriculumVersion": "5.1.0",
       "completionCriteria": [
         "удалить секрет из текущей конфигурации",
@@ -3727,8 +3727,8 @@
           "day": 1,
           "title": "Новая тема и базовая практика",
           "level": "Middle+",
-          "objective": "Новая тема и базовая практика по теме: Security baseline.",
-          "expectedResult": "По теме «Security baseline» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Новая тема и базовая практика по теме: Security и software supply chain.",
+          "expectedResult": "По теме «Security и software supply chain» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
           "practice": [
             "прочитать цель недели",
             "выполнить базовую команду/конфиг",
@@ -3746,8 +3746,8 @@
           "day": 2,
           "title": "Углубление и работа с выводом",
           "level": "Middle+",
-          "objective": "Углубление и работа с выводом по теме: Security baseline.",
-          "expectedResult": "По теме «Security baseline» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Углубление и работа с выводом по теме: Security и software supply chain.",
+          "expectedResult": "По теме «Security и software supply chain» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
           "practice": [
             "получить подробный вывод",
             "найти ключевые поля",
@@ -3765,8 +3765,8 @@
           "day": 3,
           "title": "Production-слой и типовые ошибки",
           "level": "Middle+",
-          "objective": "Production-слой и типовые ошибки по теме: Security baseline.",
-          "expectedResult": "По теме «Security baseline» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Production-слой и типовые ошибки по теме: Security и software supply chain.",
+          "expectedResult": "По теме «Security и software supply chain» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
           "practice": [
             "смоделировать типовую ошибку",
             "найти root cause",
@@ -3784,8 +3784,8 @@
           "day": 4,
           "title": "Мини-инцидент или сквозной проект",
           "level": "Middle+",
-          "objective": "Мини-инцидент или сквозной проект по теме: Security baseline.",
-          "expectedResult": "По теме «Security baseline» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Мини-инцидент или сквозной проект по теме: Security и software supply chain.",
+          "expectedResult": "По теме «Security и software supply chain» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
           "practice": [
             "собрать evidence",
             "сформулировать гипотезы",
@@ -3803,8 +3803,8 @@
           "day": 5,
           "title": "Итог недели и Senior Challenge",
           "level": "Middle+",
-          "objective": "Итог недели и Senior Challenge по теме: Security baseline.",
-          "expectedResult": "Артефакт недели «SSH hardening, secrets, least privilege» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Итог недели и Senior Challenge по теме: Security и software supply chain.",
+          "expectedResult": "Артефакт недели «week23/security/ с Trivy scan, SBOM, Cosign sign/verify и исправленным pipeline» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
           "practice": [
             "выполнить итоговую задачу",
             "ответить на мини-тест",
@@ -4785,14 +4785,14 @@
     },
     {
       "week": 30,
-      "title": "Kubernetes storage and HA workloads",
+      "title": "Kubernetes storage и HA workloads",
       "targetLevel": "Senior-track",
       "mainTopics": [
         "Kubernetes"
       ],
-      "goal": "Освоить тему: Kubernetes storage and HA workloads на уровне Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
-      "productionLayer": "StatefulSet, storage failure, backup for volumes",
-      "artifact": "PV/PVC/CSI/StatefulSet backup considerations",
+      "goal": "Работать с PV/PVC, CSI и StatefulSet, проверять сохранность и backup томов.",
+      "productionLayer": "Storage failure; reclaim policy; topology; volume backup; Longhorn при доступных ресурсах; Ceph только обзор.",
+      "artifact": "week30/k8s-storage/ с проверкой persistence; Longhorn опционально, Ceph только обзор",
       "curriculumVersion": "5.1.0",
       "completionCriteria": [
         "объяснить PV, PVC и StorageClass",
@@ -4863,8 +4863,8 @@
           "day": 1,
           "title": "Новая тема и базовая практика",
           "level": "Senior-track",
-          "objective": "Новая тема и базовая практика по теме: Kubernetes storage and HA workloads.",
-          "expectedResult": "По теме «Kubernetes storage and HA workloads» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Новая тема и базовая практика по теме: Kubernetes storage и HA workloads.",
+          "expectedResult": "По теме «Kubernetes storage и HA workloads» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
           "practice": [
             "прочитать цель недели",
             "выполнить базовую команду/конфиг",
@@ -4882,8 +4882,8 @@
           "day": 2,
           "title": "Углубление и работа с выводом",
           "level": "Senior-track",
-          "objective": "Углубление и работа с выводом по теме: Kubernetes storage and HA workloads.",
-          "expectedResult": "По теме «Kubernetes storage and HA workloads» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Углубление и работа с выводом по теме: Kubernetes storage и HA workloads.",
+          "expectedResult": "По теме «Kubernetes storage и HA workloads» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
           "practice": [
             "получить подробный вывод",
             "найти ключевые поля",
@@ -4901,8 +4901,8 @@
           "day": 3,
           "title": "Production-слой и типовые ошибки",
           "level": "Senior-track",
-          "objective": "Production-слой и типовые ошибки по теме: Kubernetes storage and HA workloads.",
-          "expectedResult": "По теме «Kubernetes storage and HA workloads» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Production-слой и типовые ошибки по теме: Kubernetes storage и HA workloads.",
+          "expectedResult": "По теме «Kubernetes storage и HA workloads» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
           "practice": [
             "смоделировать типовую ошибку",
             "найти root cause",
@@ -4920,8 +4920,8 @@
           "day": 4,
           "title": "Мини-инцидент или сквозной проект",
           "level": "Senior-track",
-          "objective": "Мини-инцидент или сквозной проект по теме: Kubernetes storage and HA workloads.",
-          "expectedResult": "По теме «Kubernetes storage and HA workloads» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Мини-инцидент или сквозной проект по теме: Kubernetes storage и HA workloads.",
+          "expectedResult": "По теме «Kubernetes storage и HA workloads» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
           "practice": [
             "собрать evidence",
             "сформулировать гипотезы",
@@ -4939,8 +4939,8 @@
           "day": 5,
           "title": "Итог недели и Senior Challenge",
           "level": "Senior-track",
-          "objective": "Итог недели и Senior Challenge по теме: Kubernetes storage and HA workloads.",
-          "expectedResult": "Артефакт недели «PV/PVC/CSI/StatefulSet backup considerations» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Итог недели и Senior Challenge по теме: Kubernetes storage и HA workloads.",
+          "expectedResult": "Артефакт недели «week30/k8s-storage/ с проверкой persistence; Longhorn опционально, Ceph только обзор» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
           "practice": [
             "выполнить итоговую задачу",
             "ответить на мини-тест",

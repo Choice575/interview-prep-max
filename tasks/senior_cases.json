@@ -888,28 +888,28 @@
       "topic": "CI/CD",
       "type": "diagnostic",
       "title": "Pipeline деплоит старый artifact",
-      "context": "Учебный production-инцидент недели 9. Тема: CI/CD: основы pipeline. Нужно собрать evidence и безопасно восстановить сервис.",
+      "context": "Учебный production-инцидент недели 9: CI/CD: pipeline и registry. Нужно сохранить evidence, ограничить impact и восстановить проверяемое состояние.",
       "evidence": [
-        "Topic: CI/CD: основы pipeline",
-        "Symptom: Pipeline деплоит старый artifact",
-        "Impact: pipeline, инфраструктура, конфигурация или сервис работает некорректно",
-        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+        "Build создал artifact с commit SHA A, а deploy job скачал checksum от SHA B.",
+        "В Harbor запущенному release tag соответствует другой image digest.",
+        "Retention policy удалила старый artifact раньше срока rollback.",
+        "Nexus указан как допустимая альтернатива registry, но текущий pipeline публикует только в Harbor."
       ],
-      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "task": "Определи root cause, безопасный mitigation, постоянный fix, rollback/DR, проверку результата и prevention.",
       "expectedActions": [
-        "Собрать evidence: статусы, логи, конфиги, diff, plan или backup status.",
-        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
-        "Выбрать минимальный mitigation.",
-        "Предложить постоянный fix и rollback-план.",
-        "Проверить результат тем же способом, которым был найден симптом.",
-        "Добавить prevention: тест, алерт, checklist или runbook."
+        "Сопоставить commit SHA, artifact checksum и image digest на каждой stage.",
+        "Проверить правила needs/dependencies и источник artifact в deploy job.",
+        "Вернуть предыдущий проверенный digest как mitigation.",
+        "Исправить передачу одного artifact и запретить перезапись release tag.",
+        "Проверить retention и права robot/service account.",
+        "Добавить smoke test и проверку digest после deploy."
       ],
       "commonMistakes": [
-        "Начать с перезапуска без диагностики.",
-        "Исправлять сразу несколько вещей.",
-        "Не иметь rollback-плана.",
-        "Не проверить результат после fix.",
-        "Не оформить action items."
+        "Перезаписать release tag новым image.",
+        "Очистить cache до сравнения checksum.",
+        "Повторить pipeline без выяснения источника старого artifact.",
+        "Не проверить результат исходным сигналом.",
+        "Не оформить prevention и владельца действия."
       ],
       "scoring": {
         "evidence": 20,
@@ -951,28 +951,28 @@
       "topic": "CI/CD",
       "type": "rollback",
       "title": "После релиза выросли 500, нужен rollback за 5 минут",
-      "context": "Учебный production-инцидент недели 10. Тема: CI/CD: deployment, rollback, environments. Нужно собрать evidence и безопасно восстановить сервис.",
+      "context": "Учебный production-инцидент недели 10: CI/CD: deployment, Jenkins и rollback. Нужно сохранить evidence, ограничить impact и восстановить проверяемое состояние.",
       "evidence": [
-        "Topic: CI/CD: deployment, rollback, environments",
-        "Symptom: После релиза выросли 500, нужен rollback за 5 минут",
-        "Impact: pipeline, инфраструктура, конфигурация или сервис работает некорректно",
-        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+        "После Jenkins deploy доля HTTP 500 выросла с 0.2% до 18%.",
+        "Smoke test для критичного POST падает, health endpoint остаётся зелёным.",
+        "Production использует новый immutable digest; staging проверял тот же digest.",
+        "Миграция добавила колонку, но rollback-runbook не проверял совместимость схемы."
       ],
-      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "task": "Определи root cause, безопасный mitigation, постоянный fix, rollback/DR, проверку результата и prevention.",
       "expectedActions": [
-        "Собрать evidence: статусы, логи, конфиги, diff, plan или backup status.",
-        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
-        "Выбрать минимальный mitigation.",
-        "Предложить постоянный fix и rollback-план.",
-        "Проверить результат тем же способом, которым был найден симптом.",
-        "Добавить prevention: тест, алерт, checklist или runbook."
+        "Связать рост 500 с Jenkins build, digest и временем deploy.",
+        "Проверить failing smoke path и application logs.",
+        "Остановить дальнейшее продвижение релиза.",
+        "Откатить на предыдущий digest по runbook, не откатывая совместимую миграцию вслепую.",
+        "Повторить smoke test и проверить метрики 5xx.",
+        "Добавить smoke gate и rehearsal rollback в pipeline."
       ],
       "commonMistakes": [
-        "Начать с перезапуска без диагностики.",
-        "Исправлять сразу несколько вещей.",
-        "Не иметь rollback-плана.",
-        "Не проверить результат после fix.",
-        "Не оформить action items."
+        "Считать зелёный health endpoint полной проверкой.",
+        "Откатывать схему БД без оценки данных.",
+        "Исправлять код прямо в production вместо возврата релиза.",
+        "Не проверить результат исходным сигналом.",
+        "Не оформить prevention и владельца действия."
       ],
       "scoring": {
         "evidence": 20,
@@ -1014,28 +1014,28 @@
       "topic": "Terraform",
       "type": "tradeoff",
       "title": "Terraform plan удаляет ресурс перед apply",
-      "context": "Учебный production-инцидент недели 11. Тема: Terraform basics. Нужно собрать evidence и безопасно восстановить сервис.",
+      "context": "Учебный production-инцидент недели 11: Terraform/OpenTofu basics. Нужно сохранить evidence, ограничить impact и восстановить проверяемое состояние.",
       "evidence": [
-        "Topic: Terraform basics",
-        "Symptom: Terraform plan удаляет ресурс перед apply",
-        "Impact: pipeline, инфраструктура, конфигурация или сервис работает некорректно",
-        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+        "Terraform plan показывает replace критичного ресурса из-за изменённого immutable attribute.",
+        "OpenTofu plan на том же HCL показывает тот же набор planned actions.",
+        "В output plan виден sensitive value без корректной маркировки.",
+        "State хранится локально и попал в список untracked files."
       ],
-      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "task": "Определи root cause, безопасный mitigation, постоянный fix, rollback/DR, проверку результата и prevention.",
       "expectedActions": [
-        "Собрать evidence: статусы, логи, конфиги, diff, plan или backup status.",
-        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
-        "Выбрать минимальный mitigation.",
-        "Предложить постоянный fix и rollback-план.",
-        "Проверить результат тем же способом, которым был найден симптом.",
-        "Добавить prevention: тест, алерт, checklist или runbook."
+        "Остановить apply и сохранить оба plan как evidence.",
+        "Найти атрибут, вызвавший replacement, и сравнить state с конфигурацией.",
+        "Убрать секреты из outputs/Git и подготовить защищённый backend.",
+        "Проверить provider lock и совместимость Terraform/OpenTofu.",
+        "Сформировать минимальный план без необъяснённого destroy.",
+        "После проверки выполнить destroy только учебных ресурсов."
       ],
       "commonMistakes": [
-        "Начать с перезапуска без диагностики.",
-        "Исправлять сразу несколько вещей.",
-        "Не иметь rollback-плана.",
-        "Не проверить результат после fix.",
-        "Не оформить action items."
+        "Применить plan, ориентируясь только на итоговое число изменений.",
+        "Коммитить state для обмена между машинами.",
+        "Запустить Terraform и OpenTofu apply одновременно.",
+        "Не проверить результат исходным сигналом.",
+        "Не оформить prevention и владельца действия."
       ],
       "scoring": {
         "evidence": 20,
@@ -1075,28 +1075,28 @@
       "topic": "Terraform",
       "type": "incident",
       "title": "Terraform apply заблокирован после падения CI",
-      "context": "Учебный production-инцидент недели 12. Тема: Terraform modules, remote state, drift. Нужно собрать evidence и безопасно восстановить сервис.",
+      "context": "Учебный production-инцидент недели 12: Terraform/OpenTofu modules, remote state и Yandex Cloud. Нужно сохранить evidence, ограничить impact и восстановить проверяемое состояние.",
       "evidence": [
-        "Topic: Terraform modules, remote state, drift",
-        "Symptom: Terraform apply заблокирован после падения CI",
-        "Impact: pipeline, инфраструктура, конфигурация или сервис работает некорректно",
-        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+        "CI упал во время OpenTofu apply, backend в Yandex Object Storage сохранил lock.",
+        "В Yandex Cloud осталась VM и отдельный тарифицируемый диск.",
+        "Lock содержит ID и владельца завершившегося job.",
+        "Новый plan нельзя получить до решения lock, но активного runner уже нет."
       ],
-      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "task": "Определи root cause, безопасный mitigation, постоянный fix, rollback/DR, проверку результата и prevention.",
       "expectedActions": [
-        "Собрать evidence: статусы, логи, конфиги, diff, plan или backup status.",
-        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
-        "Выбрать минимальный mitigation.",
-        "Предложить постоянный fix и rollback-план.",
-        "Проверить результат тем же способом, которым был найден симптом.",
-        "Добавить prevention: тест, алерт, checklist или runbook."
+        "Проверить CI, процессы и владельца lock перед любыми изменениями.",
+        "Создать backup remote state и зафиксировать Lock ID.",
+        "Снять stale lock только после подтверждения отсутствия apply.",
+        "Получить plan и сопоставить VM, диск и сеть с state.",
+        "Удалить ресурсы через destroy и отдельно проверить billing inventory.",
+        "Добавить finally cleanup и бюджетный guardrail для лаборатории."
       ],
       "commonMistakes": [
-        "Начать с перезапуска без диагностики.",
-        "Исправлять сразу несколько вещей.",
-        "Не иметь rollback-плана.",
-        "Не проверить результат после fix.",
-        "Не оформить action items."
+        "Снять lock, пока другой apply ещё работает.",
+        "Удалить VM вручную и забыть диск/IP.",
+        "Считать успешный destroy доказательством без проверки inventory.",
+        "Не проверить результат исходным сигналом.",
+        "Не оформить prevention и владельца действия."
       ],
       "scoring": {
         "evidence": 20,
@@ -1449,28 +1449,28 @@
       "topic": "Kubernetes",
       "type": "diagnostic",
       "title": "Service есть, но Ingress отдаёт 502",
-      "context": "Учебный production-инцидент недели 18. Тема: Kubernetes networking and ingress. Нужно собрать evidence и безопасно восстановить сервис.",
+      "context": "Учебный production-инцидент недели 18: Kubernetes networking, Ingress и Gateway API. Нужно сохранить evidence, ограничить impact и восстановить проверяемое состояние.",
       "evidence": [
-        "Topic: Kubernetes networking and ingress",
-        "Symptom: Service есть, но Ingress отдаёт 502",
-        "Impact: сервис, кластер, observability или безопасность работают некорректно",
-        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+        "HTTPRoute Accepted=True, но ResolvedRefs=False для backendRef.",
+        "Service существует, EndpointSlice пуст из-за несовпадения labels.",
+        "Прямой запрос к Pod успешен, через Gateway API приходит 502.",
+        "Старый Ingress на ingress-nginx всё ещё работает, но controller EOL."
       ],
-      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "task": "Определи root cause, безопасный mitigation, постоянный fix, rollback/DR, проверку результата и prevention.",
       "expectedActions": [
-        "Собрать evidence: статусы, events, логи, метрики, конфиги или timeline.",
-        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
-        "Выбрать минимальный mitigation.",
-        "Предложить постоянный fix и rollback-план.",
-        "Проверить результат тем же способом, которым был найден симптом.",
-        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+        "Прочитать Gateway и HTTPRoute status conditions.",
+        "Сопоставить backendRef, Service port, selector и Pod labels.",
+        "Проверить EndpointSlice и readiness backend Pod.",
+        "Проверить NetworkPolicy и DNS по пути трафика.",
+        "Исправить минимальную ссылку/label и сохранить rollback Route.",
+        "Подтвердить полный поток и документировать миграцию с Ingress."
       ],
       "commonMistakes": [
-        "Начать с перезапуска без диагностики.",
-        "Исправлять сразу несколько вещей.",
-        "Не иметь rollback-плана.",
-        "Не проверить результат после fix.",
-        "Не оформить action items."
+        "Менять Gateway до проверки пустых endpoints.",
+        "Считать Accepted=True доказательством доступного backend.",
+        "Строить новую production-схему на ingress-nginx после EOL.",
+        "Не проверить результат исходным сигналом.",
+        "Не оформить prevention и владельца действия."
       ],
       "scoring": {
         "evidence": 20,
@@ -1512,28 +1512,28 @@
       "topic": "Kubernetes",
       "type": "incident",
       "title": "Rolling update даёт 503 из-за readinessProbe",
-      "context": "Учебный production-инцидент недели 19. Тема: Kubernetes resources and reliability. Нужно собрать evidence и безопасно восстановить сервис.",
+      "context": "Учебный production-инцидент недели 19: Kubernetes reliability и Helm. Нужно сохранить evidence, ограничить impact и восстановить проверяемое состояние.",
       "evidence": [
-        "Topic: Kubernetes resources and reliability",
-        "Symptom: Rolling update даёт 503 из-за readinessProbe",
-        "Impact: сервис, кластер, observability или безопасность работают некорректно",
-        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+        "После helm upgrade новые Pod долго не проходят readiness.",
+        "EndpointSlice временно пустеет, клиенты получают 503.",
+        "Helm history показывает новый revision с изменёнными probe и resources.",
+        "Нагрузочный тест подтверждает окно недоступности во время rollout."
       ],
-      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "task": "Определи root cause, безопасный mitigation, постоянный fix, rollback/DR, проверку результата и prevention.",
       "expectedActions": [
-        "Собрать evidence: статусы, events, логи, метрики, конфиги или timeline.",
-        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
-        "Выбрать минимальный mitigation.",
-        "Предложить постоянный fix и rollback-план.",
-        "Проверить результат тем же способом, которым был найден симптом.",
-        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+        "Сопоставить 503 с rollout timeline и EndpointSlice.",
+        "Проверить readiness/startup probe и events нового ReplicaSet.",
+        "Просмотреть helm diff/rendered values проблемного revision.",
+        "Откатить Helm release на известный revision.",
+        "Повторить нагрузочный тест и проверить отсутствие 503.",
+        "Добавить pre-deploy template validation и rollout gate."
       ],
       "commonMistakes": [
-        "Начать с перезапуска без диагностики.",
-        "Исправлять сразу несколько вещей.",
-        "Не иметь rollback-плана.",
-        "Не проверить результат после fix.",
-        "Не оформить action items."
+        "Лечить readiness увеличением liveness delay вслепую.",
+        "Удалять старые Pod до готовности новых.",
+        "Считать статус Helm deployed доказательством доступности.",
+        "Не проверить результат исходным сигналом.",
+        "Не оформить prevention и владельца действия."
       ],
       "scoring": {
         "evidence": 20,
@@ -1575,28 +1575,28 @@
       "topic": "Monitoring",
       "type": "diagnostic",
       "title": "Метрика пропала после релиза",
-      "context": "Учебный production-инцидент недели 20. Тема: Monitoring: Prometheus and Grafana. Нужно собрать evidence и безопасно восстановить сервис.",
+      "context": "Учебный production-инцидент недели 20: Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD. Нужно сохранить evidence, ограничить impact и восстановить проверяемое состояние.",
       "evidence": [
-        "Topic: Monitoring: Prometheus and Grafana",
-        "Symptom: Метрика пропала после релиза",
-        "Impact: сервис, кластер, observability или безопасность работают некорректно",
-        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+        "После Argo CD sync Application Synced, но метрика request_duration исчезла.",
+        "Prometheus target DOWN из-за несовпадения selector ServiceMonitor.",
+        "VictoriaMetrics не получает новую серию, старые данные доступны.",
+        "Live hotfix selector был отменён self-heal до фикса в Git."
       ],
-      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "task": "Определи root cause, безопасный mitigation, постоянный fix, rollback/DR, проверку результата и prevention.",
       "expectedActions": [
-        "Собрать evidence: статусы, events, логи, метрики, конфиги или timeline.",
-        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
-        "Выбрать минимальный mitigation.",
-        "Предложить постоянный fix и rollback-план.",
-        "Проверить результат тем же способом, которым был найден симптом.",
-        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+        "Проверить Argo CD health/diff и release commit.",
+        "Проверить Prometheus target, ServiceMonitor и /metrics endpoint.",
+        "Сопоставить labels до и после релиза.",
+        "Исправить selector в Git, а не live hotfix.",
+        "Синхронизировать и подтвердить данные в Prometheus/VictoriaMetrics.",
+        "Добавить canary query и alert на пропавший target."
       ],
       "commonMistakes": [
-        "Начать с перезапуска без диагностики.",
-        "Исправлять сразу несколько вещей.",
-        "Не иметь rollback-плана.",
-        "Не проверить результат после fix.",
-        "Не оформить action items."
+        "Править live-ресурс при включённом self-heal.",
+        "Искать проблему только в Grafana dashboard.",
+        "Добавлять высококардинальную метку для диагностики.",
+        "Не проверить результат исходным сигналом.",
+        "Не оформить prevention и владельца действия."
       ],
       "scoring": {
         "evidence": 20,
@@ -1636,28 +1636,28 @@
       "topic": "Monitoring",
       "type": "incident",
       "title": "500 ошибки есть, метрики молчат",
-      "context": "Учебный production-инцидент недели 21. Тема: Logging: Loki или ELK/OpenSearch. Нужно собрать evidence и безопасно восстановить сервис.",
+      "context": "Учебный production-инцидент недели 21: Логи: Loki, Grafana Alloy и OpenTelemetry. Нужно сохранить evidence, ограничить impact и восстановить проверяемое состояние.",
       "evidence": [
-        "Topic: Logging: Loki или ELK/OpenSearch",
-        "Symptom: 500 ошибки есть, метрики молчат",
-        "Impact: сервис, кластер, observability или безопасность работают некорректно",
-        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+        "После миграции с Promtail Grafana Alloy обнаруживает targets, но Loki не получает новые записи.",
+        "Alloy exporter показывает рост failed requests.",
+        "OpenTelemetry pipeline принимает тестовую запись с correlation ID.",
+        "Positions перенесены частично, поэтому часть файлов читается повторно."
       ],
-      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "task": "Определи root cause, безопасный mitigation, постоянный fix, rollback/DR, проверку результата и prevention.",
       "expectedActions": [
-        "Собрать evidence: статусы, events, логи, метрики, конфиги или timeline.",
-        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
-        "Выбрать минимальный mitigation.",
-        "Предложить постоянный fix и rollback-план.",
-        "Проверить результат тем же способом, которым был найден симптом.",
-        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+        "Проследить тестовую запись от discovery до Loki.",
+        "Проверить Alloy/OTel internal metrics и exporter errors.",
+        "Проверить positions/checkpoints и relabel rules.",
+        "Вернуть предыдущую конфигурацию collector без удаления positions.",
+        "Исправить pipeline и подтвердить отсутствие пропусков/дублей.",
+        "Добавить alert на ingest errors и lag."
       ],
       "commonMistakes": [
-        "Начать с перезапуска без диагностики.",
-        "Исправлять сразу несколько вещей.",
-        "Не иметь rollback-плана.",
-        "Не проверить результат после fix.",
-        "Не оформить action items."
+        "Удалить positions для быстрого повторного чтения production-логов.",
+        "Перезапускать Loki до проверки collector exporter.",
+        "Оставить Promtail как бессрочное решение после EOL.",
+        "Не проверить результат исходным сигналом.",
+        "Не оформить prevention и владельца действия."
       ],
       "scoring": {
         "evidence": 20,
@@ -1697,28 +1697,28 @@
       "topic": "Monitoring",
       "type": "postmortem",
       "title": "Алерты шумят, реальный инцидент пропущен",
-      "context": "Учебный production-инцидент недели 22. Тема: Alerting, SLO, incident response. Нужно собрать evidence и безопасно восстановить сервис.",
+      "context": "Учебный production-инцидент недели 22: OpenTelemetry, алерты и incident response. Нужно сохранить evidence, ограничить impact и восстановить проверяемое состояние.",
       "evidence": [
-        "Topic: Alerting, SLO, incident response",
-        "Symptom: Алерты шумят, реальный инцидент пропущен",
-        "Impact: сервис, кластер, observability или безопасность работают некорректно",
-        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+        "Реальный SLO burn не создал page, но низкоприоритетные alerts шумят.",
+        "OpenTelemetry Collector экспортирует metrics, но traces имеют dropped spans.",
+        "В logs есть trace ID проблемного запроса, tracing backend его не находит.",
+        "Routing rule отправляет critical alert в неверный receiver."
       ],
-      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "task": "Определи root cause, безопасный mitigation, постоянный fix, rollback/DR, проверку результата и prevention.",
       "expectedActions": [
-        "Собрать evidence: статусы, events, логи, метрики, конфиги или timeline.",
-        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
-        "Выбрать минимальный mitigation.",
-        "Предложить постоянный fix и rollback-план.",
-        "Проверить результат тем же способом, которым был найден симптом.",
-        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+        "Оценить impact и SLO burn до настройки алертов.",
+        "Проследить trace ID через OTel receiver, processors и exporter.",
+        "Проверить dropped spans и routing/silence timeline.",
+        "Исправить минимальную OTel/alert config с rollback.",
+        "Отправить synthetic signal и проверить end-to-end delivery.",
+        "Оформить timeline, root cause и action items с владельцами."
       ],
       "commonMistakes": [
-        "Начать с перезапуска без диагностики.",
-        "Исправлять сразу несколько вещей.",
-        "Не иметь rollback-плана.",
-        "Не проверить результат после fix.",
-        "Не оформить action items."
+        "Просто снизить все пороги и усилить шум.",
+        "Считать отсутствие trace доказательством отсутствия запроса.",
+        "Закрыть инцидент без проверки маршрута synthetic alert.",
+        "Не проверить результат исходным сигналом.",
+        "Не оформить prevention и владельца действия."
       ],
       "scoring": {
         "evidence": 20,
@@ -1758,28 +1758,28 @@
       "topic": "Security",
       "type": "incident",
       "title": "Секрет попал в pipeline logs",
-      "context": "Учебный production-инцидент недели 23. Тема: Security baseline. Нужно собрать evidence и безопасно восстановить сервис.",
+      "context": "Учебный production-инцидент недели 23: Security и software supply chain. Нужно сохранить evidence, ограничить impact и восстановить проверяемое состояние.",
       "evidence": [
-        "Topic: Security baseline",
-        "Symptom: Секрет попал в pipeline logs",
-        "Impact: сервис, кластер, observability или безопасность работают некорректно",
-        "Constraint: нельзя делать разрушительные действия без rollback-плана"
+        "Секрет попал в pipeline logs и использовался robot account с избыточными правами.",
+        "Trivy нашёл critical CVE в опубликованном image.",
+        "Syft SBOM подтверждает уязвимую версию библиотеки.",
+        "Cosign verify не подтверждает подпись digest, который сейчас развёрнут."
       ],
-      "task": "Определи root cause, mitigation, fix, проверку результата и prevention.",
+      "task": "Определи root cause, безопасный mitigation, постоянный fix, rollback/DR, проверку результата и prevention.",
       "expectedActions": [
-        "Собрать evidence: статусы, events, логи, метрики, конфиги или timeline.",
-        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
-        "Выбрать минимальный mitigation.",
-        "Предложить постоянный fix и rollback-план.",
-        "Проверить результат тем же способом, которым был найден симптом.",
-        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+        "Отозвать и ротировать утёкший credential, сохранив audit evidence.",
+        "Ограничить robot account и Kubernetes RBAC до least privilege.",
+        "Сопоставить Trivy finding с SBOM и фактически развёрнутым digest.",
+        "Заблокировать неподписанный digest и вернуть последний доверенный image.",
+        "Пересобрать image, создать SBOM, подписать и проверить Cosign.",
+        "Добавить secret scan, policy gate и pinned CI dependencies."
       ],
       "commonMistakes": [
-        "Начать с перезапуска без диагностики.",
-        "Исправлять сразу несколько вещей.",
-        "Не иметь rollback-плана.",
-        "Не проверить результат после fix.",
-        "Не оформить action items."
+        "Только замаскировать старый лог без rotation.",
+        "Подписать изменяемый тег вместо проверки digest.",
+        "Игнорировать CVE без documented risk acceptance.",
+        "Не проверить результат исходным сигналом.",
+        "Не оформить prevention и владельца действия."
       ],
       "scoring": {
         "evidence": 20,
@@ -2206,28 +2206,28 @@
       "topic": "Kubernetes",
       "type": "incident",
       "title": "Pod переехал на другую node и потерял данные",
-      "context": "Учебный production-инцидент недели 30. Тема: Kubernetes storage and HA workloads. Нужно собрать evidence, оценить impact и безопасно восстановить сервис.",
+      "context": "Учебный production-инцидент недели 30: Kubernetes storage и HA workloads. Нужно сохранить evidence, ограничить impact и восстановить проверяемое состояние.",
       "evidence": [
-        "Topic: Kubernetes storage and HA workloads",
-        "Symptom: Pod переехал на другую node и потерял данные",
-        "Impact: production-сервис, данные, кластер или пользователи деградируют",
-        "Constraint: нельзя делать разрушительные действия без rollback/DR-плана"
+        "После reschedule StatefulSet Pod смонтировал новый empty volume вместо прежнего PVC.",
+        "PV прежнего тома имеет topology zone-a, новая node находится в zone-b.",
+        "CSI events показывают failed attachment.",
+        "Longhorn backup существует; Ceph не развёрнут и рассматривается только как архитектурная альтернатива."
       ],
-      "task": "Определи root cause, mitigation, fix, проверку результата, rollback/DR и prevention.",
+      "task": "Определи root cause, безопасный mitigation, постоянный fix, rollback/DR, проверку результата и prevention.",
       "expectedActions": [
-        "Собрать evidence: статусы, логи, метрики, topology, backup status или incident timeline.",
-        "Оценить impact, blast radius, RTO/RPO или пользовательский эффект.",
-        "Сформулировать 2-3 гипотезы и проверить их по порядку.",
-        "Выбрать минимальный mitigation.",
-        "Предложить постоянный fix и rollback/DR-план.",
-        "Добавить prevention: тест, алерт, checklist, runbook или postmortem action item."
+        "Остановить запись и сопоставить Pod, PVC, PV и volumeAttachment.",
+        "Проверить StorageClass, reclaim policy и topology constraints.",
+        "Оценить целостность исходного volume и доступный backup.",
+        "Восстановить Longhorn backup в отдельный PVC при необходимости.",
+        "Переключить StatefulSet после проверки данных и зафиксировать RTO/RPO.",
+        "Исправить topology/backup runbook; не внедрять Ceph во время инцидента."
       ],
       "commonMistakes": [
-        "Начать с перезапуска без диагностики.",
-        "Исправлять сразу несколько вещей.",
-        "Не оценить blast radius.",
-        "Не иметь rollback/DR-плана.",
-        "Не оформить action items."
+        "Удалить PVC в попытке перепривязать volume.",
+        "Считать наличие backup доказательством restore.",
+        "Начать миграцию на Ceph во время восстановления.",
+        "Не проверить результат исходным сигналом.",
+        "Не оформить prevention и владельца действия."
       ],
       "scoring": {
         "evidence": 20,

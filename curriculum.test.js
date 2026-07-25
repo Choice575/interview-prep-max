@@ -105,3 +105,51 @@ test('defines a distinct verifiable result for every study day', () => {
   });
   assert.equal(new Set(expectedResults).size, expectedResults.length);
 });
+
+test('covers roadmap v5.1 technologies in assessments and senior cases', () => {
+  const studyTests = readTask('study_tests.json');
+  const seniorCases = readTask('senior_cases.json');
+  const requiredTermsByWeek = new Map([
+    [9, ['Harbor', 'Nexus']],
+    [10, ['Jenkins']],
+    [11, ['OpenTofu']],
+    [12, ['Yandex Cloud']],
+    [18, ['Gateway API', 'HTTPRoute']],
+    [19, ['Helm']],
+    [20, ['VictoriaMetrics', 'Argo CD']],
+    [21, ['Grafana Alloy', 'OpenTelemetry', 'Promtail']],
+    [22, ['OpenTelemetry']],
+    [23, ['Trivy', 'SBOM', 'Cosign']],
+    [30, ['Longhorn', 'Ceph']]
+  ]);
+
+  requiredTermsByWeek.forEach((terms, week) => {
+    const assessmentText = JSON.stringify({
+      miniTests: studyTests.miniTests.filter(item => item.week === week),
+      weeklyTests: studyTests.weeklyTests.filter(item => item.week === week)
+    });
+    const seniorText = JSON.stringify(seniorCases.cases.filter(item => item.week === week));
+
+    terms.forEach(term => {
+      assert.ok(assessmentText.includes(term), `week ${week} assessments must cover ${term}`);
+      assert.ok(seniorText.includes(term), `week ${week} senior cases must cover ${term}`);
+    });
+  });
+});
+
+test('keeps roadmap v5.1 mini-tests specific to each study day', () => {
+  const studyTests = readTask('study_tests.json');
+  const upgradedWeeks = [9, 10, 11, 12, 18, 19, 20, 21, 22, 23, 30];
+
+  upgradedWeeks.forEach(week => {
+    const miniTests = studyTests.miniTests.filter(item => item.week === week);
+    const dayQuestions = miniTests.map(item => item.questions[0].q);
+
+    assert.equal(miniTests.length, 5, `week ${week} must have five mini-tests`);
+    assert.equal(new Set(dayQuestions).size, 5, `week ${week} must have a distinct question for every day`);
+    miniTests.forEach(item => {
+      assert.equal(item.questions.length, 5, `${item.id} must have five questions`);
+      assert.equal(item.questions.reduce((sum, question) => sum + question.score, 0), 5, `${item.id} must total five points`);
+    });
+  });
+});
