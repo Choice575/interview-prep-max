@@ -275,6 +275,24 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans
 .study-title{font-size:22px;font-weight:800;line-height:1.25;margin-bottom:8px}
 .study-goal{font-size:13px;color:var(--text2);line-height:1.6}
 .study-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.study-tech-panel{margin-top:18px;padding:14px;border:1px solid var(--border);border-radius:9px;background:linear-gradient(135deg,color-mix(in srgb,var(--bg3) 88%,var(--blue-dim)),var(--bg3))}
+.study-tech-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px}
+.study-tech-eyebrow{font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--text)}
+.study-tech-reviewed{margin-top:3px;font-size:10px;color:var(--text3)}
+.study-tech-source{max-width:48%;padding:4px 8px;border:1px solid var(--border2);border-radius:999px;font-size:10px;line-height:1.35;color:var(--text2);text-align:right}
+.study-tech-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.study-tech-group{--tech-color:var(--text2);--tech-bg:var(--bg2);min-width:0;padding:9px 10px;border-left:2px solid var(--tech-color);border-radius:5px;background:color-mix(in srgb,var(--tech-bg) 32%,var(--bg2))}
+.study-tech-label{display:flex;align-items:center;gap:6px;margin-bottom:7px;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--tech-color)}
+.study-tech-label span{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 0 3px color-mix(in srgb,currentColor 18%,transparent)}
+.study-tech-items{display:flex;flex-wrap:wrap;gap:5px}
+.study-tech-items span{max-width:100%;padding:3px 6px;border:1px solid color-mix(in srgb,var(--tech-color) 30%,var(--border));border-radius:5px;font-size:11px;font-weight:700;line-height:1.25;color:var(--text);overflow-wrap:anywhere}
+.study-tech-preferred{--tech-color:var(--green);--tech-bg:var(--green-dim)}
+.study-tech-current{--tech-color:var(--blue);--tech-bg:var(--blue-dim)}
+.study-tech-legacy{--tech-color:var(--yellow);--tech-bg:var(--yellow-dim)}
+.study-tech-eol{--tech-color:var(--red);--tech-bg:var(--red-dim)}
+.study-tech-overviewOnly{--tech-color:var(--orange);--tech-bg:var(--orange-dim)}
+.study-tech-optional{--tech-color:var(--text2);--tech-bg:var(--bg3)}
+.study-tech-note{margin-top:10px;padding-top:9px;border-top:1px dashed var(--border2);font-size:11px;line-height:1.5;color:var(--text2)}
 .study-days{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
 .study-day{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;transition:all .15s;min-height:74px;color:var(--text);font:inherit;text-align:left}
 .study-day:hover{border-color:var(--border2);background:var(--bg3)}
@@ -408,6 +426,6 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans
 .practice-footer strong{color:var(--text2)}
 @media(max-width:560px){.coach-metrics{grid-template-columns:1fr 1fr}.coach-metric:last-child{grid-column:1/-1}.coach-actions .btn{flex:1;justify-content:center}.coach-empty{align-items:flex-start;flex-direction:column}.coach-review-grid{grid-template-columns:1fr 1fr}.coach-review-grid>div:last-child{grid-column:1/-1}.coach-status{white-space:nowrap}.coach-journal-modal,.coach-ai-modal{max-height:92vh}.coach-ai-grid{grid-template-columns:1fr}}
 @media(max-width:980px){.study-layout{grid-template-columns:1fr}.study-side{order:2}.study-days{grid-template-columns:1fr 1fr}}
-@media(max-width:560px){.study-days{grid-template-columns:1fr}.study-title{font-size:18px}}
+@media(max-width:560px){.study-days{grid-template-columns:1fr}.study-title{font-size:18px}.study-tech-head{flex-direction:column;gap:8px}.study-tech-source{max-width:100%;text-align:left}.study-tech-groups{grid-template-columns:1fr}}
 @media(max-width:820px){.practices-hero{grid-template-columns:1fr;align-items:start}.practice-grid{grid-template-columns:1fr}.practice-card{min-height:230px}}
 @media(max-width:560px){.practices-hero{padding:22px}.practices-hero h2{font-size:22px}.practices-stats{grid-template-columns:1fr 1fr}.practices-stats div:nth-child(3){grid-column:1/-1;border-left:0;border-top:1px solid var(--border)}.practice-panel{padding:16px}.practice-panel-head{align-items:center}.practice-card{padding:18px;min-height:260px}.practice-action{left:18px;right:18px}.practice-footer{align-items:stretch;flex-direction:column}.practice-footer .btn{justify-content:center}}

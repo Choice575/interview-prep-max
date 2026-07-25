@@ -648,11 +648,13 @@ function renderStudy(){
   renderStudySeniorCase(cases[0]);
 }
 function renderStudyCurrent(week,day){
+  const technologyStatus=typeof IPMaxStudyUI!=='undefined'?IPMaxStudyUI.renderTechnologyStatus(week.technologyStatus,esc):'';
   document.getElementById('study-current').innerHTML=
     '<section class="study-hero"><div class="study-kicker">Неделя '+week.week+' · '+esc(week.targetLevel||'')+'</div>'+
     '<div class="study-title">'+esc(week.title)+'</div>'+
     '<div class="study-goal">'+esc(week.goal||'')+'</div>'+
-    '<div class="study-meta"><span class="tag tag-lx">День '+day.day+'</span><span class="tag tag-sc">'+esc(day.title)+'</span><span class="tag tag-tr">Production-слой</span></div></section>';
+    '<div class="study-meta"><span class="tag tag-lx">День '+day.day+'</span><span class="tag tag-sc">'+esc(day.title)+'</span><span class="tag tag-tr">Production-слой</span></div>'+
+    technologyStatus+'</section>';
 }
 function renderStudyDays(week,activeDay){
   const prog=getStudyProgress();
