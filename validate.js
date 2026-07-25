@@ -16,15 +16,50 @@ const KNOWN_STUDY_TYPES = ['incident', 'diagnostic', 'tradeoff', 'rollback', 'po
 const KNOWN_TRAINERS = ['exam', 'analytics', 'subnet', 'ts', 'cmd', 'labs', 'code', 'ansible', 'dockerfile', 'k8s', 'ports', 'git', 'regex', 'tips'];
 const APP_VERSION = '12.0.0';
 const CURRICULUM_VERSION = '5.1.0';
+const STRICT = process.argv.includes('--strict') || /^(1|true)$/i.test(String(process.env.CI || ''));
 const STUDY_PREREQUISITE_WEEKS = new Set([6, 11, 15, 17, 25]);
 const STUDY_TECHNOLOGY_STATUS_WEEKS = new Set([11, 18, 19, 20, 21, 22, 30]);
 const STUDY_TECHNOLOGY_STATUS_FIELDS = ['current', 'preferred', 'legacy', 'eol', 'overviewOnly', 'optional'];
+const KNOWN_SECRET_PATTERNS = [
+  ['private key', /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/i],
+  ['AWS access key', /\bAKIA[0-9A-Z]{16}\b/],
+  ['GitHub token', /\bgh[pousr]_[A-Za-z0-9]{20,}\b/],
+  ['bearer token', /\bBearer\s+[A-Za-z0-9._-]{24,}\b/i],
+];
 
 let errors = 0, warnings = 0;
 
 function err(msg) { console.error('  ❌ ' + msg); errors++; }
 function warn(msg) { console.warn('  ⚠️  ' + msg); warnings++; }
 function ok(msg) { console.log('  ✅ ' + msg); }
+
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+function validateStringArray(value, prefix, field, minLength = 1) {
+  if (!Array.isArray(value) || value.length < minLength || value.some(item => !isNonEmptyString(item))) {
+    err(`${prefix}: ${field} must contain at least ${minLength} non-empty item(s)`);
+    return false;
+  }
+  return true;
+}
+
+function scanKnownSecrets(value, location) {
+  if (typeof value === 'string') {
+    KNOWN_SECRET_PATTERNS.forEach(([name, pattern]) => {
+      if (pattern.test(value)) err(`${location}: possible ${name} found in curriculum data`);
+    });
+    return;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => scanKnownSecrets(item, `${location}[${index}]`));
+    return;
+  }
+  if (value && typeof value === 'object') {
+    Object.entries(value).forEach(([key, item]) => scanKnownSecrets(item, `${location}.${key}`));
+  }
+}
 
 function normalizeOptionText(opt) {
   return String(opt || '')
@@ -296,9 +331,35 @@ const studyMap = readJsonTask('study_map.json', 'Study map');
 const studyTests = readJsonTask('study_tests.json', 'Study tests');
 const seniorCases = readJsonTask('senior_cases.json', 'Senior cases');
 
+if (studyMap && studyTests && seniorCases) {
+  const versions = [studyMap.version, studyTests.version, seniorCases.version];
+  if (new Set(versions).size !== 1) err(`study JSON versions must match, found ${versions.join(', ')}`);
+
+  const studyIdOwners = new Map();
+  [
+    ['miniTests', studyTests.miniTests],
+    ['weeklyTests', studyTests.weeklyTests],
+    ['seniorCases', seniorCases.cases],
+  ].forEach(([collection, records]) => {
+    (Array.isArray(records) ? records : []).forEach(record => {
+      if (!isNonEmptyString(record.id)) return;
+      const owner = studyIdOwners.get(record.id);
+      if (owner && owner !== collection) err(`Study id ${record.id} is shared by ${owner} and ${collection}`);
+      else studyIdOwners.set(record.id, collection);
+    });
+  });
+
+  scanKnownSecrets(studyMap, 'study_map.json');
+  scanKnownSecrets(studyTests, 'study_tests.json');
+  scanKnownSecrets(seniorCases, 'senior_cases.json');
+}
+
 const seniorCaseIds = new Set();
+const seniorCasesById = new Map();
+const referencedSeniorCaseIds = new Set();
 if (seniorCases) {
   const cases = Array.isArray(seniorCases.cases) ? seniorCases.cases : [];
+  if (seniorCases.version !== CURRICULUM_VERSION) err(`senior_cases.json: expected curriculum ${CURRICULUM_VERSION}`);
   if (!Array.isArray(seniorCases.cases)) err('senior_cases.json: нет массива cases');
   ok(`Загружено ${cases.length} senior-кейсов`);
   cases.forEach((c, i) => {
@@ -309,7 +370,10 @@ if (seniorCases) {
     if (c.id) {
       if (seniorCaseIds.has(c.id)) err(`${prefix}: дубликат id=${c.id}`);
       seniorCaseIds.add(c.id);
+      if (!seniorCasesById.has(c.id)) seniorCasesById.set(c.id, c);
     }
+    if (!Number.isInteger(c.week) || c.week < 1 || c.week > 32) err(`${prefix}: week must be an integer from 1 to 32`);
+    if (!Number.isInteger(c.day) || c.day < 1 || c.day > 5) err(`${prefix}: day must be an integer from 1 to 5`);
     if (c.topic && !KNOWN_TOPICS.includes(c.topic)) warn(`${prefix}: неизвестная тема "${c.topic}"`);
     if (c.level && !KNOWN_LEVELS.includes(c.level)) warn(`${prefix}: неизвестный уровень "${c.level}"`);
     if (c.type && !KNOWN_STUDY_TYPES.includes(c.type)) err(`${prefix}: неизвестный type "${c.type}"`);
@@ -317,9 +381,13 @@ if (seniorCases) {
     if (!Array.isArray(c.expectedActions) || c.expectedActions.length === 0) err(`${prefix}: expectedActions должен быть непустым массивом`);
     if (!Array.isArray(c.commonMistakes)) err(`${prefix}: commonMistakes должен быть массивом`);
     if (!c.scoring || typeof c.scoring !== 'object' || Array.isArray(c.scoring)) err(`${prefix}: scoring должен быть объектом`);
-    else Object.entries(c.scoring).forEach(([k, v]) => {
-      if (typeof v !== 'number') err(`${prefix}: scoring.${k} должен быть числом`);
-    });
+    else {
+      Object.entries(c.scoring).forEach(([k, v]) => {
+        if (typeof v !== 'number') err(`${prefix}: scoring.${k} должен быть числом`);
+      });
+      const score = Object.values(c.scoring).reduce((sum, value) => sum + (typeof value === 'number' ? value : 0), 0);
+      if (score !== 100) err(`${prefix}: scoring must total exactly 100, found ${score}`);
+    }
   });
 }
 
@@ -332,15 +400,19 @@ if (studyMap) {
   const weekNumbers = new Set();
   weeks.forEach(w => {
     const prefix = `StudyWeek#${w.week || '?'}`;
-    if (Number.isInteger(w.week)) {
+    if (!Number.isInteger(w.week) || w.week < 1 || w.week > 32) {
+      err(`${prefix}: week must be an integer from 1 to 32`);
+    } else {
       if (weekNumbers.has(w.week)) err(`${prefix}: duplicate week number`);
       weekNumbers.add(w.week);
     }
+    ['title', 'targetLevel', 'goal', 'productionLayer', 'artifact', 'curriculumVersion'].forEach(field => {
+      if (!isNonEmptyString(w[field])) err(`${prefix}: ${field} must be a non-empty string`);
+    });
     if (w.curriculumVersion !== studyMap.version) err(`${prefix}: curriculumVersion must match study_map version`);
-    if (typeof w.artifact !== 'string' || !w.artifact.trim()) err(`${prefix}: artifact must be a non-empty string`);
-    if (!Array.isArray(w.completionCriteria) || w.completionCriteria.length !== 4 ||
+    if (!Array.isArray(w.completionCriteria) || w.completionCriteria.length < 4 ||
       w.completionCriteria.some(item => typeof item !== 'string' || !item.trim())) {
-      err(`${prefix}: completionCriteria must contain exactly four non-empty items`);
+      err(`${prefix}: completionCriteria must contain at least four non-empty items`);
     }
     if (!w.aiTrack || typeof w.aiTrack !== 'object' || Array.isArray(w.aiTrack) || w.aiTrack.optional !== true ||
       typeof w.aiTrack.title !== 'string' || !w.aiTrack.title.trim() ||
@@ -381,18 +453,30 @@ if (studyMap) {
         err(`${prefix}: technologyStatus.note must explain the classification`);
       }
     }
-    if (!w.week) err(`${prefix}: нет week`);
-    if (!w.title) err(`${prefix}: нет title`);
     if (!Array.isArray(w.days)) err(`${prefix}: days должен быть массивом`);
     else {
-      if (w.days.length !== 5) warn(`${prefix}: ожидается 5 дней, найдено ${w.days.length}`);
+      if (w.days.length !== 5) err(`${prefix}: expected exactly 5 days, found ${w.days.length}`);
+      const dayNumbers = new Set();
       w.days.forEach(d => {
         const dp = `${prefix}/Day#${d.day || '?'}`;
-        if (!d.day) err(`${dp}: нет day`);
-        if (!d.title) err(`${dp}: нет title`);
-        if (!d.objective) err(`${dp}: нет objective`);
-        if (!Array.isArray(d.practice)) warn(`${dp}: practice должен быть массивом`);
+        if (!Number.isInteger(d.day) || d.day < 1 || d.day > 5) {
+          err(`${dp}: day must be an integer from 1 to 5`);
+        } else {
+          if (dayNumbers.has(d.day)) err(`${dp}: duplicate day number`);
+          dayNumbers.add(d.day);
+        }
+        ['title', 'level', 'objective'].forEach(field => {
+          if (!isNonEmptyString(d[field])) err(`${dp}: ${field} must be a non-empty string`);
+        });
+        validateStringArray(d.practice, dp, 'practice');
+        validateStringArray(d.pitfalls, dp, 'pitfalls');
+        if (Object.prototype.hasOwnProperty.call(d, 'weeklyTest')) {
+          err(`${dp}: embedded weeklyTest is forbidden; use study_tests.json`);
+        }
       });
+      for (let day = 1; day <= 5; day++) {
+        if (!dayNumbers.has(day)) err(`${prefix}: missing day ${day}`);
+      }
     }
     const trainersList = w.interviewPrepMax && w.interviewPrepMax.trainers;
     if (trainersList) {
@@ -411,45 +495,95 @@ if (studyMap) {
 if (studyTests) {
   const miniTests = Array.isArray(studyTests.miniTests) ? studyTests.miniTests : [];
   const weeklyTests = Array.isArray(studyTests.weeklyTests) ? studyTests.weeklyTests : [];
+  if (studyTests.version !== CURRICULUM_VERSION) err(`study_tests.json: expected curriculum ${CURRICULUM_VERSION}`);
   if (!Array.isArray(studyTests.miniTests)) err('study_tests.json: нет массива miniTests');
   if (!Array.isArray(studyTests.weeklyTests)) err('study_tests.json: нет массива weeklyTests');
+  if (miniTests.length !== 160) err(`study_tests.json: expected exactly 160 miniTests, found ${miniTests.length}`);
+  if (weeklyTests.length !== 32) err(`study_tests.json: expected exactly 32 weeklyTests, found ${weeklyTests.length}`);
   ok(`Загружено ${miniTests.length} мини-тестов и ${weeklyTests.length} недельных тестов`);
 
   const miniByWeek = {};
+  const miniTestIds = new Set();
+  const miniTestCoordinates = new Set();
   miniTests.forEach(t => {
     const prefix = `MiniTest#${t.id || '?'}`;
-    if (!t.id) err(`${prefix}: нет id`);
-    if (!t.week) err(`${prefix}: нет week`);
-    if (!t.day) err(`${prefix}: нет day`);
+    if (!isNonEmptyString(t.id)) err(`${prefix}: id must be a non-empty string`);
+    else {
+      if (miniTestIds.has(t.id)) err(`${prefix}: duplicate id=${t.id}`);
+      miniTestIds.add(t.id);
+    }
+    if (!Number.isInteger(t.week) || t.week < 1 || t.week > 32) err(`${prefix}: week must be an integer from 1 to 32`);
+    if (!Number.isInteger(t.day) || t.day < 1 || t.day > 5) err(`${prefix}: day must be an integer from 1 to 5`);
+    if (Number.isInteger(t.week) && Number.isInteger(t.day)) {
+      const coordinate = `${t.week}:${t.day}`;
+      if (miniTestCoordinates.has(coordinate)) err(`${prefix}: duplicate week/day coordinate ${coordinate}`);
+      miniTestCoordinates.add(coordinate);
+    }
+    if (!isNonEmptyString(t.title)) err(`${prefix}: title must be a non-empty string`);
     if (!Array.isArray(t.questions)) err(`${prefix}: questions должен быть массивом`);
     else {
-      if (t.questions.length !== 5) warn(`${prefix}: ожидается 5 вопросов, найдено ${t.questions.length}`);
+      if (t.questions.length < 3 || t.questions.length > 5) err(`${prefix}: questions must contain 3 to 5 items, found ${t.questions.length}`);
       t.questions.forEach((q, i) => {
         if (!q.q) err(`${prefix}/Q${i + 1}: нет q`);
         if (!q.expected) err(`${prefix}/Q${i + 1}: нет expected`);
         if (typeof q.score !== 'number') err(`${prefix}/Q${i + 1}: score должен быть числом`);
       });
     }
-    if (t.week) miniByWeek[t.week] = (miniByWeek[t.week] || 0) + 1;
-    (t.relatedSeniorCases || []).forEach(id => {
-      if (!seniorCaseIds.has(id)) err(`${prefix}: relatedSeniorCases ссылается на неизвестный кейс ${id}`);
-    });
+    if (Number.isInteger(t.week)) miniByWeek[t.week] = (miniByWeek[t.week] || 0) + 1;
+    if (t.relatedSeniorCases !== undefined && !Array.isArray(t.relatedSeniorCases)) {
+      err(`${prefix}: relatedSeniorCases must be an array`);
+    } else {
+      (t.relatedSeniorCases || []).forEach(id => {
+        referencedSeniorCaseIds.add(id);
+        const seniorCase = seniorCasesById.get(id);
+        if (!seniorCase) err(`${prefix}: relatedSeniorCases ссылается на неизвестный кейс ${id}`);
+        else if (seniorCase.week !== t.week) err(`${prefix}: related Senior case ${id} belongs to week ${seniorCase.week}`);
+      });
+    }
   });
-  Object.entries(miniByWeek).forEach(([week, count]) => {
-    if (count !== 5) warn(`Неделя ${week}: ожидается 5 miniTests, найдено ${count}`);
-  });
+  for (let week = 1; week <= 32; week++) {
+    const count = miniByWeek[week] || 0;
+    if (count !== 5) err(`Week ${week}: expected exactly 5 miniTests, found ${count}`);
+  }
 
+  const weeklyTestIds = new Set();
+  const weeklyTestWeeks = new Set();
   weeklyTests.forEach(t => {
     const prefix = `WeeklyTest#${t.id || '?'}`;
-    if (!t.id) err(`${prefix}: нет id`);
-    if (!t.week) err(`${prefix}: нет week`);
-    if (!t.parts || typeof t.parts !== 'object') err(`${prefix}: нет parts`);
+    if (!isNonEmptyString(t.id)) err(`${prefix}: id must be a non-empty string`);
     else {
-      const score = Object.values(t.parts).reduce((sum, part) => sum + (typeof part.score === 'number' ? part.score : 0), 0);
+      if (weeklyTestIds.has(t.id)) err(`${prefix}: duplicate id=${t.id}`);
+      weeklyTestIds.add(t.id);
+    }
+    if (!Number.isInteger(t.week) || t.week < 1 || t.week > 32) err(`${prefix}: week must be an integer from 1 to 32`);
+    else {
+      if (weeklyTestWeeks.has(t.week)) err(`${prefix}: duplicate weekly test for week ${t.week}`);
+      weeklyTestWeeks.add(t.week);
+    }
+    if (!isNonEmptyString(t.title)) err(`${prefix}: title must be a non-empty string`);
+    if (t.maxScore !== 100) err(`${prefix}: maxScore must be exactly 100`);
+    if (!t.parts || typeof t.parts !== 'object' || Array.isArray(t.parts)) err(`${prefix}: parts must be an object`);
+    else {
+      Object.entries(t.parts).forEach(([name, part]) => {
+        if (!part || typeof part !== 'object' || typeof part.score !== 'number') err(`${prefix}: parts.${name}.score must be a number`);
+      });
+      const score = Object.values(t.parts).reduce((sum, part) => sum + (part && typeof part.score === 'number' ? part.score : 0), 0);
       if (score !== 100) err(`${prefix}: сумма score должна быть 100, сейчас ${score}`);
       const caseId = t.parts.seniorChallenge && t.parts.seniorChallenge.caseId;
-      if (caseId && !seniorCaseIds.has(caseId)) err(`${prefix}: seniorChallenge ссылается на неизвестный кейс ${caseId}`);
+      if (!isNonEmptyString(caseId)) err(`${prefix}: seniorChallenge.caseId is required`);
+      else {
+        referencedSeniorCaseIds.add(caseId);
+        const seniorCase = seniorCasesById.get(caseId);
+        if (!seniorCase) err(`${prefix}: seniorChallenge ссылается на неизвестный кейс ${caseId}`);
+        else if (seniorCase.week !== t.week) err(`${prefix}: seniorChallenge case ${caseId} belongs to week ${seniorCase.week}`);
+      }
     }
+  });
+  for (let week = 1; week <= 32; week++) {
+    if (!weeklyTestWeeks.has(week)) err(`study_tests.json: missing weekly test for week ${week}`);
+  }
+  seniorCaseIds.forEach(id => {
+    if (!referencedSeniorCaseIds.has(id)) err(`SeniorCase#${id}: case is not referenced by any study test`);
   });
 }
 
@@ -460,8 +594,7 @@ if (studyMap && studyTests) {
 
   miniTests.forEach(test => {
     if (!test.id) return;
-    if (miniTestsById.has(test.id)) err(`study_tests.json: duplicate mini-test id ${test.id}`);
-    miniTestsById.set(test.id, test);
+    if (!miniTestsById.has(test.id)) miniTestsById.set(test.id, test);
   });
 
   (studyMap.weeks || []).forEach(week => {
@@ -495,4 +628,5 @@ console.log(`\n${'═'.repeat(50)}`);
 console.log(`Проверка завершена: ${errors} ошибок, ${warnings} предупреждений`);
 if (errors === 0 && warnings === 0) console.log('🎉 Все данные в порядке!');
 else if (errors === 0) console.log('⚠️  Есть предупреждения, но ошибок нет');
-else { console.log('❌ Нужно исправить ошибки перед деплоем'); process.exit(1); }
+else console.log('❌ Нужно исправить ошибки перед деплоем');
+if (errors > 0 || (STRICT && warnings > 0)) process.exit(1);
