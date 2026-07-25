@@ -35,6 +35,30 @@ test('formats only valid roadmap review dates', () => {
   assert.equal(StudyUI.formatReviewDate(), '');
 });
 
+test('renders the production layer and prerequisites safely', () => {
+  const markup = StudyUI.renderWeekContext({
+    productionLayer: 'Gateway < Service',
+    prerequisites: ['Docker & Compose', 'CI создаёт image'],
+  });
+
+  assert.match(markup, /study-week-context has-prerequisites/);
+  assert.match(markup, /Production-слой/);
+  assert.match(markup, /Gateway &lt; Service/);
+  assert.match(markup, /Входные условия/);
+  assert.match(markup, /Docker &amp; Compose/);
+  assert.match(markup, /CI создаёт image/);
+});
+
+test('renders a production-only context and rejects malformed input', () => {
+  const markup = StudyUI.renderWeekContext({ productionLayer: 'Immutable artifact' });
+
+  assert.match(markup, /study-context-production/);
+  assert.doesNotMatch(markup, /has-prerequisites/);
+  assert.doesNotMatch(markup, /study-context-prerequisites/);
+  assert.equal(StudyUI.renderWeekContext(null), '');
+  assert.equal(StudyUI.renderWeekContext({ prerequisites: [] }), '');
+});
+
 test('omits an empty or malformed technology status', () => {
   assert.equal(StudyUI.renderTechnologyStatus(null), '');
   assert.equal(StudyUI.renderTechnologyStatus([]), '');

@@ -26,6 +26,32 @@
     return match ? `${match[3]}.${match[2]}.${match[1]}` : '';
   }
 
+  function renderWeekContext(week, escapeHtml) {
+    if (!week || typeof week !== 'object' || Array.isArray(week)) return '';
+    const esc = typeof escapeHtml === 'function' ? escapeHtml : defaultEscape;
+    const productionLayer = String(week.productionLayer || '').trim();
+    const prerequisites = Array.isArray(week.prerequisites)
+      ? week.prerequisites.filter(value => String(value || '').trim())
+      : [];
+    if (!productionLayer && !prerequisites.length) return '';
+
+    const productionMarkup = productionLayer
+      ? '<div class="study-context-block study-context-production">' +
+          '<div class="study-context-label">Production-слой</div>' +
+          '<p>' + esc(productionLayer) + '</p>' +
+        '</div>'
+      : '';
+    const prerequisitesMarkup = prerequisites.length
+      ? '<div class="study-context-block study-context-prerequisites">' +
+          '<div class="study-context-label">Входные условия</div>' +
+          '<ul>' + prerequisites.map(value => '<li>' + esc(value) + '</li>').join('') + '</ul>' +
+        '</div>'
+      : '';
+
+    return '<div class="study-week-context' + (productionMarkup && prerequisitesMarkup ? ' has-prerequisites' : '') + '">' +
+      productionMarkup + prerequisitesMarkup + '</div>';
+  }
+
   function renderTechnologyStatus(status, escapeHtml) {
     if (!status || typeof status !== 'object' || Array.isArray(status)) return '';
     const esc = typeof escapeHtml === 'function' ? escapeHtml : defaultEscape;
@@ -54,5 +80,5 @@
       '</section>';
   }
 
-  return { STATUS_GROUPS, formatReviewDate, renderTechnologyStatus };
+  return { STATUS_GROUPS, formatReviewDate, renderWeekContext, renderTechnologyStatus };
 });
