@@ -642,6 +642,7 @@ function renderStudy(){
   renderStudyCurrent(week,day);
   renderStudyDays(week,day.day);
   renderStudyToday(day);
+  renderStudyWeekOutcome(week);
   renderStudyMiniTest(mini,weekly,day.day===5);
   renderStudyProgress(week);
   renderStudyTrainers(week);
@@ -672,6 +673,31 @@ function renderStudyToday(day){
     '<div class="study-actions"><button class="btn btn-outline btn-sm" onclick="setStudyDayStatus(getStudyPosition().week,getStudyPosition().day,\'in_progress\')">Начал</button>'+
     '<button class="btn btn-primary btn-sm" onclick="setStudyDayStatus(getStudyPosition().week,getStudyPosition().day,\'done\')">Отметить готово</button>'+
     '<button class="btn btn-outline btn-sm" onclick="setStudyDayStatus(getStudyPosition().week,getStudyPosition().day,\'review\')">На повтор</button></div></section>';
+}
+function renderStudyWeekOutcome(week){
+  const el=document.getElementById('study-week-outcome');
+  if(!el)return;
+  const progress=getStudyProgress();
+  const key='w'+week.week+'criteria';
+  const completed=Array.isArray(progress[key])?progress[key]:[];
+  el.innerHTML=typeof IPMaxStudyUI!=='undefined'?IPMaxStudyUI.renderWeekOutcome(week,completed,esc):'';
+  el.onchange=event=>{
+    const checkbox=event.target.closest?.('[data-study-criterion]');
+    if(!checkbox||!el.contains(checkbox))return;
+    setStudyCriterion(week.week,Number(checkbox.dataset.studyCriterion),checkbox.checked);
+  };
+}
+function setStudyCriterion(weekNumber,index,isComplete){
+  const week=getStudyWeek(weekNumber);
+  const criteria=week?.completionCriteria||[];
+  if(!Number.isInteger(index)||index<0||index>=criteria.length)return;
+  const progress=getStudyProgress();
+  const key='w'+weekNumber+'criteria';
+  const completed=Array.isArray(progress[key])?progress[key].slice(0,criteria.length):[];
+  completed[index]=Boolean(isComplete);
+  progress[key]=completed;
+  lsSet('study_progress',progress);
+  renderStudyWeekOutcome(week);
 }
 function renderStudyMiniTest(test,weekly,showWeekly){
   const el=document.getElementById('study-test');

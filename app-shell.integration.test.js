@@ -42,12 +42,14 @@ test('serves the complete app shell and personal-coach modules', async () => {
     assert.match(analyticsUi, /selectNextQuestions/);
     assert.match(homeUi, /calculateMastery/);
     assert.match(homeUi, /data-home-action/);
+    assert.match(html, /id="study-week-outcome"/);
     assert.ok(html.indexOf('./home-ui.js') < html.indexOf('./exam-ui.js'));
     assert.ok(html.indexOf('./exam-ui.js') < html.indexOf('./study-ui.js'));
     assert.match(examUi, /filterQuestions/);
     assert.match(examUi, /data-exam-action="answer"/);
     assert.ok(html.indexOf('./study-ui.js') < html.indexOf('./coach-ui.js'));
     assert.match(studyUi, /renderTechnologyStatus/);
+    assert.match(studyUi, /data-study-criterion/);
     assert.ok(html.indexOf('./coach-ui.js') < html.indexOf('./app.js'));
     assert.match(coachUi, /data-coach-action="start-control"/);
     assert.match(app, /recordQuestionResult/);

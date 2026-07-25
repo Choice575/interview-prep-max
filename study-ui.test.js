@@ -59,6 +59,30 @@ test('renders a production-only context and rejects malformed input', () => {
   assert.equal(StudyUI.renderWeekContext({ prerequisites: [] }), '');
 });
 
+test('renders a weekly artifact and persisted completion criteria', () => {
+  const markup = StudyUI.renderWeekOutcome({
+    artifact: 'Signed image <release>',
+    completionCriteria: ['Build проходит', 'Rollback & restore проверены'],
+  }, [true, false]);
+
+  assert.match(markup, /Результат недели/);
+  assert.match(markup, /Signed image &lt;release&gt;/);
+  assert.match(markup, /1 \/ 2/);
+  assert.match(markup, /data-study-criterion="0" checked/);
+  assert.match(markup, /study-criterion is-complete/);
+  assert.match(markup, /Rollback &amp; restore проверены/);
+  assert.doesNotMatch(markup, /data-study-criterion="1" checked/);
+});
+
+test('renders artifact-only outcomes and omits malformed outcomes', () => {
+  const markup = StudyUI.renderWeekOutcome({ artifact: 'Runbook' });
+
+  assert.match(markup, /Runbook/);
+  assert.doesNotMatch(markup, /study-criteria/);
+  assert.equal(StudyUI.renderWeekOutcome(null), '');
+  assert.equal(StudyUI.renderWeekOutcome({ completionCriteria: [] }), '');
+});
+
 test('omits an empty or malformed technology status', () => {
   assert.equal(StudyUI.renderTechnologyStatus(null), '');
   assert.equal(StudyUI.renderTechnologyStatus([]), '');

@@ -52,6 +52,37 @@
       productionMarkup + prerequisitesMarkup + '</div>';
   }
 
+  function renderWeekOutcome(week, completedCriteria, escapeHtml) {
+    if (!week || typeof week !== 'object' || Array.isArray(week)) return '';
+    const esc = typeof escapeHtml === 'function' ? escapeHtml : defaultEscape;
+    const artifact = String(week.artifact || '').trim();
+    const criteria = Array.isArray(week.completionCriteria)
+      ? week.completionCriteria.filter(value => String(value || '').trim())
+      : [];
+    if (!artifact && !criteria.length) return '';
+
+    const completed = Array.isArray(completedCriteria) ? completedCriteria : [];
+    const completedCount = criteria.reduce((total, value, index) => total + (completed[index] === true ? 1 : 0), 0);
+    const artifactMarkup = artifact
+      ? '<div class="study-artifact"><div class="study-outcome-label">Артефакт недели</div><p>' + esc(artifact) + '</p></div>'
+      : '';
+    const criteriaMarkup = criteria.length
+      ? '<div class="study-criteria"><div class="study-criteria-head"><h4>Критерии завершения</h4>' +
+          '<span aria-live="polite">' + completedCount + ' / ' + criteria.length + '</span></div>' +
+          '<div class="study-criteria-list">' + criteria.map((value, index) =>
+            '<label class="study-criterion' + (completed[index] === true ? ' is-complete' : '') + '">' +
+              '<input type="checkbox" data-study-criterion="' + index + '"' + (completed[index] === true ? ' checked' : '') + '>' +
+              '<span class="study-criterion-box" aria-hidden="true"></span>' +
+              '<span class="study-criterion-text">' + esc(value) + '</span>' +
+            '</label>'
+          ).join('') + '</div></div>'
+      : '';
+
+    return '<section class="study-card study-outcome">' +
+      '<div class="study-outcome-kicker">Результат недели</div><h3>Что должно остаться после практики</h3>' +
+      artifactMarkup + criteriaMarkup + '</section>';
+  }
+
   function renderTechnologyStatus(status, escapeHtml) {
     if (!status || typeof status !== 'object' || Array.isArray(status)) return '';
     const esc = typeof escapeHtml === 'function' ? escapeHtml : defaultEscape;
@@ -80,5 +111,5 @@
       '</section>';
   }
 
-  return { STATUS_GROUPS, formatReviewDate, renderWeekContext, renderTechnologyStatus };
+  return { STATUS_GROUPS, formatReviewDate, renderWeekContext, renderWeekOutcome, renderTechnologyStatus };
 });
