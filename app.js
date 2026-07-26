@@ -615,7 +615,12 @@ function endMockInterview(){
 
 // ═══ STUDY TAB ═══
 function getStudyPosition(){return lsGet('study_position',{week:1,day:1});}
-function setStudyPosition(week,day){lsSet('study_position',{week:week,day:day});renderStudy();}
+function setStudyPosition(week,day){
+  const targetWeek=getStudyWeek(Number(week));
+  const targetDay=targetWeek&&(targetWeek.days||[]).find(item=>item.day===Number(day));
+  if(!targetWeek||!targetDay)return;
+  lsSet('study_position',{week:targetWeek.week,day:targetDay.day});renderStudy();
+}
 function getStudyProgress(){return lsGet('study_progress',{});}
 function setStudyDayStatus(week,day,status){const p=getStudyProgress();p['w'+week+'d'+day]=status;lsSet('study_progress',p);renderStudy();}
 function getStudyWeek(week){return (STUDY_MAP?.weeks||[]).find(w=>w.week===week);}
@@ -639,6 +644,7 @@ function renderStudy(){
   const mini=getMiniTest(actualPos.week,actualPos.day);
   const weekly=getWeeklyTest(actualPos.week);
   const cases=getSeniorCasesForDay(actualPos.week,actualPos.day);
+  renderStudyWeekNavigator(week.week);
   renderStudyCurrent(week,day);
   renderStudyDays(week,day.day);
   renderStudyToday(day);
@@ -648,6 +654,23 @@ function renderStudy(){
   renderStudyProgress(week);
   renderStudyTrainers(week);
   renderStudySeniorCase(cases[0]);
+}
+function renderStudyWeekNavigator(activeWeek){
+  const el=document.getElementById('study-roadmap');
+  if(!el)return;
+  const weeks=STUDY_MAP?.weeks||[];
+  el.innerHTML=typeof IPMaxStudyUI!=='undefined'?IPMaxStudyUI.renderWeekNavigator(weeks,activeWeek,esc):'';
+  el.onclick=event=>{
+    const direct=event.target.closest?.('[data-study-week]');
+    if(direct&&el.contains(direct)){setStudyPosition(Number(direct.dataset.studyWeek),1);return;}
+    const shift=event.target.closest?.('[data-study-week-shift]');
+    if(!shift||!el.contains(shift))return;
+    setStudyPosition(activeWeek+Number(shift.dataset.studyWeekShift),1);
+  };
+  el.onchange=event=>{
+    const select=event.target.closest?.('[data-study-week-select]');
+    if(select&&el.contains(select))setStudyPosition(Number(select.value),1);
+  };
 }
 function renderStudyCurrent(week,day){
   const weekContext=typeof IPMaxStudyUI!=='undefined'?IPMaxStudyUI.renderWeekContext(week,esc):'';

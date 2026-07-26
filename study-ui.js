@@ -35,6 +35,38 @@
       '<p>' + esc(result) + '</p></div>';
   }
 
+  function renderWeekNavigator(weeks, activeWeek, escapeHtml) {
+    if (!Array.isArray(weeks) || !weeks.length) return '';
+    const esc = typeof escapeHtml === 'function' ? escapeHtml : defaultEscape;
+    const currentIndex = Math.max(0, weeks.findIndex(week => week && week.week === activeWeek));
+    const current = weeks[currentIndex];
+    if (!current) return '';
+    const previous = weeks[currentIndex - 1];
+    const next = weeks[currentIndex + 1];
+    const options = weeks.map(week =>
+      '<option value="' + week.week + '"' + (week.week === current.week ? ' selected' : '') + '>' +
+        'Неделя ' + week.week + ' · ' + esc(week.title || '') + '</option>'
+    ).join('');
+    const map = weeks.map(week =>
+      '<button type="button" class="study-week-map-item' + (week.week === current.week ? ' is-current' : '') + '" ' +
+        'data-study-week="' + week.week + '"' + (week.week === current.week ? ' aria-current="step"' : '') + '>' +
+        '<span>' + String(week.week).padStart(2, '0') + '</span><strong>' + esc(week.title || '') + '</strong>' +
+      '</button>'
+    ).join('');
+
+    return '<section class="study-roadmap-nav" aria-label="Навигация по учебному плану">' +
+      '<div class="study-roadmap-controls">' +
+        '<button type="button" class="btn btn-outline btn-sm" data-study-week-shift="-1"' + (!previous ? ' disabled' : '') +
+          ' aria-label="Предыдущая неделя">← <span>' + (previous ? 'Неделя ' + previous.week : 'Начало') + '</span></button>' +
+        '<label class="study-week-select"><span>Текущая неделя</span><select data-study-week-select>' + options + '</select></label>' +
+        '<button type="button" class="btn btn-outline btn-sm" data-study-week-shift="1"' + (!next ? ' disabled' : '') +
+          ' aria-label="Следующая неделя"><span>' + (next ? 'Неделя ' + next.week : 'Финиш') + '</span> →</button>' +
+      '</div>' +
+      '<details class="study-week-map"><summary>Карта курса · ' + weeks.length + ' недели</summary>' +
+        '<div class="study-week-map-grid">' + map + '</div></details>' +
+    '</section>';
+  }
+
   function renderWeekContext(week, escapeHtml) {
     if (!week || typeof week !== 'object' || Array.isArray(week)) return '';
     const esc = typeof escapeHtml === 'function' ? escapeHtml : defaultEscape;
@@ -141,5 +173,5 @@
       '</section>';
   }
 
-  return { STATUS_GROUPS, formatReviewDate, renderExpectedResult, renderWeekContext, renderWeekOutcome, renderAITrack, renderTechnologyStatus };
+  return { STATUS_GROUPS, formatReviewDate, renderExpectedResult, renderWeekNavigator, renderWeekContext, renderWeekOutcome, renderAITrack, renderTechnologyStatus };
 });

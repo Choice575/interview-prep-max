@@ -45,6 +45,32 @@ test('renders a verifiable daily result safely', () => {
   assert.equal(StudyUI.renderExpectedResult(null), '');
 });
 
+test('renders accessible navigation for every roadmap week', () => {
+  const weeks = [
+    { week: 1, title: 'Linux <basics>' },
+    { week: 2, title: 'Сети & HTTP' },
+    { week: 3, title: 'Processes' },
+  ];
+  const markup = StudyUI.renderWeekNavigator(weeks, 2);
+
+  assert.match(markup, /data-study-week-select/);
+  assert.match(markup, /value="2" selected/);
+  assert.match(markup, /data-study-week="2" aria-current="step"/);
+  assert.match(markup, /data-study-week-shift="-1"/);
+  assert.match(markup, /data-study-week-shift="1"/);
+  assert.match(markup, /Карта курса · 3 недели/);
+  assert.match(markup, /Linux &lt;basics&gt;/);
+  assert.match(markup, /Сети &amp; HTTP/);
+  assert.equal(StudyUI.renderWeekNavigator([], 1), '');
+});
+
+test('disables week navigation at roadmap boundaries', () => {
+  const weeks = [{ week: 1, title: 'Start' }, { week: 2, title: 'Finish' }];
+
+  assert.match(StudyUI.renderWeekNavigator(weeks, 1), /data-study-week-shift="-1" disabled/);
+  assert.match(StudyUI.renderWeekNavigator(weeks, 2), /data-study-week-shift="1" disabled/);
+});
+
 test('renders the production layer and prerequisites safely', () => {
   const markup = StudyUI.renderWeekContext({
     productionLayer: 'Gateway < Service',
