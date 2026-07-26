@@ -106,6 +106,26 @@ test('defines a distinct verifiable result for every study day', () => {
   assert.equal(new Set(expectedResults).size, expectedResults.length);
 });
 
+test('keeps the detailed v5.1 days concrete instead of template-generated', () => {
+  const studyMap = readTask('study_map.json');
+  const detailedWeeks = new Set([9, 10, 11, 12, 18, 19, 20, 21, 22, 23]);
+  const days = studyMap.weeks
+    .filter(week => detailedWeeks.has(week.week))
+    .flatMap(week => week.days);
+
+  assert.equal(days.length, 50);
+  for (const field of ['title', 'objective', 'expectedResult']) {
+    assert.equal(new Set(days.map(day => day[field])).size, days.length, `${field} must be unique for all detailed days`);
+  }
+  for (const field of ['practice', 'pitfalls']) {
+    assert.equal(new Set(days.map(day => JSON.stringify(day[field]))).size, days.length, `${field} must be specific to every detailed day`);
+  }
+  days.forEach(day => {
+    assert.doesNotMatch(day.objective, /по теме:/i);
+    assert.doesNotMatch(day.practice.join(' '), /прочитать цель недели|выполнить базовую команду\/конфиг/i);
+  });
+});
+
 test('covers roadmap v5.1 technologies in assessments and senior cases', () => {
   const studyTests = readTask('study_tests.json');
   const seniorCases = readTask('senior_cases.json');

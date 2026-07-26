@@ -1393,96 +1393,96 @@
       "days": [
         {
           "day": 1,
-          "title": "Новая тема и базовая практика",
+          "title": "Pipeline: stages, jobs, runner и variables",
           "level": "Middle",
-          "objective": "Новая тема и базовая практика по теме: CI/CD: pipeline и registry.",
-          "expectedResult": "По теме «CI/CD: pipeline и registry» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Разобрать структуру CI pipeline и собрать минимальный .gitlab-ci.yml со stages, независимыми jobs, runner tags и безопасными variables.",
+          "expectedResult": "Pipeline запускает lint, test и build по порядку; в сохранённом выводе jobs видны runner, stage и итоговый status, а секретные variables не раскрываются.",
           "practice": [
-            "прочитать цель недели",
-            "выполнить базовую команду/конфиг",
-            "сохранить вывод",
-            "объяснить результат своими словами"
+            "описать stages lint, test и build в .gitlab-ci.yml",
+            "разнести команды по независимым jobs",
+            "назначить подходящий runner tag",
+            "запустить pipeline и сохранить job logs"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "хранить секреты прямо в YAML",
+            "передавать состояние между jobs через рабочий каталог runner",
+            "использовать production runner без ограничивающих tags"
           ],
           "miniTestId": "mini-w9d1-cicd-artifact-015"
         },
         {
           "day": 2,
-          "title": "Углубление и работа с выводом",
+          "title": "Cache, artifacts и проверенный результат",
           "level": "Middle",
-          "objective": "Углубление и работа с выводом по теме: CI/CD: pipeline и registry.",
-          "expectedResult": "По теме «CI/CD: pipeline и registry» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Научиться различать ускоряющий cache и переносимый artifact, передавать результат build между stages и проверять его целостность.",
+          "expectedResult": "Следующий job получает именно проверенный build artifact; evidence содержит artifact ID, срок хранения и совпадающий checksum, а cache можно удалить без потери релиза.",
           "practice": [
-            "получить подробный вывод",
-            "найти ключевые поля",
-            "сравнить нормальный и проблемный случай",
-            "записать выводы"
+            "добавить cache для зависимостей с осмысленным key",
+            "сохранить build как artifact с ограниченным сроком жизни",
+            "скачать artifact в следующем job",
+            "сравнить checksum до и после передачи"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "считать cache источником релизного artifact",
+            "использовать один cache key для несовместимых веток",
+            "публиковать artifact без checksum и срока хранения"
           ],
           "miniTestId": "mini-w9d2-cicd-artifact-015"
         },
         {
           "day": 3,
-          "title": "Production-слой и типовые ошибки",
+          "title": "GitLab Registry, Harbor/Nexus и service accounts",
           "level": "Middle",
-          "objective": "Production-слой и типовые ошибки по теме: CI/CD: pipeline и registry.",
-          "expectedResult": "По теме «CI/CD: pipeline и registry» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Опубликовать immutable image в registry и сравнить GitLab Container Registry, Harbor и Nexus по доступу, сканированию и эксплуатации.",
+          "expectedResult": "Image опубликован от ограниченного service account с immutable tag; вывод push содержит digest, а таблица выбора объясняет, когда нужны Harbor, Nexus или встроенный GitLab Registry.",
           "practice": [
-            "смоделировать типовую ошибку",
-            "найти root cause",
-            "предложить минимальное исправление",
-            "описать rollback"
+            "создать отдельный service account для push",
+            "собрать image с тегом commit SHA",
+            "выполнить login без вывода токена в лог",
+            "зафиксировать image digest и сравнение registry"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "выдавать pipeline учётные данные администратора",
+            "передавать пароль в аргументах команды",
+            "считать изменяемый tag достаточным идентификатором релиза"
           ],
           "miniTestId": "mini-w9d3-cicd-artifact-015"
         },
         {
           "day": 4,
-          "title": "Мини-инцидент или сквозной проект",
+          "title": "Инцидент: изменяемый тег latest",
           "level": "Middle",
-          "objective": "Мини-инцидент или сквозной проект по теме: CI/CD: pipeline и registry.",
-          "expectedResult": "По теме «CI/CD: pipeline и registry» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Расследовать расхождение между ожидаемой и запущенной версией, когда тег latest был перезаписан после сборки.",
+          "expectedResult": "Причина старого или неожиданного image подтверждена сравнением digest в build, registry и workload; evidence, безопасный rollback и запрет перезаписи release tags записаны в incident note.",
           "practice": [
-            "собрать evidence",
-            "сформулировать гипотезы",
-            "проверить гипотезы по порядку",
-            "оформить короткий runbook"
+            "сравнить commit SHA pipeline и release metadata",
+            "получить digest image в registry",
+            "снять digest реально запущенного workload",
+            "оформить timeline, root cause и rollback"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "перезапускать deploy до сбора evidence",
+            "удалять latest и терять исходное состояние",
+            "объявлять причиной cache без сравнения digest"
           ],
           "miniTestId": "mini-w9d4-cicd-artifact-015"
         },
         {
           "day": 5,
-          "title": "Итог недели и Senior Challenge",
+          "title": "Pipeline lint -> test -> build -> scan -> push",
           "level": "Middle",
-          "objective": "Итог недели и Senior Challenge по теме: CI/CD: pipeline и registry.",
-          "expectedResult": "Артефакт недели «week09/ci-basics/ с рабочим pipeline и registry» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Собрать полный CI pipeline, который не публикует image при ошибках lint, tests или security scan.",
+          "expectedResult": "Рабочий pipeline публикует image только после всех обязательных gates; сохранённый вывод успешного и намеренно сломанного запуска доказывает порядок stages и блокировку push.",
           "practice": [
-            "выполнить итоговую задачу",
-            "ответить на мини-тест",
-            "разобрать Senior Challenge",
-            "записать ошибки недели"
+            "соединить stages lint, test, build, scan и push",
+            "передать artifact и digest между stages",
+            "проверить остановку pipeline на намеренной ошибке",
+            "пройти мини-тест и разобрать Senior Challenge"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "запускать push независимо от scan",
+            "игнорировать exit code обязательного теста",
+            "сохранять только скриншот вместо воспроизводимого pipeline"
           ],
           "miniTestId": "mini-w9d5-cicd-artifact-015"
         }
@@ -1553,96 +1553,96 @@
       "days": [
         {
           "day": 1,
-          "title": "Новая тема и базовая практика",
+          "title": "Environments и protected variables",
           "level": "Middle+",
-          "objective": "Новая тема и базовая практика по теме: CI/CD: deployment, Jenkins и rollback.",
-          "expectedResult": "По теме «CI/CD: deployment, Jenkins и rollback» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Разделить staging и production, ограничить production jobs защищёнными ветками и настроить protected variables без утечки секретов.",
+          "expectedResult": "Staging доступен обычному merge pipeline, production только защищённой ветке; вывод jobs подтверждает environment и доступ, не раскрывая значения protected variables.",
           "practice": [
-            "прочитать цель недели",
-            "выполнить базовую команду/конфиг",
-            "сохранить вывод",
-            "объяснить результат своими словами"
+            "описать staging и production environments",
+            "ограничить production job protected branch",
+            "добавить masked protected variable",
+            "проверить права и вывод обоих deploy jobs"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "использовать общий незащищённый секрет для всех веток",
+            "давать review environment доступ к production",
+            "печатать переменные при диагностике pipeline"
           ],
           "miniTestId": "mini-w10d1-cicd-rollback-016"
         },
         {
           "day": 2,
-          "title": "Углубление и работа с выводом",
+          "title": "Smoke-test и immutable release tags",
           "level": "Middle+",
-          "objective": "Углубление и работа с выводом по теме: CI/CD: deployment, Jenkins и rollback.",
-          "expectedResult": "По теме «CI/CD: deployment, Jenkins и rollback» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Добавить после deploy проверяемый smoke-test и привязать релиз к immutable tag и image digest.",
+          "expectedResult": "Smoke-test подтверждает health и критичный пользовательский сценарий; evidence содержит HTTP status, проверенное тело ответа и digest версии, фактически развёрнутой в environment.",
           "practice": [
-            "получить подробный вывод",
-            "найти ключевые поля",
-            "сравнить нормальный и проблемный случай",
-            "записать выводы"
+            "публиковать release tag вместе с commit SHA",
+            "выполнить deploy по immutable tag или digest",
+            "проверить health и один критичный endpoint",
+            "сохранить HTTP status, latency и deployed digest"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "проверять только старт процесса",
+            "использовать latest как release tag",
+            "считать HTTP 200 достаточным без проверки ответа"
           ],
           "miniTestId": "mini-w10d2-cicd-rollback-016"
         },
         {
           "day": 3,
-          "title": "Production-слой и типовые ошибки",
+          "title": "Declarative Jenkinsfile",
           "level": "Middle+",
-          "objective": "Production-слой и типовые ошибки по теме: CI/CD: deployment, Jenkins и rollback.",
-          "expectedResult": "По теме «CI/CD: deployment, Jenkins и rollback» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Прочитать и собрать минимальный declarative Jenkinsfile с agent, stages и credentials binding без секретов в console log.",
+          "expectedResult": "Jenkins выполняет отдельные lint, test и deploy stages; вывод stage view и console log показывает порядок и результат, а credential остаётся замаскированным.",
           "practice": [
-            "смоделировать типовую ошибку",
-            "найти root cause",
-            "предложить минимальное исправление",
-            "описать rollback"
+            "описать agent и stages в Jenkinsfile",
+            "подключить credential через credentials binding",
+            "добавить lint, test и deploy stage",
+            "запустить build и изучить stage view и console output"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "вставлять credential в Jenkinsfile",
+            "использовать один shell stage для всего pipeline",
+            "отключать masking ради диагностики"
           ],
           "miniTestId": "mini-w10d3-cicd-rollback-016"
         },
         {
           "day": 4,
-          "title": "Мини-инцидент или сквозной проект",
+          "title": "Инцидент: deploy использовал старый artifact",
           "level": "Middle+",
-          "objective": "Мини-инцидент или сквозной проект по теме: CI/CD: deployment, Jenkins и rollback.",
-          "expectedResult": "По теме «CI/CD: deployment, Jenkins и rollback» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Найти место, где deployment потерял связь с проверенным artifact, и восстановить трассируемость от commit до запущенной версии.",
+          "expectedResult": "Старый artifact локализован на конкретном шаге передачи; evidence связывает commit, build, checksum и deployed digest, а исправление не изменяет уже выпущенные immutable artifacts.",
           "practice": [
-            "собрать evidence",
-            "сформулировать гипотезы",
-            "проверить гипотезы по порядку",
-            "оформить короткий runbook"
+            "сопоставить build number и commit SHA",
+            "проверить artifact checksum в CI storage",
+            "сравнить release metadata и запущенный digest",
+            "оформить причину, mitigation и rollback"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "пересобирать artifact до сравнения checksum",
+            "очищать workspace и уничтожать evidence",
+            "перезаписывать release tag новой сборкой"
           ],
           "miniTestId": "mini-w10d4-cicd-rollback-016"
         },
         {
           "day": 5,
-          "title": "Итог недели и Senior Challenge",
+          "title": "Manual approval и проверенный rollback",
           "level": "Middle+",
-          "objective": "Итог недели и Senior Challenge по теме: CI/CD: deployment, Jenkins и rollback.",
-          "expectedResult": "Артефакт недели «week10/cd/ со staging, approval, минимальным Jenkinsfile и rollback-runbook» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Построить контролируемый production deploy с manual approval, smoke-test и rollback на последнюю проверенную версию.",
+          "expectedResult": "Production deploy требует явного approval и сохраняет audit evidence; лабораторный rollback возвращает предыдущий digest, а повторный smoke-test подтверждает восстановление сервиса.",
           "practice": [
-            "выполнить итоговую задачу",
-            "ответить на мини-тест",
-            "разобрать Senior Challenge",
-            "записать ошибки недели"
+            "добавить manual approval перед production",
+            "записать approver и release metadata",
+            "намеренно развернуть дефектную версию в лаборатории",
+            "выполнить rollback и повторный smoke-test"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "считать approval заменой автоматическим тестам",
+            "откатываться на неизвестный latest",
+            "завершать инцидент до проверки восстановленной версии"
           ],
           "miniTestId": "mini-w10d5-cicd-rollback-016"
         }
@@ -1729,96 +1729,96 @@
       "days": [
         {
           "day": 1,
-          "title": "Новая тема и базовая практика",
+          "title": "HCL, providers и resources",
           "level": "Middle",
-          "objective": "Новая тема и базовая практика по теме: Terraform/OpenTofu basics.",
-          "expectedResult": "По теме «Terraform/OpenTofu basics» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Создать небольшой HCL-проект с закреплённой версией provider и одним безопасным локальным resource.",
+          "expectedResult": "Проект проходит fmt и validate; вывод init фиксирует выбранную версию provider, а конфигурация resource не содержит секретов или неявных production-зависимостей.",
           "practice": [
-            "прочитать цель недели",
-            "выполнить базовую команду/конфиг",
-            "сохранить вывод",
-            "объяснить результат своими словами"
+            "объявить required_version и required_providers",
+            "настроить provider без секретов в коде",
+            "описать resource и зависимости",
+            "выполнить fmt, init и validate с сохранением вывода"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "не закреплять диапазон версий provider",
+            "хранить token в .tf-файле",
+            "начинать с apply до fmt и validate"
           ],
           "miniTestId": "mini-w11d1-tf-plan-risk-017"
         },
         {
           "day": 2,
-          "title": "Углубление и работа с выводом",
+          "title": "Variables, outputs и чтение plan",
           "level": "Middle",
-          "objective": "Углубление и работа с выводом по теме: Terraform/OpenTofu basics.",
-          "expectedResult": "По теме «Terraform/OpenTofu basics» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Параметризовать конфигурацию, добавить безопасные outputs и научиться объяснять create, update, replace и destroy в plan.",
+          "expectedResult": "Сохранённый plan однозначно показывает ожидаемые действия; в разборе вывода объяснены create/update/replace/destroy, а sensitive variables и outputs не раскрыты.",
           "practice": [
-            "получить подробный вывод",
-            "найти ключевые поля",
-            "сравнить нормальный и проблемный случай",
-            "записать выводы"
+            "объявить typed variables с validation",
+            "пометить чувствительные значения sensitive",
+            "добавить полезные outputs",
+            "сохранить plan и объяснить каждое действие"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "передавать секрет через обычный output",
+            "принимать replace как безрисковое обновление",
+            "применять plan, который не был просмотрен"
           ],
           "miniTestId": "mini-w11d2-tf-plan-risk-017"
         },
         {
           "day": 3,
-          "title": "Production-слой и типовые ошибки",
+          "title": "State и секреты",
           "level": "Middle",
-          "objective": "Production-слой и типовые ошибки по теме: Terraform/OpenTofu basics.",
-          "expectedResult": "По теме «Terraform/OpenTofu basics» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Исследовать содержимое state, исключить его из Git и определить безопасное хранение и восстановление состояния.",
+          "expectedResult": "Проверочный вывод показывает, какие данные попали в state; state отсутствует в Git, а документированный план хранения включает шифрование, ограничение доступа и резервную копию.",
           "practice": [
-            "смоделировать типовую ошибку",
-            "найти root cause",
-            "предложить минимальное исправление",
-            "описать rollback"
+            "создать локальный state в учебном проекте",
+            "проверить state на чувствительные поля",
+            "добавить state и tfvars в ignore",
+            "описать backend, access control и backup"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "коммитить state как резервную копию",
+            "считать sensitive защитой данных внутри state",
+            "редактировать state вручную без backup"
           ],
           "miniTestId": "mini-w11d3-tf-plan-risk-017"
         },
         {
           "day": 4,
-          "title": "Мини-инцидент или сквозной проект",
+          "title": "Terraform и OpenTofu: совместимость и различия",
           "level": "Middle",
-          "objective": "Мини-инцидент или сквозной проект по теме: Terraform/OpenTofu basics.",
-          "expectedResult": "По теме «Terraform/OpenTofu basics» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Запустить один учебный HCL-проект Terraform и OpenTofu, сравнить lock-файлы, команды и ограничения совместимости.",
+          "expectedResult": "Один HCL-проект проверен Terraform и OpenTofu; сохранённый вывод версий, init и validate позволяет объяснить совместимую часть и обнаруженные различия без совместной записи state.",
           "practice": [
-            "собрать evidence",
-            "сформулировать гипотезы",
-            "проверить гипотезы по порядку",
-            "оформить короткий runbook"
+            "выполнить terraform init и validate",
+            "выполнить tofu init и validate на копии проекта",
+            "сравнить версии provider и lock-файлы",
+            "записать различия лицензирования и экосистемы"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "использовать один state одновременно двумя процессами",
+            "объявлять инструменты полностью взаимозаменяемыми без проверки",
+            "смешивать lock-файлы без diff"
           ],
           "miniTestId": "mini-w11d4-tf-plan-risk-017"
         },
         {
           "day": 5,
-          "title": "Итог недели и Senior Challenge",
+          "title": "Один проект в Terraform и OpenTofu",
           "level": "Middle",
-          "objective": "Итог недели и Senior Challenge по теме: Terraform/OpenTofu basics.",
-          "expectedResult": "Артефакт недели «week11/terraform-basics/ без секретов в state/Git, проверенный Terraform и OpenTofu» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Завершить воспроизводимую лабораторию, которую другой пользователь может проверить обоими инструментами и безопасно удалить.",
+          "expectedResult": "README воспроизводит fmt, validate и plan в Terraform и OpenTofu; вывод обоих plan сопоставлен, ресурс удалён, а финальная проверка не показывает незапланированных объектов.",
           "practice": [
-            "выполнить итоговую задачу",
-            "ответить на мини-тест",
-            "разобрать Senior Challenge",
-            "записать ошибки недели"
+            "добавить README с командами Terraform и OpenTofu",
+            "выполнить plan обоими инструментами",
+            "проверить отсутствие секретов и неожиданных destroy",
+            "создать и удалить учебный resource с evidence"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "оставлять созданный resource после лаборатории",
+            "скрывать различия plan между инструментами",
+            "передавать проект без version constraints"
           ],
           "miniTestId": "mini-w11d5-tf-plan-risk-017"
         }
@@ -1887,96 +1887,96 @@
       "days": [
         {
           "day": 1,
-          "title": "Новая тема и базовая практика",
+          "title": "Yandex VPC и сеть",
           "level": "Middle+",
-          "objective": "Новая тема и базовая практика по теме: Terraform/OpenTofu modules, remote state и Yandex Cloud.",
-          "expectedResult": "По теме «Terraform/OpenTofu modules, remote state и Yandex Cloud» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Спроектировать минимальную Yandex VPC с подсетью, понятным CIDR и контролируемым маршрутом доступа.",
+          "expectedResult": "Plan создаёт только ожидаемые VPC и subnet; в сохранённом выводе видны CIDR, зона и маршруты, а схема объясняет границы внешнего и внутреннего доступа.",
           "practice": [
-            "прочитать цель недели",
-            "выполнить базовую команду/конфиг",
-            "сохранить вывод",
-            "объяснить результат своими словами"
+            "создать network и subnet в отдельном каталоге",
+            "выбрать непересекающийся CIDR",
+            "описать route и требуемый внешний доступ",
+            "выполнить plan и сверить адреса и зону"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "использовать пересекающиеся CIDR",
+            "выдавать public IP без обоснования",
+            "создавать сеть до проверки квот и зоны"
           ],
           "miniTestId": "mini-w12d1-tf-lock-018"
         },
         {
           "day": 2,
-          "title": "Углубление и работа с выводом",
+          "title": "Compute VM и security group",
           "level": "Middle+",
-          "objective": "Углубление и работа с выводом по теме: Terraform/OpenTofu modules, remote state и Yandex Cloud.",
-          "expectedResult": "По теме «Terraform/OpenTofu modules, remote state и Yandex Cloud» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Описать малую Compute VM и security group с минимально необходимыми входящими и исходящими правилами.",
+          "expectedResult": "VM доступна только по разрешённому пути; вывод plan и сетевой проверки подтверждает правила security group, закрытый лишний порт и выбранный ограниченный размер ресурса.",
           "practice": [
-            "получить подробный вывод",
-            "найти ключевые поля",
-            "сравнить нормальный и проблемный случай",
-            "записать выводы"
+            "выбрать минимальный учебный размер VM",
+            "привязать VM к созданной subnet",
+            "разрешить SSH только с доверенного CIDR",
+            "проверить plan, подключение и закрытый порт"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "открывать 0.0.0.0/0 для всех портов",
+            "встраивать приватный SSH key в metadata",
+            "не учитывать стоимость диска и public IP"
           ],
           "miniTestId": "mini-w12d2-tf-lock-018"
         },
         {
           "day": 3,
-          "title": "Production-слой и типовые ошибки",
+          "title": "Object Storage для remote state",
           "level": "Middle+",
-          "objective": "Production-слой и типовые ошибки по теме: Terraform/OpenTofu modules, remote state и Yandex Cloud.",
-          "expectedResult": "По теме «Terraform/OpenTofu modules, remote state и Yandex Cloud» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Перенести state в Yandex Object Storage с блокировкой, шифрованием и отдельными ограниченными credentials.",
+          "expectedResult": "State хранится в закрытом versioned bucket; вывод init подтверждает миграцию backend, конкурентный запуск получает lock, а repository scan не находит credentials или state.",
           "practice": [
-            "смоделировать типовую ошибку",
-            "найти root cause",
-            "предложить минимальное исправление",
-            "описать rollback"
+            "создать bucket с versioning и закрытым доступом",
+            "настроить backend без секрета в репозитории",
+            "мигрировать локальный state",
+            "проверить remote state и конкурентную блокировку"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "делать bucket публичным",
+            "хранить static key в backend.tf",
+            "мигрировать state без локальной резервной копии"
           ],
           "miniTestId": "mini-w12d3-tf-lock-018"
         },
         {
           "day": 4,
-          "title": "Мини-инцидент или сквозной проект",
+          "title": "Drift, import, locking и контроль стоимости",
           "level": "Middle+",
-          "objective": "Мини-инцидент или сквозной проект по теме: Terraform/OpenTofu modules, remote state и Yandex Cloud.",
-          "expectedResult": "По теме «Terraform/OpenTofu modules, remote state и Yandex Cloud» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Смоделировать drift, вернуть существующий ресурс под управление через import и безопасно разобрать stale lock.",
+          "expectedResult": "Plan показывает смоделированный drift и стоимость изменений; evidence содержит import address, данные lock и решение о безопасном восстановлении без параллельной записи state.",
           "practice": [
-            "собрать evidence",
-            "сформулировать гипотезы",
-            "проверить гипотезы по порядку",
-            "оформить короткий runbook"
+            "изменить учебный tag вне IaC и обнаружить drift",
+            "подготовить import существующего ресурса",
+            "исследовать lock owner и timestamp",
+            "оценить стоимость plan и записать условия force-unlock"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "делать force-unlock без проверки владельца",
+            "исправлять drift ручным повторным изменением",
+            "импортировать ресурс без резервной копии state"
           ],
           "miniTestId": "mini-w12d4-tf-lock-018"
         },
         {
           "day": 5,
-          "title": "Итог недели и Senior Challenge",
+          "title": "Проверка инфраструктуры и обязательный destroy",
           "level": "Middle+",
-          "objective": "Итог недели и Senior Challenge по теме: Terraform/OpenTofu modules, remote state и Yandex Cloud.",
-          "expectedResult": "Артефакт недели «week12/yandex-cloud-iac/ с сетью, VM, remote state, расчётом стоимости и destroy» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Создать полную учебную инфраструктуру, проверить доступность и гарантированно удалить все платные ресурсы.",
+          "expectedResult": "Инфраструктура создана и проверена, затем destroy завершён; вывод CLI и отдельный список ресурсов Yandex Cloud подтверждают отсутствие VM, дисков, IP и иных платных остатков.",
           "practice": [
-            "выполнить итоговую задачу",
-            "ответить на мини-тест",
-            "разобрать Senior Challenge",
-            "записать ошибки недели"
+            "выполнить согласованный plan и apply",
+            "проверить сеть, VM и remote state",
+            "зафиксировать список и стоимость ресурсов",
+            "выполнить destroy и проверить облако отдельно"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "заканчивать лабораторию после успешного apply",
+            "считать destroy завершённым по одному exit code",
+            "оставлять диски, IP или bucket без учёта"
           ],
           "miniTestId": "mini-w12d5-tf-lock-018"
         }
@@ -2870,96 +2870,96 @@
       "days": [
         {
           "day": 1,
-          "title": "Новая тема и базовая практика",
+          "title": "Service, endpoints и CoreDNS",
           "level": "Middle",
-          "objective": "Новая тема и базовая практика по теме: Kubernetes networking, Ingress и Gateway API.",
-          "expectedResult": "По теме «Kubernetes networking, Ingress и Gateway API» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Проследить путь трафика от Kubernetes Service через EndpointSlice к Pod и проверить разрешение имени через CoreDNS.",
+          "expectedResult": "Service направляет запрос в нужный Pod; вывод get service/endpointslice, DNS lookup и curl подтверждает selector, адрес backend и рабочее разрешение CoreDNS.",
           "practice": [
-            "прочитать цель недели",
-            "выполнить базовую команду/конфиг",
-            "сохранить вывод",
-            "объяснить результат своими словами"
+            "создать Deployment и ClusterIP Service",
+            "сопоставить selector с labels Pod",
+            "проверить EndpointSlice",
+            "выполнить DNS lookup и curl из временного Pod"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "диагностировать DNS до проверки endpoints",
+            "оставлять Service без подходящих labels",
+            "тестировать внутреннее имя только с локальной машины"
           ],
           "miniTestId": "mini-w18d1-k8s-ingress-024"
         },
         {
           "day": 2,
-          "title": "Углубление и работа с выводом",
+          "title": "Ingress как существующий подход",
           "level": "Middle",
-          "objective": "Углубление и работа с выводом по теме: Kubernetes networking, Ingress и Gateway API.",
-          "expectedResult": "По теме «Kubernetes networking, Ingress и Gateway API» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Настроить базовый Ingress для существующей системы и определить границы его применения и зависимости от controller.",
+          "expectedResult": "Ingress обслуживает тестовый host; вывод IngressClass, events и HTTP-запроса подтверждает маршрут, а заметка объясняет legacy-контекст и переход к Gateway API.",
           "practice": [
-            "получить подробный вывод",
-            "найти ключевые поля",
-            "сравнить нормальный и проблемный случай",
-            "записать выводы"
+            "установить или использовать учебный Ingress controller",
+            "создать Ingress rule для Service",
+            "проверить IngressClass и controller events",
+            "описать ограничения и путь миграции"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "считать Ingress самостоятельным без controller",
+            "начинать новый дизайн на ingress-nginx без учёта EOL",
+            "игнорировать различия аннотаций контроллеров"
           ],
           "miniTestId": "mini-w18d2-k8s-ingress-024"
         },
         {
           "day": 3,
-          "title": "Production-слой и типовые ошибки",
+          "title": "GatewayClass, Gateway и HTTPRoute",
           "level": "Middle",
-          "objective": "Production-слой и типовые ошибки по теме: Kubernetes networking, Ingress и Gateway API.",
-          "expectedResult": "По теме «Kubernetes networking, Ingress и Gateway API» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Построить целевой маршрут Gateway API и объяснить разделение ответственности между инфраструктурой и приложением.",
+          "expectedResult": "HTTPRoute принят и запрограммирован; вывод status conditions для Gateway и HTTPRoute, а также HTTP-запрос подтверждают связь GatewayClass -> Gateway -> Service.",
           "practice": [
-            "смоделировать типовую ошибку",
-            "найти root cause",
-            "предложить минимальное исправление",
-            "описать rollback"
+            "проверить установленный Gateway API controller",
+            "создать GatewayClass и Gateway",
+            "привязать HTTPRoute к Service",
+            "проверить Accepted, Programmed и ResolvedRefs"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "смотреть только наличие YAML без status conditions",
+            "назначать HTTPRoute неверный parentRef",
+            "смешивать владение Gateway и маршрутом приложения"
           ],
           "miniTestId": "mini-w18d3-k8s-ingress-024"
         },
         {
           "day": 4,
-          "title": "Мини-инцидент или сквозной проект",
+          "title": "TLS, NetworkPolicy и диагностика 404/502",
           "level": "Middle",
-          "objective": "Мини-инцидент или сквозной проект по теме: Kubernetes networking, Ingress и Gateway API.",
-          "expectedResult": "По теме «Kubernetes networking, Ingress и Gateway API» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Защитить маршрут TLS и NetworkPolicy, затем различить ошибку маршрутизации 404 и недоступный backend 502.",
+          "expectedResult": "TLS и разрешённый трафик работают; сохранённый вывод двух поломок связывает 404 с matching HTTPRoute, а 502 с Service, EndpointSlice или NetworkPolicy.",
           "practice": [
-            "собрать evidence",
-            "сформулировать гипотезы",
-            "проверить гипотезы по порядку",
-            "оформить короткий runbook"
+            "подключить TLS secret к Gateway listener",
+            "ограничить backend NetworkPolicy",
+            "смоделировать неверный route и недоступный endpoint",
+            "собрать conditions, events, DNS и HTTP evidence"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "отключать NetworkPolicy до диагностики",
+            "менять сразу route, Service и Deployment",
+            "трактовать все HTTP-ошибки как проблему приложения"
           ],
           "miniTestId": "mini-w18d4-k8s-ingress-024"
         },
         {
           "day": 5,
-          "title": "Итог недели и Senior Challenge",
+          "title": "Лаборатория Gateway API",
           "level": "Middle",
-          "objective": "Итог недели и Senior Challenge по теме: Kubernetes networking, Ingress и Gateway API.",
-          "expectedResult": "Артефакт недели «week18/k8s-networking/ с Gateway API, HTTPRoute, TLS и схемой трафика» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Собрать воспроизводимую лабораторию Gateway API с HTTPRoute, TLS, ограниченным backend и проверенным rollback.",
+          "expectedResult": "Лаборатория воспроизводится по README; вывод HTTP/TLS-проверок и status conditions подтверждает маршрут, а сохранённый rollback возвращает рабочую конфигурацию.",
           "practice": [
-            "выполнить итоговую задачу",
-            "ответить на мини-тест",
-            "разобрать Senior Challenge",
-            "записать ошибки недели"
+            "развернуть Gateway, HTTPRoute и тестовый Service",
+            "выполнить позитивные и негативные HTTP-проверки",
+            "сломать route и восстановить предыдущий manifest",
+            "пройти тест и оформить схему трафика"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "проверять только happy path",
+            "не сохранять status conditions до rollback",
+            "оставлять Ingress и Gateway конкурировать за один host"
           ],
           "miniTestId": "mini-w18d5-k8s-ingress-024"
         }
@@ -3043,96 +3043,96 @@
       "days": [
         {
           "day": 1,
-          "title": "Новая тема и базовая практика",
+          "title": "Probes и типовые ошибки",
           "level": "Middle+",
-          "objective": "Новая тема и базовая практика по теме: Kubernetes reliability и Helm.",
-          "expectedResult": "По теме «Kubernetes reliability и Helm» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Настроить startup, readiness и liveness probes и увидеть, как каждая влияет на rollout и доступность.",
+          "expectedResult": "Pod проходит startup и liveness, а Service получает endpoint только после readiness; вывод conditions и events объясняет поведение при намеренной ошибке каждой probe.",
           "practice": [
-            "прочитать цель недели",
-            "выполнить базовую команду/конфиг",
-            "сохранить вывод",
-            "объяснить результат своими словами"
+            "добавить разные endpoints для probes",
+            "задать реалистичные initial delay и thresholds",
+            "смоделировать провал readiness",
+            "сравнить Pod conditions и events"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "использовать один тяжёлый endpoint для всех probes",
+            "лечить медленный старт увеличением liveness failures",
+            "проверять rollout без events"
           ],
           "miniTestId": "mini-w19d1-k8s-readiness-025"
         },
         {
           "day": 2,
-          "title": "Углубление и работа с выводом",
+          "title": "Requests, limits, OOMKilled и HPA",
           "level": "Middle+",
-          "objective": "Углубление и работа с выводом по теме: Kubernetes reliability и Helm.",
-          "expectedResult": "По теме «Kubernetes reliability и Helm» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Связать requests и limits с scheduling и OOMKilled, затем настроить HPA на доступной метрике.",
+          "expectedResult": "Сохранённый вывод describe показывает OOMKilled и причину scheduling; HPA получает метрики и изменяет replicas при нагрузке без скрытого дефицита ресурсов.",
           "practice": [
-            "получить подробный вывод",
-            "найти ключевые поля",
-            "сравнить нормальный и проблемный случай",
-            "записать выводы"
+            "задать измеренные CPU/memory requests",
+            "смоделировать превышение memory limit",
+            "проверить lastState и events",
+            "настроить HPA и наблюдать scale decision"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "копировать одинаковые limits всем сервисам",
+            "лечить OOMKilled только рестартом",
+            "включать HPA без requests и metrics source"
           ],
           "miniTestId": "mini-w19d2-k8s-readiness-025"
         },
         {
           "day": 3,
-          "title": "Production-слой и типовые ошибки",
+          "title": "Helm chart, templates и values",
           "level": "Middle+",
-          "objective": "Production-слой и типовые ошибки по теме: Kubernetes reliability и Helm.",
-          "expectedResult": "По теме «Kubernetes reliability и Helm» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Упаковать приложение в Helm chart, отделить значения окружения и проверить отрендеренные manifests до установки.",
+          "expectedResult": "Chart проходит helm lint; вывод helm template содержит ожидаемые image, resources и согласованные selectors, а values можно менять без редактирования шаблонов.",
           "practice": [
-            "смоделировать типовую ошибку",
-            "найти root cause",
-            "предложить минимальное исправление",
-            "описать rollback"
+            "создать Chart.yaml и templates",
+            "вынести image, resources и service в values",
+            "добавить helpers для labels и names",
+            "выполнить helm lint и helm template"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "зашивать environment-specific значения в templates",
+            "генерировать нестабильные selectors",
+            "устанавливать chart без просмотра rendered diff"
           ],
           "miniTestId": "mini-w19d3-k8s-readiness-025"
         },
         {
           "day": 4,
-          "title": "Мини-инцидент или сквозной проект",
+          "title": "helm upgrade, history и rollback",
           "level": "Middle+",
-          "objective": "Мини-инцидент или сквозной проект по теме: Kubernetes reliability и Helm.",
-          "expectedResult": "По теме «Kubernetes reliability и Helm» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Выполнить безопасное обновление Helm release, изучить revision history и вернуть предыдущую рабочую версию.",
+          "expectedResult": "Helm history содержит последовательные revisions; вывод rollback и rollout status подтверждает возврат предыдущего image и восстановление Service endpoints.",
           "practice": [
-            "собрать evidence",
-            "сформулировать гипотезы",
-            "проверить гипотезы по порядку",
-            "оформить короткий runbook"
+            "установить первую версию release",
+            "выполнить upgrade с изменённым image",
+            "сохранить helm history и rollout status",
+            "сломать revision и выполнить helm rollback"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "использовать upgrade без atomic или timeout",
+            "удалять release вместо анализа history",
+            "считать rollback успешным до проверки workload"
           ],
           "miniTestId": "mini-w19d4-k8s-readiness-025"
         },
         {
           "day": 5,
-          "title": "Итог недели и Senior Challenge",
+          "title": "Релиз без 503 и проверенный rollback",
           "level": "Middle+",
-          "objective": "Итог недели и Senior Challenge по теме: Kubernetes reliability и Helm.",
-          "expectedResult": "Артефакт недели «week19/k8s-helm/ с chart, values окружений, нагрузочным тестом и Helm rollback» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Настроить Helm release так, чтобы обновление сохраняло доступность, а дефектная версия быстро откатывалась.",
+          "expectedResult": "Непрерывный probe и вывод Helm показывают обновление без недопустимых 503; дефектный revision откатан, history и фактический image подтверждают восстановление.",
           "practice": [
-            "выполнить итоговую задачу",
-            "ответить на мини-тест",
-            "разобрать Senior Challenge",
-            "записать ошибки недели"
+            "настроить readiness и rolling update",
+            "запустить непрерывный HTTP probe во время upgrade",
+            "выполнить дефектный upgrade с atomic",
+            "подтвердить rollback и отсутствие длительных 503"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "использовать Recreate без необходимости",
+            "уменьшать readiness ради быстрого rollout",
+            "оценивать доступность только после завершения upgrade"
           ],
           "miniTestId": "mini-w19d5-k8s-readiness-025"
         }
@@ -3218,96 +3218,96 @@
       "days": [
         {
           "day": 1,
-          "title": "Новая тема и базовая практика",
+          "title": "Prometheus targets и PromQL",
           "level": "Middle",
-          "objective": "Новая тема и базовая практика по теме: Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD.",
-          "expectedResult": "По теме «Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Подключить приложение к Prometheus, проверить target и написать базовые диагностические PromQL-запросы.",
+          "expectedResult": "Target имеет состояние UP; вывод Prometheus API и PromQL показывает request rate и error ratio, а labels позволяют однозначно найти workload и environment.",
           "practice": [
-            "прочитать цель недели",
-            "выполнить базовую команду/конфиг",
-            "сохранить вывод",
-            "объяснить результат своими словами"
+            "экспортировать request и error metrics",
+            "проверить discovery labels и target health",
+            "написать rate и error ratio queries",
+            "сохранить ответы Prometheus API"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "начинать с dashboard при DOWN target",
+            "использовать gauge как counter",
+            "строить rate по слишком короткому окну без объяснения"
           ],
           "miniTestId": "mini-w20d1-mon-metric-missing-026"
         },
         {
           "day": 2,
-          "title": "Углубление и работа с выводом",
+          "title": "Grafana dashboard и cardinality",
           "level": "Middle",
-          "objective": "Углубление и работа с выводом по теме: Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD.",
-          "expectedResult": "По теме «Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Собрать диагностический Grafana dashboard и обнаружить опасные labels с высокой cardinality.",
+          "expectedResult": "Dashboard отвечает на четыре диагностических вопроса; вывод series count подтверждает контролируемую cardinality после удаления уникальных labels.",
           "practice": [
-            "получить подробный вывод",
-            "найти ключевые поля",
-            "сравнить нормальный и проблемный случай",
-            "записать выводы"
+            "добавить панели traffic, errors, latency и saturation",
+            "привязать панели к конкретным PromQL",
+            "проверить series count по labels",
+            "убрать request_id или user_id из metric labels"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "делать dashboard из несвязанных красивых графиков",
+            "использовать уникальные IDs как labels",
+            "скрывать единицы измерения и query"
           ],
           "miniTestId": "mini-w20d2-mon-metric-missing-026"
         },
         {
           "day": 3,
-          "title": "Production-слой и типовые ошибки",
+          "title": "VictoriaMetrics как альтернативный backend",
           "level": "Middle",
-          "objective": "Production-слой и типовые ошибки по теме: Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD.",
-          "expectedResult": "По теме «Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Подключить VictoriaMetrics как совместимый metrics backend и сравнить ingestion, query path и эксплуатационные компромиссы.",
+          "expectedResult": "Одинаковая метрика доступна в Prometheus и VictoriaMetrics; вывод запросов совпадает по значению, а решение фиксирует различия ingestion, retention и operations.",
           "practice": [
-            "смоделировать типовую ошибку",
-            "найти root cause",
-            "предложить минимальное исправление",
-            "описать rollback"
+            "настроить remote_write или vmagent",
+            "проверить поступление тестовой метрики",
+            "выполнить одинаковый PromQL к двум backend",
+            "сравнить retention, масштабирование и восстановление"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "мигрировать backend без двойной записи или проверки",
+            "считать совместимость API полной без теста",
+            "сравнивать системы только по потреблению диска"
           ],
           "miniTestId": "mini-w20d3-mon-metric-missing-026"
         },
         {
           "day": 4,
-          "title": "Мини-инцидент или сквозной проект",
+          "title": "Argo CD: sync, health, drift и self-heal",
           "level": "Middle",
-          "objective": "Мини-инцидент или сквозной проект по теме: Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD.",
-          "expectedResult": "По теме «Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Развернуть приложение через Argo CD и исследовать sync status, health status, ручной drift и self-heal.",
+          "expectedResult": "Argo CD показывает Synced/Healthy для Git revision; вывод diff фиксирует ручной drift, а self-heal возвращает кластер к declarative state без ручного patch.",
           "practice": [
-            "собрать evidence",
-            "сформулировать гипотезы",
-            "проверить гипотезы по порядку",
-            "оформить короткий runbook"
+            "создать Application на Git repository",
+            "дождаться Synced и Healthy",
+            "изменить workload вручную",
+            "наблюдать OutOfSync и восстановление self-heal"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "исправлять manifest напрямую в кластере",
+            "путать Healthy с Synced",
+            "включать auto-sync без понимания prune и rollback"
           ],
           "miniTestId": "mini-w20d4-mon-metric-missing-026"
         },
         {
           "day": 5,
-          "title": "Итог недели и Senior Challenge",
+          "title": "GitOps и диагностика пропавшей метрики",
           "level": "Middle",
-          "objective": "Итог недели и Senior Challenge по теме: Monitoring и GitOps: Prometheus, VictoriaMetrics и Argo CD.",
-          "expectedResult": "Артефакт недели «week20/gitops-monitoring/ с dashboard, тремя метриками, Argo CD Application и drift test» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Пройти сквозной сценарий: изменить мониторинг через GitOps и найти метрику, исчезнувшую после релиза.",
+          "expectedResult": "Причина пропажи метрики подтверждена цепочкой Git revision -> Argo CD -> target; вывод Prometheus API после исправления показывает непрерывное поступление новых samples.",
           "practice": [
-            "выполнить итоговую задачу",
-            "ответить на мини-тест",
-            "разобрать Senior Challenge",
-            "записать ошибки недели"
+            "внести изменение ServiceMonitor или scrape config через Git",
+            "проверить Argo CD sync и health",
+            "сопоставить release, target discovery и labels",
+            "исправить Git и подтвердить возврат метрики"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "патчить monitoring resource мимо Git",
+            "откатывать приложение до проверки target",
+            "объявлять data gap без временной шкалы"
           ],
           "miniTestId": "mini-w20d5-mon-metric-missing-026"
         }
@@ -3395,96 +3395,96 @@
       "days": [
         {
           "day": 1,
-          "title": "Новая тема и базовая практика",
+          "title": "Structured logs и correlation ID",
           "level": "Middle+",
-          "objective": "Новая тема и базовая практика по теме: Логи: Loki, Grafana Alloy и OpenTelemetry.",
-          "expectedResult": "По теме «Логи: Loki, Grafana Alloy и OpenTelemetry» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Перевести сервис на структурированные логи и обеспечить прохождение correlation ID через запрос и связанные события.",
+          "expectedResult": "Логи валидны как JSON и не содержат секретов; вывод фильтра по correlation_id восстанавливает последовательность одного запроса через все компоненты.",
           "practice": [
-            "прочитать цель недели",
-            "выполнить базовую команду/конфиг",
-            "сохранить вывод",
-            "объяснить результат своими словами"
+            "определить поля timestamp, level, service, environment и correlation_id",
+            "сгенерировать JSON logs",
+            "передать correlation ID между двумя компонентами",
+            "найти весь запрос одним фильтром"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "писать секреты и токены в поля логов",
+            "менять названия полей между сервисами",
+            "использовать сообщение вместо отдельного level"
           ],
           "miniTestId": "mini-w21d1-logs-500-027"
         },
         {
           "day": 2,
-          "title": "Углубление и работа с выводом",
+          "title": "Loki или OpenSearch",
           "level": "Middle+",
-          "objective": "Углубление и работа с выводом по теме: Логи: Loki, Grafana Alloy и OpenTelemetry.",
-          "expectedResult": "По теме «Логи: Loki, Grafana Alloy и OpenTelemetry» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Загрузить структурированные логи в Loki или OpenSearch и сравнить модель индексации, запросов и стоимости хранения.",
+          "expectedResult": "Тестовый поток находится по service и correlation ID; вывод запроса и подсчёт labels/fields подтверждают управляемую cardinality, а решение фиксирует выбор backend.",
           "practice": [
-            "получить подробный вывод",
-            "найти ключевые поля",
-            "сравнить нормальный и проблемный случай",
-            "записать выводы"
+            "настроить приём тестового потока логов",
+            "выбрать низкокардинальные labels или index fields",
+            "выполнить запрос по service и correlation ID",
+            "сравнить retention и эксплуатационные затраты"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "делать каждый correlation ID label в Loki",
+            "индексировать всё без запроса использования",
+            "сравнивать решения без оценки retention"
           ],
           "miniTestId": "mini-w21d2-logs-500-027"
         },
         {
           "day": 3,
-          "title": "Production-слой и типовые ошибки",
+          "title": "Grafana Alloy или OpenTelemetry Collector",
           "level": "Middle+",
-          "objective": "Production-слой и типовые ошибки по теме: Логи: Loki, Grafana Alloy и OpenTelemetry.",
-          "expectedResult": "По теме «Логи: Loki, Grafana Alloy и OpenTelemetry» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Собрать современный pipeline доставки логов через Grafana Alloy или OpenTelemetry Collector с фильтрацией чувствительных полей.",
+          "expectedResult": "Collector принимает, очищает и экспортирует тестовый log; вывод internal metrics и backend query доказывает доставку, а чувствительное поле отсутствует.",
           "practice": [
-            "смоделировать типовую ошибку",
-            "найти root cause",
-            "предложить минимальное исправление",
-            "описать rollback"
+            "настроить receiver/source и processor",
+            "удалить или замаскировать секретное поле",
+            "направить поток в Loki или OpenSearch",
+            "проверить internal metrics и доставленный log"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "отправлять логи без backpressure и retry",
+            "фильтровать данные только на стороне UI",
+            "не наблюдать собственные ошибки collector"
           ],
           "miniTestId": "mini-w21d3-logs-500-027"
         },
         {
           "day": 4,
-          "title": "Мини-инцидент или сквозной проект",
+          "title": "Promtail EOL и план миграции",
           "level": "Middle+",
-          "objective": "Мини-инцидент или сквозной проект по теме: Логи: Loki, Grafana Alloy и OpenTelemetry.",
-          "expectedResult": "По теме «Логи: Loki, Grafana Alloy и OpenTelemetry» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Подготовить безопасную миграцию с Promtail на Grafana Alloy без потери логов и с возможностью отката.",
+          "expectedResult": "Promtail и Alloy дают сопоставимый count тестовых событий; вывод backend queries подтверждает отсутствие разрыва, а план содержит критерии переключения и rollback.",
           "practice": [
-            "собрать evidence",
-            "сформулировать гипотезы",
-            "проверить гипотезы по порядку",
-            "оформить короткий runbook"
+            "зафиксировать текущие Promtail scrape configs",
+            "перенести pipeline stages в Alloy",
+            "запустить двойную доставку на тестовом потоке",
+            "сравнить counts и описать rollback"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "выключать Promtail до проверки Alloy",
+            "переносить конфигурацию без проверки семантики stages",
+            "считать одинаковый файл конфигурации доказательством доставки"
           ],
           "miniTestId": "mini-w21d4-logs-500-027"
         },
         {
           "day": 5,
-          "title": "Итог недели и Senior Challenge",
+          "title": "Поиск причины HTTP 500 по логам",
           "level": "Middle+",
-          "objective": "Итог недели и Senior Challenge по теме: Логи: Loki, Grafana Alloy и OpenTelemetry.",
-          "expectedResult": "Артефакт недели «week21/logging/ с Alloy/OTel collector, structured logs и запросами диагностики» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Найти root cause HTTP 500 по структурированным логам и correlation ID, не меняя production до сбора evidence.",
+          "expectedResult": "Correlation ID связывает gateway и application error; сохранённый вывод запросов к логам подтверждает root cause, а повторный запрос после исправления завершается без HTTP 500.",
           "practice": [
-            "выполнить итоговую задачу",
-            "ответить на мини-тест",
-            "разобрать Senior Challenge",
-            "записать ошибки недели"
+            "воспроизвести один ошибочный запрос",
+            "получить correlation ID из ответа или gateway log",
+            "собрать связанные записи всех сервисов",
+            "оформить timeline, причину и проверку исправления"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "искать только по тексту HTTP 500",
+            "повышать log level глобально без ограничения",
+            "перезапускать сервис до сохранения логов"
           ],
           "miniTestId": "mini-w21d5-logs-500-027"
         }
@@ -3565,96 +3565,96 @@
       "days": [
         {
           "day": 1,
-          "title": "Новая тема и базовая практика",
+          "title": "Traces, spans и trace ID",
           "level": "Middle+",
-          "objective": "Новая тема и базовая практика по теме: OpenTelemetry, алерты и incident response.",
-          "expectedResult": "По теме «OpenTelemetry, алерты и incident response» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Инструментировать один запрос traces и научиться читать parent-child связи, длительность и status spans.",
+          "expectedResult": "Trace содержит связанную иерархию spans; вывод trace backend показывает critical path, длительности и status, а trace ID совпадает с идентификатором в логах.",
           "practice": [
-            "прочитать цель недели",
-            "выполнить базовую команду/конфиг",
-            "сохранить вывод",
-            "объяснить результат своими словами"
+            "создать root и child spans",
+            "передать trace context между компонентами",
+            "найти trace по trace ID",
+            "объяснить critical path и ошибочный span"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "создавать несвязанные spans",
+            "записывать чувствительные payload в attributes",
+            "искать latency только по общей длительности trace"
           ],
           "miniTestId": "mini-w22d1-alert-fatigue-028"
         },
         {
           "day": 2,
-          "title": "Углубление и работа с выводом",
+          "title": "OTLP и OpenTelemetry Collector",
           "level": "Middle+",
-          "objective": "Углубление и работа с выводом по теме: OpenTelemetry, алерты и incident response.",
-          "expectedResult": "По теме «OpenTelemetry, алерты и incident response» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Настроить OTLP pipeline Collector с receiver, processors, exporter и наблюдаемой обработкой ошибок.",
+          "expectedResult": "Collector принимает и экспортирует тестовый trace; вывод health/internal metrics не показывает dropped spans, а временная ошибка backend обрабатывается retry без потери процесса.",
           "practice": [
-            "получить подробный вывод",
-            "найти ключевые поля",
-            "сравнить нормальный и проблемный случай",
-            "записать выводы"
+            "принять OTLP/gRPC или HTTP",
+            "добавить batch и memory_limiter processors",
+            "экспортировать traces в учебный backend",
+            "проверить health и internal telemetry Collector"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "открывать OTLP endpoint наружу без контроля",
+            "убирать retry при временной ошибке backend",
+            "не ограничивать память Collector"
           ],
           "miniTestId": "mini-w22d2-alert-fatigue-028"
         },
         {
           "day": 3,
-          "title": "Production-слой и типовые ошибки",
+          "title": "Связь metrics, logs и traces",
           "level": "Middle+",
-          "objective": "Production-слой и типовые ошибки по теме: OpenTelemetry, алерты и incident response.",
-          "expectedResult": "По теме «OpenTelemetry, алерты и incident response» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Связать три сигнала наблюдаемости для одного запроса и выбрать правильный переход от симптома к причине.",
+          "expectedResult": "Один инцидент связан от метрики к trace и логам; сохранённый вывод запросов содержит общий временной интервал и trace ID, не увеличивая cardinality метрик.",
           "practice": [
-            "смоделировать типовую ошибку",
-            "найти root cause",
-            "предложить минимальное исправление",
-            "описать rollback"
+            "обнаружить всплеск error ratio в metrics",
+            "перейти к trace по exemplar или времени",
+            "найти logs по trace ID",
+            "собрать доказательную цепочку симптом -> компонент -> ошибка"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "искать причину только на dashboard",
+            "сопоставлять сигналы без общего времени и IDs",
+            "добавлять уникальный trace ID в metric labels"
           ],
           "miniTestId": "mini-w22d3-alert-fatigue-028"
         },
         {
           "day": 4,
-          "title": "Мини-инцидент или сквозной проект",
+          "title": "SLI/SLO, severity и incident timeline",
           "level": "Middle+",
-          "objective": "Мини-инцидент или сквозной проект по теме: OpenTelemetry, алерты и incident response.",
-          "expectedResult": "По теме «OpenTelemetry, алерты и incident response» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Определить SLI/SLO, назначить severity по влиянию и составить проверяемую временную шкалу инцидента.",
+          "expectedResult": "SLI вычисляется из сохранённого вывода метрик, SLO и error budget согласованы; severity опирается на impact, а каждое событие timeline имеет timestamp и источник evidence.",
           "practice": [
-            "собрать evidence",
-            "сформулировать гипотезы",
-            "проверить гипотезы по порядку",
-            "оформить короткий runbook"
+            "выбрать availability или latency SLI",
+            "сформулировать SLO и окно",
+            "рассчитать error budget impact",
+            "записать severity и timeline по evidence"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "задавать SLO без измеримого SLI",
+            "определять severity по сложности исправления",
+            "ставить события timeline по памяти без источников"
           ],
           "miniTestId": "mini-w22d4-alert-fatigue-028"
         },
         {
           "day": 5,
-          "title": "Итог недели и Senior Challenge",
+          "title": "Полный инцидент и postmortem",
           "level": "Middle+",
-          "objective": "Итог недели и Senior Challenge по теме: OpenTelemetry, алерты и incident response.",
-          "expectedResult": "Артефакт недели «week22/otel-incident/ с Collector, trace ID в логах, alerts, timeline и postmortem» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Провести учебный инцидент от alert до mitigation и оформить blameless postmortem с проверяемыми action items.",
+          "expectedResult": "Postmortem содержит evidence из трёх сигналов, подтверждённые impact/root cause/mitigation и action items с owner, сроком и способом проверки результата.",
           "practice": [
-            "выполнить итоговую задачу",
-            "ответить на мини-тест",
-            "разобрать Senior Challenge",
-            "записать ошибки недели"
+            "получить actionable alert",
+            "собрать metrics, logs и traces",
+            "выполнить безопасный mitigation и подтвердить SLO",
+            "написать timeline, root cause и action items"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "путать mitigation с permanent fix",
+            "назначать виновного вместо системной причины",
+            "закрывать action item без owner и срока"
           ],
           "miniTestId": "mini-w22d5-alert-fatigue-028"
         }
@@ -3725,96 +3725,96 @@
       "days": [
         {
           "day": 1,
-          "title": "Новая тема и базовая практика",
+          "title": "Trivy image/config scan",
           "level": "Middle+",
-          "objective": "Новая тема и базовая практика по теме: Security и software supply chain.",
-          "expectedResult": "По теме «Security и software supply chain» выполнены минимум три действия практики, включая «прочитать цель недели» и «выполнить базовую команду/конфиг»; сохранён проверочный вывод после выполнения, а ключевые объекты и ожидаемый результат объяснены своими словами.",
+          "objective": "Проверить image и IaC/config с Trivy, интерпретировать severity и сделать обоснованный security gate.",
+          "expectedResult": "Trivy создаёт воспроизводимый report; вывод содержит package, CVE, severity и fixed version, а правило gate отличает критичный исправимый риск от документированного исключения.",
           "practice": [
-            "прочитать цель недели",
-            "выполнить базовую команду/конфиг",
-            "сохранить вывод",
-            "объяснить результат своими словами"
+            "запустить Trivy image scan",
+            "запустить Trivy config scan",
+            "сохранить JSON report",
+            "разобрать fixable vulnerability и настроить gate"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "блокировать релиз по любой найденной записи",
+            "игнорировать unfixed и runtime context",
+            "считать exit code полным объяснением риска"
           ],
           "miniTestId": "mini-w23d1-secret-leak-029"
         },
         {
           "day": 2,
-          "title": "Углубление и работа с выводом",
+          "title": "SBOM и Syft",
           "level": "Middle+",
-          "objective": "Углубление и работа с выводом по теме: Security и software supply chain.",
-          "expectedResult": "По теме «Security и software supply chain» сохранены выполненные шаги для «получить подробный вывод» и «найти ключевые поля» и проверочный вывод после них; ключевые поля или изменения отмечены, состояние системы объяснено своими словами.",
+          "objective": "Создать SBOM образа через Syft, проверить состав и сохранить документ рядом с immutable artifact.",
+          "expectedResult": "SBOM содержит ожидаемые компоненты и версии; вывод Syft и metadata связывают документ с конкретным image digest, а CI сохраняет его как неизменяемый artifact.",
           "practice": [
-            "получить подробный вывод",
-            "найти ключевые поля",
-            "сравнить нормальный и проблемный случай",
-            "записать выводы"
+            "сгенерировать SPDX или CycloneDX SBOM",
+            "найти известный package и version",
+            "связать SBOM с image digest",
+            "сохранить SBOM как CI artifact"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "создавать SBOM только после инцидента",
+            "связывать документ только с изменяемым tag",
+            "публиковать SBOM с секретами из build context"
           ],
           "miniTestId": "mini-w23d2-secret-leak-029"
         },
         {
           "day": 3,
-          "title": "Production-слой и типовые ошибки",
+          "title": "Cosign: подпись и проверка образа",
           "level": "Middle+",
-          "objective": "Production-слой и типовые ошибки по теме: Security и software supply chain.",
-          "expectedResult": "По теме «Security и software supply chain» для занятия «Production-слой и типовые ошибки» воспроизведён проблемный сценарий; причина подтверждена выводом, риски и минимальное безопасное исправление описаны.",
+          "objective": "Подписать image digest с Cosign и настроить проверку подписи перед deployment.",
+          "expectedResult": "Cosign verify успешно принимает только ожидаемый digest и identity; вывод положительной и отрицательной проверок доказывает, что неподписанный или чужой image блокируется.",
           "practice": [
-            "смоделировать типовую ошибку",
-            "найти root cause",
-            "предложить минимальное исправление",
-            "описать rollback"
+            "подписать конкретный image digest",
+            "сохранить certificate или identity metadata",
+            "выполнить cosign verify с ограничением identity",
+            "проверить отказ для неподписанного image"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "подписывать только mutable tag",
+            "принимать любую валидную подпись без identity policy",
+            "хранить приватный ключ в repository"
           ],
           "miniTestId": "mini-w23d3-secret-leak-029"
         },
         {
           "day": 4,
-          "title": "Мини-инцидент или сквозной проект",
+          "title": "Утечка секрета и ротация",
           "level": "Middle+",
-          "objective": "Мини-инцидент или сквозной проект по теме: Security и software supply chain.",
-          "expectedResult": "По теме «Security и software supply chain» практическая задача «Мини-инцидент или сквозной проект» решена самостоятельно: собраны evidence, проверены гипотезы и записан короткий порядок действий с rollback.",
+          "objective": "Отработать утечку секрета в pipeline log: ограничить ущерб, отозвать credential и устранить источник раскрытия.",
+          "expectedResult": "Старый credential отозван и не проходит проверку, новый имеет минимальные права; audit evidence фиксирует timeline, а повторный pipeline не раскрывает секрет в выводе.",
           "practice": [
-            "собрать evidence",
-            "сформулировать гипотезы",
-            "проверить гипотезы по порядку",
-            "оформить короткий runbook"
+            "остановить использование скомпрометированного credential",
+            "собрать audit evidence без копирования секрета",
+            "отозвать и выпустить новый credential",
+            "очистить pipeline и проверить masking и доступ"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "сначала удалять log вместо revoke",
+            "считать удаление Git commit ротацией",
+            "повторно использовать секрет после masking"
           ],
           "miniTestId": "mini-w23d4-secret-leak-029"
         },
         {
           "day": 5,
-          "title": "Итог недели и Senior Challenge",
+          "title": "Build -> scan -> SBOM -> sign -> verify -> push",
           "level": "Middle+",
-          "objective": "Итог недели и Senior Challenge по теме: Security и software supply chain.",
-          "expectedResult": "Артефакт недели «week23/security/ с Trivy scan, SBOM, Cosign sign/verify и исправленным pipeline» создан и проверен на практике, исполняемая часть реально запущена; мини-тест, недельный тест не ниже 70/100 и Senior Challenge завершены, критичные ошибки разобраны.",
+          "objective": "Собрать supply-chain pipeline, где проверенный image получает SBOM и подпись до допуска к публикации и deployment.",
+          "expectedResult": "Pipeline последовательно выполняет build, scan, SBOM, sign, verify и push; сохранённый вывод успешного и заблокированного запуска доказывает, что каждый gate работает по одному digest.",
           "practice": [
-            "выполнить итоговую задачу",
-            "ответить на мини-тест",
-            "разобрать Senior Challenge",
-            "записать ошибки недели"
+            "собрать image и зафиксировать digest",
+            "выполнить Trivy scan и security gate",
+            "создать SBOM и подписать digest",
+            "проверить подпись перед push/deploy и смоделировать отказ"
           ],
           "pitfalls": [
-            "исправлять без evidence",
-            "не иметь rollback-плана",
-            "не проверять результат после изменения"
+            "подписывать image до завершения scan",
+            "терять связь SBOM с digest",
+            "разрешать deploy при ошибке verify"
           ],
           "miniTestId": "mini-w23d5-secret-leak-029"
         }
