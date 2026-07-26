@@ -10,16 +10,27 @@ const { createAppServer } = require('./server.js');
 const root = __dirname;
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 
-function loadServiceWorker(cacheKeys = []) {
+function loadServiceWorker(cacheKeys = [], options = {}) {
   const handlers = new Map();
   const deleted = [];
   let claimed = false;
   let precached = [];
+  const added = [];
+  const stored = [];
   let context;
 
+  const unavailable = new Set(options.unavailable || []);
   const cache = {
-    addAll: async assets => { precached = [...assets]; },
-    put: async () => {}
+    addAll: async assets => {
+      const broken = [...assets].filter(asset => unavailable.has(asset));
+      if (broken.length) throw new TypeError('failed to fetch ' + broken[0]);
+      precached = [...assets];
+    },
+    add: async asset => {
+      if (unavailable.has(asset)) throw new TypeError('failed to fetch ' + asset);
+      added.push(asset);
+    },
+    put: async request => { stored.push(request); }
   };
   context = vm.createContext({
     self: {
@@ -38,7 +49,7 @@ function loadServiceWorker(cacheKeys = []) {
       open: async () => cache,
       match: async () => undefined
     },
-    fetch: async () => ({ ok: true, clone: () => ({}) }),
+    fetch: async () => options.response || { ok: true, type: 'basic', clone: () => ({}) },
     URL,
     Response
   });
@@ -49,7 +60,9 @@ function loadServiceWorker(cacheKeys = []) {
     handlers,
     deleted,
     wasClaimed: () => claimed,
-    precached: () => precached
+    precached: () => precached,
+    added: () => added,
+    stored: () => stored
   };
 }
 
@@ -80,9 +93,41 @@ test('publishes version 13.1.0 with a complete offline shell', async () => {
   assert.equal(worker.context.self.IPMAX_CACHE_NAME, 'ipmax-v13.1.0');
   await dispatchExtendable(worker.handlers.get('install'));
   assert.ok(worker.precached().includes('./study-ui.js'));
-  assert.ok(worker.precached().includes('./tasks/study_map.json'));
-  assert.ok(worker.precached().includes('./tasks/study_tests.json'));
-  assert.ok(worker.precached().includes('./tasks/senior_cases.json'));
+  assert.ok(worker.added().includes('./tasks/study_map.json'));
+  assert.ok(worker.added().includes('./tasks/study_tests.json'));
+  assert.ok(worker.added().includes('./tasks/senior_cases.json'));
+});
+
+test('installs the offline shell even when one dataset is unavailable', async () => {
+  const worker = loadServiceWorker([], { unavailable: ['./tasks/labs.json'] });
+
+  await dispatchExtendable(worker.handlers.get('install'));
+
+  assert.ok(worker.precached().includes('./index.html'), 'shell must stay atomic');
+  assert.ok(worker.precached().includes('./app.js'));
+  assert.ok(!worker.precached().some(asset => asset.startsWith('./tasks/')), 'datasets cache separately');
+  assert.ok(worker.added().includes('./tasks/study_map.json'), 'healthy datasets still cached');
+  assert.ok(!worker.added().includes('./tasks/labs.json'), 'broken dataset is skipped');
+});
+
+test('fails the install when the offline shell itself is unavailable', async () => {
+  const worker = loadServiceWorker([], { unavailable: ['./app.js'] });
+
+  await assert.rejects(() => dispatchExtendable(worker.handlers.get('install')));
+});
+
+test('never caches unsuccessful responses', async () => {
+  const worker = loadServiceWorker([], { response: { ok: false, status: 404, type: 'basic', clone: () => ({}) } });
+  const handler = worker.handlers.get('fetch');
+  let answered;
+  handler({
+    request: { method: 'GET', url: 'http://127.0.0.1/tasks/labs.json' },
+    respondWith: promise => { answered = promise; }
+  });
+
+  const response = await answered;
+  assert.equal(response.status, 404);
+  assert.deepEqual(worker.stored(), [], 'a 404 must not poison the offline cache');
 });
 
 test('deletes only stale Interview Prep Max caches on activation', async () => {

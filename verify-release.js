@@ -65,9 +65,16 @@ const dataFiles = dataFilesBlock ? [...dataFilesBlock[1].matchAll(/'((?:tasks\/)
 expect(dataFiles.length > 0, 'DATA_FILES не содержит JSON-наборов');
 dataFiles.forEach(file => expect(fs.existsSync(path.join(root, file)), `отсутствует ${file}, указанный в DATA_FILES`));
 
-const assetsBlock = sw.match(/const ASSETS = \[([\s\S]*?)\];/);
-expect(!!assetsBlock, 'не найден ASSETS в sw.js');
-const assets = assetsBlock ? [...assetsBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
+const shellBlock = sw.match(/const SHELL_ASSETS = \[([\s\S]*?)\];/);
+const dataBlock = sw.match(/const DATA_ASSETS = \[([\s\S]*?)\];/);
+expect(!!shellBlock, 'не найден SHELL_ASSETS в sw.js');
+expect(!!dataBlock, 'не найден DATA_ASSETS в sw.js');
+expect(/const ASSETS = SHELL_ASSETS\.concat\(DATA_ASSETS\);/.test(sw), 'sw.js должен объединять shell и датасеты в ASSETS');
+expect(/await cache\.addAll\(SHELL_ASSETS\);/.test(sw), 'offline-shell обязан кешироваться атомарно');
+expect(/cache\.add\(asset\)\.then\(\(\) => null\)\.catch\(\(\) => asset\)/.test(sw), 'датасеты обязаны кешироваться по отдельности с обработкой сбоя');
+const shellAssets = shellBlock ? [...shellBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
+const dataAssets = dataBlock ? [...dataBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
+const assets = shellAssets.concat(dataAssets);
 ['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './analytics-ui.js', './home-ui.js', './exam-ui.js', './study-ui.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
   expect(assets.includes(file), `offline-кеш не содержит ${file}`);
 });
