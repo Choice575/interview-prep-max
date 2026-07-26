@@ -7,6 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { findMissingRequiredTerms } = require('./study-curriculum-rules');
 
 const TASKS_DIR = path.join(__dirname, 'tasks');
 const KNOWN_TOPICS = ['Terraform', 'Linux', 'Сети', 'Ansible', 'Docker', 'Kubernetes', 'CI/CD', 'Git', 'Regex', 'Monitoring', 'Cloud', 'Security'];
@@ -412,6 +413,9 @@ if (studyMap) {
     }
     ['title', 'targetLevel', 'goal', 'productionLayer', 'artifact', 'curriculumVersion'].forEach(field => {
       if (!isNonEmptyString(w[field])) err(`${prefix}: ${field} must be a non-empty string`);
+    });
+    findMissingRequiredTerms(w).forEach(term => {
+      err(`${prefix}: required roadmap technology marker "${term}" is missing`);
     });
     if (w.curriculumVersion !== studyMap.version) err(`${prefix}: curriculumVersion must match study_map version`);
     if (!Array.isArray(w.completionCriteria) || w.completionCriteria.length < 4 ||
