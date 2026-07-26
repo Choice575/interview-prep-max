@@ -159,17 +159,28 @@ test('covers roadmap v5.1 technologies in assessments and senior cases', () => {
 
 test('keeps roadmap v5.1 mini-tests specific to each study day', () => {
   const studyTests = readTask('study_tests.json');
-  const upgradedWeeks = [9, 10, 11, 12, 18, 19, 20, 21, 22, 23, 30];
+  const detailedWeeks = [9, 10, 11, 12, 18, 19, 20, 21, 22, 23];
+  const detailedTests = studyTests.miniTests.filter(item => detailedWeeks.includes(item.week));
+  const questions = detailedTests.flatMap(item => item.questions);
 
-  upgradedWeeks.forEach(week => {
+  detailedWeeks.forEach(week => {
     const miniTests = studyTests.miniTests.filter(item => item.week === week);
-    const dayQuestions = miniTests.map(item => item.questions[0].q);
 
     assert.equal(miniTests.length, 5, `week ${week} must have five mini-tests`);
-    assert.equal(new Set(dayQuestions).size, 5, `week ${week} must have a distinct question for every day`);
     miniTests.forEach(item => {
       assert.equal(item.questions.length, 5, `${item.id} must have five questions`);
       assert.equal(item.questions.reduce((sum, question) => sum + question.score, 0), 5, `${item.id} must total five points`);
+      assert.ok(item.questions.some(question => question.q.startsWith('Дан вывод')), `${item.id} must test output interpretation`);
+      assert.ok(item.questions.some(question => question.q.startsWith('Какое безопасное действие')), `${item.id} must test a safe first action`);
     });
   });
+
+  assert.equal(detailedTests.length, 50);
+  assert.equal(questions.length, 250);
+  assert.equal(new Set(questions.map(question => question.q)).size, questions.length);
+  assert.equal(new Set(questions.map(question => question.expected)).size, questions.length);
+  questions.forEach(question => assert.ok(question.expected.length >= 80));
+
+  const week30Tests = studyTests.miniTests.filter(item => item.week === 30);
+  assert.equal(new Set(week30Tests.map(item => item.questions[0].q)).size, 5);
 });

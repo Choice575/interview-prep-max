@@ -20,6 +20,9 @@ const STUDY_PREREQUISITE_WEEKS = new Set([6, 11, 15, 17, 25]);
 const STUDY_TECHNOLOGY_STATUS_WEEKS = new Set([11, 18, 19, 20, 21, 22, 30]);
 const STUDY_TECHNOLOGY_STATUS_FIELDS = ['current', 'preferred', 'legacy', 'eol', 'overviewOnly', 'optional'];
 const STUDY_RESULT_EVIDENCE_PATTERN = /вывод|evidence|не ниже 70\/100/i;
+const STUDY_DETAILED_WEEKS = new Set([9, 10, 11, 12, 18, 19, 20, 21, 22, 23]);
+const STUDY_OUTPUT_QUESTION_PATTERN = /^Дан вывод/u;
+const STUDY_SAFE_ACTION_QUESTION_PATTERN = /^Какое безопасное действие/u;
 const KNOWN_SECRET_PATTERNS = [
   ['private key', /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/i],
   ['AWS access key', /\bAKIA[0-9A-Z]{16}\b/],
@@ -535,9 +538,23 @@ if (studyTests) {
     if (!Array.isArray(t.questions)) err(`${prefix}: questions должен быть массивом`);
     else {
       if (t.questions.length < 3 || t.questions.length > 5) err(`${prefix}: questions must contain 3 to 5 items, found ${t.questions.length}`);
+      if (STUDY_DETAILED_WEEKS.has(t.week)) {
+        const questionTexts = t.questions.map(question => question && question.q);
+        if (t.questions.length !== 5) err(`${prefix}: detailed roadmap mini-test must contain exactly 5 questions`);
+        if (new Set(questionTexts).size !== questionTexts.length) err(`${prefix}: detailed roadmap questions must be distinct`);
+        if (!questionTexts.some(question => STUDY_OUTPUT_QUESTION_PATTERN.test(String(question || '')))) {
+          err(`${prefix}: detailed roadmap mini-test must include output interpretation`);
+        }
+        if (!questionTexts.some(question => STUDY_SAFE_ACTION_QUESTION_PATTERN.test(String(question || '')))) {
+          err(`${prefix}: detailed roadmap mini-test must include a safe first action`);
+        }
+      }
       t.questions.forEach((q, i) => {
         if (!q.q) err(`${prefix}/Q${i + 1}: нет q`);
         if (!q.expected) err(`${prefix}/Q${i + 1}: нет expected`);
+        if (STUDY_DETAILED_WEEKS.has(t.week) && isNonEmptyString(q.expected) && q.expected.trim().length < 80) {
+          err(`${prefix}/Q${i + 1}: expected answer must explain the decision and evidence`);
+        }
         if (typeof q.score !== 'number') err(`${prefix}/Q${i + 1}: score должен быть числом`);
       });
     }
