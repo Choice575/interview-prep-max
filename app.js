@@ -1276,7 +1276,7 @@ let diagnosticState={questions:[], idx:0, answers:[], active:false};
 function startDiagnostic(){
   const allQ=getAllQ();
   const topics=['Linux','Docker','Kubernetes','CI/CD','Terraform','Ansible','Сети','Monitoring','Security'];
-  const perTopic=[];topics.forEach(t=>{const qs=allQ.filter(q=>q.topic===t);for(let i=0;i<Math.min(3,qs.length);i++)perTopic.push(qs[Math.floor(Math.random()*qs.length)]);});
+  const perTopic=requireExamUIModule().selectDiagnosticQuestions(allQ,topics,shuffle,3);
   diagnosticState.questions=shuffle(perTopic).slice(0,15);
   diagnosticState.idx=0;diagnosticState.answers=[];diagnosticState.active=true;
   nav('exam');

@@ -51,6 +51,19 @@ test('selects adaptive and mixed sessions through the injected randomizer', () =
   assert.deepEqual(ExamUI.filterQuestions(questions, { mode: 'mix10', randomize: reverse }).map(question => question.id), [3, 2, 1]);
 });
 
+test('selects distinct diagnostic questions from every topic', () => {
+  const pool = [
+    { id: 1, topic: 'Linux' }, { id: 2, topic: 'Linux' }, { id: 3, topic: 'Linux' },
+    { id: 4, topic: 'Docker' }, { id: 5, topic: 'Docker' }
+  ];
+  const selected = ExamUI.selectDiagnosticQuestions(pool, ['Linux', 'Docker'], items => items.slice().reverse(), 3);
+
+  assert.deepEqual(selected.map(question => question.id), [3, 2, 1, 5, 4]);
+  assert.equal(new Set(selected.map(question => question.id)).size, selected.length);
+  assert.deepEqual(pool.map(question => question.id), [1, 2, 3, 4, 5]);
+  assert.deepEqual(ExamUI.selectDiagnosticQuestions(null, ['Linux'], null, 3), []);
+});
+
 test('renders safe answer controls without inline JavaScript', () => {
   const started = [];
   const markup = ExamUI.renderQuestionCard({

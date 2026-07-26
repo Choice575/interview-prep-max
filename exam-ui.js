@@ -106,6 +106,16 @@
     return result;
   }
 
+  function selectDiagnosticQuestions(questions, topics, randomize, perTopic) {
+    const list = Array.isArray(questions) ? questions : [];
+    const selectedTopics = Array.isArray(topics) ? topics : [];
+    const limit = Math.max(0, Math.floor(Number(perTopic) || 0));
+    return selectedTopics.flatMap(topic => randomized(
+      list.filter(question => question && question.topic === topic),
+      randomize
+    ).slice(0, limit));
+  }
+
   function summarizeProgress(questions, progress) {
     const list = Array.isArray(questions) ? questions : [];
     let correct = 0;
@@ -369,7 +379,7 @@
 
   return {
     TOPIC_CLASSES, LEVEL_CLASSES, CATEGORY_CLASSES, CATEGORY_LABELS,
-    topicTag, levelTag, categoryTag, filterQuestions, summarizeProgress,
+    topicTag, levelTag, categoryTag, filterQuestions, selectDiagnosticQuestions, summarizeProgress,
     buildWhyWrong, renderQuestionCard, renderFlashcardMarkup, create
   };
 });

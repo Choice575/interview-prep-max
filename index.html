@@ -268,16 +268,16 @@
 <div class="modal-overlay" id="custom-modal" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="custom-modal-title" tabindex="-1">
     <h3 id="custom-modal-title">➕ Добавить свой вопрос</h3>
-    <div class="form-group"><label>Тема</label><select class="form-input" id="cq-topic"></select></div>
-    <div class="form-group"><label>Уровень</label><select class="form-input" id="cq-level"><option>Junior</option><option>Middle</option><option>Senior</option></select></div>
-    <div class="form-group"><label>Категория</label><select class="form-input" id="cq-category"><option value="definition">Определение</option><option value="scenario">Сценарий</option><option value="tradeoff">Trade-off</option></select></div>
-    <div class="form-group"><label>Вопрос</label><textarea class="form-input" id="cq-q" rows="3" placeholder="Текст вопроса..."></textarea></div>
-    <div class="form-group"><label>Вариант A</label><input class="form-input" id="cq-a" placeholder="Вариант A"></div>
-    <div class="form-group"><label>Вариант B</label><input class="form-input" id="cq-b" placeholder="Вариант B"></div>
-    <div class="form-group"><label>Вариант C (опционально)</label><input class="form-input" id="cq-c" placeholder="Вариант C"></div>
-    <div class="form-group"><label>Вариант D (опционально)</label><input class="form-input" id="cq-d" placeholder="Вариант D"></div>
-    <div class="form-group"><label>Правильный ответ (0=A, 1=B, 2=C, 3=D)</label><input class="form-input" id="cq-ans" type="number" min="0" max="3" value="0"></div>
-    <div class="form-group"><label>Объяснение</label><textarea class="form-input" id="cq-exp" rows="2" placeholder="Объяснение..."></textarea></div>
+    <div class="form-group"><label for="cq-topic">Тема</label><select class="form-input" id="cq-topic"></select></div>
+    <div class="form-group"><label for="cq-level">Уровень</label><select class="form-input" id="cq-level"><option>Junior</option><option>Middle</option><option>Senior</option></select></div>
+    <div class="form-group"><label for="cq-category">Категория</label><select class="form-input" id="cq-category"><option value="definition">Определение</option><option value="scenario">Сценарий</option><option value="tradeoff">Trade-off</option></select></div>
+    <div class="form-group"><label for="cq-q">Вопрос</label><textarea class="form-input" id="cq-q" rows="3" placeholder="Текст вопроса..."></textarea></div>
+    <div class="form-group"><label for="cq-a">Вариант A</label><input class="form-input" id="cq-a" placeholder="Вариант A"></div>
+    <div class="form-group"><label for="cq-b">Вариант B</label><input class="form-input" id="cq-b" placeholder="Вариант B"></div>
+    <div class="form-group"><label for="cq-c">Вариант C (опционально)</label><input class="form-input" id="cq-c" placeholder="Вариант C"></div>
+    <div class="form-group"><label for="cq-d">Вариант D (опционально)</label><input class="form-input" id="cq-d" placeholder="Вариант D"></div>
+    <div class="form-group"><label for="cq-ans">Правильный ответ (0=A, 1=B, 2=C, 3=D)</label><input class="form-input" id="cq-ans" type="number" min="0" max="3" value="0"></div>
+    <div class="form-group"><label for="cq-exp">Объяснение</label><textarea class="form-input" id="cq-exp" rows="2" placeholder="Объяснение..."></textarea></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
       <button class="btn btn-outline" onclick="closeCustomModal()">Отмена</button>
       <button class="btn btn-primary" onclick="saveCustomQ()">Сохранить</button>
@@ -302,11 +302,11 @@
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="onboarding-modal-title" tabindex="-1" style="max-width:420px">
     <h3 id="onboarding-modal-title">🚀 Добро пожаловать в Interview Prep Max</h3>
     <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Ответьте на 3 вопроса, чтобы приложение построило ваш персональный план подготовки.</p>
-    <div class="form-group"><label>🎯 Целевая роль</label>
+    <div class="form-group"><label for="onb-role">🎯 Целевая роль</label>
       <select class="form-input" id="onb-role"><option value="DevOps">DevOps Engineer</option><option value="SRE">SRE</option><option value="Platform">Platform Engineer</option><option value="Cloud">Cloud Engineer</option></select></div>
-    <div class="form-group"><label>📊 Текущий уровень</label>
+    <div class="form-group"><label for="onb-level">📊 Текущий уровень</label>
       <select class="form-input" id="onb-level"><option value="Junior">Junior — начинаю путь</option><option value="Middle" selected>Middle — есть база, хочу углубить</option><option value="Senior">Senior — готовлюсь к сложным собесам</option></select></div>
-    <div class="form-group"><label>📅 Дата интервью (опционально)</label>
+    <div class="form-group"><label for="onb-date">📅 Дата интервью (опционально)</label>
       <input class="form-input" id="onb-date" type="date"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
       <button type="button" class="btn btn-outline btn-sm" data-coach-action="skip-goal">Пропустить</button>

@@ -58,6 +58,11 @@ test('serves the complete app shell and personal-coach modules', async () => {
     assert.match(app, /configureCoachUI\(\)/);
     assert.equal(JSON.parse(questions).length, 746);
     assert.equal(JSON.parse(practices).topics.length, 12);
+    const labelledControls = [
+      'cq-topic', 'cq-level', 'cq-category', 'cq-q', 'cq-a', 'cq-b', 'cq-c', 'cq-d', 'cq-ans', 'cq-exp',
+      'onb-role', 'onb-level', 'onb-date'
+    ];
+    labelledControls.forEach(id => assert.match(html, new RegExp('<label[^>]+for="' + id + '"'), id + ' needs an explicit label'));
   } finally {
     await new Promise(resolve => server.close(resolve));
   }
