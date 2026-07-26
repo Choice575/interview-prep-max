@@ -4,6 +4,8 @@ const profile = { role: 'SRE', level: 'Middle', date: '', completedAt: '2026-07-
 
 async function setProgress(page, values) {
   await page.addInitScript(data => {
+    if (sessionStorage.getItem('ipmax_e2e_seeded') === 'true') return;
+    sessionStorage.setItem('ipmax_e2e_seeded', 'true');
     localStorage.clear();
     Object.entries(data).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
   }, values);
@@ -429,6 +431,104 @@ test('preserves study progress while migrating an older curriculum profile', asy
   expect(migration.curriculum).toBe('5.1.0');
   expect(migration.progress).toEqual({ w3d1: 'done', w3d2: 'review' });
   expect(migration.backup.fromCurriculumVersion).toBe('5.0.0');
+});
+
+test('navigates the complete roadmap through the selector and week map', async ({ page }) => {
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+  await page.locator('[data-page="study"]').click();
+
+  await expect(page.locator('[data-study-week-select] option')).toHaveCount(32);
+  await page.locator('[data-study-week-select]').selectOption('9');
+  await expect(page.locator('[data-study-week-select]')).toHaveValue('9');
+  await expect(page.locator('#study-test .study-question')).toHaveCount(5);
+
+  await page.locator('.study-week-map summary').click();
+  await page.locator('[data-study-week="10"]').click();
+  await expect(page.locator('[data-study-week-select]')).toHaveValue('10');
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_study_position')).week)).toBe(10);
+});
+
+test('completes a study week, unlocks the next one and restores it after reload', async ({ page }) => {
+  await setProgress(page, {
+    ipmax_onboarding: profile,
+    ipmax_onboarding_complete: true,
+    ipmax_study_position: { week: 1, day: 5 },
+    ipmax_study_progress: {
+      w1d1: 'done', w1d2: 'done', w1d3: 'done', w1d4: 'done',
+      w1criteria: [true, true, true, true],
+    },
+  });
+  await page.goto('/');
+  await page.locator('[data-page="study"]').click();
+
+  await expect(page.locator('#study-overview')).toBeVisible();
+  await expect(page.locator('#study-overview [role="progressbar"]')).toHaveAttribute('aria-valuenow', '3');
+  const miniAnswers = page.locator('#study-test > .study-card').first().locator('.study-answer');
+  await expect(miniAnswers).toHaveCount(5);
+  for (let index = 0; index < 5; index += 1) await miniAnswers.nth(index).fill(`Evidence ${index + 1}`);
+  for (let index = 0; index < 5; index += 1) {
+    await page.locator('#study-test > .study-card').first().locator('.study-question').nth(index).locator('.study-score-row .btn-primary').click();
+  }
+  await expect(page.locator('#study-overview [role="progressbar"]')).toHaveAttribute('aria-valuenow', '3');
+
+  const weekly = page.locator('.study-weekly-test');
+  await expect(weekly).toBeVisible();
+  const weeklyAnswers = weekly.locator('textarea');
+  for (let index = 0; index < await weeklyAnswers.count(); index += 1) {
+    await weeklyAnswers.nth(index).fill(`Проверяемое evidence ${index + 1}`);
+  }
+  const scores = weekly.locator('input[type="number"]');
+  await expect(scores).toHaveCount(4);
+  for (let index = 0; index < 4; index += 1) {
+    await scores.nth(index).fill(await scores.nth(index).getAttribute('max'));
+  }
+  const gates = weekly.locator('.study-weekly-gates input[type="checkbox"]');
+  for (let index = 0; index < await gates.count(); index += 1) await gates.nth(index).check();
+  page.once('dialog', dialog => dialog.accept());
+  await weekly.locator('.study-actions .btn-primary').click();
+
+  await expect(page.locator('.study-weekly-state')).toHaveClass(/passed/);
+  await expect(page.locator('.study-week-map-item[data-study-week="1"]')).toHaveClass(/is-complete/);
+  const persisted = await page.evaluate(() => ({
+    result: JSON.parse(localStorage.getItem('ipmax_study_weekly_results'))['weekly-w1-linux-permissions'],
+    progress: JSON.parse(localStorage.getItem('ipmax_study_progress')),
+  }));
+  expect(persisted.result.passed).toBe(true);
+  expect(persisted.result.bestScore).toBe(100);
+  expect(persisted.progress.w2d1).toBe('todo');
+
+  await page.locator('.study-overview-continue').click();
+  await expect(page.locator('[data-study-week-select]')).toHaveValue('2');
+  await page.reload();
+  await page.locator('[data-page="study"]').click();
+  await expect(page.locator('[data-study-week-select]')).toHaveValue('2');
+  await expect(page.locator('.study-week-map-item[data-study-week="1"]')).toHaveClass(/is-complete/);
+});
+
+test('keeps study progress and recommendations accessible on a compact viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await setProgress(page, {
+    ipmax_onboarding: profile,
+    ipmax_onboarding_complete: true,
+    ipmax_study_position: { week: 1, day: 2 },
+    ipmax_study_progress: { w1d1: 'done', w1d2: 'review' },
+    ipmax_study_answers: { 'mini-w1d1-linux-paths': { score: 2, qScores: [1, 1, 0, 0, 0] } },
+  });
+  await page.goto('/');
+  await page.locator('#menu-toggle').click();
+  await page.locator('[data-page="study"]').click();
+
+  await expect(page.getByRole('heading', { name: 'Общий прогресс курса' })).toBeVisible();
+  await expect(page.getByRole('progressbar', { name: 'Прогресс учебного курса' })).toBeVisible();
+  await expect(page.locator('.study-recommendation').first()).toBeVisible();
+  await page.locator('.study-overview-continue').focus();
+  await expect(page.locator('.study-overview-continue')).toBeFocused();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+
+  await page.locator('.study-week-map summary').click();
+  await expect(page.locator('.study-week-map-item')).toHaveCount(32);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
 });
 
 const curriculumSmokeScenarios = [
