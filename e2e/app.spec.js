@@ -403,3 +403,60 @@ test('loads the app shell after the network goes offline', async ({ page, contex
     await context.setOffline(false);
   }
 });
+
+test('preserves study progress while migrating an older curriculum profile', async ({ page }) => {
+  await setProgress(page, {
+    ipmax_onboarding: profile,
+    ipmax_onboarding_complete: true,
+    ipmax_storage_schema: 1,
+    ipmax_curriculum_version: '5.0.0',
+    ipmax_study_position: { week: 3, day: 1 },
+    ipmax_study_progress: { w3d1: 'done', w3d2: 'review' },
+  });
+  await page.goto('/');
+  await page.locator('[data-page="study"]').click();
+
+  await expect(page.locator('#study-current')).toContainText('Неделя 3');
+  await expect(page.locator('#study-progress .study-status.done')).toHaveText('готово');
+  await expect(page.locator('#study-progress .study-status.review')).toHaveText('повторить');
+  const migration = await page.evaluate(() => ({
+    schema: JSON.parse(localStorage.getItem('ipmax_storage_schema')),
+    curriculum: JSON.parse(localStorage.getItem('ipmax_curriculum_version')),
+    progress: JSON.parse(localStorage.getItem('ipmax_study_progress')),
+    backup: JSON.parse(localStorage.getItem('ipmax_progress_backup')),
+  }));
+  expect(migration.schema).toBe(2);
+  expect(migration.curriculum).toBe('5.1.0');
+  expect(migration.progress).toEqual({ w3d1: 'done', w3d2: 'review' });
+  expect(migration.backup.fromCurriculumVersion).toBe('5.0.0');
+});
+
+const curriculumSmokeScenarios = [
+  { week: 9, day: 3, name: 'container registries', terms: ['Harbor/Nexus', 'Дан вывод'] },
+  { week: 12, day: 1, name: 'Yandex Cloud', terms: ['Yandex Cloud', 'Yandex VPC'] },
+  { week: 18, day: 3, name: 'Gateway API', terms: ['Gateway API', 'HTTPRoute'] },
+  { week: 19, day: 3, name: 'Helm', terms: ['Helm chart', 'templates', 'values'] },
+  { week: 20, day: 4, name: 'Argo CD', terms: ['Argo CD', 'self-heal'] },
+  { week: 21, day: 3, name: 'Grafana Alloy', terms: ['Grafana Alloy', 'OpenTelemetry Collector'] },
+  { week: 22, day: 2, name: 'OpenTelemetry', terms: ['OTLP', 'OpenTelemetry Collector'] },
+  { week: 23, day: 5, name: 'software supply chain', terms: ['SBOM', 'Cosign'] },
+  { week: 32, day: 5, name: 'final capstone', terms: ['Production capstone', 'Senior Challenge'] },
+];
+
+for (const scenario of curriculumSmokeScenarios) {
+  test(`renders roadmap week ${scenario.week}: ${scenario.name}`, async ({ page }) => {
+    await setProgress(page, {
+      ipmax_onboarding: profile,
+      ipmax_onboarding_complete: true,
+      ipmax_study_position: { week: scenario.week, day: scenario.day },
+    });
+    await page.goto('/');
+    await page.locator('[data-page="study"]').click();
+
+    await expect(page.locator('#study-current')).toContainText(`Неделя ${scenario.week}`);
+    await expect(page.locator('#study-test .study-question')).toHaveCount(5);
+    for (const term of scenario.terms) {
+      await expect(page.locator('#page-study')).toContainText(term);
+    }
+  });
+}
