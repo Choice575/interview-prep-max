@@ -15,7 +15,8 @@ const dependencies = {
 test('builds a complete versioned export through the module contract', () => {
   const values = {
     stats: { total: 4, correct: 3 }, streak_best: 5,
-    storage_schema: 2, curriculum_version: '5.1.0'
+    storage_schema: 2, curriculum_version: '5.1.0',
+    study_weekly_results: { 'weekly-w01': { bestScore: 84, passed: true } }
   };
   const data = ProgressIO.createExportData({
     version: '12.9.0',
@@ -35,6 +36,7 @@ test('builds a complete versioned export through the module contract', () => {
   assert.deepEqual(data.onboarding, { role: 'SRE' });
   assert.equal(data.onboarding_complete, true);
   assert.equal(data.coach_control, undefined);
+  assert.deepEqual(data.study_weekly_results, { 'weekly-w01': { bestScore: 84, passed: true } });
 });
 
 test('validates and prepares only supported bounded import fields', () => {
@@ -46,6 +48,7 @@ test('validates and prepares only supported bounded import fields', () => {
     skill_events: [{ valid: true, id: 1 }, { valid: true, id: 2 }, { valid: true, id: 3 }],
     coach_journal: [{ note: 'Первая' }, { note: 'Вторая' }],
     coach_control: { questionIds: ['1'] },
+    study_weekly_results: { 'weekly-w01': { bestScore: 72, passed: true } },
     unknown: 'ignored'
   }, dependencies);
 
@@ -54,6 +57,7 @@ test('validates and prepares only supported bounded import fields', () => {
   assert.deepEqual(prepared.entries.skill_events.map(event => event.id), [2, 3]);
   assert.deepEqual(prepared.entries.coach_journal, [{ note: 'Вторая' }]);
   assert.equal(prepared.entries.coach_control.normalised, true);
+  assert.deepEqual(prepared.entries.study_weekly_results, { 'weekly-w01': { bestScore: 72, passed: true } });
   assert.equal('unknown' in prepared.entries, false);
 });
 

@@ -173,5 +173,51 @@
       '</section>';
   }
 
-  return { STATUS_GROUPS, formatReviewDate, renderExpectedResult, renderWeekNavigator, renderWeekContext, renderWeekOutcome, renderAITrack, renderTechnologyStatus };
+  function clampWeeklyScore(value, maximum) {
+    const max = Number.isFinite(Number(maximum)) ? Math.max(0, Math.round(Number(maximum))) : 0;
+    const score = Number(value);
+    if (!Number.isFinite(score)) return 0;
+    return Math.min(max, Math.max(0, Math.round(score)));
+  }
+
+  function evaluateWeeklyAttempt(test, submittedScores, requirements) {
+    const parts = test && typeof test === 'object' && !Array.isArray(test) ? (test.parts || {}) : {};
+    const scores = submittedScores && typeof submittedScores === 'object' && !Array.isArray(submittedScores) ? submittedScores : {};
+    const gates = requirements && typeof requirements === 'object' && !Array.isArray(requirements) ? requirements : {};
+    const maxima = {
+      practice: Number(parts.practice?.score) || 0,
+      theory: Number(parts.theory?.score) || 0,
+      debug: Number(parts.debug?.score) || 0,
+      seniorChallenge: Number(parts.seniorChallenge?.score) || 0,
+    };
+    const normalisedScores = Object.fromEntries(
+      Object.entries(maxima).map(([key, maximum]) => [key, clampWeeklyScore(scores[key], maximum)])
+    );
+    const total = Object.values(normalisedScores).reduce((sum, score) => sum + score, 0);
+    const configuredMaximum = Number(test?.maxScore);
+    const maxScore = Number.isFinite(configuredMaximum) && configuredMaximum > 0
+      ? Math.round(configuredMaximum)
+      : Object.values(maxima).reduce((sum, score) => sum + score, 0);
+    const configuredPassScore = Number(gates.passScore);
+    const passScore = Number.isFinite(configuredPassScore) && configuredPassScore > 0
+      ? Math.min(maxScore, Math.round(configuredPassScore))
+      : Math.min(maxScore, 70);
+    const completionGates = {
+      score: total >= passScore,
+      artifact: gates.artifactReady === true,
+      criteria: gates.criteriaComplete === true,
+      criticalErrors: gates.criticalReviewed === true,
+    };
+
+    return {
+      scores: normalisedScores,
+      total,
+      maxScore,
+      passScore,
+      gates: completionGates,
+      passed: Object.values(completionGates).every(Boolean),
+    };
+  }
+
+  return { STATUS_GROUPS, formatReviewDate, renderExpectedResult, renderWeekNavigator, renderWeekContext, renderWeekOutcome, renderAITrack, renderTechnologyStatus, clampWeeklyScore, evaluateWeeklyAttempt };
 });

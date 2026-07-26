@@ -146,3 +146,38 @@ test('omits an empty or malformed technology status', () => {
   assert.equal(StudyUI.renderTechnologyStatus([]), '');
   assert.equal(StudyUI.renderTechnologyStatus({ preferred: [], legacy: [] }), '');
 });
+
+test('evaluates weekly scores and every completion gate', () => {
+  const testData = {
+    maxScore: 100,
+    parts: {
+      practice: { score: 35 }, theory: { score: 25 },
+      debug: { score: 25 }, seniorChallenge: { score: 15 },
+    },
+  };
+  const result = StudyUI.evaluateWeeklyAttempt(testData, {
+    practice: 40, theory: 20.4, debug: -3, seniorChallenge: 15,
+  }, {
+    passScore: 70, artifactReady: true, criteriaComplete: true, criticalReviewed: true,
+  });
+
+  assert.deepEqual(result.scores, { practice: 35, theory: 20, debug: 0, seniorChallenge: 15 });
+  assert.equal(result.total, 70);
+  assert.equal(result.maxScore, 100);
+  assert.equal(result.passScore, 70);
+  assert.equal(result.passed, true);
+  assert.deepEqual(result.gates, { score: true, artifact: true, criteria: true, criticalErrors: true });
+});
+
+test('does not pass a weekly test when a non-score gate is missing', () => {
+  const result = StudyUI.evaluateWeeklyAttempt({
+    parts: { practice: { score: 35 }, theory: { score: 25 }, debug: { score: 25 }, seniorChallenge: { score: 15 } },
+  }, { practice: 35, theory: 25, debug: 25, seniorChallenge: 15 }, {
+    artifactReady: true, criteriaComplete: false, criticalReviewed: true,
+  });
+
+  assert.equal(result.total, 100);
+  assert.equal(result.passed, false);
+  assert.equal(result.gates.criteria, false);
+  assert.equal(StudyUI.clampWeeklyScore('not-a-number', 25), 0);
+});

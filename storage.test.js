@@ -20,6 +20,8 @@ test('round-trips namespaced data and ignores unknown keys', () => {
   const store = storage.create(createAdapter());
   assert.equal(store.set('qprog', { 1: { correct: 1 } }), true);
   assert.deepEqual(store.get('qprog', {}), { 1: { correct: 1 } });
+  assert.equal(store.set('study_weekly_results', { 'weekly-w01': { passed: true } }), true);
+  assert.deepEqual(store.get('study_weekly_results', {}), { 'weekly-w01': { passed: true } });
   assert.equal(store.set('unknown', 1), false);
   assert.equal(store.get('unknown', 'fallback'), 'fallback');
   assert.equal(store.remove('qprog'), true);

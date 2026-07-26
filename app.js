@@ -748,15 +748,84 @@ function renderStudyMiniTest(test,weekly,showWeekly){
 }
 function renderWeeklyTest(test){
   const parts=test.parts||{};
-  const theory=(parts.theory?.questions||[]).map(q=>'<li>'+esc(q)+'</li>').join('');
+  const stored=lsGet('study_weekly_results',{})[test.id]||{};
+  const last=stored.lastAttempt||{};
+  const answers=last.answers||{};
+  const scores=last.scores||{};
+  const prefix=weeklyTestDomId(test.id,'');
+  const theory=(parts.theory?.questions||[]).map((q,index)=>
+    '<label class="study-weekly-question" for="'+prefix+'theory-'+index+'"><span>'+(index+1)+'. '+esc(q)+'</span>'+
+    '<textarea class="study-answer" id="'+prefix+'theory-'+index+'" placeholder="Краткий ответ и evidence...">'+esc((answers.theory||[])[index]||'')+'</textarea></label>'
+  ).join('');
   const must=(parts.practice?.mustInclude||[]).map(q=>'<li>'+esc(q)+'</li>').join('');
-  return '<section class="study-card"><h3>Пятничный тест: '+esc(test.title)+'</h3>'+
-    '<h4>Практика · '+(parts.practice?.score||0)+' баллов</h4><p class="study-goal">'+esc(parts.practice?.task||'')+'</p><ul class="study-list">'+must+'</ul>'+
-    '<h4>Теория · '+(parts.theory?.score||0)+' баллов</h4><ul class="study-list">'+theory+'</ul>'+
-    '<h4>Debug · '+(parts.debug?.score||0)+' баллов</h4><p class="study-goal">'+esc(parts.debug?.task||'')+'</p>'+
+  const attempts=Array.isArray(stored.attempts)?stored.attempts.length:0;
+  const stateClass=stored.passed?'passed':attempts?'failed':'pending';
+  const stateLabel=stored.passed?'Неделя зачтена':attempts?'Нужна повторная попытка':'Ещё не пройден';
+  const scoreInput=(part,label)=>'<label class="study-weekly-score" for="'+prefix+'score-'+part+'"><span>'+label+'</span>'+
+    '<input id="'+prefix+'score-'+part+'" type="number" min="0" max="'+(parts[part]?.score||0)+'" step="1" value="'+esc(String(scores[part]??0))+'" inputmode="numeric"></label>';
+  return '<section class="study-card study-weekly-test"><div class="study-weekly-head"><div><div class="study-outcome-kicker">Контроль недели '+test.week+'</div><h3>Пятничный тест: '+esc(test.title)+'</h3></div>'+
+    '<span class="study-weekly-state '+stateClass+'" aria-live="polite">'+stateLabel+'</span></div>'+
+    '<div class="study-weekly-summary"><span>Проходной балл <b>'+weeklyPassScore()+' / '+(test.maxScore||100)+'</b></span><span>Лучший результат <b>'+(stored.bestScore||0)+'</b></span><span>Попыток <b>'+attempts+'</b></span></div>'+
+    '<fieldset class="study-weekly-part"><legend>Практика · '+(parts.practice?.score||0)+' баллов</legend><p class="study-goal">'+esc(parts.practice?.task||'')+'</p><ul class="study-list">'+must+'</ul>'+
+    '<label class="study-weekly-answer" for="'+prefix+'practice"><span>Ссылка на артефакт, команды и результат проверки</span><textarea class="study-answer" id="'+prefix+'practice" placeholder="Опишите выполненную работу и приложите evidence...">'+esc(answers.practice||'')+'</textarea></label>'+scoreInput('practice','Самооценка практики')+'</fieldset>'+
+    '<fieldset class="study-weekly-part"><legend>Теория · '+(parts.theory?.score||0)+' баллов</legend><div class="study-weekly-questions">'+theory+'</div>'+scoreInput('theory','Самооценка теории')+'</fieldset>'+
+    '<fieldset class="study-weekly-part"><legend>Debug · '+(parts.debug?.score||0)+' баллов</legend><p class="study-goal">'+esc(parts.debug?.task||'')+'</p>'+
+    '<label class="study-weekly-answer" for="'+prefix+'debug"><span>Диагностика, исправление и проверка</span><textarea class="study-answer" id="'+prefix+'debug" placeholder="Сначала evidence, затем безопасное действие...">'+esc(answers.debug||'')+'</textarea></label>'+
     '<button class="btn btn-outline btn-sm" onclick="toggleStudyRef(\''+escAttr(test.id)+'-debug\')">Показать ожидаемый ответ</button>'+
-    '<div class="study-reference" id="study-ref-'+test.id+'-debug">'+esc(parts.debug?.expected||'')+'</div>'+
-    '<h4>Senior Challenge · '+(parts.seniorChallenge?.score||0)+' баллов</h4><p class="study-goal">Кейс: '+esc(parts.seniorChallenge?.caseId||'')+'. '+esc(parts.seniorChallenge?.task||'')+'</p></section>';
+    '<div class="study-reference" id="study-ref-'+test.id+'-debug">'+esc(parts.debug?.expected||'')+'</div>'+scoreInput('debug','Самооценка debug')+'</fieldset>'+
+    '<fieldset class="study-weekly-part"><legend>Senior Challenge · '+(parts.seniorChallenge?.score||0)+' баллов</legend><p class="study-goal">Кейс: '+esc(parts.seniorChallenge?.caseId||'')+'. '+esc(parts.seniorChallenge?.task||'')+'</p>'+
+    '<label class="study-weekly-answer" for="'+prefix+'senior"><span>Решение и компромиссы</span><textarea class="study-answer" id="'+prefix+'senior" placeholder="Защитите решение как на Senior-интервью...">'+esc(answers.seniorChallenge||'')+'</textarea></label>'+scoreInput('seniorChallenge','Самооценка Senior Challenge')+'</fieldset>'+
+    '<div class="study-weekly-gates"><h4>Условия зачёта</h4>'+
+    '<label><input id="'+prefix+'artifact" type="checkbox"'+(last.artifactReady?' checked':'')+'> <span>Рабочий артефакт недели готов и проверен</span></label>'+
+    '<label><input id="'+prefix+'critical" type="checkbox"'+(last.criticalReviewed?' checked':'')+'> <span>Все найденные критические ошибки разобраны и исправлены</span></label>'+
+    '<p>Также должны быть отмечены все критерии завершения в карточке «Результат недели».</p></div>'+
+    '<div class="study-actions"><button class="btn btn-primary" onclick="saveWeeklyTest(\''+escAttr(test.id)+'\')">Сохранить попытку и проверить</button></div></section>';
+}
+function weeklyTestDomId(testId,field){return 'study-weekly-'+String(testId).replace(/[^a-zA-Z0-9_-]/g,'-')+'-'+field;}
+function weeklyPassScore(){return Number(STUDY_TESTS?.grading?.weeklyTest?.passScore)||70;}
+function saveWeeklyTest(testId){
+  const test=(STUDY_TESTS?.weeklyTests||[]).find(item=>item.id===testId);if(!test||typeof IPMaxStudyUI==='undefined')return;
+  const prefix=weeklyTestDomId(test.id,'');
+  const value=field=>document.getElementById(prefix+field)?.value||'';
+  const checked=field=>document.getElementById(prefix+field)?.checked===true;
+  const answers={
+    practice:value('practice'),
+    theory:(test.parts?.theory?.questions||[]).map((question,index)=>value('theory-'+index)),
+    debug:value('debug'),seniorChallenge:value('senior')
+  };
+  const scores={practice:value('score-practice'),theory:value('score-theory'),debug:value('score-debug'),seniorChallenge:value('score-seniorChallenge')};
+  const week=getStudyWeek(test.week);
+  const criteria=week?.completionCriteria||[];
+  const completed=getStudyProgress()['w'+test.week+'criteria'];
+  const criteriaComplete=criteria.every((criterion,index)=>Array.isArray(completed)&&completed[index]===true);
+  const artifactReady=checked('artifact');
+  const criticalReviewed=checked('critical');
+  const evaluation=IPMaxStudyUI.evaluateWeeklyAttempt(test,scores,{passScore:weeklyPassScore(),artifactReady,criteriaComplete,criticalReviewed});
+  const attemptedAt=new Date().toISOString();
+  const attempt={attemptedAt,answers,scores:evaluation.scores,total:evaluation.total,maxScore:evaluation.maxScore,passed:evaluation.passed,gates:evaluation.gates,artifactReady,criticalReviewed};
+  const store=lsGet('study_weekly_results',{});
+  const previous=store[test.id]||{};
+  const attempts=(Array.isArray(previous.attempts)?previous.attempts:[]).concat(attempt).slice(-20);
+  store[test.id]={
+    attempts,lastAttempt:attempt,bestScore:Math.max(Number(previous.bestScore)||0,evaluation.total),
+    passed:previous.passed===true||evaluation.passed,
+    passedAt:previous.passedAt||(evaluation.passed?attemptedAt:''),updatedAt:attemptedAt
+  };
+  if(!lsSet('study_weekly_results',store)){alert('Не удалось сохранить попытку. Проверьте доступное место в браузере.');return;}
+  if(evaluation.passed){
+    const progress=getStudyProgress();
+    progress['w'+test.week+'d5']='done';
+    if(getStudyWeek(test.week+1)&&(!progress['w'+(test.week+1)+'d1']||progress['w'+(test.week+1)+'d1']==='locked'))progress['w'+(test.week+1)+'d1']='todo';
+    lsSet('study_progress',progress);
+  }
+  renderStudy();
+  if(evaluation.passed){alert('Неделя зачтена: '+evaluation.total+' / '+evaluation.maxScore+'. Следующая неделя разблокирована.');return;}
+  const missing=[];
+  if(!evaluation.gates.score)missing.push('набрать минимум '+evaluation.passScore+' баллов');
+  if(!evaluation.gates.artifact)missing.push('подтвердить рабочий артефакт');
+  if(!evaluation.gates.criteria)missing.push('закрыть все критерии недели');
+  if(!evaluation.gates.criticalErrors)missing.push('разобрать критические ошибки');
+  alert('Попытка сохранена: '+evaluation.total+' / '+evaluation.maxScore+'. Для зачёта: '+missing.join('; ')+'.');
 }
 function saveStudyAnswers(testId,silent){
   const test=(STUDY_TESTS?.miniTests||[]).find(t=>t.id===testId);if(!test)return;

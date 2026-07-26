@@ -9,7 +9,7 @@
   const IMPORT_RECORD_KEYS = [
     'mistakes', 'stats', 'qprog', 'ts_scores', 'cmd_prog', 'code_prog', 'subnet_prog', 'git_prog',
     'regex_prog', 'ans_prog', 'df_prog', 'k8s_prog', 'pt_prog', 'labs_prog', 'daily', 'study_progress',
-    'study_answers', 'senior_case_prog', 'coach_control'
+    'study_answers', 'study_weekly_results', 'senior_case_prog', 'coach_control'
   ];
   const IMPORT_ARRAY_KEYS = ['history', 'custom', 'skill_events', 'coach_journal'];
 
@@ -151,7 +151,8 @@
       ans_prog: get('ans_prog', {}), df_prog: get('df_prog', {}), k8s_prog: get('k8s_prog', {}),
       pt_prog: get('pt_prog', {}), labs_prog: get('labs_prog', {}), daily: get('daily', {}),
       study_progress: get('study_progress', {}), study_position: get('study_position', { week: 1, day: 1 }),
-      study_answers: get('study_answers', {}), senior_case_prog: get('senior_case_prog', {}),
+      study_answers: get('study_answers', {}), study_weekly_results: get('study_weekly_results', {}),
+      senior_case_prog: get('senior_case_prog', {}),
       skill_events: typeof source.getSkillEvents === 'function' ? source.getSkillEvents() : [],
       coach_journal: typeof source.getCoachJournal === 'function' ? source.getCoachJournal() : [],
       coach_control: control || undefined, onboarding: onboarding || undefined, onboarding_complete: !!onboarding
