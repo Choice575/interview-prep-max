@@ -35,7 +35,7 @@
       '<p>' + esc(result) + '</p></div>';
   }
 
-  function renderWeekNavigator(weeks, activeWeek, escapeHtml) {
+  function renderWeekNavigator(weeks, activeWeek, escapeHtml, weekStates) {
     if (!Array.isArray(weeks) || !weeks.length) return '';
     const esc = typeof escapeHtml === 'function' ? escapeHtml : defaultEscape;
     const currentIndex = Math.max(0, weeks.findIndex(week => week && week.week === activeWeek));
@@ -47,12 +47,18 @@
       '<option value="' + week.week + '"' + (week.week === current.week ? ' selected' : '') + '>' +
         'Неделя ' + week.week + ' · ' + esc(week.title || '') + '</option>'
     ).join('');
-    const map = weeks.map(week =>
-      '<button type="button" class="study-week-map-item' + (week.week === current.week ? ' is-current' : '') + '" ' +
-        'data-study-week="' + week.week + '"' + (week.week === current.week ? ' aria-current="step"' : '') + '>' +
+    const states = weekStates && typeof weekStates === 'object' && !Array.isArray(weekStates) ? weekStates : {};
+    const stateLabels = { complete: 'завершена', available: 'доступна', locked: 'закрыта' };
+    const map = weeks.map(week => {
+      const state = states[week.week] || '';
+      const stateClass = stateLabels[state] ? ' is-' + state : '';
+      const stateLabel = stateLabels[state] ? ', ' + stateLabels[state] : '';
+      return '<button type="button" class="study-week-map-item' + stateClass + (week.week === current.week ? ' is-current' : '') + '" ' +
+        'data-study-week="' + week.week + '"' + (week.week === current.week ? ' aria-current="step"' : '') +
+        ' aria-label="Неделя ' + week.week + stateLabel + '">' +
         '<span>' + String(week.week).padStart(2, '0') + '</span><strong>' + esc(week.title || '') + '</strong>' +
-      '</button>'
-    ).join('');
+      '</button>';
+    }).join('');
 
     return '<section class="study-roadmap-nav" aria-label="Навигация по учебному плану">' +
       '<div class="study-roadmap-controls">' +
@@ -219,5 +225,146 @@
     };
   }
 
-  return { STATUS_GROUPS, formatReviewDate, renderExpectedResult, renderWeekNavigator, renderWeekContext, renderWeekOutcome, renderAITrack, renderTechnologyStatus, clampWeeklyScore, evaluateWeeklyAttempt };
+  function buildStudyOverview(weeks, miniTests, weeklyTests, state) {
+    const roadmapWeeks = Array.isArray(weeks) ? weeks.filter(Boolean) : [];
+    const mini = Array.isArray(miniTests) ? miniTests : [];
+    const weekly = Array.isArray(weeklyTests) ? weeklyTests : [];
+    const stored = state && typeof state === 'object' && !Array.isArray(state) ? state : {};
+    const progress = stored.progress && typeof stored.progress === 'object' ? stored.progress : {};
+    const miniAnswers = stored.miniAnswers && typeof stored.miniAnswers === 'object' ? stored.miniAnswers : {};
+    const weeklyResults = stored.weeklyResults && typeof stored.weeklyResults === 'object' ? stored.weeklyResults : {};
+    const activePosition = stored.activePosition && typeof stored.activePosition === 'object' ? stored.activePosition : {};
+    const weeklyByWeek = new Map(weekly.map(test => [test.week, test]));
+    const miniByPosition = new Map(mini.map(test => [`${test.week}:${test.day}`, test]));
+    const passedWeek = weekNumber => {
+      const test = weeklyByWeek.get(weekNumber);
+      return Boolean(test && weeklyResults[test.id]?.passed === true);
+    };
+    const dayStatus = (weekNumber, dayNumber) => {
+      const explicit = progress[`w${weekNumber}d${dayNumber}`];
+      if (explicit) return explicit;
+      return dayNumber === 1 && (weekNumber === 1 || passedWeek(weekNumber - 1)) ? 'todo' : 'locked';
+    };
+    const days = roadmapWeeks.flatMap(week => (Array.isArray(week.days) ? week.days : []).map(day => ({
+      week: week.week,
+      day: day.day,
+      title: day.title || '',
+      status: dayStatus(week.week, day.day),
+    })));
+    const doneDays = days.filter(day => day.status === 'done').length;
+    const attemptedMiniTests = mini.filter(test => {
+      const answer = miniAnswers[test.id];
+      return answer && (Array.isArray(answer.qScores) || answer.completedAt);
+    }).length;
+    const passedMiniTests = mini.filter(test => Number(miniAnswers[test.id]?.score) >= 4).length;
+    const passedWeeks = roadmapWeeks.filter(week => passedWeek(week.week)).length;
+    const weekStates = {};
+    roadmapWeeks.forEach(week => {
+      const hasStarted = (week.days || []).some(day => {
+        const key = `w${week.week}d${day.day}`;
+        return Object.prototype.hasOwnProperty.call(progress, key) && progress[key] !== 'locked';
+      });
+      weekStates[week.week] = passedWeek(week.week)
+        ? 'complete'
+        : (week.week === 1 || passedWeek(week.week - 1) || hasStarted ? 'available' : 'locked');
+    });
+
+    const priority = { review: 0, in_progress: 1, todo: 2 };
+    const nextDay = days
+      .filter(day => Object.prototype.hasOwnProperty.call(priority, day.status))
+      .sort((left, right) => priority[left.status] - priority[right.status] || left.week - right.week || left.day - right.day)[0] || null;
+    const recommendations = [];
+    const seen = new Set();
+    const addRecommendation = item => {
+      const key = `${item.week || 0}:${item.day || 0}:${item.kind}`;
+      if (recommendations.length >= 3 || seen.has(key)) return;
+      seen.add(key);
+      recommendations.push(item);
+    };
+
+    weekly.forEach(test => {
+      const result = weeklyResults[test.id];
+      if (!result || result.passed === true || !result.lastAttempt) return;
+      addRecommendation({
+        kind: 'weekly', week: test.week, day: 5,
+        title: `Повторить недельный тест ${test.week}`,
+        detail: `Последняя попытка: ${Number(result.lastAttempt.total) || 0} / ${Number(result.lastAttempt.maxScore) || Number(test.maxScore) || 100}.`,
+      });
+    });
+    mini.forEach(test => {
+      const answer = miniAnswers[test.id];
+      if (!answer || !Array.isArray(answer.qScores) || Number(answer.score) >= 4) return;
+      addRecommendation({
+        kind: 'mini', week: test.week, day: test.day,
+        title: `Разобрать мини-тест W${test.week}D${test.day}`,
+        detail: `${Number(answer.score) || 0} / 5: сверить объяснения и повторить проверку.`,
+      });
+    });
+    days.filter(day => day.status === 'review').forEach(day => addRecommendation({
+      kind: 'review', week: day.week, day: day.day,
+      title: `Вернуться к W${day.week}D${day.day}`,
+      detail: day.title || 'Материал отмечен для повторения.',
+    }));
+    if (!recommendations.length && nextDay) addRecommendation({
+      kind: 'next', week: nextDay.week, day: nextDay.day,
+      title: `Продолжить с W${nextDay.week}D${nextDay.day}`,
+      detail: nextDay.title || 'Следующий доступный день учебного плана.',
+    });
+    if (!recommendations.length && days.length && doneDays === days.length) addRecommendation({
+      kind: 'complete', title: 'Курс пройден', detail: 'Все учебные дни завершены. Поддерживайте форму повторными тестами.',
+    });
+
+    return {
+      totalDays: days.length,
+      doneDays,
+      percent: days.length ? Math.round(doneDays / days.length * 100) : 0,
+      totalWeeks: roadmapWeeks.length,
+      passedWeeks,
+      totalMiniTests: mini.length,
+      attemptedMiniTests,
+      passedMiniTests,
+      nextDay,
+      activePosition: { week: Number(activePosition.week) || 1, day: Number(activePosition.day) || 1 },
+      recommendations,
+      weekStates,
+    };
+  }
+
+  function renderStudyOverview(overview, escapeHtml) {
+    if (!overview || typeof overview !== 'object' || Array.isArray(overview)) return '';
+    const esc = typeof escapeHtml === 'function' ? escapeHtml : defaultEscape;
+    const percent = Math.min(100, Math.max(0, Number(overview.percent) || 0));
+    const next = overview.nextDay;
+    const nextMarkup = next
+      ? '<button type="button" class="btn btn-primary study-overview-continue" data-study-jump-week="' + next.week + '" data-study-jump-day="' + next.day + '">Продолжить · W' + next.week + 'D' + next.day + '</button>'
+      : '<span class="study-overview-complete">Маршрут завершён</span>';
+    const recommendations = Array.isArray(overview.recommendations) ? overview.recommendations : [];
+    const recommendationsMarkup = recommendations.map(item => {
+      const canJump = Number.isInteger(item.week) && Number.isInteger(item.day);
+      const tag = canJump ? 'button' : 'div';
+      const attributes = canJump
+        ? ' type="button" data-study-jump-week="' + item.week + '" data-study-jump-day="' + item.day + '"'
+        : '';
+      return '<' + tag + ' class="study-recommendation is-' + esc(item.kind || 'next') + '"' + attributes + '>' +
+        '<span aria-hidden="true"></span><div><strong>' + esc(item.title || '') + '</strong><small>' + esc(item.detail || '') + '</small></div>' +
+      '</' + tag + '>';
+    }).join('');
+
+    return '<section class="study-overview" aria-labelledby="study-overview-title">' +
+      '<div class="study-overview-head"><div><div class="study-overview-kicker">Roadmap 5.1 · 32 недели</div>' +
+        '<h2 id="study-overview-title">Общий прогресс курса</h2></div>' + nextMarkup + '</div>' +
+      '<div class="study-overview-progress"><div class="study-overview-progress-copy"><strong>' + percent + '%</strong><span>' +
+        overview.doneDays + ' из ' + overview.totalDays + ' учебных дней</span></div>' +
+        '<div class="study-overview-track" role="progressbar" aria-label="Прогресс учебного курса" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + percent + '">' +
+          '<span style="width:' + percent + '%"></span></div></div>' +
+      '<div class="study-overview-metrics">' +
+        '<div><strong>' + overview.passedWeeks + ' / ' + overview.totalWeeks + '</strong><span>недель зачтено</span></div>' +
+        '<div><strong>' + overview.passedMiniTests + ' / ' + overview.totalMiniTests + '</strong><span>мини-тестов ≥ 4/5</span></div>' +
+        '<div><strong>' + overview.attemptedMiniTests + '</strong><span>мини-тестов начато</span></div>' +
+      '</div>' +
+      '<div class="study-overview-recommendations"><h3>Что делать дальше</h3><div>' + recommendationsMarkup + '</div></div>' +
+    '</section>';
+  }
+
+  return { STATUS_GROUPS, formatReviewDate, renderExpectedResult, renderWeekNavigator, renderWeekContext, renderWeekOutcome, renderAITrack, renderTechnologyStatus, clampWeeklyScore, evaluateWeeklyAttempt, buildStudyOverview, renderStudyOverview };
 });

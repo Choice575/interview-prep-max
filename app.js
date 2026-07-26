@@ -632,6 +632,12 @@ function getMiniTest(week,day){
 function getWeeklyTest(week){return (STUDY_TESTS?.weeklyTests||[]).find(t=>t.week===week);}
 function getSeniorCaseList(){return Array.isArray(SENIOR_CASES)?SENIOR_CASES:(SENIOR_CASES?.cases||[]);}
 function getSeniorCasesForDay(week,day){return getSeniorCaseList().filter(c=>c.week===week&&(!c.day||c.day===day));}
+function getStudyOverview(){
+  if(typeof IPMaxStudyUI==='undefined')return null;
+  return IPMaxStudyUI.buildStudyOverview(STUDY_MAP?.weeks||[],STUDY_TESTS?.miniTests||[],STUDY_TESTS?.weeklyTests||[],{
+    progress:getStudyProgress(),miniAnswers:lsGet('study_answers',{}),weeklyResults:lsGet('study_weekly_results',{}),activePosition:getStudyPosition()
+  });
+}
 function statusLabel(s){return {locked:'закрыт',todo:'к изучению',in_progress:'в процессе',review:'повторить',done:'готово'}[s||'todo']||s;}
 function escAttr(s){return esc(s).replace(/'/g,'&#39;');}
 function renderStudy(){
@@ -644,7 +650,9 @@ function renderStudy(){
   const mini=getMiniTest(actualPos.week,actualPos.day);
   const weekly=getWeeklyTest(actualPos.week);
   const cases=getSeniorCasesForDay(actualPos.week,actualPos.day);
-  renderStudyWeekNavigator(week.week);
+  const overview=getStudyOverview();
+  renderStudyOverviewSummary(overview);
+  renderStudyWeekNavigator(week.week,overview);
   renderStudyCurrent(week,day);
   renderStudyDays(week,day.day);
   renderStudyToday(day);
@@ -655,11 +663,20 @@ function renderStudy(){
   renderStudyTrainers(week);
   renderStudySeniorCase(cases[0]);
 }
-function renderStudyWeekNavigator(activeWeek){
+function renderStudyOverviewSummary(overview){
+  const el=document.getElementById('study-overview');
+  if(!el)return;
+  el.innerHTML=typeof IPMaxStudyUI!=='undefined'?IPMaxStudyUI.renderStudyOverview(overview,esc):'';
+  el.onclick=event=>{
+    const target=event.target.closest?.('[data-study-jump-week][data-study-jump-day]');
+    if(target&&el.contains(target))setStudyPosition(Number(target.dataset.studyJumpWeek),Number(target.dataset.studyJumpDay));
+  };
+}
+function renderStudyWeekNavigator(activeWeek,overview){
   const el=document.getElementById('study-roadmap');
   if(!el)return;
   const weeks=STUDY_MAP?.weeks||[];
-  el.innerHTML=typeof IPMaxStudyUI!=='undefined'?IPMaxStudyUI.renderWeekNavigator(weeks,activeWeek,esc):'';
+  el.innerHTML=typeof IPMaxStudyUI!=='undefined'?IPMaxStudyUI.renderWeekNavigator(weeks,activeWeek,esc,overview?.weekStates):'';
   el.onclick=event=>{
     const direct=event.target.closest?.('[data-study-week]');
     if(direct&&el.contains(direct)){setStudyPosition(Number(direct.dataset.studyWeek),1);return;}

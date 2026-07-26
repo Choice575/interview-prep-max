@@ -181,3 +181,64 @@ test('does not pass a weekly test when a non-score gate is missing', () => {
   assert.equal(result.gates.criteria, false);
   assert.equal(StudyUI.clampWeeklyScore('not-a-number', 25), 0);
 });
+
+test('builds an overall curriculum snapshot with actionable priorities', () => {
+  const weeks = [
+    { week: 1, days: [{ day: 1, title: 'Start' }, { day: 2, title: 'Review Linux' }] },
+    { week: 2, days: [{ day: 1, title: 'Networks' }, { day: 2, title: 'HTTP' }] },
+  ];
+  const miniTests = [
+    { id: 'mini-1', week: 1, day: 1 },
+    { id: 'mini-2', week: 1, day: 2 },
+  ];
+  const weeklyTests = [{ id: 'weekly-1', week: 1, maxScore: 100 }, { id: 'weekly-2', week: 2, maxScore: 100 }];
+  const overview = StudyUI.buildStudyOverview(weeks, miniTests, weeklyTests, {
+    progress: { w1d1: 'done', w1d2: 'review', w2d1: 'todo' },
+    miniAnswers: {
+      'mini-1': { score: 3, qScores: [1, 1, 1, 0, 0] },
+      'mini-2': { score: 4, qScores: [1, 1, 1, 1, 0] },
+    },
+    weeklyResults: { 'weekly-1': { passed: false, lastAttempt: { total: 65, maxScore: 100 } } },
+    activePosition: { week: 1, day: 2 },
+  });
+
+  assert.equal(overview.totalDays, 4);
+  assert.equal(overview.doneDays, 1);
+  assert.equal(overview.percent, 25);
+  assert.equal(overview.attemptedMiniTests, 2);
+  assert.equal(overview.passedMiniTests, 1);
+  assert.equal(overview.passedWeeks, 0);
+  assert.deepEqual(overview.nextDay, { week: 1, day: 2, title: 'Review Linux', status: 'review' });
+  assert.deepEqual(overview.recommendations.map(item => item.kind), ['weekly', 'mini', 'review']);
+  assert.equal(overview.weekStates[1], 'available');
+  assert.equal(overview.weekStates[2], 'available');
+});
+
+test('renders overall progress, recommendations and week state accessibly', () => {
+  const overview = {
+    totalDays: 160, doneDays: 40, percent: 25,
+    totalWeeks: 32, passedWeeks: 7,
+    totalMiniTests: 160, attemptedMiniTests: 43, passedMiniTests: 38,
+    nextDay: { week: 8, day: 2 },
+    recommendations: [{ kind: 'next', week: 8, day: 2, title: 'Continue <now>', detail: 'Safe & focused' }],
+  };
+  const markup = StudyUI.renderStudyOverview(overview);
+  const navigator = StudyUI.renderWeekNavigator(
+    [{ week: 1, title: 'Done' }, { week: 2, title: 'Next' }, { week: 3, title: 'Later' }],
+    2,
+    undefined,
+    { 1: 'complete', 2: 'available', 3: 'locked' }
+  );
+
+  assert.match(markup, /aria-valuenow="25"/);
+  assert.match(markup, /40 из 160/);
+  assert.match(markup, /7 \/ 32/);
+  assert.match(markup, /data-study-jump-week="8" data-study-jump-day="2"/);
+  assert.match(markup, /Continue &lt;now&gt;/);
+  assert.match(markup, /Safe &amp; focused/);
+  assert.match(navigator, /is-complete/);
+  assert.match(navigator, /is-available is-current/);
+  assert.match(navigator, /is-locked/);
+  assert.match(navigator, /aria-label="Неделя 1, завершена"/);
+  assert.equal(StudyUI.renderStudyOverview(null), '');
+});
