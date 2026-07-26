@@ -332,6 +332,21 @@
   </div>
 </div>
 
+<!-- OFFLINE REPORT MODAL -->
+<div class="modal-overlay" id="offline-modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="offline-modal-title" tabindex="-1" style="max-width:520px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <h3 id="offline-modal-title" style="margin:0">📶 Готовность к работе офлайн</h3>
+      <button type="button" class="btn-icon" id="offline-modal-close" aria-label="Закрыть отчёт" onclick="closeOfflineReport()">✕</button>
+    </div>
+    <div id="offline-report-body"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
+      <button type="button" class="btn btn-outline btn-sm" onclick="refreshOfflineCache()">Обновить кеш</button>
+      <button type="button" class="btn btn-primary btn-sm" onclick="closeOfflineReport()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
 <!-- AI REVIEW MODAL -->
 <div class="modal-overlay" id="coach-ai-modal" aria-hidden="true">
   <div class="modal coach-ai-modal" role="dialog" aria-modal="true" aria-labelledby="coach-ai-title" tabindex="-1">
@@ -351,6 +366,7 @@
 <script src="./coach.js"></script>
 <script src="./ai-coach.js"></script>
 <script src="./progress-io.js"></script>
+<script src="./offline-ui.js"></script>
 <script src="./analytics-ui.js"></script>
 <script src="./home-ui.js"></script>
 <script src="./exam-ui.js"></script>

@@ -1446,20 +1446,43 @@ document.addEventListener('keydown',function(e){
 });
 
 // ═══ OFFLINE READINESS CHECK ═══
-async function checkOfflineReady(){
-  const files=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
-  const tasks=['base_questions','subnet','ts','cmd','code','git','regex','ansible_pb','dockerfile','k8s','ports','labs','tips','incidents','study_map','study_tests','senior_cases','best_practices'];
-  tasks.forEach(t=>files.push('./tasks/'+t+'.json'));
-  let ok=0,fail=0;const results=[];
-  for(const f of files){
-    try{
-      const r=await fetch(f,{cache:'only-if-cached',mode:'same-origin'});
-      if(r.ok){ok++;results.push('✅ '+f);}
-      else{fail++;results.push('⚠️ '+f);}
-    }catch(e){fail++;results.push('❌ '+f);}
-  }
-  alert('📶 Оффлайн: '+Math.round(ok/files.length*100)+'% ('+ok+'/'+files.length+')\n\n'+results.slice(0,10).join('\n')+'\n...\n'+(ok===files.length?'🎉 Полный оффлайн!':'💡 Откройте разделы при интернете.'));
+function requireOfflineUI(){if(typeof IPMaxOfflineUI==='undefined') throw new Error('Модуль offline-отчёта не загружен.');return IPMaxOfflineUI;}
+function offlineAssetList(){
+  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  return shell.concat(Object.values(DATA_FILES).map(file=>'./'+file));
 }
+async function probeOfflineAssets(assets){
+  const results=[];
+  for(const asset of assets){
+    try{
+      const response=await fetch(asset,{cache:'only-if-cached',mode:'same-origin'});
+      results.push({asset,cached:response.ok});
+    }catch(error){
+      results.push({asset,cached:false});
+    }
+  }
+  return results;
+}
+function setOfflineReportStatus(message){
+  const body=document.getElementById('offline-report-body');
+  if(body) body.innerHTML='<div class="offline-report" role="status" aria-live="polite">'+esc(message)+'</div>';
+}
+async function checkOfflineReady(){
+  const offlineUI=requireOfflineUI();
+  openAccessibleModal('offline-modal','#offline-modal-close');
+  setOfflineReportStatus('Проверяем офлайн-кеш…');
+  const report=offlineUI.buildReport(await probeOfflineAssets(offlineAssetList()));
+  const body=document.getElementById('offline-report-body');
+  if(body) body.innerHTML=offlineUI.renderReport(report);
+  return report;
+}
+function closeOfflineReport(){closeAccessibleModal('offline-modal');}
+async function refreshOfflineCache(){
+  setOfflineReportStatus('Догружаем файлы…');
+  await Promise.all(offlineAssetList().map(asset=>fetch(asset,{cache:'reload'}).catch(()=>null)));
+  return checkOfflineReady();
+}
+
 
 // ═══ PWA ═══
 if ('serviceWorker' in navigator) {

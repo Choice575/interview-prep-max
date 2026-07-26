@@ -32,13 +32,14 @@ const progressScriptIndex = html.indexOf('<script src="./progress.js"></script>'
 const coachScriptIndex = html.indexOf('<script src="./coach.js"></script>');
 const aiCoachScriptIndex = html.indexOf('<script src="./ai-coach.js"></script>');
 const progressIoScriptIndex = html.indexOf('<script src="./progress-io.js"></script>');
+const offlineUiScriptIndex = html.indexOf('<script src="./offline-ui.js"></script>');
 const analyticsUiScriptIndex = html.indexOf('<script src="./analytics-ui.js"></script>');
 const homeUiScriptIndex = html.indexOf('<script src="./home-ui.js"></script>');
 const examUiScriptIndex = html.indexOf('<script src="./exam-ui.js"></script>');
 const studyUiScriptIndex = html.indexOf('<script src="./study-ui.js"></script>');
 const coachUiScriptIndex = html.indexOf('<script src="./coach-ui.js"></script>');
 const appScriptIndex = html.indexOf('<script src="./app.js"></script>');
-expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && aiCoachScriptIndex > coachScriptIndex && progressIoScriptIndex > aiCoachScriptIndex && analyticsUiScriptIndex > progressIoScriptIndex && homeUiScriptIndex > analyticsUiScriptIndex && examUiScriptIndex > homeUiScriptIndex && studyUiScriptIndex > examUiScriptIndex && coachUiScriptIndex > studyUiScriptIndex && appScriptIndex > coachUiScriptIndex, 'index.html должен загружать browser-модули до app.js в установленном порядке');
+expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && aiCoachScriptIndex > coachScriptIndex && progressIoScriptIndex > aiCoachScriptIndex && offlineUiScriptIndex > progressIoScriptIndex && analyticsUiScriptIndex > offlineUiScriptIndex && homeUiScriptIndex > analyticsUiScriptIndex && examUiScriptIndex > homeUiScriptIndex && studyUiScriptIndex > examUiScriptIndex && coachUiScriptIndex > studyUiScriptIndex && appScriptIndex > coachUiScriptIndex, 'index.html должен загружать browser-модули до app.js в установленном порядке');
 expect(manifest.start_url === './' && manifest.scope === './', 'manifest должен использовать относительные start_url и scope');
 
 const requiredIcons = [
@@ -75,7 +76,7 @@ expect(/cache\.add\(asset\)\.then\(\(\) => null\)\.catch\(\(\) => asset\)/.test(
 const shellAssets = shellBlock ? [...shellBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
 const dataAssets = dataBlock ? [...dataBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
 const assets = shellAssets.concat(dataAssets);
-['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './analytics-ui.js', './home-ui.js', './exam-ui.js', './study-ui.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
+['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './offline-ui.js', './analytics-ui.js', './home-ui.js', './exam-ui.js', './study-ui.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
   expect(assets.includes(file), `offline-кеш не содержит ${file}`);
 });
 dataFiles.forEach(file => expect(assets.includes('./' + file), `offline-кеш не содержит ./${file}`));
