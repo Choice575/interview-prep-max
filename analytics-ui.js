@@ -48,6 +48,31 @@
     });
   }
 
+  // A 15-question screening indicates coverage gaps; it cannot certify seniority.
+  function describeDiagnostic(correct, total) {
+    const answered = Math.max(0, Math.floor(Number(total) || 0));
+    const scored = Math.min(Math.max(0, Math.floor(Number(correct) || 0)), answered);
+    const percent = answered ? Math.round(scored / answered * 100) : 0;
+    if (!answered) {
+      return {
+        percent: 0, screeningOnly: true,
+        verdict: 'Скрининг не пройден — данных для оценки нет.',
+        nextStep: 'Пройдите диагностику, чтобы увидеть профиль по темам.'
+      };
+    }
+    const verdict = percent >= 80
+      ? 'Базовое покрытие тем уверенное.'
+      : percent >= 50
+        ? 'Базовое покрытие неровное: часть тем провалена.'
+        : 'Базовые темы ещё не закрыты.';
+    const nextStep = percent >= 80
+      ? 'Переходите к сценарным вопросам и Mock Interview — там проверяется инженерное мышление, а не определения.'
+      : percent >= 50
+        ? 'Закройте слабые темы из профиля ниже через вкладку «Учёба».'
+        : 'Начните с Недели 1 учебного плана и закрепите базу.';
+    return { percent, screeningOnly: true, verdict, nextStep };
+  }
+
   function selectNextQuestions(questions, progress, random, limit) {
     const byTopic = new Map();
     (Array.isArray(questions) ? questions : []).forEach(question => {
@@ -399,7 +424,7 @@
   }
 
   return {
-    GRADES, CATEGORIES, isMastered, calculateReadiness, calculateGradeReadiness,
+    GRADES, CATEGORIES, isMastered, calculateReadiness, calculateGradeReadiness, describeDiagnostic,
     selectNextQuestions, calculateWeakSpots, calculateAverageSeconds, create
   };
 });

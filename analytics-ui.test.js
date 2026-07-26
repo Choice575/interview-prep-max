@@ -83,3 +83,30 @@ test('averages only finite non-negative response times', () => {
     2: { times: [30] }
   }), 20);
 });
+
+test('describes a diagnostic screening without certifying a seniority level', () => {
+  const strong = AnalyticsUI.describeDiagnostic(14, 15);
+  const middling = AnalyticsUI.describeDiagnostic(8, 15);
+  const weak = AnalyticsUI.describeDiagnostic(3, 15);
+
+  assert.equal(strong.percent, 93);
+  assert.equal(middling.percent, 53);
+  assert.equal(weak.percent, 20);
+
+  // A 15-question screening must never claim the user is Senior.
+  [strong, middling, weak].forEach(result => {
+    assert.doesNotMatch(result.verdict, /Senior/);
+    assert.ok(result.verdict.length > 0);
+    assert.ok(result.nextStep.length > 0);
+  });
+
+  assert.match(strong.verdict, /базов/i);
+  assert.equal(strong.screeningOnly, true);
+});
+
+test('keeps the diagnostic verdict safe for an empty run', () => {
+  const empty = AnalyticsUI.describeDiagnostic(0, 0);
+
+  assert.equal(empty.percent, 0);
+  assert.ok(empty.verdict.length > 0);
+});

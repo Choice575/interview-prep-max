@@ -76,6 +76,39 @@ node verify-release.js
 npm run test:e2e
 ```
 
+## Публикация
+
+Приложение публикуется на GitHub Pages **из ветки `main`, корень репозитория** (classic Pages,
+`build_type: legacy`). Отдельного deploy-job в CI нет и он не нужен: после `git push origin main`
+GitHub сам собирает и публикует сайт своим служебным workflow `pages build and deployment`.
+
+```bash
+# перед push — обязательный минимум
+npm test
+node validate.js
+node verify-release.js
+
+git push origin main
+```
+
+Проверить, что опубликована именно нужная версия:
+
+```bash
+# статус и источник Pages
+gh api repos/Choice575/interview-prep-max/pages
+
+# последние публикации
+gh run list --workflow 'pages build and deployment' --limit 5
+```
+
+В браузере на `https://choice575.github.io/interview-prep-max/` версию видно в консоли:
+`self.IPMAX_VERSION`. Она должна совпадать с `version.js` в `main`.
+
+Если CI зелёный, но на Pages старая версия — это кеш Service Worker, а не сбой сборки.
+Приложение показывает баннер обновления; кроме того версия кеша меняется вместе с
+`IPMAX_VERSION`, поэтому новый Service Worker удаляет прежний кеш при активации.
+Для ручной проверки откройте сайт в приватном окне или сравните с `raw.githubusercontent.com`.
+
 ## Персональный план
 
 После онбординга главная страница строит ежедневную сессию под выбранную роль, уровень и дату интервью. Тренер учитывает точность, охват тем, практические тренажёры и просроченные SRS-повторы; из плана можно сразу запустить фокусную тренировку или повторение.

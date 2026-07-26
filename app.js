@@ -1321,20 +1321,20 @@ function endDiagnostic(){
   const ok=diagnosticState.answers.filter(a=>a.ok).length;
   const pct=Math.round(ok/total*100);
   const byTopic={};diagnosticState.answers.forEach(a=>{if(!byTopic[a.topic])byTopic[a.topic]={total:0,ok:0};byTopic[a.topic].total++;if(a.ok)byTopic[a.topic].ok++;});
-  const level=pct>=80?'Middle+ / Senior':pct>=50?'Middle':'Junior+';
-  lsSet('diagnostic_result',{date:new Date().toISOString(),total,ok,pct,byTopic,level});
+  const screening=IPMaxAnalyticsUI.describeDiagnostic(ok,total);
+  lsSet('diagnostic_result',{date:new Date().toISOString(),total,ok,pct,byTopic,verdict:screening.verdict,screeningOnly:true});
   document.getElementById('questions-container').innerHTML=
     '<div style="text-align:center;padding:30px 20px;max-width:800px;margin:0 auto">'+
     '<div style="font-size:48px;margin-bottom:8px">🔬</div>'+
     '<div style="font-size:24px;font-weight:800;margin-bottom:4px">Диагностика завершена</div>'+
     '<div style="font-size:48px;font-weight:800;color:var(--primary-h);margin-bottom:6px">'+pct+'%</div>'+
-    '<div style="font-size:18px;font-weight:700;margin-bottom:16px;color:'+(pct>=80?'var(--green)':pct>=50?'var(--yellow)':'var(--red)')+'">Уровень: '+level+'</div>'+
+    '<div style="font-size:16px;font-weight:700;margin-bottom:4px;color:'+(pct>=80?'var(--green)':pct>=50?'var(--yellow)':'var(--red)')+'">'+esc(screening.verdict)+'</div>'+'<div style="font-size:12px;color:var(--text3);margin-bottom:16px">Это скрининг на 15 вопросов: он показывает пробелы по темам, а не уровень Junior/Middle/Senior.</div>'+
     '<div class="card" style="text-align:left;margin-bottom:14px"><div class="card-title">📊 Профиль по темам</div>'+
     Object.entries(byTopic).sort((a,b)=>a[1].ok/a[1].total-b[1].ok/b[1].total).map(([t,d])=>{
       const tp=Math.round(d.ok/d.total*100);const barClr=tp>=80?'var(--green)':tp>=50?'var(--yellow)':'var(--red)';
       return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="font-weight:600">'+esc(t)+'</span><span style="color:var(--text2)">'+d.ok+'/'+d.total+' ('+tp+'%)</span></div><div style="height:6px;background:var(--bg3);border-radius:3px"><div style="height:100%;width:'+tp+'%;background:'+barClr+';border-radius:3px"></div></div></div>';
     }).join('')+'</div>'+
-    '<div style="font-size:13px;color:var(--text2);margin-bottom:16px">Рекомендация: '+(pct>=80?'Пробуйте Mock Interview на Middle+/Senior.':pct>=50?'Сфокусируйтесь на слабых темах через вкладку «Учёба».':'Начните с Недели 1 учебного плана и пройдите базовые темы.')+'</div>'+
+    '<div style="font-size:13px;color:var(--text2);margin-bottom:16px">Дальше: '+esc(screening.nextStep)+'</div>'+
     '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'+
     '<button class="btn btn-primary" onclick="startDiagnostic()">🔄 Пройти заново</button>'+
     '<button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
