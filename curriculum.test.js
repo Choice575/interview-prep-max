@@ -106,14 +106,14 @@ test('defines a distinct verifiable result for every study day', () => {
   assert.equal(new Set(expectedResults).size, expectedResults.length);
 });
 
-test('keeps the detailed v5.1 days concrete instead of template-generated', () => {
+test('keeps every post-foundation study day concrete instead of template-generated', () => {
   const studyMap = readTask('study_map.json');
-  const detailedWeeks = new Set([9, 10, 11, 12, 18, 19, 20, 21, 22, 23]);
+  const detailedWeeks = new Set(Array.from({ length: 28 }, (_, index) => index + 5));
   const days = studyMap.weeks
     .filter(week => detailedWeeks.has(week.week))
     .flatMap(week => week.days);
 
-  assert.equal(days.length, 50);
+  assert.equal(days.length, 140);
   for (const field of ['title', 'objective', 'expectedResult']) {
     assert.equal(new Set(days.map(day => day[field])).size, days.length, `${field} must be unique for all detailed days`);
   }
@@ -159,7 +159,7 @@ test('covers roadmap v5.1 technologies in assessments and senior cases', () => {
 
 test('keeps roadmap v5.1 mini-tests specific to each study day', () => {
   const studyTests = readTask('study_tests.json');
-  const detailedWeeks = [9, 10, 11, 12, 18, 19, 20, 21, 22, 23];
+  const detailedWeeks = Array.from({ length: 28 }, (_, index) => index + 5);
   const detailedTests = studyTests.miniTests.filter(item => detailedWeeks.includes(item.week));
   const questions = detailedTests.flatMap(item => item.questions);
 
@@ -175,8 +175,8 @@ test('keeps roadmap v5.1 mini-tests specific to each study day', () => {
     });
   });
 
-  assert.equal(detailedTests.length, 50);
-  assert.equal(questions.length, 250);
+  assert.equal(detailedTests.length, 140);
+  assert.equal(questions.length, 700);
   assert.equal(new Set(questions.map(question => question.q)).size, questions.length);
   assert.equal(new Set(questions.map(question => question.expected)).size, questions.length);
   questions.forEach(question => assert.ok(question.expected.length >= 80));

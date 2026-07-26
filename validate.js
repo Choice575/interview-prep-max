@@ -21,9 +21,11 @@ const STUDY_PREREQUISITE_WEEKS = new Set([6, 11, 15, 17, 25]);
 const STUDY_TECHNOLOGY_STATUS_WEEKS = new Set([11, 18, 19, 20, 21, 22, 30]);
 const STUDY_TECHNOLOGY_STATUS_FIELDS = ['current', 'preferred', 'legacy', 'eol', 'overviewOnly', 'optional'];
 const STUDY_RESULT_EVIDENCE_PATTERN = /вывод|evidence|не ниже 70\/100/i;
-const STUDY_DETAILED_WEEKS = new Set([9, 10, 11, 12, 18, 19, 20, 21, 22, 23]);
+const STUDY_DETAILED_WEEKS = new Set(Array.from({ length: 28 }, (_, index) => index + 5));
 const STUDY_OUTPUT_QUESTION_PATTERN = /^Дан вывод/u;
 const STUDY_SAFE_ACTION_QUESTION_PATTERN = /^Какое безопасное действие/u;
+const STUDY_GENERIC_OBJECTIVE_PATTERN = /по теме:/iu;
+const STUDY_GENERIC_PRACTICE_PATTERN = /прочитать цель недели|выполнить базовую команду\/конфиг/iu;
 const KNOWN_SECRET_PATTERNS = [
   ['private key', /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/i],
   ['AWS access key', /\bAKIA[0-9A-Z]{16}\b/],
@@ -403,6 +405,12 @@ if (studyMap) {
   ok(`Загружено ${weeks.length} учебных недель`);
   const weekNumbers = new Set();
   const expectedResults = new Set();
+  const detailedDayValues = new Map([
+    ['title', new Set()],
+    ['objective', new Set()],
+    ['practice', new Set()],
+    ['pitfalls', new Set()],
+  ]);
   weeks.forEach(w => {
     const prefix = `StudyWeek#${w.week || '?'}`;
     if (!Number.isInteger(w.week) || w.week < 1 || w.week > 32) {
@@ -489,6 +497,25 @@ if (studyMap) {
         }
         validateStringArray(d.practice, dp, 'practice');
         validateStringArray(d.pitfalls, dp, 'pitfalls');
+        if (STUDY_DETAILED_WEEKS.has(w.week)) {
+          const values = {
+            title: d.title,
+            objective: d.objective,
+            practice: d.practice,
+            pitfalls: d.pitfalls,
+          };
+          for (const [field, value] of Object.entries(values)) {
+            const normalizedValue = JSON.stringify(value).toLowerCase();
+            if (detailedDayValues.get(field).has(normalizedValue)) err(`${dp}: ${field} duplicates another detailed study day`);
+            detailedDayValues.get(field).add(normalizedValue);
+          }
+          if (isNonEmptyString(d.objective) && STUDY_GENERIC_OBJECTIVE_PATTERN.test(d.objective)) {
+            err(`${dp}: objective still uses the generic topic template`);
+          }
+          if (Array.isArray(d.practice) && STUDY_GENERIC_PRACTICE_PATTERN.test(d.practice.join(' '))) {
+            err(`${dp}: practice still uses the generic roadmap template`);
+          }
+        }
         if (Object.prototype.hasOwnProperty.call(d, 'weeklyTest')) {
           err(`${dp}: embedded weeklyTest is forbidden; use study_tests.json`);
         }
@@ -524,6 +551,8 @@ if (studyTests) {
   const miniByWeek = {};
   const miniTestIds = new Set();
   const miniTestCoordinates = new Set();
+  const detailedQuestionTexts = new Set();
+  const detailedExpectedAnswers = new Set();
   miniTests.forEach(t => {
     const prefix = `MiniTest#${t.id || '?'}`;
     if (!isNonEmptyString(t.id)) err(`${prefix}: id must be a non-empty string`);
@@ -556,8 +585,18 @@ if (studyTests) {
       t.questions.forEach((q, i) => {
         if (!q.q) err(`${prefix}/Q${i + 1}: нет q`);
         if (!q.expected) err(`${prefix}/Q${i + 1}: нет expected`);
+        if (STUDY_DETAILED_WEEKS.has(t.week) && isNonEmptyString(q.q)) {
+          const normalizedQuestion = q.q.trim().toLowerCase();
+          if (detailedQuestionTexts.has(normalizedQuestion)) err(`${prefix}/Q${i + 1}: question duplicates another detailed mini-test`);
+          detailedQuestionTexts.add(normalizedQuestion);
+        }
         if (STUDY_DETAILED_WEEKS.has(t.week) && isNonEmptyString(q.expected) && q.expected.trim().length < 80) {
           err(`${prefix}/Q${i + 1}: expected answer must explain the decision and evidence`);
+        }
+        if (STUDY_DETAILED_WEEKS.has(t.week) && isNonEmptyString(q.expected)) {
+          const normalizedAnswer = q.expected.trim().toLowerCase();
+          if (detailedExpectedAnswers.has(normalizedAnswer)) err(`${prefix}/Q${i + 1}: expected answer duplicates another detailed mini-test`);
+          detailedExpectedAnswers.add(normalizedAnswer);
         }
         if (typeof q.score !== 'number') err(`${prefix}/Q${i + 1}: score должен быть числом`);
       });
