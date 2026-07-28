@@ -2,6 +2,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое Terraform?",
     "options": [
       "Декларативный инструмент Infrastructure as Code",
@@ -16,6 +17,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое HCL?",
     "options": [
       "Формат сериализации состояния удалённого backend",
@@ -30,6 +32,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что делает terraform init?",
     "options": [
       "Применяет конфигурацию и обновляет удалённый state",
@@ -44,6 +47,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что делает terraform plan?",
     "options": [
       "Применяет сохранённый план к целевой инфраструктуре",
@@ -58,6 +62,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что делает terraform apply?",
     "options": [
       "Выполняет действия плана и обновляет инфраструктуру",
@@ -72,6 +77,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое provider?",
     "options": [
       "Хранилище, в котором Terraform размещает state и lock",
@@ -86,6 +92,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое resource?",
     "options": [
       "Значение, передаваемое вызывающим модулем в input variable",
@@ -100,6 +107,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Как можно передавать переменные в Terraform?",
     "options": [
       "Через backend config, lock-файл и локальный state",
@@ -114,6 +122,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое tfstate?",
     "options": [
       "Описание требуемых providers, modules и ограничений их версий",
@@ -128,6 +137,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "tradeoff",
     "q": "Почему Git-репозиторий не заменяет remote backend для командного Terraform state?",
     "options": [
       "Git меняет JSON-представление state после rebase и делает его нечитаемым для Terraform",
@@ -142,6 +152,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое remote backend?",
     "options": [
       "Backend, который хранит state вне локальной рабочей директории",
@@ -156,6 +167,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое state locking?",
     "options": [
       "Запрет refresh удалённых объектов во время terraform plan",
@@ -170,6 +182,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "tradeoff",
     "q": "Чем опасны два параллельных Terraform apply без общего state locking?",
     "options": [
       "Оба запуска могут опираться на устаревший state, конфликтовать в API и перезаписать результаты",
@@ -184,6 +197,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое configuration drift?",
     "options": [
       "Расхождение фактических параметров объектов с ожидаемым состоянием",
@@ -198,6 +212,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "scenario",
     "q": "Что делать, если ресурс создали вручную и нужно взять его под управление Terraform?",
     "options": [
       "terraform state rm",
@@ -212,6 +227,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Как удалить ресурс из state, не удаляя физически?",
     "options": [
       "terraform destroy",
@@ -226,6 +242,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Как посмотреть список ресурсов в state?",
     "options": [
       "terraform state list",
@@ -240,6 +257,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Для чего нужны modules?",
     "options": [
       "Для переиспользования и стандартизации связанных ресурсов",
@@ -254,6 +272,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Когда используют count и for_each?",
     "options": [
       "Для управления очередностью операций без ссылок и depends_on",
@@ -268,6 +287,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "tradeoff",
     "q": "Почему CLI workspaces могут давать слабую изоляцию окружений?",
     "options": [
       "Каждый workspace требует отдельной копии modules и повторной установки всех providers",
@@ -282,6 +302,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Что такое Terragrunt?",
     "options": [
       "Обёртка для оркестрации Terraform/OpenTofu-конфигураций и уменьшения дублирования",
@@ -296,6 +317,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Что такое Atlantis?",
     "options": [
       "Remote backend для хранения и шифрования Terraform state",
@@ -310,6 +332,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Как включить debug logs в Terraform?",
     "options": [
       "terraform --journal",
@@ -324,6 +347,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "tradeoff",
     "q": "Почему Terraform provisioners рекомендуют использовать как крайнюю меру?",
     "options": [
       "Они выполняются во время plan и поэтому превращают предварительный просмотр в изменяющую операцию",
@@ -338,6 +362,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "tradeoff",
     "q": "Чем опасны sensitive data в state?",
     "options": [
       "Флаг sensitive маскирует вывод, но значение всё равно может храниться в state и plan",
@@ -352,6 +377,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Что сделать утром перед началом работы, если коллеги могли что-то менять?",
     "options": [
       "Синхронизировать VCS, проверить нужное окружение и выполнить свежий plan",
@@ -366,6 +392,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Какой набор инструментов часто используют для качества Terraform-кода?",
     "options": [
       "provider lock-файл, workspace и lifecycle ignore_changes",
@@ -380,6 +407,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Зачем интеграция Terraform с Vault?",
     "options": [
       "Для построения dependency graph между resources разных providers",
@@ -394,6 +422,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "scenario",
     "q": "Что делать, если lock остался после падения процесса?",
     "options": [
       "Убедиться, что активных операций нет, и выполнить force-unlock с ID",
@@ -408,6 +437,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Что требуется для native lock-файла в Terraform S3 backend?",
     "options": [
       "Включить versioning бакета: каждая новая версия объекта автоматически блокирует остальные записи",
@@ -422,6 +452,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую особенность имеет процесс с PID 1 в Linux?",
     "options": [
       "Это kernel thread, который выбирает следующий процесс для выполнения на каждом CPU",
@@ -436,6 +467,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Какое практическое отличие UEFI от legacy BIOS важно при загрузке системы?",
     "options": [
       "BIOS и UEFI являются shell, которые запускаются ядром Linux после монтирования root filesystem",
@@ -450,6 +482,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Как узнать версию ядра?",
     "options": [
       "uname -r",
@@ -464,6 +497,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Что показывает free -h?",
     "options": [
       "Маршруты",
@@ -478,6 +512,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Какие данные обычно показывают top и htop?",
     "options": [
       "Историю сообщений systemd journal с фильтрацией по unit, времени и уровню важности",
@@ -492,6 +527,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Чем userspace отличается от kernelspace в Linux?",
     "options": [
       "Это уровни RAID: первый хранит данные, а второй вычисляет контрольные суммы массивов",
@@ -506,6 +542,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Что делает chmod?",
     "options": [
       "Меняет права доступа",
@@ -520,6 +557,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Что делает chown?",
     "options": [
       "Меняет inode",
@@ -534,6 +572,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Какие бывают состояния процесса R, S, D, Z, T?",
     "options": [
       "Сетевые режимы",
@@ -548,6 +587,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Как процесс становится zombie в Linux?",
     "options": [
       "Он продолжает выполняться после удаления executable и держит открытые файловые дескрипторы",
@@ -562,6 +602,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Что происходит с orphan process после завершения его родителя?",
     "options": [
       "Его принимает подходящий subreaper или PID 1, который позднее собирает статус завершения",
@@ -576,6 +617,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Чем SIGTERM отличается от SIGKILL?",
     "options": [
       "Оба сигнала запускают один handler процесса, но передают ему разные коды завершения",
@@ -590,6 +632,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Какие задачи учитывает Linux load average?",
     "options": [
       "Процент времени CPU в user и system mode, усреднённый по всем логическим ядрам",
@@ -604,6 +647,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Как изменить приоритет процесса?",
     "options": [
       "scp",
@@ -618,6 +662,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "tradeoff",
     "q": "Почему показания df и du могут различаться?",
     "options": [
       "df считает занятые блоки файловой системы, а du суммирует доступные ему каталоги и файлы",
@@ -632,6 +677,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "tradeoff",
     "q": "Почему удаление большого лог-файла иногда не освобождает место?",
     "options": [
       "DNS resolver сохраняет копию файла до истечения TTL записи имени сервера",
@@ -646,6 +692,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Что хранится в inode файловой системы?",
     "options": [
       "Полное имя и путь файла, вычисленные относительно текущего каталога каждого процесса",
@@ -660,6 +707,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "output",
     "q": "Что покажет df -i?",
     "options": [
       "Права SUID",
@@ -674,6 +722,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое hard link?",
     "options": [
       "Отдельный файл с тем же inode",
@@ -688,6 +737,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое symbolic link?",
     "options": [
       "Копия файла",
@@ -702,6 +752,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Какую задачу решает LVM в Linux?",
     "options": [
       "Управляет жизненным циклом процессов и назначает им CPU shares внутри systemd slices",
@@ -716,6 +767,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Что означают PV, VG, LV?",
     "options": [
       "Сигналы",
@@ -730,6 +782,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Что делает Linux OOM killer при исчерпании памяти?",
     "options": [
       "После неудачного reclaim выбирает процесс по badness score и завершает его для освобождения памяти",
@@ -744,6 +797,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Как sticky bit влияет на общий каталог Linux?",
     "options": [
       "Назначает владельцу каталога effective UID для каждого исполняемого файла внутри него",
@@ -758,6 +812,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Что означает SUID bit на исполняемом файле?",
     "options": [
       "Процесс получает supplementary groups владельца файла и сохраняет UID вызывающего пользователя",
@@ -772,6 +827,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Как действует SGID bit в Linux?",
     "options": [
       "На каталоге он передаёт владельца каждому файлу, а на executable включает sticky semantics",
@@ -786,6 +842,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Какие показатели предоставляет iostat?",
     "options": [
       "CPU-сводку и статистику I/O устройств: throughput, requests, latency, queue и utilization",
@@ -800,6 +857,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Для какой диагностики применяют strace?",
     "options": [
       "Для проверки YAML-схемы и поиска неизвестных полей в конфигурации системного сервиса",
@@ -814,6 +872,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Что помогает выяснить команда lsof?",
     "options": [
       "Какие runlevels объявлены init-системой и какие targets активируются при следующей загрузке",
@@ -828,6 +887,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Что означает CPU steal time внутри виртуальной машины?",
     "options": [
       "Время ожидания завершения block I/O, когда задача находится в uninterruptible sleep",
@@ -842,6 +902,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Сколько уровней в модели OSI?",
     "options": [
       "7",
@@ -856,6 +917,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "На каком уровне OSI обычно пересылает кадры Ethernet switch?",
     "options": [
       "На L7, выбирая порт по HTTP path и заголовкам запроса прикладного протокола",
@@ -870,6 +932,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "На каком уровне обычно работает router?",
     "options": [
       "L1",
@@ -884,6 +947,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Что делает NAT на границе сетей?",
     "options": [
       "Распределяет DNS-зоны между authoritative servers и изменяет TTL ресурсных записей",
@@ -898,6 +962,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую задачу решает VLAN в Ethernet-сети?",
     "options": [
       "Разделяет L2 broadcast domains через membership портов и tags на trunk links",
@@ -912,6 +977,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Для чего узлу IPv4 нужен ARP?",
     "options": [
       "Чтобы запросить authoritative DNS и получить IP-адрес по доменному имени приложения",
@@ -926,6 +992,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую роль выполняет ICMP в IP-сети?",
     "options": [
       "Предоставляет block storage поверх сети и подтверждает запись каждого дискового сектора",
@@ -940,6 +1007,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Что означает ping ::1?",
     "options": [
       "Проверка IPv4 localhost",
@@ -954,6 +1022,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Когда хост использует default gateway?",
     "options": [
       "Когда таблица маршрутизации не содержит более специфичного route для адреса назначения",
@@ -968,6 +1037,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Какой процесс описывает SYN, SYN-ACK, ACK?",
     "options": [
       "DNS lookup",
@@ -982,6 +1052,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "tradeoff",
     "q": "Почему real-time медиатрафик часто передают поверх UDP?",
     "options": [
       "UDP восстанавливает потерянные packets на transport layer и сохраняет порядок доставки frames",
@@ -996,6 +1067,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Чем транспорт HTTP/2 обычно отличается от HTTP/3?",
     "options": [
       "HTTP/2 передаёт datagrams без соединения, а HTTP/3 создаёт отдельный TCP stream для запроса",
@@ -1010,6 +1082,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Как ОС различает TCP-соединения на одном порту 443?",
     "options": [
       "По 4-tuple сокета",
@@ -1024,6 +1097,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Что задаёт TTL в DNS resource record?",
     "options": [
       "Версию TLS, которую resolver должен использовать при подключении к authoritative server",
@@ -1038,6 +1112,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Что делает recursive DNS resolver для клиента?",
     "options": [
       "Маршрутизирует IP packets к authoritative server и изменяет destination address через NAT",
@@ -1052,6 +1127,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Как отвечает authoritative DNS server?",
     "options": [
       "Завершает TLS для веб-приложения и выбирает backend по значению DNS query name",
@@ -1066,6 +1142,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Какое сопоставление распространённых DNS record types корректно?",
     "options": [
       "A/AAAA — адреса, CNAME — alias, MX — почта, NS — servers зоны, TXT — текстовые данные",
@@ -1080,6 +1157,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Что добавляет HTTPS по сравнению с HTTP?",
     "options": [
       "Обязательное кеширование ответов proxy и автоматическое уменьшение latency каждого запроса",
@@ -1094,6 +1172,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Как интерпретируются классы HTTP status codes?",
     "options": [
       "1xx и 2xx обозначают client errors, 3xx — server errors, 4xx и 5xx — успешные ответы",
@@ -1108,6 +1187,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Как в общем случае различаются POST, PUT и PATCH?",
     "options": [
       "PATCH удаляет DNS record ресурса, а POST и PUT меняют transport route до endpoint",
@@ -1122,6 +1202,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Какую роль выполняет reverse proxy?",
     "options": [
       "Принимает запросы клиентов и направляет их к backend, скрывая внутреннюю топологию сервисов",
@@ -1136,6 +1217,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Что делает load balancer при обработке трафика?",
     "options": [
       "Изменяет inode открытых sockets, чтобы несколько процессов разделяли один file descriptor",
@@ -1150,6 +1232,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Какую задачу решает network firewall?",
     "options": [
       "Разрешает DNS names через recursive lookup и подписывает ответы ключом обслуживаемой zone",
@@ -1164,6 +1247,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Какой диапазон IANA называет well-known service ports?",
     "options": [
       "80–443, потому что этот интервал зарезервирован для HTTP, HTTPS и инфраструктурных protocols",
@@ -1178,6 +1262,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "scenario",
     "q": "Как последовательно искать причину недоступности БД из контейнера?",
     "options": [
       "Проверить имя и адрес, route, TCP connect, listener, firewall/policy, credentials и server logs",
@@ -1192,6 +1277,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Для чего нужен tcpdump?",
     "options": [
       "Управление файлами",
@@ -1206,6 +1292,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Для какой задачи используют nmap?",
     "options": [
       "Для проверки заполнения inode и поиска каталогов, занимающих место на mounted filesystem",
@@ -1220,6 +1307,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Какую диагностику даёт mtr?",
     "options": [
       "Назначает VLAN interfaces и проверяет распространение tags между access и trunk ports",
@@ -1234,6 +1322,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "tradeoff",
     "q": "Почему успешность ping не определяет доступность TCP endpoint?",
     "options": [
       "ICMP echo и TCP фильтруются разными правилами, поэтому один protocol может работать без другого",
@@ -1248,6 +1337,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "На каких портах по умолчанию работают HTTP и HTTPS?",
     "options": [
       "53 и 443",
@@ -1262,6 +1352,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Для чего применяют Ansible?",
     "options": [
       "Для планирования kernel threads и распределения CPU time между процессами Linux",
@@ -1276,6 +1367,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Как обычно разделяют задачи Ansible и Terraform?",
     "options": [
       "Ansible управляет DNS, а Terraform применяется для всех остальных infrastructure services",
@@ -1290,6 +1382,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Что означает agentless-модель Ansible?",
     "options": [
       "На managed host обычно не ставят постоянный Ansible agent: controller использует connection plugin",
@@ -1304,6 +1397,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "В каком формате обычно описывают Ansible playbook?",
     "options": [
       "В JSON-документе со специальной схемой, которую controller компилирует перед каждым запуском",
@@ -1318,6 +1412,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Какой шаблонизатор использует Ansible?",
     "options": [
       "ERB",
@@ -1332,6 +1427,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое inventory?",
     "options": [
       "Список пакетов Linux",
@@ -1346,6 +1442,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Что представляет собой Ansible playbook?",
     "options": [
       "YAML-сценарий из plays, связывающих группы hosts с tasks, roles, variables и обработчиками",
@@ -1360,6 +1457,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Зачем Ansible использует roles?",
     "options": [
       "Чтобы фильтровать network traffic managed host по правилам addresses, ports и connection state",
@@ -1374,6 +1472,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Что означает idempotency для Ansible task?",
     "options": [
       "Task удаляет установленную role после первого запуска, чтобы исключить повторное применение",
@@ -1388,6 +1487,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "scenario",
     "q": "Как проверить поведение плейбука без реальных изменений?",
     "options": [
       "--fork",
@@ -1402,6 +1502,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Как работают handlers в Ansible?",
     "options": [
       "Это именованные tasks, которые ставятся в очередь через notify и запускаются в точке handler flush",
@@ -1416,6 +1517,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Когда уведомлённый handler будет выполнен?",
     "options": [
       "После каждой task независимо от changed status, чтобы синхронизировать состояние target",
@@ -1430,6 +1532,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "tradeoff",
     "q": "Почему shell и command часто уступают специализированному Ansible module?",
     "options": [
       "Они поддерживают Windows connections, но не могут выполняться на Linux managed hosts",
@@ -1444,6 +1547,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое Ansible Facts?",
     "options": [
       "Содержимое Vault",
@@ -1458,6 +1562,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Когда разумно отключить gather_facts в play?",
     "options": [
       "Когда play не использует facts и стоимость setup заметна на большом числе или медленных hosts",
@@ -1472,6 +1577,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое Ansible ad-hoc command?",
     "options": [
       "Role dependency, которая подключается controller до загрузки tasks и defaults основной role",
@@ -1486,6 +1592,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Как применить один Ansible task к набору однотипных сущностей?",
     "options": [
       "Сгенерировать shell script с отдельной командой для элемента и не использовать module results",
@@ -1500,6 +1607,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Чем role defaults отличаются от role vars?",
     "options": [
       "Defaults загружаются для Windows targets, а vars применяются controller при Linux connection",
@@ -1514,6 +1622,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Как keyword serial влияет на Ansible play?",
     "options": [
       "Делит target hosts на batches указанного размера или доли и выполняет play по партиям",
@@ -1528,6 +1637,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Когда module template уместнее copy?",
     "options": [
       "Когда binary artifact нужно перенести без преобразования и проверить его checksum на target",
@@ -1542,6 +1652,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Что такое Ansible Vault?",
     "options": [
       "Сетевой балансировщик",
@@ -1556,6 +1667,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "scenario",
     "q": "Что делать после обнаружения открытого пароля в Ansible template?",
     "options": [
       "Сжать template и оставить архив в repository, чтобы поисковые scanners не читали строку",
@@ -1570,6 +1682,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Для чего применяют Molecule при разработке Ansible content?",
     "options": [
       "Для описания test scenarios: создать environment, применить role, проверить результат и удалить resources",
@@ -1584,6 +1697,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Что называют magic variables в Ansible?",
     "options": [
       "Зашифрованные Vault values, которые автоматически становятся plaintext на managed host",
@@ -1598,6 +1712,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "scenario",
     "q": "Какие параметры CLI помогают разбирать сбой Ansible playbook?",
     "options": [
       "--fmt и --compile для форматирования YAML и сборки playbook в executable binary",
@@ -1612,6 +1727,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Какие командные задачи закрывают Git, Galaxy и automation controller?",
     "options": [
       "Git управляет inode, Galaxy выполняет DNS recursion, controller заменяет kernel managed host",
@@ -1626,6 +1742,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Чем Ansible Collection отличается от Role?",
     "options": [
       "Collection — пакет namespace/name с roles, modules, plugins, playbooks и metadata; Role уже по scope",
@@ -1640,6 +1757,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "tradeoff",
     "q": "Почему Ansible лучше устанавливать в изолированное Python-окружение?",
     "options": [
       "Чтобы controller читал inventory без connection plugins и SSH credentials",
@@ -1654,6 +1772,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Как системно ускорять медленный Ansible playbook?",
     "options": [
       "Увеличить forks без измерений и отключить timeouts для connection plugins",
@@ -1668,6 +1787,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Что важно раскрыть на собеседовании в примере сложной Ansible role?",
     "options": [
       "Количество YAML-файлов и имена tasks без связи с эксплуатационным результатом",
@@ -1682,6 +1802,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Для чего используется файл terraform.tfvars?",
     "options": [
       "Задаёт значения входных переменных, загружаемые автоматически",
@@ -1696,6 +1817,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое data source в Terraform?",
     "options": [
       "Создаёт объект и управляет его жизненным циклом",
@@ -1710,6 +1832,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Для чего используется output в Terraform?",
     "options": [
       "Настраивает блокировку state при изменении инфраструктуры",
@@ -1724,6 +1847,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что делает terraform destroy?",
     "options": [
       "Обновляет выбранные версии провайдеров в lock-файле",
@@ -1738,6 +1862,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что хранится в файле terraform.tfstate?",
     "options": [
       "Привязки адресов Terraform к удалённым объектам и их атрибутам",
@@ -1752,6 +1877,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое variable в Terraform?",
     "options": [
       "Неизменяемый параметр, встроенный в схему провайдера",
@@ -1766,6 +1892,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое module в Terraform?",
     "options": [
       "Исполняемый плагин, реализующий удалённый backend",
@@ -1780,6 +1907,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что делает terraform validate?",
     "options": [
       "Проверяет доступность credentials вызовом каждого provider API",
@@ -1794,6 +1922,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое depends_on в Terraform?",
     "options": [
       "Явно сообщает Terraform о скрытой зависимости между объектами",
@@ -1808,6 +1937,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое locals в Terraform?",
     "options": [
       "Значения входных переменных, прочитанные из tfvars-файла",
@@ -1822,6 +1952,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Что делает terraform fmt?",
     "options": [
       "Планирует удаление объектов из текущего state",
@@ -1836,6 +1967,7 @@
   {
     "topic": "Terraform",
     "level": "Junior",
+    "category": "definition",
     "q": "Чем .terraform.lock.hcl отличается от terraform.tfstate?",
     "options": [
       "tfstate фиксирует версии providers, lock-файл — ресурсы",
@@ -1850,6 +1982,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое remote backend в Terraform?",
     "options": [
       "Хранение state вне локального рабочего каталога",
@@ -1864,6 +1997,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Как работает state locking в Terraform?",
     "options": [
       "Terraform шифрует state локальным ключом перед каждым чтением provider",
@@ -1878,6 +2012,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Для чего используются terraform workspace?",
     "options": [
       "Закрепление версий providers для разных веток проекта",
@@ -1892,6 +2027,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Чем for_each отличается от count в Terraform?",
     "options": [
       "count и for_each создают адреса ресурсов одинакового вида",
@@ -1906,6 +2042,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое dynamic block в Terraform?",
     "options": [
       "Формирует повторяемые вложенные блоки из коллекции",
@@ -1920,6 +2057,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что делает terraform import?",
     "options": [
       "Добавляет provider plugin в dependency lock file",
@@ -1934,6 +2072,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что делает lifecycle ignore_changes?",
     "options": [
       "Запрещает планировать удаление resource при destroy",
@@ -1948,6 +2087,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что делает lifecycle prevent_destroy?",
     "options": [
       "Запрещает backend выдавать state lock другим процессам",
@@ -1962,6 +2102,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Какой способ принудительной замены resource рекомендует актуальный Terraform CLI?",
     "options": [
       "Передать -replace=ADDRESS в terraform plan/apply и проверить план замены",
@@ -1976,6 +2117,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "scenario",
     "q": "Как безопасно обрабатывать секретные значения в Terraform?",
     "options": [
       "Пометить variable как sensitive и не защищать backend отдельно",
@@ -1990,6 +2132,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что делает terraform graph?",
     "options": [
       "Показывает атрибуты объектов из текущего state",
@@ -2004,6 +2147,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое templatefile() в Terraform?",
     "options": [
       "Форматирует значение по правилам printf-подобного шаблона",
@@ -2018,6 +2162,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что делает -target=ADDRESS у terraform plan?",
     "options": [
       "Фокусирует план на адресе и объектах, от которых он зависит",
@@ -2032,6 +2177,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что делает terraform state mv?",
     "options": [
       "Переносит весь state между настроенными backend",
@@ -2046,6 +2192,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое count = 0 в Terraform?",
     "options": [
       "Означает недопустимое значение meta-argument count",
@@ -2060,6 +2207,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое provisioner в Terraform?",
     "options": [
       "Настройка хранения state и механизма его блокировки",
@@ -2074,6 +2222,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Что такое moved block в Terraform?",
     "options": [
       "Описывает изменение адреса объекта при рефакторинге state",
@@ -2088,6 +2237,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Как тестировать Terraform-конфигурации?",
     "options": [
       "Запускать terraform validate как проверку синтаксиса и связности",
@@ -2102,6 +2252,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Для чего нужен блок check в Terraform 1.5+?",
     "options": [
       "Проверять входные переменные перед построением plan",
@@ -2116,6 +2267,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Что такое provider aliasing?",
     "options": [
       "Закрепление версии провайдера в required_providers",
@@ -2130,6 +2282,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "scenario",
     "q": "Как организовать state для multi-account инфраструктуры?",
     "options": [
       "Разделить state по границам доступа и blast radius",
@@ -2144,6 +2297,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Как Terragrunt помогает управлять несколькими Terraform или OpenTofu units?",
     "options": [
       "Объединяет states всех units в один файл и применяет resources в порядке каталогов",
@@ -2158,6 +2312,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Как работает state migration между backends?",
     "options": [
       "terraform cloud migrate переносит state через HCP",
@@ -2172,6 +2327,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Что означает partial configuration для backend?",
     "options": [
       "Backend с конфигурацией в дочернем модуле",
@@ -2186,6 +2342,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Как реализовать blue-green deployment через Terraform?",
     "options": [
       "Держать два окружения и переключать между ними трафик",
@@ -2200,6 +2357,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Что такое drift инфраструктуры и как с ним бороться?",
     "options": [
       "Несовпадение версий провайдера и lock-файла",
@@ -2214,6 +2372,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Что гарантирует ephemeral для variable или child module output в Terraform 1.10+?",
     "options": [
       "Записывает значение в state на время одного apply",
@@ -2228,6 +2387,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "definition",
     "q": "Что такое custom provider в Terraform?",
     "options": [
       "Переименованная конфигурация registry-провайдера",
@@ -2242,6 +2402,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Что делает команда chmod?",
     "options": [
       "Изменяет биты режима доступа файла или каталога",
@@ -2256,6 +2417,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое inode в Linux?",
     "options": [
       "Имя файла внутри записи каталога",
@@ -2270,6 +2432,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Что показывает команда ps aux?",
     "options": [
       "Посылает сигнал процессам, выбранным по пользователю",
@@ -2284,6 +2447,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое /etc/fstab?",
     "options": [
       "Таблица активных служб и целей systemd",
@@ -2298,6 +2462,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое crontab?",
     "options": [
       "Команда и файл пользовательского расписания cron",
@@ -2312,6 +2477,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Для чего используется команда grep?",
     "options": [
       "Ищет файлы по имени и атрибутам",
@@ -2326,6 +2492,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое symbolic link (symlink)?",
     "options": [
       "Архивная копия файла с метаданными",
@@ -2340,6 +2507,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Что показывает df -h?",
     "options": [
       "Процессы с наибольшей загрузкой CPU",
@@ -2354,6 +2522,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое sudo?",
     "options": [
       "Запускает команду от имени указанного пользователя",
@@ -2368,6 +2537,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Что делает команда tar -czf archive.tar.gz dir/?",
     "options": [
       "Извлекает gzip-архив в текущий каталог",
@@ -2382,6 +2552,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Что такое /proc в Linux?",
     "options": [
       "Каталог постоянных журналов сервисов",
@@ -2396,6 +2567,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Что показывает ss -tlnp?",
     "options": [
       "Соседей из ARP/NDP-таблиц ядра",
@@ -2410,6 +2582,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое iptables и как работает?",
     "options": [
       "CLI для настройки правил Netfilter, включая filter и NAT",
@@ -2424,6 +2597,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое lsof и зачем использовать?",
     "options": [
       "Показывает устройства и точки монтирования",
@@ -2438,6 +2612,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Что делает strace?",
     "options": [
       "Измеряет использование CPU по функциям",
@@ -2452,6 +2627,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Как работает ulimit?",
     "options": [
       "Ограничивает пропускную способность интерфейса",
@@ -2466,6 +2642,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "tradeoff",
     "q": "Что такое swap и когда использовать?",
     "options": [
       "Область на диске для вытесненных страниц памяти",
@@ -2480,6 +2657,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Что делает команда tcpdump?",
     "options": [
       "Измеряет пропускную способность соединения",
@@ -2494,6 +2672,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Как работает ssh-agent?",
     "options": [
       "Перенаправляет SSH-трафик через прокси",
@@ -2508,6 +2687,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое cgroups (control groups)?",
     "options": [
       "Группы правил сетевой фильтрации",
@@ -2522,6 +2702,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Что изолируют namespaces в Linux?",
     "options": [
       "Видимые процессам экземпляры системных ресурсов",
@@ -2536,6 +2717,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Как rsync обновляет назначение?",
     "options": [
       "Переписывает каждый файл независимо от изменений",
@@ -2550,6 +2732,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Что обеспечивает SELinux?",
     "options": [
       "Установку и обновление пакетов системы",
@@ -2564,6 +2747,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Какую модель использует LVM?",
     "options": [
       "Таблица разделов для загрузки системы",
@@ -2578,6 +2762,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Для чего предназначен inotify?",
     "options": [
       "Наблюдать события в файловой системе",
@@ -2592,6 +2777,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Как работает systemd socket activation?",
     "options": [
       "Запускает unit после срабатывания таймера",
@@ -2606,6 +2792,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Для чего используют journalctl?",
     "options": [
       "Управлять состоянием service units",
@@ -2620,6 +2807,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Какую роль выполняет /etc/hosts?",
     "options": [
       "Хранит постоянные маршруты до сетей",
@@ -2634,6 +2822,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Для чего применяют eBPF в Linux?",
     "options": [
       "Загружают проверяемые программы в точки ядра",
@@ -2648,6 +2837,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Как ядро выбирает жертву при нехватке памяти?",
     "options": [
       "Перезагружает систему после очистки кешей",
@@ -2662,6 +2852,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Что означает NUMA для доступа к памяти?",
     "options": [
       "Одинаковую задержку доступа для каждого CPU",
@@ -2676,6 +2867,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Как снизить вероятность выбора сервиса OOM killer?",
     "options": [
       "Повысить CPU-приоритет через отрицательный nice",
@@ -2690,6 +2882,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Что дают huge pages?",
     "options": [
       "Крупные страницы уменьшают число записей TLB",
@@ -2704,6 +2897,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Для чего предназначен perf?",
     "options": [
       "Измерять скорость последовательного дискового I/O",
@@ -2718,6 +2912,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Что представляет собой io_uring?",
     "options": [
       "Схему программного RAID для блочных устройств",
@@ -2732,6 +2927,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Как современный Linux планирует обычные fair-class задачи?",
     "options": [
       "Передаёт CPU задаче до её добровольной уступки",
@@ -2746,6 +2942,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Чем основная модель cgroup v2 отличается от v1?",
     "options": [
       "Единой иерархией и согласованной работой контроллеров",
@@ -2760,6 +2957,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Для чего процессу задают seccomp-фильтр?",
     "options": [
       "Шифровать страницы его виртуальной памяти",
@@ -2774,6 +2972,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Как kdump сохраняет данные после kernel panic?",
     "options": [
       "Копирует пользовательские файлы в backup",
@@ -2788,6 +2987,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Как работают Transparent Huge Pages?",
     "options": [
       "Выделяют swap-пространство для процесса",
@@ -2802,6 +3002,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Что описывает MAC-адрес?",
     "options": [
       "Адрес интерфейса на канальном уровне сети",
@@ -2816,6 +3017,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Что создаёт VLAN?",
     "options": [
       "Шифрованный туннель между двумя сетями",
@@ -2830,6 +3032,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую задачу решает ARP?",
     "options": [
       "Ищет DNS-имя по адресу IPv6",
@@ -2844,6 +3047,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Как используется TTL в заголовке IPv4?",
     "options": [
       "Ограничивает размер полезной нагрузки пакета",
@@ -2858,6 +3062,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Как точнее сравнить TCP и UDP?",
     "options": [
       "TCP даёт надёжный поток, UDP — датаграммы без гарантии доставки",
@@ -2872,6 +3077,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Что предоставляет DHCP-клиенту?",
     "options": [
       "Маршрут между автономными системами",
@@ -2886,6 +3092,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Что выполняет NAT?",
     "options": [
       "Инкапсулирует трафик между VPN-шлюзами",
@@ -2900,6 +3107,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Что измеряет ping?",
     "options": [
       "Время разрешения имени через DNS",
@@ -2914,6 +3122,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Как используется маска IPv4-подсети?",
     "options": [
       "Отделяет биты сетевого префикса от части узла",
@@ -2928,6 +3137,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Что означает directed broadcast address в IPv4?",
     "options": [
       "Адрес маршрутизатора для выхода из подсети",
@@ -2942,6 +3152,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую информацию хранит DNS-запись A?",
     "options": [
       "Каноническое имя для доменного псевдонима",
@@ -2956,6 +3167,7 @@
   {
     "topic": "Сети",
     "level": "Junior",
+    "category": "definition",
     "q": "Как traceroute обнаруживает промежуточные узлы?",
     "options": [
       "Читает локальную таблицу маршрутизации системы",
@@ -2970,6 +3182,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Для какой задачи предназначен BGP?",
     "options": [
       "Обмен маршрутизируемыми префиксами между AS",
@@ -2984,6 +3197,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Как OSPF вычисляет маршруты внутри автономной системы?",
     "options": [
       "Передаёт соседям полный вектор расстояний",
@@ -2998,6 +3212,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Что обычно создаёт VPN поверх недоверенной сети?",
     "options": [
       "Общий широковещательный домен без инкапсуляции",
@@ -3012,6 +3227,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Что означает MTU интерфейса и как превышение влияет на IP?",
     "options": [
       "Число кадров, которое интерфейс хранит в очереди",
@@ -3026,6 +3242,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Как изменяется cwnd во время TCP slow start?",
     "options": [
       "Растёт примерно вдвое за RTT до порога или потери",
@@ -3040,6 +3257,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Какую задачу решает VXLAN?",
     "options": [
       "Шифрует L3-трафик между удалёнными площадками",
@@ -3054,6 +3272,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Чем обычно различается выбор backend у L4- и L7-балансировщиков?",
     "options": [
       "L4 читает HTTP-путь, а L7 использует MAC-адрес",
@@ -3068,6 +3287,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Какова роль ICMP в IP-сетях?",
     "options": [
       "Устанавливает надёжные соединения между приложениями",
@@ -3082,6 +3302,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Какие механизмы относятся к QoS?",
     "options": [
       "Классификация, маркировка, очереди и shaping",
@@ -3096,6 +3317,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Как STP предотвращает петли в Ethernet-сети?",
     "options": [
       "Удаляет широковещательные кадры на всех портах",
@@ -3110,6 +3332,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Что согласует LACP между двумя устройствами?",
     "options": [
       "Динамические маршруты и стоимость каждого пути",
@@ -3124,6 +3347,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Какие свойства IP-трафику может дать IPsec?",
     "options": [
       "Разрешение доменных имён и кеширование ответов",
@@ -3138,6 +3362,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Как выглядит полный 1-RTT handshake TLS 1.3 с сертификатом сервера?",
     "options": [
       "ClientHello → ServerHello и auth-сообщения → Finished клиента",
@@ -3152,6 +3377,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Как CDN уменьшает задержку доставки контента?",
     "options": [
       "Передаёт каждый запрос напрямую исходному серверу",
@@ -3166,6 +3392,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Как маршрутизация выбирает узел anycast-сервиса?",
     "options": [
       "Доставляет копию пакета каждому участнику группы",
@@ -3180,6 +3407,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Как ECMP использует несколько равнозначных next hop?",
     "options": [
       "Оставляет один активным, остальные держит резервными",
@@ -3194,6 +3422,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Что создаёт SR-IOV на совместимом PCIe-устройстве?",
     "options": [
       "PF с несколькими облегчёнными Virtual Functions",
@@ -3208,6 +3437,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Как DPDK ускоряет обработку пакетов?",
     "options": [
       "Передаёт каждый пакет в отдельный процесс ядра",
@@ -3222,6 +3452,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Какую роль выполняет EVPN в overlay-сети?",
     "options": [
       "Шифрует VXLAN-пакеты между удалёнными VTEP",
@@ -3236,6 +3467,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Какие свойства характерны для WireGuard?",
     "options": [
       "Сессии поверх TCP и согласование шифров в TLS",
@@ -3250,6 +3482,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Какие возможности объединяет QUIC?",
     "options": [
       "Защищённый UDP-транспорт, потоки и migration",
@@ -3264,6 +3497,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Как ingress-узел задаёт путь в segment routing?",
     "options": [
       "Создаёт по TCP-соединению к каждому маршрутизатору",
@@ -3278,6 +3512,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Что изолирует Linux network namespace?",
     "options": [
       "Память процесса, PID и точки монтирования",
@@ -3292,6 +3527,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Где XDP выполняет eBPF-программу при native-режиме?",
     "options": [
       "В userspace после чтения пакета обычным сокетом",
@@ -3306,6 +3542,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Как MPTCP переносит одно логическое соединение?",
     "options": [
       "Через несколько TCP-subflow по доступным путям",
@@ -3320,6 +3557,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Что отличает RDMA в пути передачи данных?",
     "options": [
       "Копирование каждого блока через буферы приложения",
@@ -3334,6 +3572,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Какую цель преследует набор стандартов TSN?",
     "options": [
       "Увеличить число адресов в Ethernet-заголовке",
@@ -3348,6 +3587,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "Что описывает программа на P4?",
     "options": [
       "Политику выдачи IP-адресов клиентам DHCP",
@@ -3362,6 +3602,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Что описывает Ansible playbook?",
     "options": [
       "Один или несколько plays с целями и задачами",
@@ -3376,6 +3617,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Что представляет собой task в playbook?",
     "options": [
       "Описание группы hosts и её variables",
@@ -3390,6 +3632,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Что задаёт inventory в Ansible?",
     "options": [
       "Порядок выполнения tasks внутри play",
@@ -3404,6 +3647,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Когда Ansible ставит handler на выполнение?",
     "options": [
       "При чтении playbook с разделом handlers",
@@ -3418,6 +3662,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Что контролирует условие when?",
     "options": [
       "Запуск task или block на основе выражения",
@@ -3432,6 +3677,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Как Ansible использует keyword loop?",
     "options": [
       "Повторяет весь play для каждой inventory group",
@@ -3446,6 +3692,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Что делает notify в task Ansible?",
     "options": [
       "Отправляет событие в configured callback",
@@ -3460,6 +3707,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Для чего предназначен ansible-vault?",
     "options": [
       "Для установки roles и collections из Galaxy",
@@ -3474,6 +3722,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Как применяются tags при запуске playbook?",
     "options": [
       "Выбирают или исключают помеченные tasks",
@@ -3488,6 +3737,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Что создаёт keyword register?",
     "options": [
       "Новую запись в dynamic inventory",
@@ -3502,6 +3752,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую роль играет defaults/main.yml?",
     "options": [
       "Задаёт параметры подключения к managed hosts",
@@ -3516,6 +3767,7 @@
   {
     "topic": "Ansible",
     "level": "Junior",
+    "category": "definition",
     "q": "Что настраивается через ansible.cfg?",
     "options": [
       "Состав hosts и groups для одного inventory",
@@ -3530,6 +3782,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Что объединяет Ansible Galaxy?",
     "options": [
       "Онлайн-каталог content и CLI для его установки",
@@ -3544,6 +3797,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Как действует keyword delegate_to?",
     "options": [
       "Передаёт variable precedence выбранной group",
@@ -3558,6 +3812,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Как связаны block, rescue и always?",
     "options": [
       "Block создаёт loop, rescue меняет loop_var",
@@ -3572,6 +3827,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Чем include_tasks отличается от import_tasks?",
     "options": [
       "Первый загружает role, второй — collection",
@@ -3586,6 +3842,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Что ограничивает keyword serial?",
     "options": [
       "Размер очередной партии hosts внутри play",
@@ -3600,6 +3857,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Как работает ansible-pull?",
     "options": [
       "Загружает collections из Galaxy на control node",
@@ -3614,6 +3872,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Что делают Jinja filters в Ansible?",
     "options": [
       "Ограничивают hosts по inventory pattern",
@@ -3628,6 +3887,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Где lookup plugin получает данные?",
     "options": [
       "Из facts на managed node через setup module",
@@ -3642,6 +3902,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Что представляет собой custom Ansible module?",
     "options": [
       "Исполняемый компонент с arguments и JSON-результатом",
@@ -3656,6 +3917,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Что гарантирует запуск ansible-playbook --check?",
     "options": [
       "Точный результат последующего обычного запуска",
@@ -3670,6 +3932,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Что определяет strategy plugin?",
     "options": [
       "Источник inventory и порядок разбора groups",
@@ -3684,6 +3947,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Для чего используется callback plugin?",
     "options": [
       "Для доставки modules на managed nodes",
@@ -3698,6 +3962,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Какое состояние создаёт set_fact?",
     "options": [
       "Host variable на время текущего запуска",
@@ -3712,6 +3977,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Что содержится в ansible_facts?",
     "options": [
       "Значения из role defaults и vars_prompt",
@@ -3726,6 +3992,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое async и poll в Ansible?",
     "options": [
       "Первый задаёт retries, второй — delay между ними",
@@ -3740,6 +4007,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Когда применяется vars_prompt?",
     "options": [
       "Когда inventory plugin обновляет список hosts",
@@ -3754,6 +4022,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Что дают AWX и automation controller?",
     "options": [
       "Централизованные jobs, API, RBAC и credentials",
@@ -3768,6 +4037,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Для чего используют Ansible Molecule?",
     "options": [
       "Для установки content из Galaxy по requirements",
@@ -3782,6 +4052,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Как работает dynamic inventory в Ansible?",
     "options": [
       "Статический YAML, который Jinja2 дополняет переменными перед каждым play",
@@ -3796,6 +4067,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "scenario",
     "q": "Как организовать управление секретами с Ansible Vault?",
     "options": [
       "Хранить секреты в закрытом vars_files и полагаться на права контроллера",
@@ -3810,6 +4082,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Что такое execution environment (EE) в Ansible?",
     "options": [
       "OCI-образ с ansible-core, collections и зависимостями для одинаковых запусков",
@@ -3824,6 +4097,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "scenario",
     "q": "Как безопасно искать и устранять узкие места Ansible?",
     "options": [
       "Сразу поднять forks до числа хостов и отключить проверку SSH host keys",
@@ -3838,6 +4112,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Что такое Ansible collections?",
     "options": [
       "Файл inventory, объединяющий группы хостов из нескольких источников",
@@ -3852,6 +4127,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Как работает pipelining в Ansible?",
     "options": [
       "Пакетно передаёт templates и files одним архивом перед запуском play",
@@ -3866,6 +4142,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Чем inventory plugins отличаются от inventory scripts?",
     "options": [
       "Плагины используют API Ansible и кеш; scripts отдают legacy JSON в stdout",
@@ -3880,6 +4157,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Что такое ARA (ARA Records Ansible)?",
     "options": [
       "Stdout callback, меняющий формат консольного вывода ansible-playbook",
@@ -3894,6 +4172,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Как реализовать идемпотентность сложного playbook?",
     "options": [
       "Выбирать модули по короткому имени и ставить changed_when: false каждой task",
@@ -3908,6 +4187,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Как работает async с poll: 0 в Ansible?",
     "options": [
       "Меняет strategy на free и снимает ограничение forks для текущего play",
@@ -8872,6 +9152,7 @@
   {
     "topic": "Docker",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую функцию выполняет Docker Engine?",
     "options": [
       "Эмулирует hardware каждой VM и загружает отдельное guest kernel для изоляции процессов приложения",
@@ -8886,6 +9167,7 @@
   {
     "topic": "Docker",
     "level": "Junior",
+    "category": "definition",
     "q": "Что описывает Dockerfile?",
     "options": [
       "Runtime-состояние одного container: PID, network namespace, writable layer и текущие значения environment",
@@ -8900,6 +9182,7 @@
   {
     "topic": "Docker",
     "level": "Junior",
+    "category": "definition",
     "q": "Что произойдёт при docker build -t myapp:latest .?",
     "options": [
       "Текущий каталог станет build context, default Dockerfile задаст build, а результат получит tag myapp:latest",
@@ -8914,6 +9197,7 @@
   {
     "topic": "Docker",
     "level": "Junior",
+    "category": "definition",
     "q": "Чем docker run отличается от docker start?",
     "options": [
       "run возобновляет paused process с прежним writable layer, start создаёт новый container из обновлённого image tag",
@@ -8928,6 +9212,7 @@
   {
     "topic": "Docker",
     "level": "Junior",
+    "category": "definition",
     "q": "Какая команда перечисляет работающие containers?",
     "options": [
       "docker images --running; флаг -a добавляет dangling image layers, связанные с остановленными processes",
@@ -8942,6 +9227,7 @@
   {
     "topic": "Docker",
     "level": "Junior",
+    "category": "definition",
     "q": "Для чего используют docker compose?",
     "options": [
       "Для сборки одного image из Dockerfile с автоматическим выбором multi-stage target по имени Compose project",
@@ -8956,6 +9242,7 @@
   {
     "topic": "Docker",
     "level": "Middle",
+    "category": "definition",
     "q": "Что даёт Docker named volume?",
     "options": [
       "Управляемое Docker storage, которое монтируется в container и живёт независимо от его удаления до удаления volume",
@@ -8970,6 +9257,7 @@
   {
     "topic": "Docker",
     "level": "Middle",
+    "category": "definition",
     "q": "Как взаимодействуют ENTRYPOINT и CMD в exec form?",
     "options": [
       "CMD запускается перед ENTRYPOINT и записывает stdout в файл, который становится stdin основного process container",
@@ -8984,6 +9272,7 @@
   {
     "topic": "Docker",
     "level": "Middle",
+    "category": "definition",
     "q": "Что означает docker run -p 8080:80 myapp?",
     "options": [
       "Container получает IP 8080 и слушает host port 80, а daemon преобразует оба числа в адреса bridge network",
@@ -8998,6 +9287,7 @@
   {
     "topic": "Docker",
     "level": "Middle",
+    "category": "definition",
     "q": "Как image layers связаны с Dockerfile и runtime container?",
     "options": [
       "Каждый Dockerfile token создаёт layer, включая comments, и daemon объединяет их в один mutable файл при push",
@@ -9012,6 +9302,7 @@
   {
     "topic": "Kubernetes",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую задачу решает Kubernetes?",
     "options": [
       "Поддерживает desired state containerized workloads: scheduling, rollout, service discovery и self-healing controllers",
@@ -9026,6 +9317,7 @@
   {
     "topic": "Kubernetes",
     "level": "Junior",
+    "category": "definition",
     "q": "Что представляет собой Pod?",
     "options": [
       "Физический Node, зарегистрированный kubelet и разделённый на containers с отдельными cluster IP addresses",
@@ -9040,6 +9332,7 @@
   {
     "topic": "Kubernetes",
     "level": "Junior",
+    "category": "output",
     "q": "Что выводит kubectl get pods без дополнительных флагов?",
     "options": [
       "Pods всех namespaces с полным PodSpec и decoded Secret values, доступными текущему service account пользователя",
@@ -9054,6 +9347,7 @@
   {
     "topic": "Kubernetes",
     "level": "Middle",
+    "category": "definition",
     "q": "Как Deployment управляет Pods?",
     "options": [
       "Назначает один Pod каждому Node напрямую и обновляет его image без ReplicaSet, сохраняя UID между revisions",
@@ -9068,6 +9362,7 @@
   {
     "topic": "Kubernetes",
     "level": "Middle",
+    "category": "definition",
     "q": "Что предоставляет Kubernetes Service?",
     "options": [
       "Стабильную сетевую абстракцию и discovery для набора endpoints, даже когда адреса backing Pods меняются",
@@ -9082,6 +9377,7 @@
   {
     "topic": "CI/CD",
     "level": "Junior",
+    "category": "definition",
     "q": "Что означает Continuous Integration на практике?",
     "options": [
       "Редкие объединения feature branches перед release с ручной сборкой, чтобы CI не выполнялся на промежуточных commits",
@@ -9096,6 +9392,7 @@
   {
     "topic": "CI/CD",
     "level": "Junior",
+    "category": "definition",
     "q": "Какой этап может оставаться ручным в процессе Continuous Delivery?",
     "options": [
       "Сохранение исходников в Git перед запуском CI pipeline",
@@ -9110,6 +9407,7 @@
   {
     "topic": "CI/CD",
     "level": "Middle",
+    "category": "definition",
     "q": "Из чего состоит GitLab CI/CD pipeline?",
     "options": [
       "Из Docker Compose services, которые GitLab превращает в постоянные runners и удаляет после закрытия merge request",
@@ -9124,6 +9422,7 @@
   {
     "topic": "CI/CD",
     "level": "Middle",
+    "category": "definition",
     "q": "Что разумно размещать в test stage pipeline?",
     "options": [
       "Повторяемые проверки вроде unit/integration tests, lint и security scans; конкретные jobs и failure policy задаёт config",
@@ -9138,6 +9437,7 @@
   {
     "topic": "CI/CD",
     "level": "Middle",
+    "category": "definition",
     "q": "Что такое job artifacts в CI/CD?",
     "options": [
       "Mutable dependency cache, который jobs изменяют совместно и который считается authoritative release storage без retention",
@@ -9152,6 +9452,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Какую функцию выполняет state в Terraform?",
     "options": [
       "Хранит исходный HCL-код модулей и выбирает версии provider-плагинов для рабочего каталога",
@@ -9166,6 +9467,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Как data source участвует в конфигурации Terraform?",
     "options": [
       "Создаёт управляемый объект через provider и отвечает за его обновление и удаление при apply",
@@ -9180,6 +9482,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Что происходит при импорте существующего объекта в Terraform?",
     "options": [
       "Объект связывается с resource address в state, после чего plan сравнивает его с конфигурацией",
@@ -9194,6 +9497,7 @@
   {
     "topic": "Terraform",
     "level": "Senior",
+    "category": "tradeoff",
     "q": "Почему `-replace=ADDRESS` предпочтительнее команды `terraform taint`?",
     "options": [
       "`-replace` переносит объект в другой backend, тогда как taint сохраняет его в текущем workspace",
@@ -9208,6 +9512,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Как изменятся права после `chmod 755 script.sh`?",
     "options": [
       "Владелец получит `rw-`, группа `r--`, остальные `r--`, поскольку исполняемый бит будет снят",
@@ -9222,6 +9527,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Какую роль обычно выполняет `/etc/fstab`?",
     "options": [
       "Описывает локальных пользователей, их домашние каталоги и оболочки для процессов входа в систему",
@@ -9236,6 +9542,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Как действует команда `kill -9 PID`?",
     "options": [
       "Посылает SIGKILL: процесс не может перехватить или игнорировать сигнал и не выполняет cleanup handler",
@@ -9250,6 +9557,7 @@
   {
     "topic": "Linux",
     "level": "Senior",
+    "category": "definition",
     "q": "Как исчерпание inode влияет на файловую систему?",
     "options": [
       "Заканчиваются сетевые сокеты, поэтому новые TCP-соединения отклоняются при свободных disk blocks",
@@ -9264,6 +9572,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Какую сетевую задачу решает VLAN?",
     "options": [
       "Шифрует Ethernet payload между коммутаторами и выдаёт ключи участникам одного IP-сегмента",
@@ -9278,6 +9587,7 @@
   {
     "topic": "Сети",
     "level": "Middle",
+    "category": "definition",
     "q": "Как точнее сравнить транспортные свойства TCP и UDP?",
     "options": [
       "TCP передаёт отдельные datagrams без порядка, а UDP формирует над ними надёжный поток байтов",
@@ -9292,6 +9602,7 @@
   {
     "topic": "Сети",
     "level": "Senior",
+    "category": "definition",
     "q": "На каком механизме строится `traceroute`?",
     "options": [
       "Посылает probes с растущим TTL или Hop Limit и сопоставляет ответы ICMP Time Exceeded от промежуточных узлов",
@@ -9306,6 +9617,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Что описывает inventory в Ansible?",
     "options": [
       "Последовательность tasks и handlers, которую controller выполняет для каждого host в рамках play",
@@ -9320,6 +9632,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Чем роль Ansible отличается от playbook?",
     "options": [
       "Роль определяет hosts и connection settings, а playbook содержит inventory groups и их variables",
@@ -9334,6 +9647,7 @@
   {
     "topic": "Ansible",
     "level": "Senior",
+    "category": "definition",
     "q": "Для чего предназначен Ansible Vault?",
     "options": [
       "Выдаёт приложениям короткоживущие database credentials и отзывает их после завершения play",
@@ -9348,6 +9662,7 @@
   {
     "topic": "Ansible",
     "level": "Middle",
+    "category": "definition",
     "q": "Когда Ansible запускает handler?",
     "options": [
       "Changed task уведомляет handler, он ставится в очередь и обычно выполняется в контрольной точке один раз по имени",
@@ -9362,6 +9677,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Какую нагрузку обслуживает Yandex Compute Cloud?",
     "options": [
       "Объекты в S3-compatible buckets с lifecycle rules, versioning и HTTP-доступом через storage API",
@@ -9376,6 +9692,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Какая модель хранения используется в Yandex Object Storage?",
     "options": [
       "POSIX-файловая система монтируется на VM и обеспечивает shared file locks между приложениями",
@@ -9390,6 +9707,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Что объединяет сервис Yandex Virtual Private Cloud?",
     "options": [
       "VM images, snapshots и instance templates, из которых создаются группы вычислительных instances",
@@ -9404,6 +9722,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Как IAM определяет доступ к ресурсам Yandex Cloud?",
     "options": [
       "Access binding назначает роль identity на ресурсе, а иерархия и состав роли определяют разрешённые действия",
@@ -9418,6 +9737,7 @@
   {
     "topic": "Kubernetes",
     "level": "Middle",
+    "category": "definition",
     "q": "Что берёт на себя Yandex Managed Service for Kubernetes?",
     "options": [
       "Создаёт локальный single-node cluster внутри developer workstation и сохраняет его state в kubeconfig",
@@ -9432,6 +9752,7 @@
   {
     "topic": "Linux",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую модель выполнения предлагает Yandex Cloud Functions?",
     "options": [
       "Постоянная VM запускает systemd units и требует ручного выбора CPU, RAM, диска и стратегии patching",
@@ -9446,6 +9767,7 @@
   {
     "topic": "Linux",
     "level": "Middle",
+    "category": "definition",
     "q": "Как проектировать отказоустойчивое приложение в Yandex Cloud?",
     "options": [
       "Разместить компоненты на одной крупной VM и увеличить её disk size, чтобы исключить сетевые зависимости",
@@ -9460,6 +9782,7 @@
   {
     "topic": "CI/CD",
     "level": "Middle",
+    "category": "scenario",
     "q": "Как безопаснее организовать deployment из GitLab CI в Yandex Cloud?",
     "options": [
       "Выдать отдельному service account минимальные роли, защитить credentials и запускать `yc` или Terraform из job",
@@ -9474,6 +9797,7 @@
   {
     "topic": "Terraform",
     "level": "Middle",
+    "category": "definition",
     "q": "Как Terraform подключается к ресурсам Yandex Cloud?",
     "options": [
       "Через AWS provider с подменой region, после чего все Yandex API автоматически повторяют интерфейсы EC2",
@@ -9488,6 +9812,7 @@
   {
     "topic": "Docker",
     "level": "Middle",
+    "category": "definition",
     "q": "Для чего служит Yandex Container Registry?",
     "options": [
       "Предоставляет shared POSIX volumes для pods и VM с directory locks и изменением файлов на месте",
@@ -9502,6 +9827,7 @@
   {
     "topic": "CI/CD",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую практику описывает Continuous Integration?",
     "options": [
       "Release собирают на рабочей станции перед квартальным окном и проверяют отдельным ручным checklist",
@@ -9516,6 +9842,7 @@
   {
     "topic": "CI/CD",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую роль выполняет GitLab Runner?",
     "options": [
       "Получает CI jobs от GitLab, исполняет их выбранным executor и возвращает logs, status и artifacts",
@@ -9530,6 +9857,7 @@
   {
     "topic": "CI/CD",
     "level": "Junior",
+    "category": "definition",
     "q": "Где GitHub Actions ищет определения workflows?",
     "options": [
       "В корневом `Jenkinsfile`, который GitHub преобразует в jobs при открытии pull request в repository",
@@ -9544,6 +9872,7 @@
   {
     "topic": "CI/CD",
     "level": "Junior",
+    "category": "definition",
     "q": "Что обычно называют job artifact в CI/CD?",
     "options": [
       "Mutable cache зависимостей, который jobs совместно перезаписывают и используют как release source of record",
@@ -9558,6 +9887,7 @@
   {
     "topic": "CI/CD",
     "level": "Middle",
+    "category": "definition",
     "q": "Как корректно сравнить конфигурацию GitLab CI и GitHub Actions?",
     "options": [
       "GitLab CI исполняет jobs последовательно, а GitHub Actions не поддерживает dependencies между jobs",
@@ -9572,6 +9902,7 @@
   {
     "topic": "CI/CD",
     "level": "Middle",
+    "category": "definition",
     "q": "Как проектировать cache в GitHub Actions?",
     "options": [
       "Кешировать каталог package manager через setup-action или cache-action с ключом из OS и lockfile hash",
@@ -9586,6 +9917,7 @@
   {
     "topic": "CI/CD",
     "level": "Middle",
+    "category": "definition",
     "q": "Что делает matrix strategy в CI workflow?",
     "options": [
       "Собирает один multi-platform image из Dockerfile и объединяет manifests для разных CPU architectures",
@@ -9600,6 +9932,7 @@
   {
     "topic": "CI/CD",
     "level": "Senior",
+    "category": "definition",
     "q": "Как Argo CD обрабатывает расхождение декларативного и фактического состояния?",
     "options": [
       "Копирует рабочий каталог по rsync на cluster nodes и запускает manifests из локального filesystem",
@@ -9614,6 +9947,7 @@
   {
     "topic": "CI/CD",
     "level": "Senior",
+    "category": "definition",
     "q": "Из каких элементов складывается canary rollout в Argo Rollouts?",
     "options": [
       "CronJob периодически меняет replicas у Deployment, а успешность определяется временем завершения schedule",
@@ -9628,6 +9962,7 @@
   {
     "topic": "CI/CD",
     "level": "Senior",
+    "category": "definition",
     "q": "Как CI job получает временный доступ к нескольким AWS accounts через OIDC?",
     "options": [
       "Job предъявляет подписанный OIDC token сервису STS и принимает role, чья trust policy ограничивает issuer и claims",
@@ -9642,6 +9977,7 @@
   {
     "topic": "CI/CD",
     "level": "Middle",
+    "category": "definition",
     "q": "Что означает self-hosted runner в CI-системе?",
     "options": [
       "Локальный plugin запускает отдельные commands разработчика, но не регистрируется у CI control plane",
@@ -9656,6 +9992,7 @@
   {
     "topic": "CI/CD",
     "level": "Middle",
+    "category": "definition",
     "q": "Как различаются manual job и deployment approval в GitLab?",
     "options": [
       "Email notification считается approval и автоматически запускает deployment от имени первого получателя письма",
@@ -9670,6 +10007,7 @@
   {
     "topic": "Kubernetes",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую границу создаёт Kubernetes Namespace?",
     "options": [
       "Отдельный network stack с собственным control plane и независимым etcd для namespaced resources",
@@ -9684,6 +10022,7 @@
   {
     "topic": "Kubernetes",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую identity предоставляет Kubernetes ServiceAccount?",
     "options": [
       "Идентифицирует workload внутри cluster; RBAC выдаёт права, а projected API token зависит от Pod configuration",
@@ -9698,6 +10037,7 @@
   {
     "topic": "Kubernetes",
     "level": "Junior",
+    "category": "definition",
     "q": "Для каких данных предназначен Kubernetes ConfigMap?",
     "options": [
       "Для ciphertext credentials, которые kubelet расшифровывает аппаратным ключом перед запуском container",
@@ -9712,6 +10052,7 @@
   {
     "topic": "Kubernetes",
     "level": "Middle",
+    "category": "tradeoff",
     "q": "Когда StatefulSet подходит лучше Deployment?",
     "options": [
       "Когда replicas взаимозаменяемы, имена Pods несущественны и rollout должен быстро заменять экземпляры",
@@ -9726,6 +10067,7 @@
   {
     "topic": "Kubernetes",
     "level": "Middle",
+    "category": "definition",
     "q": "Какую функцию выполняет Kubernetes Ingress Controller?",
     "options": [
       "Размещает Pods по Nodes, учитывая requests, affinity, topology constraints и доступные resources",
@@ -9740,6 +10082,7 @@
   {
     "topic": "Kubernetes",
     "level": "Middle",
+    "category": "definition",
     "q": "Как Kubernetes NetworkPolicy ограничивает трафик?",
     "options": [
       "Policy выбирает Pods и задаёт разрешённые ingress/egress peers и ports; реализацию обеспечивает network plugin",
@@ -9754,6 +10097,7 @@
   {
     "topic": "Kubernetes",
     "level": "Senior",
+    "category": "tradeoff",
     "q": "Что нужно выбрать при проектировании Istio для нескольких clusters?",
     "options": [
       "Один `istiod` подходит каждой topology и failure domain, поэтому control planes и API connectivity не анализируют",
@@ -9768,6 +10112,7 @@
   {
     "topic": "Kubernetes",
     "level": "Senior",
+    "category": "definition",
     "q": "Где в Kubernetes API request участвуют admission webhooks?",
     "options": [
       "Читают container logs после scheduling и отправляют их во внешний collector для indexing и retention",
@@ -9782,6 +10127,7 @@
   {
     "topic": "Kubernetes",
     "level": "Senior",
+    "category": "definition",
     "q": "Как Vertical Pod Autoscaler меняет resource sizing?",
     "options": [
       "Уменьшает limits по расписанию независимо от наблюдаемого usage и не создаёт рекомендации для requests",
@@ -9796,6 +10142,7 @@
   {
     "topic": "Kubernetes",
     "level": "Middle",
+    "category": "definition",
     "q": "Какую задачу решает Helm в Kubernetes?",
     "options": [
       "Упаковывает templated manifests в charts и управляет release values, upgrades и rollback metadata",
@@ -9810,6 +10157,7 @@
   {
     "topic": "Monitoring",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую функцию выполняет monitoring в эксплуатации систем?",
     "options": [
       "Оператор вручную входит на servers по расписанию и считает отсутствие жалоб подтверждением здоровья",
@@ -9824,6 +10172,7 @@
   {
     "topic": "Monitoring",
     "level": "Junior",
+    "category": "definition",
     "q": "Какова основная модель Prometheus?",
     "options": [
       "Копирует database backups между regions и проверяет их восстановление с помощью scheduled restore jobs",
@@ -9838,6 +10187,7 @@
   {
     "topic": "Monitoring",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую роль обычно выполняет Grafana?",
     "options": [
       "Проксирует Kubernetes API и применяет NetworkPolicy к запросам dashboards от cluster users",
@@ -9852,6 +10202,7 @@
   {
     "topic": "Monitoring",
     "level": "Middle",
+    "category": "definition",
     "q": "Для каких объектов применяют методы USE и RED?",
     "options": [
       "USE проверяет utilization, saturation и errors ресурсов, а RED — rate, errors и duration запросов сервиса",
@@ -9866,6 +10217,7 @@
   {
     "topic": "Monitoring",
     "level": "Middle",
+    "category": "definition",
     "q": "Что делает Prometheus Alertmanager после получения alerts?",
     "options": [
       "Хранит долговременную историю time series и выполняет PromQL queries вместо Prometheus servers",
@@ -9880,6 +10232,7 @@
   {
     "topic": "Monitoring",
     "level": "Senior",
+    "category": "definition",
     "q": "Как строят долгосрочное хранение Prometheus-метрик?",
     "options": [
       "Периодически экспортируют dashboard в spreadsheet и удаляют исходные series после подтверждения оператора",
@@ -9894,6 +10247,7 @@
   {
     "topic": "Monitoring",
     "level": "Senior",
+    "category": "definition",
     "q": "Как OpenTelemetry связывает spans распределённого запроса?",
     "options": [
       "Сохраняет каждый span как локальный log без context propagation, а backend объединяет записи по timestamp",
@@ -9908,6 +10262,7 @@
   {
     "topic": "Monitoring",
     "level": "Middle",
+    "category": "definition",
     "q": "Как Grafana Loki организует хранение и поиск logs?",
     "options": [
       "Индексирует labels, хранит compressed log chunks и выполняет LogQL, поэтому cardinality labels нужно ограничивать",
@@ -9922,6 +10277,7 @@
   {
     "topic": "Monitoring",
     "level": "Middle",
+    "category": "definition",
     "q": "Какие уровни сигналов нужны для monitoring Kubernetes cluster?",
     "options": [
       "Проверяют heartbeat одного control-plane endpoint и считают workloads здоровыми при успешном TCP connect",
@@ -9936,6 +10292,7 @@
   {
     "topic": "Monitoring",
     "level": "Senior",
+    "category": "definition",
     "q": "Как связаны SLI, SLO, SLA и error budget?",
     "options": [
       "SLI хранит raw logs, SLO задаёт dashboard layout, а SLA выбирает notification receiver для alerts",
@@ -9950,6 +10307,7 @@
   {
     "topic": "Monitoring",
     "level": "Middle",
+    "category": "definition",
     "q": "Как Prometheus Blackbox Exporter проверяет endpoint?",
     "options": [
       "Читает Node CPU и filesystem counters из `/proc`, используя тот же collector набор, что node exporter",
@@ -9964,6 +10322,7 @@
   {
     "topic": "Monitoring",
     "level": "Middle",
+    "category": "definition",
     "q": "Какие роли выполняют компоненты классического ELK stack?",
     "options": [
       "Elasticsearch индексирует и ищет данные, Logstash обрабатывает events, Kibana предоставляет анализ и визуализацию",
@@ -9978,6 +10337,7 @@
   {
     "topic": "Monitoring",
     "level": "Middle",
+    "category": "definition",
     "q": "Что означает instrumentation в observability?",
     "options": [
       "Настройку server packages и kernel parameters без генерации telemetry из application operations",
@@ -9992,6 +10352,7 @@
   {
     "topic": "Monitoring",
     "level": "Senior",
+    "category": "definition",
     "q": "Какой состав подходит для независимой observability-платформы с метриками, логами и трассировками?",
     "options": [
       "Fluent Bit, Elasticsearch и Kibana без хранилища метрик и распределённых трассировок",
@@ -10006,6 +10367,7 @@
   {
     "topic": "Cloud",
     "level": "Junior",
+    "category": "definition",
     "q": "Как меняется зона ответственности клиента между IaaS, PaaS и SaaS?",
     "options": [
       "В каждой модели клиент обслуживает гипервизор, операционную систему и прикладной код",
@@ -10020,6 +10382,7 @@
   {
     "topic": "Cloud",
     "level": "Junior",
+    "category": "definition",
     "q": "Какая характеристика отличает объектное хранилище от файлового и блочного?",
     "options": [
       "Данные хранятся как объекты с ключами и метаданными, а доступ обычно выполняется через API",
@@ -10034,6 +10397,7 @@
   {
     "topic": "Cloud",
     "level": "Junior",
+    "category": "definition",
     "q": "Что обычно означает managed-сервис в публичном облаке?",
     "options": [
       "Клиент получает оборудование в стойке и самостоятельно обслуживает аппаратные компоненты",
@@ -10048,6 +10412,7 @@
   {
     "topic": "Cloud",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую часть Kubernetes обычно берёт на себя облачный managed-сервис?",
     "options": [
       "Разработку бизнес-логики, выпуск релизов приложения и исправление ошибок в его коде",
@@ -10062,6 +10427,7 @@
   {
     "topic": "Cloud",
     "level": "Middle",
+    "category": "definition",
     "q": "Как снизить влияние отказа одной зоны доступности на облачное приложение?",
     "options": [
       "Увеличить ресурсы экземпляров в одной зоне и рассчитывать на резервирование оборудования",
@@ -10076,6 +10442,7 @@
   {
     "topic": "Cloud",
     "level": "Middle",
+    "category": "scenario",
     "q": "Как безопаснее аутентифицировать Terraform в Yandex Cloud из CI?",
     "options": [
       "Передавать учётные данные сервисного аккаунта из защищённого хранилища и ограничить его роли",
@@ -10090,6 +10457,7 @@
   {
     "topic": "Cloud",
     "level": "Middle",
+    "category": "definition",
     "q": "Что важно проверить до выбора регионального облачного провайдера?",
     "options": [
       "Сравнить рекламную стоимость виртуальной машины и принять остальные параметры одинаковыми",
@@ -10104,6 +10472,7 @@
   {
     "topic": "Cloud",
     "level": "Middle",
+    "category": "definition",
     "q": "Что означает заявленная совместимость хранилища с S3 API при миграции?",
     "options": [
       "Провайдер уже перенёс бакеты и сохранил прежние адреса, ключи доступа и сетевые правила",
@@ -10118,6 +10487,7 @@
   {
     "topic": "Cloud",
     "level": "Senior",
+    "category": "scenario",
     "q": "Как снизить риск при миграции приложения с AWS на другого облачного провайдера?",
     "options": [
       "Сначала заменить адреса сервисов в production, затем выяснять различия API по ошибкам",
@@ -10132,6 +10502,7 @@
   {
     "topic": "Cloud",
     "level": "Senior",
+    "category": "scenario",
     "q": "С чего начать проектирование гибридного контура, обрабатывающего персональные данные?",
     "options": [
       "Классифицировать данные и угрозы, уточнить требования со специалистами и определить меры защиты",
@@ -10146,6 +10517,7 @@
   {
     "topic": "Cloud",
     "level": "Middle",
+    "category": "definition",
     "q": "Как интерпретировать сертификат соответствия облачной платформы?",
     "options": [
       "Он автоматически распространяется на прикладной код, процессы и данные каждого клиента",
@@ -10160,6 +10532,7 @@
   {
     "topic": "Cloud",
     "level": "Senior",
+    "category": "definition",
     "q": "Как спроектировать проверяемый disaster recovery для облачной системы?",
     "options": [
       "Хранить снимки в рабочей зоне и считать успешное создание снимка проверкой восстановления",
@@ -10174,6 +10547,7 @@
   {
     "topic": "Cloud",
     "level": "Junior",
+    "category": "definition",
     "q": "Какая граница ответственности характерна для serverless-функций?",
     "options": [
       "Провайдер пишет бизнес-логику, а команда приложения настраивает гипервизор и физическую сеть",
@@ -10188,6 +10562,7 @@
   {
     "topic": "Security",
     "level": "Junior",
+    "category": "definition",
     "q": "Какой признак лучше всего характеризует практику DevSecOps?",
     "options": [
       "Риски и проверки безопасности встроены в разработку и CI/CD с быстрым feedback для команды",
@@ -10202,6 +10577,7 @@
   {
     "topic": "Security",
     "level": "Junior",
+    "category": "definition",
     "q": "Чем различаются SAST и DAST при проверке приложения?",
     "options": [
       "SAST отправляет запросы работающему сервису, а DAST разбирает исходный код и его модели",
@@ -10216,6 +10592,7 @@
   {
     "topic": "Security",
     "level": "Junior",
+    "category": "scenario",
     "q": "Как уменьшить риск утечки секретов из CI/CD?",
     "options": [
       "Зашифровать значения в репозитории и сохранить ключ расшифрования рядом с pipeline",
@@ -10230,6 +10607,7 @@
   {
     "topic": "Security",
     "level": "Middle",
+    "category": "definition",
     "q": "Что должен охватывать контроль уязвимостей контейнерного образа?",
     "options": [
       "Проверку синтаксиса Dockerfile и успешный запуск сборки на доверенном runner",
@@ -10244,6 +10622,7 @@
   {
     "topic": "Security",
     "level": "Middle",
+    "category": "definition",
     "q": "Какую задачу решает Gatekeeper в кластере Kubernetes?",
     "options": [
       "Проверяет ресурсы по policy constraints при admission и может аудировать уже созданные объекты",
@@ -10258,6 +10637,7 @@
   {
     "topic": "Security",
     "level": "Middle",
+    "category": "scenario",
     "q": "Как безопаснее доставлять секреты из Vault в pod Kubernetes?",
     "options": [
       "Записать root token в ConfigMap и разрешить чтение конфигурации каждому namespace",
@@ -10272,6 +10652,7 @@
   {
     "topic": "Security",
     "level": "Senior",
+    "category": "definition",
     "q": "Что повышает доверие к происхождению артефакта в software supply chain?",
     "options": [
       "Сборка на ноутбуке разработчика с загрузкой артефакта под его личной учётной записью",
@@ -10286,6 +10667,7 @@
   {
     "topic": "Security",
     "level": "Senior",
+    "category": "scenario",
     "q": "Как встроить проверку безопасности IaC в процесс изменений?",
     "options": [
       "Проверять форматирование файлов и считать успешный lint подтверждением безопасной конфигурации",
@@ -10300,6 +10682,7 @@
   {
     "topic": "Security",
     "level": "Middle",
+    "category": "scenario",
     "q": "Что делать при обнаружении действующего секрета в истории Git?",
     "options": [
       "Немедленно отозвать или ротировать секрет, оценить использование, затем очистить историю при необходимости",
@@ -10314,6 +10697,7 @@
   {
     "topic": "Security",
     "level": "Middle",
+    "category": "definition",
     "q": "Что нужно учитывать при применении Kubernetes NetworkPolicy?",
     "options": [
       "Правила обрабатываются сверху вниз, поэтому порядок объектов определяет итоговый доступ pod",
@@ -10328,6 +10712,7 @@
   {
     "topic": "Security",
     "level": "Senior",
+    "category": "tradeoff",
     "q": "Какой подход соответствует принципам Zero Trust в облачной системе?",
     "options": [
       "Считать внутреннюю сеть доверенной после входа через VPN и проверять пользователя на периметре",
@@ -10342,6 +10727,7 @@
   {
     "topic": "Security",
     "level": "Junior",
+    "category": "definition",
     "q": "Какие свойства соединению HTTP добавляет корректно настроенный TLS?",
     "options": [
       "Скрывает IP-адреса участников и шифрует DNS-запросы независимо от сетевой конфигурации",
@@ -10356,6 +10742,7 @@
   {
     "topic": "Cloud",
     "level": "Junior",
+    "category": "definition",
     "q": "Чем виртуальная машина отличается от контейнера на том же хосте?",
     "options": [
       "Виртуальная машина имеет гостевую ОС и ядро поверх виртуального оборудования гипервизора",
@@ -10370,6 +10757,7 @@
   {
     "topic": "Cloud",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую задачу решает VPC в публичном облаке?",
     "options": [
       "Закрепляет вычислительные ресурсы за одной физической стойкой и общим коммутатором",
@@ -10384,6 +10772,7 @@
   {
     "topic": "Cloud",
     "level": "Middle",
+    "category": "definition",
     "q": "Как обычно работает горизонтальное автомасштабирование группы облачных VM?",
     "options": [
       "Увеличивает размер подключённых дисков и расширяет файловую систему работающих экземпляров",
@@ -10398,6 +10787,7 @@
   {
     "topic": "Cloud",
     "level": "Middle",
+    "category": "definition",
     "q": "Чем выделенное подключение к облаку отличается от VPN через публичный интернет?",
     "options": [
       "Использует DNS-туннель провайдера и поэтому не требует настройки BGP или статических маршрутов",
@@ -10412,6 +10802,7 @@
   {
     "topic": "Cloud",
     "level": "Middle",
+    "category": "scenario",
     "q": "Как организовать Terraform state для совместной работы команды в облаке?",
     "options": [
       "Использовать удалённый backend с шифрованием, версиями, ограничением доступа и поддерживаемой блокировкой",
@@ -10426,6 +10817,7 @@
   {
     "topic": "Cloud",
     "level": "Senior",
+    "category": "definition",
     "q": "Что учитывать при проектировании multi-region архитектуры?",
     "options": [
       "Разместить все компоненты в одном регионе и считать резервные копии заменой работающей площадки",
@@ -10440,6 +10832,7 @@
   {
     "topic": "Cloud",
     "level": "Senior",
+    "category": "definition",
     "q": "С чего начинать выполнение применимых требований регулятора в облачной системе?",
     "options": [
       "Выбрать продукт с общим сертификатом и распространить его область действия на всю систему",
@@ -10454,6 +10847,7 @@
   {
     "topic": "Cloud",
     "level": "Middle",
+    "category": "definition",
     "q": "Зачем объектному хранилищу нужны разные storage classes?",
     "options": [
       "Они выбирают формат объекта и преобразуют содержимое между JSON, CSV и бинарным представлением",
@@ -10468,6 +10862,7 @@
   {
     "topic": "Cloud",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую задачу выполняет облачный load balancer?",
     "options": [
       "Принимает трафик, выбирает доступный backend по алгоритму и исключает цели по health check",
@@ -10482,6 +10877,7 @@
   {
     "topic": "Cloud",
     "level": "Middle",
+    "category": "definition",
     "q": "Как разделить внутренние и публичные DNS-имена облачного приложения?",
     "options": [
       "Записать внутренние адреса в публичную зону и ограничить к ним доступ правилами firewall",
@@ -10496,6 +10892,7 @@
   {
     "topic": "Monitoring",
     "level": "Junior",
+    "category": "definition",
     "q": "Что делает сигнал мониторинга полезным алертом для дежурного?",
     "options": [
       "Сырое изменение метрики отправляется в общий канал без выдержки, группировки и контекста",
@@ -10510,6 +10907,7 @@
   {
     "topic": "Monitoring",
     "level": "Junior",
+    "category": "definition",
     "q": "Какие основные типы метрик предоставляет клиентская модель Prometheus?",
     "options": [
       "Integer для нагрузки, Boolean для здоровья, String для статуса и Event для журналов",
@@ -10524,6 +10922,7 @@
   {
     "topic": "Monitoring",
     "level": "Middle",
+    "category": "definition",
     "q": "Какие данные service mesh даёт без изменения бизнес-кода?",
     "options": [
       "Прокси видит сетевые метрики и access logs, но внутренние операции и полные traces требуют инструментации",
@@ -10538,6 +10937,7 @@
   {
     "topic": "Monitoring",
     "level": "Middle",
+    "category": "definition",
     "q": "Как надёжно контролировать срок действия TLS-сертификатов?",
     "options": [
       "Проверять сертификат в браузере перед релизом и считать эту дату началом нового периода контроля",
@@ -10552,6 +10952,7 @@
   {
     "topic": "Monitoring",
     "level": "Middle",
+    "category": "definition",
     "q": "Чем synthetic monitoring отличается от Real User Monitoring?",
     "options": [
       "Анализирует серверные логи после запросов и восстанавливает пользовательские сессии по идентификаторам",
@@ -10566,6 +10967,7 @@
   {
     "topic": "Monitoring",
     "level": "Senior",
+    "category": "definition",
     "q": "Что учитывать при использовании native federation Prometheus между кластерами?",
     "options": [
       "Federation передаёт сырые журналы и traces вместе с метриками через стандартный endpoint",
@@ -10580,6 +10982,7 @@
   {
     "topic": "Monitoring",
     "level": "Senior",
+    "category": "definition",
     "q": "Какие четыре сигнала помогают оценивать пользовательское состояние сервиса по Google SRE?",
     "options": [
       "Latency, traffic, errors и saturation для задержки, нагрузки, отказов и исчерпания ресурсов",
@@ -10594,6 +10997,7 @@
   {
     "topic": "Monitoring",
     "level": "Junior",
+    "category": "definition",
     "q": "Как корректнее трактовать uptime сервиса?",
     "options": [
       "Средняя продолжительность процесса на одном хосте между его плановыми перезапусками",
@@ -10608,6 +11012,7 @@
   {
     "topic": "Monitoring",
     "level": "Middle",
+    "category": "definition",
     "q": "Зачем распределённой системе централизованная агрегация логов?",
     "options": [
       "Чтобы пересылать каждый файл по email и хранить отдельную копию в почтовом ящике команды",
@@ -10622,6 +11027,7 @@
   {
     "topic": "Monitoring",
     "level": "Junior",
+    "category": "definition",
     "q": "Какую роль выполняет хороший monitoring dashboard?",
     "options": [
       "Заменяет систему алертов и требует постоянного наблюдения инженера за каждой панелью",
@@ -10636,6 +11042,7 @@
   {
     "topic": "Security",
     "level": "Junior",
+    "category": "definition",
     "q": "Для чего команде нужен OWASP Top 10?",
     "options": [
       "Это awareness-документ о распространённых категориях риска, а не исчерпывающий стандарт проверки",
@@ -10650,6 +11057,7 @@
   {
     "topic": "Security",
     "level": "Junior",
+    "category": "definition",
     "q": "Что означает принцип наименьших привилегий?",
     "options": [
       "Назначать широкую роль команде, а ограничения добавлять после появления конфликтов доступа",
@@ -10664,6 +11072,7 @@
   {
     "topic": "Security",
     "level": "Middle",
+    "category": "definition",
     "q": "Как работает mutual TLS между сервисами?",
     "options": [
       "Клиент предъявляет сертификат, а сервер передаёт данные открытым текстом после проверки имени",
@@ -10678,6 +11087,7 @@
   {
     "topic": "Security",
     "level": "Middle",
+    "category": "definition",
     "q": "Чем CVE отличается от CVSS?",
     "options": [
       "CVE задаёт итоговый риск для бизнеса, а CVSS ведёт каталог названий затронутых продуктов",
@@ -10692,6 +11102,7 @@
   {
     "topic": "Security",
     "level": "Middle",
+    "category": "definition",
     "q": "Как работают динамические учётные данные базы данных в secret manager?",
     "options": [
       "Сервис создаёт ограниченную учётную запись по роли, выдаёт lease и отзывает её по завершении TTL",
@@ -10706,6 +11117,7 @@
   {
     "topic": "Security",
     "level": "Senior",
+    "category": "scenario",
     "q": "Как организовать incident response в cloud-native среде?",
     "options": [
       "Сразу перезапустить затронутые узлы, удалить журналы с чувствительными данными и затем искать причину",
@@ -10720,6 +11132,7 @@
   {
     "topic": "Security",
     "level": "Senior",
+    "category": "definition",
     "q": "Что означает policy as code для Kubernetes?",
     "options": [
       "Политика хранится в документе рядом с кодом, а её соблюдение проверяется при квартальном аудите",
@@ -10734,6 +11147,7 @@
   {
     "topic": "Security",
     "level": "Junior",
+    "category": "definition",
     "q": "Что отличает penetration test от обычного сканирования уязвимостей?",
     "options": [
       "Проверка запускает unit-тесты безопасности и измеряет покрытие ветвей прикладного кода",
@@ -10748,6 +11162,7 @@
   {
     "topic": "Security",
     "level": "Middle",
+    "category": "definition",
     "q": "Какую задачу решает Falco в container runtime security?",
     "options": [
       "Falco сопоставляет события ядра и других источников с правилами и сообщает о подозрительном поведении",
@@ -10762,6 +11177,7 @@
   {
     "topic": "Security",
     "level": "Junior",
+    "category": "definition",
     "q": "Как строить защиту публичного сервиса от DDoS?",
     "options": [
       "Отражать DDoS правилами в приложении после доставки всего трафика на его сетевой интерфейс",
