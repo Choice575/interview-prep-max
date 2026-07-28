@@ -406,7 +406,7 @@
   },
   {
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Зачем интеграция Terraform с Vault?",
     "options": [
@@ -751,7 +751,7 @@
   },
   {
     "topic": "Linux",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Какую задачу решает LVM в Linux?",
     "options": [
@@ -811,7 +811,7 @@
   },
   {
     "topic": "Linux",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что означает SUID bit на исполняемом файле?",
     "options": [
@@ -886,7 +886,7 @@
   },
   {
     "topic": "Linux",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что означает CPU steal time внутри виртуальной машины?",
     "options": [
@@ -1201,7 +1201,7 @@
   },
   {
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Какую роль выполняет reverse proxy?",
     "options": [
@@ -1231,7 +1231,7 @@
   },
   {
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Какую задачу решает network firewall?",
     "options": [
@@ -1276,7 +1276,7 @@
   },
   {
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Для чего нужен tcpdump?",
     "options": [
@@ -1651,7 +1651,7 @@
   },
   {
     "topic": "Ansible",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что такое Ansible Vault?",
     "options": [
@@ -1681,7 +1681,7 @@
   },
   {
     "topic": "Ansible",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Для чего применяют Molecule при разработке Ansible content?",
     "options": [
@@ -2221,7 +2221,7 @@
   },
   {
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что такое moved block в Terraform?",
     "options": [
@@ -2251,7 +2251,7 @@
   },
   {
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Для чего нужен блок check в Terraform 1.5+?",
     "options": [
@@ -2266,7 +2266,7 @@
   },
   {
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что такое provider aliasing?",
     "options": [
@@ -2326,7 +2326,7 @@
   },
   {
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что означает partial configuration для backend?",
     "options": [
@@ -2356,7 +2356,7 @@
   },
   {
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что такое drift инфраструктуры и как с ним бороться?",
     "options": [
@@ -2896,7 +2896,7 @@
   },
   {
     "topic": "Linux",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Для чего предназначен perf?",
     "options": [
@@ -4036,7 +4036,7 @@
   },
   {
     "topic": "Ansible",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Для чего используют Ansible Molecule?",
     "options": [
@@ -4081,7 +4081,7 @@
   },
   {
     "topic": "Ansible",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что такое execution environment (EE) в Ansible?",
     "options": [
@@ -4111,7 +4111,7 @@
   },
   {
     "topic": "Ansible",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что такое Ansible collections?",
     "options": [
@@ -4156,7 +4156,7 @@
   },
   {
     "topic": "Ansible",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что такое ARA (ARA Records Ansible)?",
     "options": [
@@ -5327,7 +5327,7 @@
   {
     "id": 356,
     "topic": "Docker",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Зачем контейнеру применять --cap-drop=ALL перед точечным --cap-add?",
     "options": [
@@ -6782,7 +6782,7 @@
   {
     "id": 453,
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Для чего предназначен dynamic block в Terraform?",
     "options": [
@@ -7337,7 +7337,7 @@
   {
     "id": 490,
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что означает composition Terraform modules?",
     "options": [
@@ -8822,7 +8822,7 @@
   {
     "id": 589,
     "topic": "Ansible",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Для чего нужны Jinja macros и параметры loop_control в Ansible?",
     "options": [
@@ -9646,7 +9646,7 @@
   },
   {
     "topic": "Ansible",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Для чего предназначен Ansible Vault?",
     "options": [
@@ -11131,7 +11131,7 @@
   },
   {
     "topic": "Security",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что означает policy as code для Kubernetes?",
     "options": [
