@@ -34,6 +34,12 @@
         "Linux"
       ],
       "goal": "Уверенно работать в файловой системе Linux, понимать права, владельцев, группы и типовые ошибки доступа.",
+      "prerequisites": [
+        "Доступна рабочая Linux-среда: WSL2, виртуальная машина или отдельный сервер",
+        "Терминал открывается, команда `whoami` возвращает имя пользователя",
+        "Есть права администратора для установки пакетов через sudo",
+        "Выделено 5-8 часов в неделю на практику"
+      ],
       "productionLayer": "Ошибки доступа, права директорий против прав файлов, безопасные изменения прав, диагностика Permission denied.",
       "artifact": "Мини-скрипт или чек-лист проверки доступа к конфигу сервиса.",
       "curriculumVersion": "5.1.0",
@@ -195,6 +201,12 @@
         "Сети"
       ],
       "goal": "Диагностировать доступность сервиса по слоям: DNS, TCP, TLS, HTTP, приложение.",
+      "prerequisites": [
+        "Навигация по файловой системе не требует подсказок: cd, ls, pwd, find",
+        "Понятны права доступа и чтение вывода `ls -l`",
+        "Чек-лист проверки доступа к конфигу из недели 1 выполняется по шагам",
+        "Работает просмотр и правка файлов в терминале"
+      ],
       "productionLayer": "Timeout, connection refused, HTTP 502/503, DNS failure, ICMP-блокировка, базовая CIDR-математика.",
       "artifact": "Дерево диагностики: сайт не открывается или API возвращает ошибку.",
       "curriculumVersion": "5.1.0",
@@ -362,6 +374,12 @@
         "Security"
       ],
       "goal": "Управлять процессами, понимать сигналы, читать логи systemd и безопасно работать по SSH.",
+      "prerequisites": [
+        "Дерево диагностики из недели 2 разделяет отказ по слоям: DNS, транспорт, приложение",
+        "Понятна разница между разрешением имени и доступностью порта",
+        "Команда curl используется с выводом заголовков и кода ответа",
+        "Расчёт CIDR выполняется без калькулятора"
+      ],
       "productionLayer": "Restart loop, failed unit, SIGTERM/SIGKILL/SIGTSTP, journalctl, SSH hardening.",
       "artifact": "Скрипт process_check.sh и runbook диагностики упавшего systemd-сервиса.",
       "curriculumVersion": "5.1.0",
@@ -529,6 +547,12 @@
         "CI/CD"
       ],
       "goal": "Работать с ветками, коммитами, конфликтами, pull request и безопасным откатом изменений.",
+      "prerequisites": [
+        "Скрипт process_check.sh из недели 3 находит упавший сервис",
+        "Журнал сервиса читается через journalctl с фильтром по времени",
+        "Понятны состояния процессов и назначение основных сигналов",
+        "Подключение по SSH работает по ключу, а не по паролю"
+      ],
       "productionLayer": "Protected branches, revert vs reset, rebase conflicts, release tags, безопасный rollback кода.",
       "artifact": "Репозиторий с ветками, PR-процессом, решенным конфликтом и документированным rollback-сценарием.",
       "curriculumVersion": "5.1.0",
@@ -697,6 +721,12 @@
         "Linux"
       ],
       "goal": "Освоить тему: Bash-скрипты для DevOps на уровне Middle base с упором на диагностику, rollback и сопровождение.",
+      "prerequisites": [
+        "Репозиторий из недели 4 содержит ветки и историю с осмысленными сообщениями",
+        "Конфликт слияния разрешён самостоятельно хотя бы один раз",
+        "Понятна разница между merge и rebase и когда какой применяют",
+        "Сценарий отката в репозитории задокументирован"
+      ],
       "productionLayer": "Exit codes, stderr/stdout, cron, idempotent scripts, lock files",
       "artifact": "health-check script с кодами возврата для мониторинга",
       "curriculumVersion": "5.1.0",
@@ -1018,6 +1048,12 @@
         "Docker"
       ],
       "goal": "Освоить тему: Dockerfile и сборка образов на уровне Middle с упором на диагностику, rollback и сопровождение.",
+      "prerequisites": [
+        "Контейнер приложения из недели 6 запускается с политикой перезапуска",
+        "Журнал контейнера читается, выполнение команд внутри работает",
+        "Понятна разница между образом и контейнером",
+        "Данные сохраняются между перезапусками через том"
+      ],
       "productionLayer": "Размер образа, cache, non-root user, .dockerignore, secrets at build time",
       "artifact": "multi-stage Dockerfile с non-root пользователем и .dockerignore",
       "curriculumVersion": "5.1.0",
@@ -1177,6 +1213,12 @@
         "Сети"
       ],
       "goal": "Освоить тему: Docker Compose, reverse proxy, TLS basics на уровне Middle с упором на диагностику, rollback и сопровождение.",
+      "prerequisites": [
+        "Dockerfile из недели 7 собирает образ в несколько стадий",
+        "Приложение в контейнере работает не под root",
+        "Файл .dockerignore исключает лишнее из контекста сборки",
+        "Понятно, как слои влияют на размер образа и скорость сборки"
+      ],
       "productionLayer": "depends_on limitations, healthcheck, networks, env/secrets, 502 upstream",
       "artifact": "compose-стенд app + db + nginx с healthcheck и диагностикой 502",
       "curriculumVersion": "5.1.0",
@@ -1337,6 +1379,12 @@
         "Git"
       ],
       "goal": "Настроить lint, test, build, artifact и публикацию неизменяемого image в GitLab Container Registry или Harbor.",
+      "prerequisites": [
+        "Стенд из недели 8 поднимает приложение, базу и обратный прокси одной командой",
+        "Проверки состояния определяют неготовый контейнер",
+        "Отработана диагностика ошибки 502 от обратного прокси",
+        "TLS завершается на прокси, сертификат проверен"
+      ],
       "productionLayer": "GitLab CI; stages; cache против artifacts; immutable tags; retention; service account; Harbor/Nexus как self-hosted registry.",
       "artifact": "week09/ci-basics/ с рабочим pipeline и registry",
       "curriculumVersion": "5.1.0",
@@ -1497,6 +1545,12 @@
         "Git"
       ],
       "goal": "Выполнять управляемый deploy через staging и approval, проверять smoke test и быстро откатывать плохой релиз.",
+      "prerequisites": [
+        "Конвейер из недели 9 собирает образ и публикует его в хранилище",
+        "Сборка запускается автоматически при изменении в репозитории",
+        "Секреты передаются через хранилище конвейера, а не через файлы",
+        "Образ помечается версией, а не только меткой latest"
+      ],
       "productionLayer": "Protected variables; smoke test; rollback; совместимость миграций; declarative Jenkinsfile как enterprise/legacy pipeline.",
       "artifact": "week10/cd/ со staging, approval, минимальным Jenkinsfile и rollback-runbook",
       "curriculumVersion": "5.1.0",
@@ -1832,6 +1886,12 @@
         "Terraform"
       ],
       "goal": "Использовать modules и remote state, создать минимальную инфраструктуру в Yandex Cloud и удалить её после проверки.",
+      "prerequisites": [
+        "Конфигурация из недели 11 применяется и удаляется без ручных правок",
+        "Секреты отсутствуют в файле состояния и в репозитории",
+        "Понятно назначение файла состояния и последствия его потери",
+        "План изменений читается до применения, замена ресурса распознаётся"
+      ],
       "productionLayer": "Modules; Yandex Object Storage backend; locking; drift; provider pinning; стоимость и обязательный destroy.",
       "artifact": "week12/yandex-cloud-iac/ с сетью, VM, remote state, расчётом стоимости и destroy",
       "curriculumVersion": "5.1.0",
@@ -1990,6 +2050,12 @@
         "Ansible"
       ],
       "goal": "Освоить тему: Ansible basics на уровне Middle с упором на диагностику, rollback и сопровождение.",
+      "prerequisites": [
+        "Конфигурация из недели 12 создаёт сеть и виртуальную машину в облаке",
+        "Файл состояния хранится удалённо с блокировкой",
+        "Выполнен расчёт стоимости и проверено полное удаление ресурсов",
+        "Понятно разделение на модули и передача переменных между ними"
+      ],
       "productionLayer": "become, idempotency, handlers, check mode, templates",
       "artifact": "inventory + playbook с handlers и check mode",
       "curriculumVersion": "5.1.0",
@@ -2149,6 +2215,12 @@
         "Security"
       ],
       "goal": "Освоить тему: Ansible roles, vault, zero-downtime basics на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
+      "prerequisites": [
+        "Плейбук из недели 13 выполняется повторно без изменений: changed=0",
+        "Инвентарь разделён на группы, переменные вынесены отдельно",
+        "Проверочный прогон показывает планируемые изменения до применения",
+        "Обработчики срабатывают только при фактическом изменении"
+      ],
       "productionLayer": "rolling deploy, serial, handlers, vault, inventory by environment",
       "artifact": "role + vault + rolling update",
       "curriculumVersion": "5.1.0",
@@ -2474,6 +2546,12 @@
         "Linux"
       ],
       "goal": "Освоить тему: PostgreSQL: WAL, PITR, replication basics на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
+      "prerequisites": [
+        "PostgreSQL из недели 15 установлен, подключение работает по паролю и по роли",
+        "Резервная копия создаётся и восстанавливается на отдельный экземпляр",
+        "Понятно разделение прав: владелец базы, приложение, только чтение",
+        "Известно, где лежат журналы и файл настроек экземпляра"
+      ],
       "productionLayer": "RPO/RTO, replication lag, backup validation, restore drills",
       "artifact": "backup strategy с RPO/RTO и restore drill",
       "curriculumVersion": "5.1.0",
