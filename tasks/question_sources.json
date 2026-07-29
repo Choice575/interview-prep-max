@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "updated": "2026-07-28",
+  "scope": "per-topic",
+  "disclaimer": "Ссылки ведут на официальную документацию по теме, а не на отдельный вопрос. Дата lastReviewed означает, когда тема сверялась с документацией целиком.",
+  "topics": [
+    {
+      "topic": "Ansible",
+      "questionCount": 126,
+      "source": "https://docs.ansible.com/ansible/latest/index.html",
+      "additionalSources": [],
+      "lastReviewed": "2026-07-28",
+      "reviewCadenceDays": 365,
+      "nextReviewDue": "2027-07-28",
+      "note": "Ядро стабильно, коллекции и EE обновляются чаще."
+    },
+    {
+      "topic": "CI/CD",
+      "questionCount": 58,
+      "source": "https://docs.gitlab.com/ee/ci/",
+      "additionalSources": [
+        "https://argo-cd.readthedocs.io/en/stable/"
+      ],
+      "lastReviewed": "2026-07-28",
+      "reviewCadenceDays": 180,
+      "nextReviewDue": "2027-01-24",
+      "note": "Ключевой источник для рынка РФ — GitLab CI; Argo CD для GitOps."
+    },
+    {
+      "topic": "Cloud",
+      "questionCount": 23,
+      "source": "https://yandex.cloud/ru/docs/",
+      "additionalSources": [],
+      "lastReviewed": "2026-07-28",
+      "reviewCadenceDays": 120,
+      "nextReviewDue": "2026-11-25",
+      "note": "Облачные API и тарифы меняются часто; приоритет — Yandex Cloud."
+    },
+    {
+      "topic": "Docker",
+      "questionCount": 51,
+      "source": "https://docs.docker.com/reference/",
+      "additionalSources": [
+        "https://docs.docker.com/reference/dockerfile/"
+      ],
+      "lastReviewed": "2026-07-28",
+      "reviewCadenceDays": 365,
+      "nextReviewDue": "2027-07-28",
+      "note": "Синтаксис Dockerfile и CLI стабильны, но появляются новые флаги сборки."
+    },
+    {
+      "topic": "Kubernetes",
+      "questionCount": 56,
+      "source": "https://kubernetes.io/docs/home/",
+      "additionalSources": [
+        "https://gateway-api.sigs.k8s.io/"
+      ],
+      "lastReviewed": "2026-07-28",
+      "reviewCadenceDays": 120,
+      "nextReviewDue": "2026-11-25",
+      "note": "Релизы каждые ~4 месяца, API устаревают: Ingress -> Gateway API."
+    },
+    {
+      "topic": "Linux",
+      "questionCount": 134,
+      "source": "https://www.kernel.org/doc/html/latest/",
+      "additionalSources": [
+        "https://man7.org/linux/man-pages/"
+      ],
+      "lastReviewed": "2026-07-28",
+      "reviewCadenceDays": 365,
+      "nextReviewDue": "2027-07-28",
+      "note": "Ядро и man-страницы меняются медленно; базовые команды стабильны."
+    },
+    {
+      "topic": "Monitoring",
+      "questionCount": 24,
+      "source": "https://prometheus.io/docs/introduction/overview/",
+      "additionalSources": [
+        "https://opentelemetry.io/docs/",
+        "https://grafana.com/docs/alloy/latest/"
+      ],
+      "lastReviewed": "2026-07-28",
+      "reviewCadenceDays": 120,
+      "nextReviewDue": "2026-11-25",
+      "note": "Самый быстро меняющийся слой: Promtail EOL 2026-03-02, переход на Alloy/OTel."
+    },
+    {
+      "topic": "Security",
+      "questionCount": 22,
+      "source": "https://docs.sigstore.dev/",
+      "additionalSources": [
+        "https://github.com/anchore/syft",
+        "https://owasp.org/www-project-top-ten/"
+      ],
+      "lastReviewed": "2026-07-28",
+      "reviewCadenceDays": 120,
+      "nextReviewDue": "2026-11-25",
+      "note": "Supply chain security быстро развивается: cosign, SBOM, policy as code."
+    },
+    {
+      "topic": "Terraform",
+      "questionCount": 128,
+      "source": "https://developer.hashicorp.com/terraform/docs",
+      "additionalSources": [
+        "https://opentofu.org/docs/"
+      ],
+      "lastReviewed": "2026-07-28",
+      "reviewCadenceDays": 180,
+      "nextReviewDue": "2027-01-24",
+      "note": "Проверять и Terraform, и OpenTofu: расхождение растёт со временем."
+    },
+    {
+      "topic": "Сети",
+      "questionCount": 124,
+      "source": "https://datatracker.ietf.org/doc/html/rfc9293",
+      "additionalSources": [
+        "https://datatracker.ietf.org/doc/html/rfc1034",
+        "https://datatracker.ietf.org/doc/html/rfc9110"
+      ],
+      "lastReviewed": "2026-07-28",
+      "reviewCadenceDays": 730,
+      "nextReviewDue": "2028-07-27",
+      "note": "RFC на TCP, DNS и HTTP — самый стабильный слой знаний."
+    }
+  ]
+}

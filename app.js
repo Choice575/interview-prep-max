@@ -9,7 +9,8 @@ var BASE_QUESTIONS = [], SUBNET_PROBLEMS = [], TS_SCENARIOS = [], CMD_TASKS = []
     CODE_TASKS = [], GIT_TASKS = [], REGEX_TASKS = [], ANSIBLE_PB_TASKS = [],
     DOCKERFILE_TASKS = [], K8S_TASKS = [], PORTS_TASKS = [], LABS_TASKS = [], TIPS = [],
     INCIDENTS = [],
-    STUDY_MAP = null, STUDY_TESTS = null, SENIOR_CASES = [], BEST_PRACTICES = null;
+    STUDY_MAP = null, STUDY_TESTS = null, SENIOR_CASES = [], BEST_PRACTICES = null,
+    QUESTION_SOURCES = null;
 
 const DATA_FILES = {
   base_questions: 'tasks/base_questions.json',
@@ -29,7 +30,8 @@ const DATA_FILES = {
   study_map: 'tasks/study_map.json',
   study_tests: 'tasks/study_tests.json',
   senior_cases: 'tasks/senior_cases.json',
-  best_practices: 'tasks/best_practices.json'
+  best_practices: 'tasks/best_practices.json',
+  question_sources: 'tasks/question_sources.json'
 };
 
 const DATA_VARS = {
@@ -37,7 +39,7 @@ const DATA_VARS = {
   cmd: 'CMD_TASKS', code: 'CODE_TASKS', git: 'GIT_TASKS', regex: 'REGEX_TASKS',
   ansible_pb: 'ANSIBLE_PB_TASKS', dockerfile: 'DOCKERFILE_TASKS', k8s: 'K8S_TASKS',
   ports: 'PORTS_TASKS', labs: 'LABS_TASKS', tips: 'TIPS', incidents: 'INCIDENTS', study_map: 'STUDY_MAP',
-  study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES'
+  study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES', question_sources: 'QUESTION_SOURCES'
 };
 
 function dataSize(data){
@@ -1448,7 +1450,7 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 function requireOfflineUI(){if(typeof IPMaxOfflineUI==='undefined') throw new Error('Модуль offline-отчёта не загружен.');return IPMaxOfflineUI;}
 function offlineAssetList(){
-  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./sources-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   return shell.concat(Object.values(DATA_FILES).map(file=>'./'+file));
 }
 async function probeOfflineAssets(assets){
@@ -1476,6 +1478,13 @@ async function checkOfflineReady(){
   if(body) body.innerHTML=offlineUI.renderReport(report);
   return report;
 }
+function requireSourcesUI(){if(typeof IPMaxSourcesUI==='undefined') throw new Error('Модуль источников не загружен.');return IPMaxSourcesUI;}
+function showSourcesReport(){
+  const body=document.getElementById('sources-report-body');
+  openAccessibleModal('sources-modal','#sources-modal-close');
+  if(body) body.innerHTML=requireSourcesUI().renderPanel(QUESTION_SOURCES,Date.now());
+}
+function closeSourcesReport(){closeAccessibleModal('sources-modal');}
 function closeOfflineReport(){closeAccessibleModal('offline-modal');}
 async function refreshOfflineCache(){
   setOfflineReportStatus('Догружаем файлы…');

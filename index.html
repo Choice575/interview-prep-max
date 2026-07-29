@@ -46,6 +46,7 @@
     <div class="sb-export-sep"></div>
     <button type="button" class="sb-item" onclick="exportProgress()"><span class="icon">📋</span>Копировать прогресс</button>
     <button type="button" class="sb-item" onclick="pasteProgressFromClipboard()"><span class="icon">📥</span>Вставить прогресс</button>
+    <button type="button" class="sb-item" onclick="showSourcesReport()"><span class="icon">🔎</span>Источники</button>
     <button type="button" class="sb-item" onclick="checkOfflineReady()"><span class="icon">📶</span>Проверить оффлайн</button>
     <input type="file" id="import-inp" accept=".json" style="display:none" onchange="importProgress(this)">
   </div>
@@ -347,6 +348,20 @@
   </div>
 </div>
 
+<!-- SOURCES MODAL -->
+<div class="modal-overlay" id="sources-modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="sources-modal-title" tabindex="-1" style="max-width:720px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <h3 id="sources-modal-title" style="margin:0">🔎 Источники и актуальность</h3>
+      <button type="button" class="btn-icon" id="sources-modal-close" aria-label="Закрыть источники" onclick="closeSourcesReport()">✕</button>
+    </div>
+    <div id="sources-report-body"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
+      <button type="button" class="btn btn-primary btn-sm" onclick="closeSourcesReport()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
 <!-- AI REVIEW MODAL -->
 <div class="modal-overlay" id="coach-ai-modal" aria-hidden="true">
   <div class="modal coach-ai-modal" role="dialog" aria-modal="true" aria-labelledby="coach-ai-title" tabindex="-1">
@@ -367,6 +382,7 @@
 <script src="./ai-coach.js"></script>
 <script src="./progress-io.js"></script>
 <script src="./offline-ui.js"></script>
+<script src="./sources-ui.js"></script>
 <script src="./analytics-ui.js"></script>
 <script src="./home-ui.js"></script>
 <script src="./exam-ui.js"></script>

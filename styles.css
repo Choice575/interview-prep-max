@@ -551,3 +551,21 @@ button.study-recommendation{cursor:pointer}.study-recommendation:hover{border-co
 .offline-missing li{margin-bottom:3px}
 .offline-missing code{font-size:12px;word-break:break-all}
 .offline-hint{margin:0;font-size:12px;color:var(--text3)}
+
+/* SOURCES / PROVENANCE */
+.sources-report{font-size:13px;color:var(--text2)}
+.sources-lead{margin:0 0 12px;color:var(--text);font-weight:600}
+.sources-lead-stale{color:var(--yellow)}
+.sources-table{width:100%;border-collapse:collapse;font-size:12px}
+.sources-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);padding:6px 8px;border-bottom:1px solid var(--bg3)}
+.sources-table td{padding:7px 8px;border-bottom:1px solid var(--bg3);vertical-align:middle}
+.sources-table tr:last-child td{border-bottom:0}
+.sources-note{margin:12px 0 0;font-size:11px;color:var(--text3)}
+.source-badge{display:inline-block;padding:2px 7px;border-radius:10px;background:var(--bg3);color:var(--text2);font-size:11px;font-weight:600;white-space:nowrap}
+.source-badge-stale{background:rgba(234,179,8,.18);color:var(--yellow)}
+.source-link{font-size:11px;color:var(--primary-h);text-decoration:underline}
+.source-link:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+@media(max-width:600px){
+  .sources-table{font-size:11px}
+  .sources-table th:nth-child(2),.sources-table td:nth-child(2){display:none}
+}
