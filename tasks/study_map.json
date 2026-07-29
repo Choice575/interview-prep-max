@@ -2797,6 +2797,12 @@
         "Сети"
       ],
       "goal": "Настроить Service, внутренний DNS и Gateway API; понимать Ingress как существующий legacy-подход.",
+      "prerequisites": [
+        "Deployment, Service, ConfigMap и Secret из недели 17 применяются одной командой",
+        "Rollout и rollback проверены на живом Deployment",
+        "Понятно, как Service находит поды по меткам и что показывает пустой endpoints",
+        "Работает DNS внутри кластера: под достучался до сервиса по имени"
+      ],
       "productionLayer": "CoreDNS; NetworkPolicy; GatewayClass/Gateway/HTTPRoute; TLS; 404/502; ingress-nginx EOL.",
       "artifact": "week18/k8s-networking/ с Gateway API, HTTPRoute, TLS и схемой трафика",
       "curriculumVersion": "5.1.0",
@@ -2974,6 +2980,12 @@
         "Monitoring"
       ],
       "goal": "Настроить probes, requests/limits, HPA и упаковать приложение в Helm chart с проверенным rollback.",
+      "prerequisites": [
+        "Gateway API и HTTPRoute из недели 18 маршрутизируют трафик по хосту и пути",
+        "TLS завершается на входе в кластер, цепочка сертификата проверена",
+        "Нарисована схема пути пакета от клиента до пода",
+        "Понятна разница между Ingress и Gateway API"
+      ],
       "productionLayer": "readiness/liveness/startup; OOMKilled; eviction; Helm values/template/upgrade/history/rollback; rollout 503.",
       "artifact": "week19/k8s-helm/ с chart, values окружений, нагрузочным тестом и Helm rollback",
       "curriculumVersion": "5.1.0",
@@ -3146,6 +3158,12 @@
         "Monitoring"
       ],
       "goal": "Собирать метрики, строить dashboard и синхронизировать Kubernetes-приложение через Argo CD.",
+      "prerequisites": [
+        "Helm chart из недели 19 разворачивает сервис с разными values для окружений",
+        "Helm rollback возвращает предыдущую версию релиза",
+        "Проведён нагрузочный тест, известно поведение под нагрузкой",
+        "Настроены readiness и liveness пробы, различие между ними понятно"
+      ],
       "productionLayer": "Prometheus/Grafana; VictoriaMetrics; labels/cardinality; Git source of truth; Argo CD sync, health, drift/self-heal.",
       "artifact": "week20/gitops-monitoring/ с dashboard, тремя метриками, Argo CD Application и drift test",
       "curriculumVersion": "5.1.0",
@@ -3321,6 +3339,12 @@
         "Monitoring"
       ],
       "goal": "Централизованно собирать и искать structured logs через Grafana Alloy или OpenTelemetry Collector.",
+      "prerequisites": [
+        "Prometheus из недели 20 собирает минимум три метрики сервиса",
+        "Argo CD Application синхронизирует состояние из репозитория",
+        "Проверен drift test: ручное изменение в кластере откатывается обратно",
+        "Есть дашборд, по которому видно деградацию сервиса"
+      ],
       "productionLayer": "Structured logs; correlation ID; retention; Grafana Alloy/OTel pipelines; миграция с Promtail EOL.",
       "artifact": "week21/logging/ с Alloy/OTel collector, structured logs и запросами диагностики",
       "curriculumVersion": "5.1.0",
@@ -3498,6 +3522,12 @@
         "Monitoring"
       ],
       "goal": "Связать traces, metrics и logs через OpenTelemetry Collector, создать алерты и провести учебный инцидент.",
+      "prerequisites": [
+        "Alloy или OTel collector из недели 21 доставляет логи в Loki",
+        "Логи структурированы, поиск по полям работает",
+        "Составлены запросы диагностики для типовых отказов",
+        "Понятна разница между логами, метриками и трассировками"
+      ],
       "productionLayer": "OTel Collector pipelines; trace ID; alert routing; severity; SLO/error budget; timeline и postmortem.",
       "artifact": "week22/otel-incident/ с Collector, trace ID в логах, alerts, timeline и postmortem",
       "curriculumVersion": "5.1.0",
@@ -3669,6 +3699,12 @@
         "Linux"
       ],
       "goal": "Усилить Linux, Docker, CI/CD и Kubernetes, создать SBOM и проверить происхождение подписанного image.",
+      "prerequisites": [
+        "Collector из недели 22 передаёт трассировки, trace ID виден в логах",
+        "Настроены алерты, привязанные к влиянию на пользователя",
+        "Написаны timeline инцидента и postmortem",
+        "Понятно, чем оповещение отличается от записи в панели наблюдения"
+      ],
       "productionLayer": "Least privilege; Trivy; Syft SBOM; Cosign sign/verify; secret scanning; version pinning; RBAC; rotation.",
       "artifact": "week23/security/ с Trivy scan, SBOM, Cosign sign/verify и исправленным pipeline",
       "curriculumVersion": "5.1.0",
@@ -3830,6 +3866,12 @@
         "Monitoring"
       ],
       "goal": "Освоить тему: Capstone v1: production-like service на уровне Middle+ с упором на диагностику, rollback и сопровождение.",
+      "prerequisites": [
+        "Trivy scan из недели 23 встроен в pipeline и блокирует уязвимые сборки",
+        "Генерируется SBOM, состав образа известен",
+        "Cosign подписывает образ, проверка подписи проходит",
+        "Секреты не попадают в репозиторий и в журналы сборки"
+      ],
       "productionLayer": "Deploy, rollback, backup, healthcheck, alerting",
       "artifact": "сервис с deploy, rollback, backup, healthcheck, alerting",
       "curriculumVersion": "5.1.0",
@@ -4158,6 +4200,12 @@
         "Monitoring"
       ],
       "goal": "Освоить тему: Load balancing and HA edge на уровне Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
+      "prerequisites": [
+        "Схема пути пакета из недели 25 описывает трафик от клиента до сервиса",
+        "Правила межсетевого экрана задокументированы и проверены",
+        "VPN-подключение работает, маршрутизация понятна",
+        "Цепочка TLS проверена до корневого сертификата"
+      ],
       "productionLayer": "Keepalived, VRRP, active/passive, failover testing",
       "artifact": "HAProxy/Nginx + health checks + failover test",
       "curriculumVersion": "5.1.0",
@@ -4318,6 +4366,12 @@
         "Linux"
       ],
       "goal": "Освоить тему: PostgreSQL production на уровне Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
+      "prerequisites": [
+        "HAProxy или Nginx из недели 26 распределяет трафик между узлами",
+        "Проверки состояния выводят неисправный узел из балансировки",
+        "Проведён тест отказа: потеря узла не роняет сервис",
+        "Понятна разница между sticky-сессиями и consistent hashing"
+      ],
       "productionLayer": "WAL archive, streaming replication, PITR, failover limits",
       "artifact": "WAL archive + replication + restore drill",
       "curriculumVersion": "5.1.0",
@@ -4476,6 +4530,12 @@
         "Monitoring"
       ],
       "goal": "Освоить тему: PostgreSQL migration and performance на уровне Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
+      "prerequisites": [
+        "Архивирование WAL из недели 27 настроено и проверено",
+        "Работает репликация, задержка реплики измерена",
+        "Проведено учебное восстановление с замером времени",
+        "Известны фактические значения допустимой потери данных и срока восстановления"
+      ],
       "productionLayer": "locks, long transactions, indexes, slow queries, vacuum basics",
       "artifact": "план миграции без долгих lock и диагностика slow queries",
       "curriculumVersion": "5.1.0",
@@ -4633,6 +4693,12 @@
         "Kubernetes"
       ],
       "goal": "Освоить тему: Self-managed Kubernetes architecture на уровне Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
+      "prerequisites": [
+        "План миграции из недели 28 не содержит долгих блокировок",
+        "Медленные запросы найдены и объяснены планом выполнения",
+        "Понятно, как добавить индекс без остановки обслуживания",
+        "Проверен откат миграции на копии данных"
+      ],
       "productionLayer": "etcd backup, kubelet, API server, CNI, cluster upgrade plan",
       "artifact": "план обновления control plane с etcd backup",
       "curriculumVersion": "5.1.0",
@@ -4791,6 +4857,12 @@
         "Kubernetes"
       ],
       "goal": "Работать с PV/PVC, CSI и StatefulSet, проверять сохранность и backup томов.",
+      "prerequisites": [
+        "План обновления control plane из недели 29 включает резервную копию etcd",
+        "Понятно, что означает потеря quorum в etcd для кластера",
+        "Известен порядок обновления: control plane перед рабочими узлами",
+        "Восстановление etcd из копии проверено на стенде"
+      ],
       "productionLayer": "Storage failure; reclaim policy; topology; volume backup; Longhorn при доступных ресурсах; Ceph только обзор.",
       "artifact": "week30/k8s-storage/ с проверкой persistence; Longhorn опционально, Ceph только обзор",
       "curriculumVersion": "5.1.0",
@@ -4964,6 +5036,12 @@
         "Monitoring"
       ],
       "goal": "Освоить тему: Observability and incident management на уровне Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
+      "prerequisites": [
+        "Постоянное хранилище из недели 30 сохраняет данные после перезапуска пода",
+        "Проверено поведение при перепланировании пода на другой узел",
+        "Понятна разница между StatefulSet и Deployment для приложений с состоянием",
+        "Известны ограничения выбранного класса хранилища"
+      ],
       "productionLayer": "MTTR, MTTD, on-call, severity, blameless postmortem",
       "artifact": "incident timeline, runbook, postmortem, action items",
       "curriculumVersion": "5.1.0",
@@ -5125,6 +5203,12 @@
         "Security"
       ],
       "goal": "Освоить тему: Production capstone на уровне Middle+/Senior-track с упором на архитектурное мышление, диагностику, rollback, RTO/RPO и сопровождение.",
+      "prerequisites": [
+        "Timeline инцидента и postmortem из недели 31 составлены по реальному разбору",
+        "Runbook позволяет действовать без автора системы",
+        "Пункты улучшений из postmortem превращены в задачи",
+        "Все артефакты недель 25-31 воспроизводятся по README"
+      ],
       "productionLayer": "HA, backup, restore, monitoring, security, rollback, incident drill",
       "artifact": "финальный production-like проект и защита",
       "curriculumVersion": "5.1.0",

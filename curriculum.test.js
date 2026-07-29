@@ -45,7 +45,16 @@ test('exposes measurable V5.1 fields without changing stable week numbers', () =
     assert.ok(week.aiTrack.title);
     assert.ok(week.aiTrack.result);
   });
-  assert.deepEqual(prerequisiteWeeks, [6, 11, 15, 17, 25]);
+  // Weeks 6/11/15/17/25 are the original gate weeks; 18-32 got explicit entry
+  // conditions so the advanced half states what must already work.
+  assert.deepEqual(prerequisiteWeeks, [
+    6, 11, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
+  ]);
+  prerequisiteWeeks.forEach(number => {
+    const week = studyMap.weeks.find(entry => entry.week === number);
+    assert.ok(week.prerequisites.length >= 3, `week ${number}: too few prerequisites`);
+    week.prerequisites.forEach(item => assert.ok(String(item).trim(), `week ${number}: empty prerequisite`));
+  });
   assert.deepEqual(lifecycleWeeks, [11, 18, 19, 20, 21, 22, 30]);
 });
 
