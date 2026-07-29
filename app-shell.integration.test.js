@@ -39,6 +39,15 @@ test('serves the complete app shell and personal-coach modules', async () => {
     assert.ok(html.indexOf('./sources-ui.js') < html.indexOf('./interview-practice-ui.js'));
     assert.ok(html.indexOf('./interview-practice-ui.js') < html.indexOf('./analytics-ui.js'));
     assert.match(html, /id="page-interview"/);
+
+    // Form errors must be announced to assistive tech, not only via alert().
+    assert.match(html, /id="cq-error"[^>]*role="alert"/,
+      'the custom question form needs a live error region');
+    assert.match(html, /id="cq-error"[^>]*aria-live="assertive"/,
+      'the error region must be announced assertively');
+    assert.doesNotMatch(app, /alert\('Заполните вопрос/,
+      'validation must use the live region instead of alert()');
+    assert.match(app, /showCustomQError/, 'app.js needs a form error helper');
     assert.match(html, /id="sources-report-body"/);
     assert.match(html, /id="offline-report-body"/);
     assert.match(html, /aria-live="polite"|offline-report-body/);

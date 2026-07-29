@@ -1147,20 +1147,41 @@ function openCustomModal(){
   // Заполняем список тем динамически
   const sel = document.getElementById('cq-topic');
   sel.innerHTML = getAllTopics().map(t => '<option>'+esc(t)+'</option>').join('');
+  clearCustomQError();
   openAccessibleModal('custom-modal','#cq-topic');
 }
 function closeCustomModal(){closeAccessibleModal('custom-modal');}
+function showCustomQError(message,fieldId){
+  const box=document.getElementById('cq-error');
+  ['cq-q','cq-a','cq-b','cq-c','cq-d','cq-ans'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.removeAttribute('aria-invalid');
+  });
+  if(!box){alert(message);return;}
+  box.textContent=message;
+  const field=fieldId?document.getElementById(fieldId):null;
+  if(field){field.setAttribute('aria-invalid','true');field.focus();}
+}
+function clearCustomQError(){
+  const box=document.getElementById('cq-error');
+  if(box) box.textContent='';
+  ['cq-q','cq-a','cq-b','cq-c','cq-d','cq-ans'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.removeAttribute('aria-invalid');
+  });
+}
 function saveCustomQ(){
   const q=document.getElementById('cq-q').value.trim();
   const a=document.getElementById('cq-a').value.trim();
   const b=document.getElementById('cq-b').value.trim();
-  if(!q||!a||!b){alert('Заполните вопрос и хотя бы два варианта (A и B)');return;}
+  clearCustomQError();
+  if(!q||!a||!b){showCustomQError('Заполните вопрос и хотя бы два варианта (A и B).',!q?'cq-q':(!a?'cq-a':'cq-b'));return;}
   const c=document.getElementById('cq-c').value.trim();
   const d=document.getElementById('cq-d').value.trim();
   const ansIdx=parseInt(document.getElementById('cq-ans').value)||0;
   // Валидация: правильный ответ должен указывать на непустой вариант
   const opts=[a,b,c,d].filter(Boolean);
-  if(ansIdx >= opts.length){alert('Правильный ответ ('+ansIdx+') указывает на несуществующий вариант. Вариантов: '+opts.length);return;}
+  if(ansIdx >= opts.length){showCustomQError('Правильный ответ ('+ansIdx+') указывает на несуществующий вариант. Заполнено вариантов: '+opts.length+'.','cq-ans');return;}
   const customs=getCustomQ();
   // ID по всей базе (не только custom), уводим custom в диапазон 900000+
   const allQ=getAllQ();
@@ -1175,7 +1196,7 @@ function saveCustomQ(){
     explanation: document.getElementById('cq-exp').value.trim(),
     category: document.getElementById('cq-category').value
   });
-  if(!lsSet('custom',customs)){alert('Не удалось сохранить вопрос: хранилище браузера недоступно или заполнено.');return;}
+  if(!lsSet('custom',customs)){showCustomQError('Не удалось сохранить вопрос: хранилище браузера недоступно или заполнено.','cq-q');return;}
   closeCustomModal();
   buildTopicFilters();
   document.getElementById('sb-counter').textContent='DevOps Edition · '+getAllQ().length+' вопросов';

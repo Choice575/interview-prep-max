@@ -279,7 +279,7 @@
     <div class="form-group"><label for="cq-c">Вариант C (опционально)</label><input class="form-input" id="cq-c" placeholder="Вариант C"></div>
     <div class="form-group"><label for="cq-d">Вариант D (опционально)</label><input class="form-input" id="cq-d" placeholder="Вариант D"></div>
     <div class="form-group"><label for="cq-ans">Правильный ответ (0=A, 1=B, 2=C, 3=D)</label><input class="form-input" id="cq-ans" type="number" min="0" max="3" value="0"></div>
-    <div class="form-group"><label for="cq-exp">Объяснение</label><textarea class="form-input" id="cq-exp" rows="2" placeholder="Объяснение..."></textarea></div>
+    <div class="form-group"><p id="cq-error" class="form-error" role="alert" aria-live="assertive"></p></div><div class="form-group"><label for="cq-exp">Объяснение</label><textarea class="form-input" id="cq-exp" rows="2" placeholder="Объяснение..."></textarea></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
       <button class="btn btn-outline" onclick="closeCustomModal()">Отмена</button>
       <button class="btn btn-primary" onclick="saveCustomQ()">Сохранить</button>

@@ -608,3 +608,8 @@ button.study-recommendation{cursor:pointer}.study-recommendation:hover{border-co
   .ip-layout{grid-template-columns:1fr}
   .ip-side{order:2}
 }
+
+/* FORM ERRORS */
+.form-error{margin:0;font-size:12px;font-weight:600;color:var(--red);min-height:1em}
+.form-error:empty{display:none}
+.form-input[aria-invalid="true"]{border-color:var(--red)}
