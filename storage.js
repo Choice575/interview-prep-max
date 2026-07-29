@@ -18,7 +18,10 @@
     progress_backup: 'ipmax_progress_backup'
   };
 
-  function create(adapter, keys) {
+  // `options` carries the timer host for debounced writes ({ setTimeout,
+  // clearTimeout }); it is separate from `keys` so key-name overrides and
+  // scheduling never collide.
+  function create(adapter, keys, options) {
     const store = adapter && typeof adapter.getItem === 'function' ? adapter : null;
     const names = { ...DEFAULT_KEYS, ...(keys || {}) };
     function get(key, fallback) {
@@ -129,7 +132,65 @@
       };
     }
 
-    return { get, set, setMany, remove, migrate, keys: names };
+    // Keystroke-rate writes: typing an answer used to serialise the whole
+    // store on every character. Coalesce into one write after a quiet period.
+    const pending = new Map();
+    const timerHost = options || {};
+    const schedule = typeof timerHost.setTimeout === 'function' ? timerHost.setTimeout : null;
+    const unschedule = typeof timerHost.clearTimeout === 'function' ? timerHost.clearTimeout : null;
+    const DEFAULT_DEBOUNCE_MS = 400;
+
+    function cancelPending(key) {
+      const entry = pending.get(key);
+      if (!entry) return;
+      if (unschedule && entry.timer !== null) unschedule(entry.timer);
+      pending.delete(key);
+    }
+
+    function setDebounced(key, value, waitMs) {
+      if (!names[key]) return false;
+      // No timer host (or none provided): never risk losing the value.
+      if (!schedule) return set(key, value);
+      cancelPending(key);
+      const delay = Number.isFinite(waitMs) && waitMs >= 0 ? waitMs : DEFAULT_DEBOUNCE_MS;
+      const entry = { value, timer: null };
+      entry.timer = schedule(() => {
+        // Only write if this entry is still the pending one for the key.
+        if (pending.get(key) !== entry) return;
+        pending.delete(key);
+        set(key, entry.value);
+      }, delay);
+      pending.set(key, entry);
+      return true;
+    }
+
+    function flush(key) {
+      const entry = pending.get(key);
+      if (!entry) return false;
+      cancelPending(key);
+      return set(key, entry.value);
+    }
+
+    function flushAll() {
+      let written = 0;
+      for (const key of [...pending.keys()]) {
+        if (flush(key)) written++;
+      }
+      return written;
+    }
+
+    function hasPending(key) {
+      return key === undefined ? pending.size > 0 : pending.has(key);
+    }
+
+    // An explicit write must win over a queued one for the same key,
+    // otherwise a late timer would resurrect the stale draft.
+    function setNow(key, value) {
+      cancelPending(key);
+      return set(key, value);
+    }
+    return { get, set: setNow, setMany, remove, migrate, keys: names,
+      setDebounced, flush, flushAll, hasPending, DEFAULT_DEBOUNCE_MS };
   }
 
   return { CURRENT_STORAGE_SCHEMA, DEFAULT_KEYS, create };

@@ -91,3 +91,108 @@ test('keeps progress and schema markers unchanged when migration fails', () => {
   assert.equal(store.get('curriculum_version', null), null);
   assert.ok(store.get('progress_backup', null));
 });
+
+// Counts real setItem calls so a debounced write can be told apart from a
+// per-keystroke one, and lets tests drive time instead of waiting.
+function createCountingAdapter() {
+  const adapter = createAdapter();
+  const inner = adapter.setItem;
+  adapter.writes = 0;
+  adapter.setItem = (key, value) => { adapter.writes++; inner(key, value); };
+  return adapter;
+}
+
+function createClock() {
+  const timers = [];
+  return {
+    timers,
+    setTimeout: (fn, ms) => { timers.push({ fn, ms, cancelled: false, done: false }); return timers.length; },
+    clearTimeout: id => { if (timers[id - 1]) timers[id - 1].cancelled = true; },
+    runPending() {
+      timers.filter(timer => !timer.cancelled && !timer.done)
+        .forEach(timer => { timer.done = true; timer.fn(); });
+    }
+  };
+}
+
+test('debounced set writes once after the quiet period, not per keystroke', () => {
+  const adapter = createCountingAdapter();
+  const clock = createClock();
+  const store = storage.create(adapter, null, { setTimeout: clock.setTimeout, clearTimeout: clock.clearTimeout });
+
+  store.setDebounced('study_answers', { a: '1' }, 400);
+  store.setDebounced('study_answers', { a: '12' }, 400);
+  store.setDebounced('study_answers', { a: '123' }, 400);
+
+  assert.equal(adapter.writes, 0, 'nothing may be written while typing continues');
+
+  clock.runPending();
+
+  assert.equal(adapter.writes, 1, 'exactly one write after the quiet period');
+  assert.deepEqual(store.get('study_answers', null), { a: '123' }, 'last value wins');
+});
+
+test('flush forces a pending debounced write immediately', () => {
+  const adapter = createCountingAdapter();
+  const clock = createClock();
+  const store = storage.create(adapter, null, { setTimeout: clock.setTimeout, clearTimeout: clock.clearTimeout });
+
+  store.setDebounced('study_answers', { note: 'draft' }, 400);
+  assert.equal(adapter.writes, 0);
+
+  assert.equal(store.flush('study_answers'), true);
+  assert.equal(adapter.writes, 1);
+  assert.deepEqual(store.get('study_answers', null), { note: 'draft' });
+
+  assert.equal(store.flush('study_answers'), false, 'nothing pending any more');
+  assert.equal(adapter.writes, 1);
+});
+
+test('flushAll writes every pending key', () => {
+  const adapter = createCountingAdapter();
+  const clock = createClock();
+  const store = storage.create(adapter, null, { setTimeout: clock.setTimeout, clearTimeout: clock.clearTimeout });
+
+  store.setDebounced('study_answers', { a: 1 }, 400);
+  store.setDebounced('custom', [{ id: 1 }], 400);
+
+  assert.equal(adapter.writes, 0);
+  assert.equal(store.flushAll(), 2);
+  assert.equal(adapter.writes, 2);
+  assert.deepEqual(store.get('study_answers', null), { a: 1 });
+  assert.deepEqual(store.get('custom', null), [{ id: 1 }]);
+  assert.equal(store.flushAll(), 0);
+});
+
+test('an immediate set cancels a pending debounced write for the same key', () => {
+  const adapter = createCountingAdapter();
+  const clock = createClock();
+  const store = storage.create(adapter, null, { setTimeout: clock.setTimeout, clearTimeout: clock.clearTimeout });
+
+  store.setDebounced('study_answers', { stale: true }, 400);
+  store.set('study_answers', { fresh: true });
+
+  // Firing the stale timer must not resurrect the old value.
+  clock.runPending();
+
+  assert.deepEqual(store.get('study_answers', null), { fresh: true });
+});
+
+test('debounced set falls back to an immediate write without a timer host', () => {
+  const adapter = createCountingAdapter();
+  const store = storage.create(adapter, null, { setTimeout: null, clearTimeout: null });
+
+  assert.equal(store.setDebounced('study_answers', { a: 1 }, 400), true);
+  assert.equal(adapter.writes, 1, 'without setTimeout the write must not be lost');
+  assert.deepEqual(store.get('study_answers', null), { a: 1 });
+});
+
+test('debounced set rejects unknown keys like the immediate setter', () => {
+  const adapter = createCountingAdapter();
+  const clock = createClock();
+  const store = storage.create(adapter, null, { setTimeout: clock.setTimeout, clearTimeout: clock.clearTimeout });
+
+  assert.equal(store.setDebounced('unknown', 1, 400), false);
+  clock.runPending();
+  assert.equal(adapter.writes, 0);
+});

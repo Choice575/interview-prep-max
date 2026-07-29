@@ -109,9 +109,21 @@ async function loadAllData() {
 
 // ═══ STORAGE ═══
 const LS=typeof IPMaxStorage!=='undefined'?IPMaxStorage.DEFAULT_KEYS:{};
-const appStorage=typeof IPMaxStorage!=='undefined'?IPMaxStorage.create(localStorage):null;
+const appStorage=typeof IPMaxStorage!=='undefined'?IPMaxStorage.create(localStorage,null,{
+  setTimeout:(fn,ms)=>setTimeout(fn,ms),clearTimeout:id=>clearTimeout(id)
+}):null;
 function lsGet(k,def){return appStorage?appStorage.get(k,def):def;}
 function lsSet(k,v){return appStorage?appStorage.set(k,v):false;}
+// Coalesces keystroke-rate writes: one localStorage write after a pause
+// instead of serialising the whole store on every character.
+function lsSetDebounced(k,v,ms){return appStorage?appStorage.setDebounced(k,v,ms):false;}
+function lsFlush(){return appStorage?appStorage.flushAll():0;}
+// A draft typed inside the debounce window would be lost on close or tab
+// switch, so force any pending write out at those points.
+if(typeof window!=='undefined'){
+  window.addEventListener('pagehide',lsFlush);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden') lsFlush();});
+}
 function getCustomQ(){return lsGet('custom',[]);}
 function getAllQ(){return [...BASE_QUESTIONS,...getCustomQ()];}
 function getMistakes(){return lsGet('mistakes',{});}
@@ -141,7 +153,15 @@ function recordQuestionResult(question,input){
   if(input?.history){
     const hist=lsGet('history',[]);hist.unshift({date:new Date(now).toLocaleString('ru'),topic:question.topic,correct:result.score>=0.5});if(hist.length>20)hist.pop();lsSet('history',hist);
   }
-  if(input?.daily!==false){const today=IPMaxDate.localDateKey(now);const daily=lsGet('daily',{});daily[today]=(daily[today]||0)+1;lsSet('daily',daily);}
+  if(input?.daily!==false){
+    const today=IPMaxDate.localDateKey(now);
+    let daily=lsGet('daily',{});
+    // Drop counters outside the retention window: analytics reads 14 days,
+    // but this store used to grow by one key for every active day forever.
+    if(ProgressTracker.dailyNeedsPruning(daily,now)) daily=ProgressTracker.pruneDailyCounters(daily,now);
+    daily[today]=(daily[today]||0)+1;
+    lsSet('daily',daily);
+  }
   recordSkillEvent({source:input?.source||'exam',topic:question.topic,skill:question.topic,score:result.score,possible:1,durationSeconds:input?.responseSeconds,at:now});
   recordCoachControlAttempt(question,result,input,now);
   return result;
@@ -766,6 +786,8 @@ function renderStudyMiniTest(test,weekly,showWeekly){
       '<div class="study-reference" id="study-ref-'+test.id+'-'+i+'">'+esc(q.expected)+'</div></div>').join('')+
     '<div class="study-actions"><button class="btn btn-primary btn-sm" onclick="saveStudyAnswers(\''+escAttr(test.id)+'\')">Сохранить ответы</button></div></section>'+
     (showWeekly&&weekly?renderWeeklyTest(weekly):'');
+  el.querySelectorAll('.study-answer').forEach(field=>
+    field.addEventListener('input',()=>scheduleStudyAnswerSave(test.id)));
 }
 function renderWeeklyTest(test){
   const parts=test.parts||{};
@@ -847,6 +869,14 @@ function saveWeeklyTest(testId){
   if(!evaluation.gates.criteria)missing.push('закрыть все критерии недели');
   if(!evaluation.gates.criticalErrors)missing.push('разобрать критические ошибки');
   alert('Попытка сохранена: '+evaluation.total+' / '+evaluation.maxScore+'. Для зачёта: '+missing.join('; ')+'.');
+}
+// Autosave a draft while typing so leaving the page no longer discards it.
+function scheduleStudyAnswerSave(testId){
+  const test=(STUDY_TESTS?.miniTests||[]).find(t=>t.id===testId);if(!test)return;
+  const store=lsGet('study_answers',{});const cur=store[testId]||{};
+  cur.answers=(test.questions||[]).map((q,i)=>document.getElementById('study-answer-'+testId+'-'+i)?.value||'');
+  cur.draftAt=new Date().toISOString();store[testId]=cur;
+  lsSetDebounced('study_answers',store);
 }
 function saveStudyAnswers(testId,silent){
   const test=(STUDY_TESTS?.miniTests||[]).find(t=>t.id===testId);if(!test)return;

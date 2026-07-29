@@ -44,6 +44,45 @@
     return { progress: next, record, score, outcome };
   }
 
+  // Daily activity counters grow by one key per active day and are never
+  // read beyond the analytics window, so keep a bounded retention window.
+  const DAILY_RETENTION_DAYS = 30;
+
+  function dailyCutoffKey(now, retentionDays) {
+    const days = Number.isFinite(retentionDays) && retentionDays > 0
+      ? Math.floor(retentionDays)
+      : DAILY_RETENTION_DAYS;
+    const date = new Date(Number.isFinite(now) ? now : Date.now());
+    date.setDate(date.getDate() - (days - 1));
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return date.getFullYear() + '-' + month + '-' + day;
+  }
+
+  function validDailyEntry(key, value) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) return false;
+    const count = Number(value);
+    return Number.isFinite(count) && count > 0;
+  }
+
+  function pruneDailyCounters(daily, now, retentionDays) {
+    if (!daily || typeof daily !== 'object' || Array.isArray(daily)) return {};
+    // ISO date keys sort lexicographically, so a string compare is enough.
+    const cutoff = dailyCutoffKey(now, retentionDays);
+    const next = {};
+    for (const key of Object.keys(daily)) {
+      if (!validDailyEntry(key, daily[key])) continue;
+      if (key < cutoff) continue;
+      next[key] = Number(daily[key]);
+    }
+    return next;
+  }
+
+  function dailyNeedsPruning(daily, now, retentionDays) {
+    if (!daily || typeof daily !== 'object' || Array.isArray(daily)) return false;
+    const cutoff = dailyCutoffKey(now, retentionDays);
+    return Object.keys(daily).some(key => key < cutoff || !validDailyEntry(key, daily[key]));
+  }
   function normaliseEvent(input, now) {
     if (!input || typeof input !== 'object' || typeof input.source !== 'string' || !input.source.trim()) return null;
     const possible = Math.max(1, finite(input.possible, 1));
@@ -70,5 +109,6 @@
 
   function isSkillEvent(value) { return !!normaliseEvent(value, Date.now()); }
 
-  return { recordQuestionAttempt, appendSkillEvent, isSkillEvent, scoreFor, EVENT_LIMIT };
+  return { recordQuestionAttempt, appendSkillEvent, isSkillEvent, scoreFor, EVENT_LIMIT,
+    pruneDailyCounters, dailyNeedsPruning, DAILY_RETENTION_DAYS };
 });
