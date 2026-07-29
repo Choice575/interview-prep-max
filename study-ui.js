@@ -235,7 +235,6 @@
     const weeklyResults = stored.weeklyResults && typeof stored.weeklyResults === 'object' ? stored.weeklyResults : {};
     const activePosition = stored.activePosition && typeof stored.activePosition === 'object' ? stored.activePosition : {};
     const weeklyByWeek = new Map(weekly.map(test => [test.week, test]));
-    const miniByPosition = new Map(mini.map(test => [`${test.week}:${test.day}`, test]));
     const passedWeek = weekNumber => {
       const test = weeklyByWeek.get(weekNumber);
       return Boolean(test && weeklyResults[test.id]?.passed === true);

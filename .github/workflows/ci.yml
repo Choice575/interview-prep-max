@@ -15,19 +15,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+      # Every .js file, not a hand-maintained list: 14 of 24 files (including
+      # every module added recently) were previously never syntax-checked.
       - name: Syntax check
         run: |
-          node --check app.js
-          node --check validate.js
-          node --check sw.js
-          node --check version.js
-          node --check date.js
-          node --check storage.js
-          node --check progress.js
-          node --check coach.js
-          node --check question-quality.js
-          node --check verify-release.js
-          npm test
+          for file in $(git ls-files '*.js'); do
+            node --check "$file" || exit 1
+          done
+      - name: Lint
+        run: npm run lint:strict
+      - name: Unit and integration tests
+        run: npm test
       - name: JSON validation
         run: node validate.js
       - name: Question quality baseline

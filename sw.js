@@ -23,6 +23,10 @@ const DATA_ASSETS = [
   './tasks/study_tests.json', './tasks/senior_cases.json', './tasks/best_practices.json', './tasks/question_sources.json', './tasks/interview_practice.json'
 ];
 
+// Full asset list. Not read by precache() (shell and datasets are cached
+// separately), but verify-release.js asserts this line exists as the single
+// place where the complete cache manifest is visible.
+// eslint-disable-next-line no-unused-vars
 const ASSETS = SHELL_ASSETS.concat(DATA_ASSETS);
 
 async function precache() {

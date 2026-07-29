@@ -5,6 +5,8 @@
     "start": "node server.js",
     "test": "node --test date.test.js progress.test.js progress-io.test.js offline-ui.test.js sources-ui.test.js interview-practice-ui.test.js analytics-ui.test.js home-ui.test.js exam-ui.test.js study-ui.test.js storage.test.js coach.test.js coach-ui.test.js ai-coach.test.js server.test.js coach-flow.integration.test.js app-shell.integration.test.js question-quality.test.js best-practices.test.js curriculum.test.js release.test.js validate.test.js",
     "verify:release": "node validate.js --strict && node verify-release.js && node --test release.test.js",
+    "lint": "eslint .",
+    "lint:strict": "eslint . --max-warnings 80",
     "quality:questions": "node question-quality.js --check",
     "quality:questions:report": "node question-quality.js",
     "quality:questions:baseline": "node question-quality.js --write-baseline",
@@ -13,6 +15,7 @@
     "generate:pwa-icons": "node scripts/generate-pwa-icons.js"
   },
   "devDependencies": {
-    "@playwright/test": "1.54.1"
+    "@playwright/test": "1.54.1",
+    "eslint": "9.37.0"
   }
 }
