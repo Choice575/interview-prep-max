@@ -569,3 +569,42 @@ button.study-recommendation{cursor:pointer}.study-recommendation:hover{border-co
   .sources-table{font-size:11px}
   .sources-table th:nth-child(2),.sources-table td:nth-child(2){display:none}
 }
+
+/* INTERVIEW PRACTICE (STAR + SYSTEM DESIGN) */
+.ip-hero{margin-bottom:14px}
+.ip-hero h2{margin:4px 0 6px;font-size:20px}
+.ip-hero p{margin:0;font-size:13px;color:var(--text2);max-width:70ch}
+.ip-kicker{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
+.ip-layout{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
+.ip-side{background:var(--bg2);border:1px solid var(--bg3);border-radius:10px;padding:12px}
+.ip-list-item{display:block;width:100%;text-align:left;background:transparent;border:1px solid transparent;border-radius:8px;padding:9px 10px;margin-bottom:6px;color:var(--text);font-size:12px;line-height:1.35;cursor:pointer}
+.ip-list-item:hover{background:var(--bg3)}
+.ip-list-item.active{background:var(--primary-dim);border-color:var(--primary);color:var(--primary-h)}
+.ip-list-item:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.ip-list-topic{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);margin-bottom:3px}
+.ip-card{background:var(--bg2);border:1px solid var(--bg3);border-radius:10px;padding:16px}
+.ip-prompt{margin:6px 0 10px;font-size:16px;line-height:1.4}
+.ip-why,.ip-context{margin:0 0 12px;font-size:13px;color:var(--text2);line-height:1.5}
+.ip-block{margin-top:12px}
+.ip-block-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);margin-bottom:6px}
+.ip-block ul{margin:0;padding-left:18px}
+.ip-block li{font-size:13px;line-height:1.5;margin-bottom:4px}
+.ip-pitfalls li{color:var(--yellow)}
+.ip-constraints li{color:var(--primary-h)}
+.ip-task p{margin:0;font-size:13px;font-weight:600}
+.ip-rubric-form{margin-top:14px;background:var(--bg2);border:1px solid var(--bg3);border-radius:10px;padding:12px}
+.ip-check{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px}
+.ip-check label{font-size:13px;line-height:1.4;cursor:pointer}
+.ip-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.ip-score{display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px;border-radius:10px;background:var(--bg2);border:1px solid var(--bg3)}
+.ip-score-num{font-size:26px;font-weight:800;line-height:1}
+.ip-score-text{display:flex;flex-direction:column;gap:2px;font-size:13px}
+.ip-score-text span{font-size:11px;color:var(--text3)}
+.ip-score-good .ip-score-num{color:var(--green)}
+.ip-score-mid .ip-score-num{color:var(--yellow)}
+.ip-score-low .ip-score-num{color:var(--red)}
+.ip-missing li{color:var(--text2)}
+@media(max-width:900px){
+  .ip-layout{grid-template-columns:1fr}
+  .ip-side{order:2}
+}

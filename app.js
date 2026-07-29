@@ -10,7 +10,7 @@ var BASE_QUESTIONS = [], SUBNET_PROBLEMS = [], TS_SCENARIOS = [], CMD_TASKS = []
     DOCKERFILE_TASKS = [], K8S_TASKS = [], PORTS_TASKS = [], LABS_TASKS = [], TIPS = [],
     INCIDENTS = [],
     STUDY_MAP = null, STUDY_TESTS = null, SENIOR_CASES = [], BEST_PRACTICES = null,
-    QUESTION_SOURCES = null;
+    QUESTION_SOURCES = null, INTERVIEW_PRACTICE = null;
 
 const DATA_FILES = {
   base_questions: 'tasks/base_questions.json',
@@ -31,7 +31,8 @@ const DATA_FILES = {
   study_tests: 'tasks/study_tests.json',
   senior_cases: 'tasks/senior_cases.json',
   best_practices: 'tasks/best_practices.json',
-  question_sources: 'tasks/question_sources.json'
+  question_sources: 'tasks/question_sources.json',
+  interview_practice: 'tasks/interview_practice.json'
 };
 
 const DATA_VARS = {
@@ -39,7 +40,7 @@ const DATA_VARS = {
   cmd: 'CMD_TASKS', code: 'CODE_TASKS', git: 'GIT_TASKS', regex: 'REGEX_TASKS',
   ansible_pb: 'ANSIBLE_PB_TASKS', dockerfile: 'DOCKERFILE_TASKS', k8s: 'K8S_TASKS',
   ports: 'PORTS_TASKS', labs: 'LABS_TASKS', tips: 'TIPS', incidents: 'INCIDENTS', study_map: 'STUDY_MAP',
-  study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES', question_sources: 'QUESTION_SOURCES'
+  study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES', question_sources: 'QUESTION_SOURCES', interview_practice: 'INTERVIEW_PRACTICE'
 };
 
 function dataSize(data){
@@ -234,7 +235,7 @@ let coachQuestionIds=null;
 let currentPracticeTopic='';
 
 // ═══ NAV ═══
-const PAGE_TITLES={home:'Главная',study:'Учёба',practices:'Best Practices',exam:'Экзамен',analytics:'Аналитика',
+const PAGE_TITLES={home:'Главная',interview:'Собеседование',study:'Учёба',practices:'Best Practices',exam:'Экзамен',analytics:'Аналитика',
   subnet:'Тренажёр подсетей',ts:'Troubleshooting-симулятор',
   cmd:'Command Builder',code:'Code Reviewer',
   ansible:'Ansible Playbook',dockerfile:'Dockerfile',k8s:'K8s YAML',ports:'Порты TCP',labs:'Debugging',
@@ -266,6 +267,7 @@ function nav(page){
   if(page==='ports') renderPorts();
   if(page==='tips') renderTips();
   if(page==='exam'){resetQuestionRenderLimit();restoreExamControls();renderQuestions();}
+  if(page==='interview') renderInterviewPractice();
   if(page==='git') renderGit();
   if(page==='regex') renderRegex();
 }
@@ -1450,7 +1452,7 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 function requireOfflineUI(){if(typeof IPMaxOfflineUI==='undefined') throw new Error('Модуль offline-отчёта не загружен.');return IPMaxOfflineUI;}
 function offlineAssetList(){
-  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./sources-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./sources-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   return shell.concat(Object.values(DATA_FILES).map(file=>'./'+file));
 }
 async function probeOfflineAssets(assets){
@@ -1477,6 +1479,55 @@ async function checkOfflineReady(){
   const body=document.getElementById('offline-report-body');
   if(body) body.innerHTML=offlineUI.renderReport(report);
   return report;
+}
+function requireInterviewPracticeUI(){if(typeof IPMaxInterviewPracticeUI==='undefined') throw new Error('Модуль подготовки к собеседованию не загружен.');return IPMaxInterviewPracticeUI;}
+let interviewKind='star', interviewItemId=null;
+function setInterviewKind(kind,btn){
+  interviewKind=(kind==='systemDesign')?'systemDesign':'star';
+  interviewItemId=null;
+  if(btn){document.querySelectorAll('#ip-kind-chips .chip').forEach(c=>{c.classList.remove('active');c.setAttribute('aria-pressed','false');});btn.classList.add('active');btn.setAttribute('aria-pressed','true');}
+  renderInterviewPractice();
+}
+function selectInterviewItem(id){interviewItemId=id;renderInterviewPractice();}
+function renderInterviewPractice(){
+  const ui=requireInterviewPracticeUI();
+  const list=ui.items(INTERVIEW_PRACTICE,interviewKind);
+  const listEl=document.getElementById('ip-list');
+  const detailEl=document.getElementById('ip-detail');
+  const refEl=document.getElementById('ip-reference');
+  const rubricEl=document.getElementById('ip-rubric');
+  const scoreEl=document.getElementById('ip-score');
+  if(!listEl||!detailEl) return;
+  if(!list.length){listEl.innerHTML='';detailEl.innerHTML='<div class="empty-state"><div class="icon">🎤</div><p>Задания не загружены</p></div>';if(refEl){refEl.innerHTML='';refEl.hidden=true;}if(rubricEl)rubricEl.innerHTML='';if(scoreEl)scoreEl.innerHTML='';return;}
+  if(!interviewItemId||!ui.findItem(INTERVIEW_PRACTICE,interviewKind,interviewItemId)) interviewItemId=list[0].id;
+  listEl.innerHTML=list.map(item=>{
+    const label=interviewKind==='star'?item.prompt:item.title;
+    const active=item.id===interviewItemId?' active':'';
+    return '<button type="button" class="ip-list-item'+active+'" aria-pressed="'+(active?'true':'false')+'" data-ip-id="'+esc(item.id)+'"><span class="ip-list-topic">'+esc(item.topic)+'</span>'+esc(label)+'</button>';
+  }).join('');
+  listEl.querySelectorAll('[data-ip-id]').forEach(btn=>btn.addEventListener('click',()=>selectInterviewItem(btn.getAttribute('data-ip-id'))));
+  const item=ui.findItem(INTERVIEW_PRACTICE,interviewKind,interviewItemId);
+  detailEl.innerHTML=interviewKind==='star'?ui.renderStar(item):ui.renderSystemDesign(item);
+  if(refEl){refEl.innerHTML=ui.renderReference(item,interviewKind);refEl.hidden=true;}
+  const revealBtn=document.getElementById('ip-reveal-btn');
+  if(revealBtn) revealBtn.textContent='Показать рубрику';
+  if(rubricEl) rubricEl.innerHTML=ui.renderRubricForm(item,'ip-rb');
+  if(scoreEl) scoreEl.innerHTML='';
+}
+function revealInterviewReference(){
+  const refEl=document.getElementById('ip-reference');
+  const btn=document.getElementById('ip-reveal-btn');
+  if(!refEl) return;
+  refEl.hidden=!refEl.hidden;
+  if(btn) btn.textContent=refEl.hidden?'Показать рубрику':'Скрыть рубрику';
+}
+function scoreInterviewAnswer(){
+  const ui=requireInterviewPracticeUI();
+  const item=ui.findItem(INTERVIEW_PRACTICE,interviewKind,interviewItemId);
+  const scoreEl=document.getElementById('ip-score');
+  if(!item||!scoreEl) return;
+  const checked=[...document.querySelectorAll('#ip-rubric input[type="checkbox"]:checked')].map(i=>Number(i.value));
+  scoreEl.innerHTML=ui.renderScore(ui.score(item,checked));
 }
 function requireSourcesUI(){if(typeof IPMaxSourcesUI==='undefined') throw new Error('Модуль источников не загружен.');return IPMaxSourcesUI;}
 function showSourcesReport(){

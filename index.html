@@ -46,6 +46,7 @@
     <div class="sb-export-sep"></div>
     <button type="button" class="sb-item" onclick="exportProgress()"><span class="icon">📋</span>Копировать прогресс</button>
     <button type="button" class="sb-item" onclick="pasteProgressFromClipboard()"><span class="icon">📥</span>Вставить прогресс</button>
+    <button type="button" class="sb-item" onclick="nav('interview')" data-page="interview"><span class="icon">🎤</span>Собеседование</button>
     <button type="button" class="sb-item" onclick="showSourcesReport()"><span class="icon">🔎</span>Источники</button>
     <button type="button" class="sb-item" onclick="checkOfflineReady()"><span class="icon">📶</span>Проверить оффлайн</button>
     <input type="file" id="import-inp" accept=".json" style="display:none" onchange="importProgress(this)">
@@ -348,6 +349,31 @@
   </div>
 </div>
 
+<div class="page" id="page-interview">
+  <div class="ip-hero">
+    <div class="ip-kicker">Подготовка к собеседованию</div>
+    <h2>Открытые вопросы и проектирование</h2>
+    <p>Здесь нет вариантов ответа. Вы отвечаете вслух или письменно, затем сверяетесь с рубрикой и отмечаете, что действительно раскрыли.</p>
+  </div>
+  <div class="filter-row" id="ip-kind-chips">
+    <button type="button" class="chip active" onclick="setInterviewKind('star',this)">🎤 Поведенческие (STAR)</button>
+    <button type="button" class="chip" onclick="setInterviewKind('systemDesign',this)">🧩 Проектирование</button>
+  </div>
+  <div class="ip-layout">
+    <aside class="ip-side"><div class="ip-block-title">Задания</div><div id="ip-list"></div></aside>
+    <main class="ip-main">
+      <div id="ip-detail"></div>
+      <div id="ip-reference" hidden></div>
+      <div id="ip-rubric"></div>
+      <div id="ip-score"></div>
+      <div class="ip-actions">
+        <button type="button" class="btn btn-outline btn-sm" onclick="revealInterviewReference()" id="ip-reveal-btn">Показать рубрику</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="scoreInterviewAnswer()">Оценить ответ</button>
+      </div>
+    </main>
+  </div>
+</div>
+
 <!-- SOURCES MODAL -->
 <div class="modal-overlay" id="sources-modal" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="sources-modal-title" tabindex="-1" style="max-width:720px">
@@ -383,6 +409,7 @@
 <script src="./progress-io.js"></script>
 <script src="./offline-ui.js"></script>
 <script src="./sources-ui.js"></script>
+<script src="./interview-practice-ui.js"></script>
 <script src="./analytics-ui.js"></script>
 <script src="./home-ui.js"></script>
 <script src="./exam-ui.js"></script>
