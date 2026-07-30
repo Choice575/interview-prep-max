@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "updated": "2026-07-30",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Развернуть Nginx с кастомной страницей",
+      "description": "Установите Nginx, создайте HTML-страницу с текстом «DevOps Practice», настройте виртуальный хост и откройте её в браузере. Приложите скриншот страницы в браузере с видимым URL.",
+      "difficulty": "junior",
+      "topic": "Linux",
+      "evidenceType": ["screenshot", "text"],
+      "points": 10
+    },
+    {
+      "id": 2,
+      "title": "Dockerfile для Node.js-приложения",
+      "description": "Создайте многостадийный Dockerfile для простого Node.js-приложения (например, express hello world). Финальный образ не должен содержать npm. Опубликуйте Dockerfile в GitHub gist или репозитории.",
+      "difficulty": "middle",
+      "topic": "Docker",
+      "evidenceType": ["link", "text"],
+      "points": 15
+    },
+    {
+      "id": 3,
+      "title": "Terraform: создать S3 bucket с версионированием",
+      "description": "Напишите Terraform-конфигурацию, создающую S3 bucket с включённым версионированием и тегом Environment=dev. Выполните terraform apply и приложите вывод terraform show.",
+      "difficulty": "middle",
+      "topic": "Terraform",
+      "evidenceType": ["text", "screenshot"],
+      "points": 20
+    },
+    {
+      "id": 4,
+      "title": "Ansible playbook: установить Docker на удалённый хост",
+      "description": "Напишите Ansible playbook, устанавливающий Docker на удалённую машину (можно использовать локальный контейнер или VM). Запустите playbook и приложите вывод ansible-playbook с успешным статусом.",
+      "difficulty": "middle",
+      "topic": "Ansible",
+      "evidenceType": ["text", "link"],
+      "points": 20
+    },
+    {
+      "id": 5,
+      "title": "Troubleshooting: найти процесс, занимающий порт 8080",
+      "description": "На тестовой машине запустите любой процесс на порту 8080 (например, python -m http.server 8080). Найдите его PID и путь к исполняемому файлу с помощью lsof или ss. Приложите команду и её вывод.",
+      "difficulty": "junior",
+      "topic": "Linux",
+      "evidenceType": ["text"],
+      "points": 10
+    }
+  ]
+}

@@ -26,6 +26,7 @@
     <button type="button" class="sb-item active" onclick="nav('home')" data-page="home"><span class="icon">🏠</span>Главная</button>
     <button type="button" class="sb-item" onclick="nav('study')" data-page="study"><span class="icon">🎓</span>Учёба</button>
     <button type="button" class="sb-item" onclick="nav('practices')" data-page="practices"><span class="icon">✦</span>Best Practices</button>
+    <button type="button" class="sb-item" onclick="nav('external')" data-page="external"><span class="icon">🎯</span>Задания</button>
     <button type="button" class="sb-item" onclick="nav('exam')" data-page="exam"><span class="icon">📋</span>Экзамен</button>
     <button type="button" class="sb-item" onclick="nav('analytics')" data-page="analytics"><span class="icon">📊</span>Аналитика</button>
     <div class="sb-divider"></div>
@@ -147,6 +148,12 @@
   </div>
 
   <!-- EXAM -->
+  <div class="page" id="page-external">
+    <h1>Практические задания</h1>
+    <p class="page-subtitle">Выполните задания вне приложения и приложите доказательство</p>
+    <div id="external-tasks-container"></div>
+  </div>
+
   <div class="page" id="page-exam">
     <div class="exam-controls" id="exam-controls">
       <div><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:5px">РЕЖИМ</div><div class="filter-row" id="mode-chips"><button type="button" class="chip active" onclick="setMode('all',this)">Все</button><button type="button" class="chip" onclick="setMode('mix10',this)">Микс 10</button><button type="button" class="chip" onclick="setMode('mix20',this)">Микс 20</button><button type="button" class="chip" onclick="setMode('mix30',this)">Микс 30</button><button type="button" class="chip" onclick="setMode('mistakes',this)">Ошибки</button><button type="button" class="chip" onclick="setMode('smart',this)">Умный SR</button><button type="button" class="chip" onclick="setMode('srs',this)">🔄 SRS</button></div></div>
@@ -400,6 +407,12 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="evidence-modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="evidence-modal-title" tabindex="-1">
+    <h3 id="evidence-modal-title" class="sr-only">Отправка доказательства</h3>
+    <div id="evidence-modal-body"></div>
+  </div>
+</div>
 <script src="./version.js"></script>
 <script src="./date.js"></script>
 <script src="./storage.js"></script>
@@ -410,6 +423,7 @@
 <script src="./offline-ui.js"></script>
 <script src="./sources-ui.js"></script>
 <script src="./best-practices-ui.js"></script>
+<script src="./external-tasks-ui.js"></script>
 <script src="./interview-practice-ui.js"></script>
 <script src="./analytics-ui.js"></script>
 <script src="./home-ui.js"></script>

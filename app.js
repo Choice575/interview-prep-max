@@ -10,7 +10,7 @@ var BASE_QUESTIONS = [], SUBNET_PROBLEMS = [], TS_SCENARIOS = [], CMD_TASKS = []
     DOCKERFILE_TASKS = [], K8S_TASKS = [], PORTS_TASKS = [], LABS_TASKS = [], TIPS = [],
     INCIDENTS = [],
     STUDY_MAP = null, STUDY_TESTS = null, SENIOR_CASES = [], BEST_PRACTICES = null,
-    QUESTION_SOURCES = null, INTERVIEW_PRACTICE = null;
+    QUESTION_SOURCES = null, INTERVIEW_PRACTICE = null, EXTERNAL_TASKS = null;
 
 const DATA_FILES = {
   base_questions: 'tasks/base_questions.json',
@@ -31,6 +31,7 @@ const DATA_FILES = {
   study_tests: 'tasks/study_tests.json',
   senior_cases: 'tasks/senior_cases.json',
   best_practices: 'tasks/best_practices.json',
+  external_tasks: 'tasks/external_tasks.json',
   question_sources: 'tasks/question_sources.json',
   interview_practice: 'tasks/interview_practice.json'
 };
@@ -40,7 +41,7 @@ const DATA_VARS = {
   cmd: 'CMD_TASKS', code: 'CODE_TASKS', git: 'GIT_TASKS', regex: 'REGEX_TASKS',
   ansible_pb: 'ANSIBLE_PB_TASKS', dockerfile: 'DOCKERFILE_TASKS', k8s: 'K8S_TASKS',
   ports: 'PORTS_TASKS', labs: 'LABS_TASKS', tips: 'TIPS', incidents: 'INCIDENTS', study_map: 'STUDY_MAP',
-  study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES', question_sources: 'QUESTION_SOURCES', interview_practice: 'INTERVIEW_PRACTICE'
+  study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES', question_sources: 'QUESTION_SOURCES', interview_practice: 'INTERVIEW_PRACTICE', external_tasks: 'EXTERNAL_TASKS'
 };
 
 function dataSize(data){
@@ -276,6 +277,7 @@ function nav(page){
   if(page==='home') renderHome();
   if(page==='study'){cameFromStudy=false;interviewMode=false;renderStudy();}
   if(page==='practices') renderBestPractices();
+  if(page==='external') renderExternalTasks();
   if(page==='analytics') renderAnalytics();
   if(page==='subnet') renderSubnet();
   if(page==='ts') renderTsList();
@@ -1707,4 +1709,34 @@ function endIncidentSim(){
     '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">'+
     '<button class="btn btn-primary" onclick="startIncidentSim()">🔄 Другой инцидент</button>'+
     '<button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
+}
+function renderExternalTasks(){
+  const container=document.getElementById('external-tasks-container');
+  if(!container) return;
+  const et=typeof IPMaxExternalTasksUI!=='undefined'?IPMaxExternalTasksUI:null;
+  if(!et){container.innerHTML='<p>Модуль не загружен.</p>';return;}
+  const completed=JSON.parse(localStorage.getItem('external_tasks_completed')||'{}');
+  container.innerHTML=et.renderTaskList(EXTERNAL_TASKS,completed);
+  document.querySelectorAll('.btn-submit-evidence').forEach(btn=>{
+    btn.addEventListener('click',()=>openEvidenceModal(parseInt(btn.dataset.taskId)));
+  });
+}
+function openEvidenceModal(taskId){
+  const et=typeof IPMaxExternalTasksUI!=='undefined'?IPMaxExternalTasksUI:null;
+  if(!et) return;
+  const task=(et.tasksOf(EXTERNAL_TASKS)).find(t=>t.id===taskId);
+  if(!task) return;
+  document.getElementById('evidence-modal-body').innerHTML=et.renderEvidenceModal(task);
+  openAccessibleModal('evidence-modal','#evidence-modal-body');
+  document.getElementById('evidence-cancel')?.addEventListener('click',()=>closeAccessibleModal('evidence-modal'));
+  document.getElementById('evidence-form')?.addEventListener('submit',e=>{
+    e.preventDefault();
+    const evidence=et.collectEvidence();
+    if(!et.validateEvidence(evidence)){alert('Приложите хотя бы одно доказательство.');return;}
+    const completed=JSON.parse(localStorage.getItem('external_tasks_completed')||'{}');
+    completed[taskId]={completedAt:Date.now(),evidence};
+    localStorage.setItem('external_tasks_completed',JSON.stringify(completed));
+    closeAccessibleModal('evidence-modal');
+    renderExternalTasks();
+  });
 }

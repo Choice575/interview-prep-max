@@ -77,7 +77,7 @@ expect(/cache\.add\(asset\)\.then\(\(\) => null\)\.catch\(\(\) => asset\)/.test(
 const shellAssets = shellBlock ? [...shellBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
 const dataAssets = dataBlock ? [...dataBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
 const assets = shellAssets.concat(dataAssets);
-['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './offline-ui.js', './sources-ui.js', './best-practices-ui.js', './interview-practice-ui.js', './analytics-ui.js', './home-ui.js', './exam-ui.js', './study-ui.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
+['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './offline-ui.js', './sources-ui.js', './best-practices-ui.js', './external-tasks-ui.js', './interview-practice-ui.js', './analytics-ui.js', './home-ui.js', './exam-ui.js', './study-ui.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
   expect(assets.includes(file), `offline-кеш не содержит ${file}`);
 });
 dataFiles.forEach(file => expect(assets.includes('./' + file), `offline-кеш не содержит ./${file}`));

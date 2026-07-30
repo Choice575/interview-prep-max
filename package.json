@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "test": "node --test date.test.js progress.test.js progress-io.test.js offline-ui.test.js sources-ui.test.js interview-practice-ui.test.js analytics-ui.test.js home-ui.test.js exam-ui.test.js study-ui.test.js storage.test.js coach.test.js coach-ui.test.js ai-coach.test.js server.test.js coach-flow.integration.test.js app-shell.integration.test.js question-quality.test.js best-practices.test.js best-practices-ui.test.js curriculum.test.js release.test.js validate.test.js",
+    "test": "node --test date.test.js progress.test.js progress-io.test.js offline-ui.test.js sources-ui.test.js interview-practice-ui.test.js analytics-ui.test.js home-ui.test.js exam-ui.test.js study-ui.test.js storage.test.js coach.test.js coach-ui.test.js ai-coach.test.js server.test.js coach-flow.integration.test.js app-shell.integration.test.js question-quality.test.js best-practices.test.js best-practices-ui.test.js external-tasks.test.js external-tasks-ui.test.js curriculum.test.js release.test.js validate.test.js",
     "verify:release": "node validate.js --strict && node verify-release.js && node --test release.test.js",
     "lint": "eslint .",
     "lint:strict": "eslint . --max-warnings 80",
