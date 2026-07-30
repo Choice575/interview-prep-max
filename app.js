@@ -248,6 +248,7 @@ let streak=0;
 let questionStartTime={};
 let cmdMuscleActive=false;
 let interviewMode=false;
+let controlMode=false;
 let cameFromStudy=false;
 let updateReloadPending=false;
 let coachSessionLimit=0;
@@ -263,7 +264,7 @@ const PAGE_TITLES={home:'Главная',interview:'Собеседование',
 function nav(page){
   stopActiveSessions();
   if(page!=='exam') coachQuestionIds=null;
-  if(page!=='exam'&&page!=='study'){cameFromStudy=false;interviewMode=false;}
+  if(page!=='exam'&&page!=='study'){cameFromStudy=false;interviewMode=false;controlMode=false;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i=>{i.classList.remove('active');i.removeAttribute('aria-current');});
   const pg=document.getElementById('page-'+page);
@@ -415,6 +416,7 @@ const examUI=requireExamUIModule().create({
   getView:()=>currentView,getTimerSeconds:()=>timerSecs,
   getStudyMode:()=>document.getElementById('study-mode-cb')?.checked||cameFromStudy,
   getInterviewMode:()=>interviewMode&&!cameFromStudy,
+    getControlMode:()=>controlMode,
   getActiveQuestions:()=>activeQuestions,setActiveQuestions:questions=>{activeQuestions=questions;},
   getSingleIndex:()=>singleIdx,resetSingleIndex:()=>{singleIdx=0;},
   randomize:shuffle,clearTimer:clearTInterval,renderFreeform,startTimer,
@@ -438,9 +440,29 @@ function pick(qid,chosen,correct){
   const q=getAllQ().find(x=>String(x.id)===String(qid));
   if(!q) return;
   const opts=card.querySelectorAll('.q-opt');
-  opts.forEach(o=>{o.classList.add('disabled');const oi=parseInt(o.getAttribute('data-orig-idx'));if(oi===correct)o.classList.add('correct-opt');else if(oi===chosen)o.classList.add('wrong-opt');});
+  opts.forEach(o=>{
+    o.classList.add('disabled');
+    const oi=parseInt(o.getAttribute('data-orig-idx'));
+    if(oi===correct&&!controlMode) o.classList.add('correct-opt');
+    else if(oi===chosen) o.classList.add(chosen===correct?'correct-opt':'wrong-opt');
+    else if(oi===correct&&controlMode) o.classList.add('control-pending');
+  });
   const ok=chosen===correct;
   card.classList.add(ok?'correct':'wrong');
+  if(controlMode){
+    const total=document.querySelectorAll('#questions-container .q-card').length;
+    const done=document.querySelectorAll('#questions-container .q-card.correct,#questions-container .q-card.wrong').length;
+    if(done>=total&&total>0&&!document.getElementById('control-reveal-btn')){
+      const btn=document.createElement('button');
+      btn.id='control-reveal-btn';btn.className='btn btn-primary';
+      btn.style.cssText='display:block;margin:16px auto;padding:10px 24px';
+      btn.textContent='Показать правильные ответы';
+      btn.setAttribute('aria-label','Завершить контрольную и показать правильные ответы');
+      btn.onclick=revealControlAnswers;
+      document.getElementById('questions-container')?.appendChild(btn);
+      btn.focus();
+    }
+  }
   streak=ok?streak+1:0;
   const best=lsGet('streak_best',0);if(streak>best)lsSet('streak_best',streak);
   updateStreakDisplay();
@@ -450,6 +472,24 @@ function pick(qid,chosen,correct){
   updateQuestionProgressSummary();
   clearTInterval();
   if(pageActive('home')) renderMasteryCards();
+}
+function revealControlAnswers(){
+  controlMode=false;
+  document.getElementById('control-reveal-btn')?.remove();
+  document.querySelectorAll('#questions-container .q-card').forEach(card=>{
+    const q=getAllQ().find(x=>'qcard-'+x.id===card.id);if(!q) return;
+    card.querySelectorAll('.q-opt').forEach(o=>{
+      const oi=parseInt(o.getAttribute('data-orig-idx'));
+      if(oi===q.answer){o.classList.remove('control-pending');o.classList.add('correct-opt');}
+    });
+    if(q.explanation&&!interviewMode){
+      const el=document.getElementById('qexpl-'+q.id);
+      if(el){el.innerHTML='💡 '+esc(q.explanation);el.style.display='block';}
+    }
+  });
+  document.querySelector('#questions-container .correct-opt')?.scrollIntoView({block:'center',behavior:'smooth'});
+  const live=document.getElementById('exam-sr-status');
+  if(live)live.textContent='Правильные ответы показаны.';
 }
 function pageActive(p){return document.getElementById('page-'+p)?.classList.contains('active');}
 
@@ -964,7 +1004,7 @@ function startCoachControlMode(plan){
     id:'control-'+Date.now(),startedAt:Date.now(),completedAt:null,
     questionIds:ids.map(String),topics:Array.isArray(plan.controlSession.topics)?plan.controlSession.topics:[],attempts:[]
   });
-  currentTopic='all';currentLevel='all';currentCategory='all';currentMode='all';currentView='standard';interviewMode=true;cameFromStudy=false;
+  currentTopic='all';currentLevel='all';currentCategory='all';currentMode='all';currentView='standard';interviewMode=true;controlMode=true;cameFromStudy=false;
   nav('exam');
 }
 
