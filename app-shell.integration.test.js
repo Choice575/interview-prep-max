@@ -72,8 +72,8 @@ test('serves the complete app shell and personal-coach modules', async () => {
     assert.match(coachUi, /data-coach-action="start-control"/);
     assert.match(app, /recordQuestionResult/);
     assert.match(app, /configureCoachUI\(\)/);
-    assert.equal(JSON.parse(questions).length, 770);
-    assert.equal(JSON.parse(practices).topics.length, 12);
+    assert.equal(JSON.parse(questions).length, 818);
+    assert.equal(JSON.parse(practices).topics.length, 13);
     const labelledControls = [
       'cq-topic', 'cq-level', 'cq-category', 'cq-q', 'cq-a', 'cq-b', 'cq-c', 'cq-d', 'cq-ans', 'cq-exp',
       'onb-role', 'onb-level', 'onb-date'

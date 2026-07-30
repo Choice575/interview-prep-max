@@ -10,7 +10,7 @@ const path = require('path');
 const { findMissingRequiredTerms } = require('./study-curriculum-rules');
 
 const TASKS_DIR = path.join(__dirname, 'tasks');
-const KNOWN_TOPICS = ['Terraform', 'Linux', 'Сети', 'Ansible', 'Docker', 'Kubernetes', 'CI/CD', 'Git', 'Regex', 'Monitoring', 'Cloud', 'Security'];
+const KNOWN_TOPICS = ['Terraform', 'Linux', 'Сети', 'Ansible', 'Docker', 'Kubernetes', 'CI/CD', 'Git', 'Regex', 'Monitoring', 'Cloud', 'Security', 'System Design'];
 const KNOWN_LEVELS = ['Junior', 'Middle', 'Senior', 'Junior+', 'Middle+', 'Senior-track'];
 const KNOWN_CATEGORIES = ['definition', 'scenario', 'tradeoff', 'output'];
 const KNOWN_STUDY_TYPES = ['incident', 'diagnostic', 'tradeoff', 'rollback', 'postmortem'];

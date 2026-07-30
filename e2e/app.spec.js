@@ -313,7 +313,7 @@ test('defers exam cards and renders the full list in batches', async ({ page }) 
   await expect(page.locator('#questions-container .q-card')).toHaveCount(0);
   await page.locator('[data-page="exam"]').click();
   await expect(page.locator('#questions-container .q-card')).toHaveCount(60);
-  await expect(page.locator('#questions-load-more')).toContainText('60/770');
+  await expect(page.locator('#questions-load-more')).toContainText('60/818');
   await page.locator('#questions-load-more button').click();
   await expect(page.locator('#questions-container .q-card')).toHaveCount(120);
 });

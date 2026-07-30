@@ -5,7 +5,7 @@
 })(typeof self !== 'undefined' ? self : globalThis, function() {
   const TOPIC_CLASSES = {
     Terraform: 'tf', Linux: 'lx', 'Сети': 'net', Ansible: 'ans', Docker: 'docker',
-    Kubernetes: 'k8s', 'CI/CD': 'cicd', Git: 'git', Regex: 'rx', Monitoring: 'mon', Cloud: 'cloud', Security: 'sec'
+    Kubernetes: 'k8s', 'CI/CD': 'cicd', Git: 'git', Regex: 'rx', Monitoring: 'mon', Cloud: 'cloud', Security: 'sec', 'System Design': 'sysd'
   };
   const LEVEL_CLASSES = { Junior: 'jr', Middle: 'md', Senior: 'sr' };
   const CATEGORY_CLASSES = { scenario: 'sc', tradeoff: 'tr', output: 'out' };
