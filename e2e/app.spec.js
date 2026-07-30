@@ -202,7 +202,7 @@ test('exports a versioned progress backup through the extracted module', async (
   const backup = JSON.parse(Buffer.concat(chunks).toString('utf8'));
 
   expect(download.suggestedFilename()).toMatch(/^ipmax_\d{4}-\d{2}-\d{2}\.json$/);
-  expect(backup.version).toBe('13.3.0');
+  expect(backup.version).toBe('13.4.0');
   expect(backup.qprog['1']).toEqual({ correct: 2, wrong: 1 });
   expect(backup.onboarding.role).toBe(profile.role);
 });
