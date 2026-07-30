@@ -1164,33 +1164,26 @@ function renderTips(){document.getElementById('tips-container').innerHTML=TIPS.m
 function toggleTip(i){const b=document.getElementById('tb-'+i);const a=document.getElementById('ta-'+i);b.classList.toggle('open');a.textContent=b.classList.contains('open')?'▲':'▼';}
 
 // ═══ BEST PRACTICES ═══
-function getBestPracticeTopics(){return Array.isArray(BEST_PRACTICES?.topics)?BEST_PRACTICES.topics:[];}
 function renderBestPractices(requestedTopic,restoreFocus){
-  const topics=getBestPracticeTopics();
   const tabs=document.getElementById('practice-tabs');
   const panel=document.getElementById('practice-panel');
   if(!tabs||!panel) return;
+  const bp=typeof IPMaxBestPracticesUI!=='undefined'?IPMaxBestPracticesUI:null;
+  const topics=bp?bp.topicsOf(BEST_PRACTICES):[];
   if(!topics.length){panel.innerHTML='<div class="empty-state"><p>Раздел пока недоступен.</p></div>';return;}
-  const selected=topics.find(topic=>topic.topic===(requestedTopic||currentPracticeTopic))||topics[0];
+  const selected=bp?bp.selectTopic(BEST_PRACTICES,requestedTopic,currentPracticeTopic):(topics.find(topic=>topic.topic===(requestedTopic||currentPracticeTopic))||topics[0]);
   currentPracticeTopic=selected.topic;
   document.getElementById('practice-topic-count').textContent=topics.length;
-  document.getElementById('practice-card-count').textContent=topics.reduce((sum,topic)=>sum+topic.practices.length,0);
+  document.getElementById('practice-card-count').textContent=bp?bp.totalPracticeCount(BEST_PRACTICES):topics.reduce((sum,topic)=>sum+topic.practices.length,0);
   document.getElementById('practice-reviewed-date').textContent=BEST_PRACTICES.updated||'—';
-  tabs.innerHTML=topics.map(topic=>{
-    const active=topic.topic===selected.topic;
-    return '<button type="button" class="practice-tab" role="tab" id="practice-tab-'+escAttr(topic.slug)+'" aria-controls="practice-panel" aria-selected="'+active+'" tabindex="'+(active?'0':'-1')+'" data-practice-topic="'+escAttr(topic.topic)+'"><span aria-hidden="true">'+esc(topic.icon)+'</span><span>'+esc(topic.topic)+'</span></button>';
-  }).join('');
+  tabs.innerHTML=bp?bp.renderTabs(BEST_PRACTICES,selected.topic):'';
   tabs.querySelectorAll('[data-practice-topic]').forEach(button=>{
     button.addEventListener('click',()=>renderBestPractices(button.dataset.practiceTopic,true));
     button.addEventListener('keydown',movePracticeTab);
   });
 
   panel.setAttribute('aria-labelledby','practice-tab-'+selected.slug);
-  panel.innerHTML='<div class="practice-panel-head"><div class="practice-topic-icon" aria-hidden="true">'+esc(selected.icon)+'</div><div><div class="practice-kicker">Проверенный рабочий подход</div><h2>'+esc(selected.topic)+'</h2><p>'+esc(selected.summary)+'</p></div></div>'+
-    '<div class="practice-grid">'+selected.practices.map((practice,index)=>
-      '<article class="practice-card"><div class="practice-card-number">'+String(index+1).padStart(2,'0')+'</div><h3>'+esc(practice.title)+'</h3><p class="practice-why">'+esc(practice.why)+'</p><div class="practice-action"><span>Применить</span><p>'+esc(practice.action)+'</p></div></article>'
-    ).join('')+'</div>'+
-    '<div class="practice-footer"><div><strong>'+selected.practices.length+' практик</strong><span> · ревизия '+esc(BEST_PRACTICES.updated||'—')+'</span></div><button type="button" class="btn btn-primary" id="practice-trainer" data-topic="'+escAttr(selected.topic)+'" data-page="'+escAttr(selected.trainer||'exam')+'">Перейти к практике →</button></div>';
+  panel.innerHTML=bp?bp.renderPanel(selected,BEST_PRACTICES.updated):'';
   document.getElementById('practice-trainer').addEventListener('click',startPracticeTraining);
   if(restoreFocus) requestAnimationFrame(()=>document.getElementById('practice-tab-'+selected.slug)?.focus());
 }
@@ -1199,9 +1192,9 @@ function movePracticeTab(event){
   event.preventDefault();
   const buttons=[...document.querySelectorAll('#practice-tabs [role="tab"]')];
   const current=buttons.indexOf(event.currentTarget);
-  let next=event.key==='Home'?0:event.key==='End'?buttons.length-1:current+(event.key==='ArrowRight'?1:-1);
-  next=(next+buttons.length)%buttons.length;
-  buttons[next].click();
+  const bp=typeof IPMaxBestPracticesUI!=='undefined'?IPMaxBestPracticesUI:null;
+  const next=bp?bp.nextTabIndex(event.key,current,buttons.length):((event.key==='Home'?0:event.key==='End'?buttons.length-1:current+(event.key==='ArrowRight'?1:-1))+buttons.length)%buttons.length;
+  buttons[next]?.click();
 }
 function startPracticeTraining(event){
   const topic=event.currentTarget.dataset.topic;

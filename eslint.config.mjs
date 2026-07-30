@@ -77,6 +77,7 @@ const appGlobals = {
   IPMaxAnalyticsUI: 'readonly',
   IPMaxOfflineUI: 'readonly',
   IPMaxSourcesUI: 'readonly',
+  IPMaxBestPracticesUI: 'readonly',
   IPMaxInterviewPracticeUI: 'readonly',
   IPMaxAICoach: 'readonly',
   IPMaxCoach: 'readonly',
@@ -152,7 +153,7 @@ export default [
     files: [
       'coach.js', 'coach-ui.js', 'ai-coach.js', 'storage.js', 'progress.js', 'progress-io.js',
       'date.js', 'home-ui.js', 'exam-ui.js', 'study-ui.js', 'analytics-ui.js', 'offline-ui.js',
-      'sources-ui.js', 'interview-practice-ui.js', 'study-curriculum-rules.js', 'question-quality.js'
+      'sources-ui.js', 'best-practices-ui.js', 'interview-practice-ui.js', 'study-curriculum-rules.js', 'question-quality.js'
     ],
     languageOptions: {
       ecmaVersion: 2023,
