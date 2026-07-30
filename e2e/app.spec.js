@@ -202,7 +202,7 @@ test('exports a versioned progress backup through the extracted module', async (
   const backup = JSON.parse(Buffer.concat(chunks).toString('utf8'));
 
   expect(download.suggestedFilename()).toMatch(/^ipmax_\d{4}-\d{2}-\d{2}\.json$/);
-  expect(backup.version).toBe('13.4.0');
+  expect(backup.version).toBe('13.5.0');
   expect(backup.qprog['1']).toEqual({ correct: 2, wrong: 1 });
   expect(backup.onboarding.role).toBe(profile.role);
 });
@@ -366,7 +366,7 @@ test('shows Best Practices for every topic and opens the related trainer', async
   await page.goto('/');
   await page.locator('[data-page="practices"]').click();
   await expect(page.locator('#page-practices')).toHaveClass(/active/);
-  await expect(page.getByRole('tab')).toHaveCount(12);
+  await expect(page.getByRole('tab')).toHaveCount(13);
   await expect(page.locator('.practice-card')).toHaveCount(5);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
 
