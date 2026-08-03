@@ -37,7 +37,9 @@ test('serves the complete app shell and personal-coach modules', async () => {
     assert.ok(html.indexOf('./progress-io.js') < html.indexOf('./offline-ui.js'));
     assert.ok(html.indexOf('./offline-ui.js') < html.indexOf('./sources-ui.js'));
     assert.ok(html.indexOf('./sources-ui.js') < html.indexOf('./catalog-ui.js'));
-    assert.ok(html.indexOf('./catalog-ui.js') < html.indexOf('./interview-practice-ui.js'));
+    assert.ok(html.indexOf('./catalog-ui.js') < html.indexOf('./chapter-ui.js'));
+    assert.ok(html.indexOf('./chapter-ui.js') < html.indexOf('./interview-practice-ui.js'));
+    assert.match(html, /id="page-chapter"/);
     assert.match(html, /id="page-catalog"/);
     assert.match(html, /data-page="catalog"/);
     assert.ok(html.indexOf('./interview-practice-ui.js') < html.indexOf('./analytics-ui.js'));

@@ -258,7 +258,7 @@ let coachQuestionIds=null;
 let currentPracticeTopic='';
 
 // ═══ NAV ═══
-const PAGE_TITLES={home:'Главная',interview:'Собеседование',catalog:'Курсы',study:'Учёба',practices:'Best Practices',exam:'Экзамен',analytics:'Аналитика',
+const PAGE_TITLES={home:'Главная',interview:'Собеседование',catalog:'Курсы',chapter:'Глава',study:'Учёба',practices:'Best Practices',exam:'Экзамен',analytics:'Аналитика',
   subnet:'Тренажёр подсетей',ts:'Troubleshooting-симулятор',
   cmd:'Command Builder',code:'Code Reviewer',
   ansible:'Ansible Playbook',dockerfile:'Dockerfile',k8s:'K8s YAML',ports:'Порты TCP',labs:'Debugging',
@@ -278,6 +278,7 @@ function nav(page){
   if(page==='home') renderHome();
   if(page==='study'){cameFromStudy=false;interviewMode=false;renderStudy();}
   if(page==='catalog') renderCatalog();
+  if(page==='chapter') renderChapterPage();
   if(page==='practices') renderBestPractices();
   if(page==='external') renderExternalTasks();
   if(page==='analytics') renderAnalytics();
@@ -1540,7 +1541,7 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 function requireOfflineUI(){if(typeof IPMaxOfflineUI==='undefined') throw new Error('Модуль offline-отчёта не загружен.');return IPMaxOfflineUI;}
 function offlineAssetList(){
-  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   return shell.concat(Object.values(DATA_FILES).map(file=>'./'+file));
 }
 async function probeOfflineAssets(assets){
@@ -1801,15 +1802,66 @@ function handleCatalogClick(event){
   const slug=target.dataset.catalogOpen||target.dataset.catalogCourse;
   if(slug) openCatalogCourse(slug);
 }
-// Страницы главы пока нет: открываем соответствующий день на вкладке «Учёба».
+// Открываем первую непройденную главу курса на странице главы.
 function openCatalogCourse(slug){
   const ui=requireCatalogUI();
   const course=ui.coursesOf(COURSES).find(item=>item.slug===slug);
-  if(!course) return;
+  if(!course||!course.chapters.length) return;
   const next=ui.nextChapter(course,catalogCompletedChapterIds())||course.chapters[0];
-  const source=(next&&next.source)||{};
-  const week=source.week||course.weeks[0];
-  const day=source.day||1;
-  nav('study');
-  setStudyPosition(week,day);
+  openChapter(slug,next.id);
+}
+
+// ═══ CHAPTER ═══
+// Страница главы: структура берётся из courses.json, текст — из исходных
+// датасетов по ссылке source (в courses.json прозы нет, тонкий режим).
+function requireChapterUI(){if(typeof IPMaxChapterUI==='undefined') throw new Error('Модуль главы не загружен.');return IPMaxChapterUI;}
+function chapterDatasets(){
+  return {studyMap:STUDY_MAP,studyTests:STUDY_TESTS,seniorCases:SENIOR_CASES,
+    labs:LABS_TASKS,externalTasks:EXTERNAL_TASKS,simulators:TS_SCENARIOS};
+}
+function getChapterPosition(){return lsGet('chapter_position',null);}
+function openChapter(courseSlug,chapterId){
+  lsSet('chapter_position',{slug:courseSlug,chapterId:chapterId});
+  nav('chapter');
+}
+function renderChapterPage(){
+  const host=document.getElementById('chapter-host');
+  if(!host) return;
+  const ui=requireChapterUI();
+  const position=getChapterPosition();
+  const course=position?ui.findCourse(COURSES,position.slug):null;
+  const chapter=course?ui.findChapter(course,position.chapterId):null;
+  if(!course||!chapter){
+    host.innerHTML='<div class="empty-state"><p>Глава не выбрана. Откройте курс в разделе «Курсы».</p>'+
+      '<button type="button" class="btn btn-primary" data-chapter-catalog="1">К списку курсов</button></div>';
+    host.onclick=handleChapterClick;
+    return;
+  }
+  const resolved=ui.resolveChapter(chapter,chapterDatasets());
+  const neighbours=ui.neighbours(course,chapter.id);
+  const complete=catalogCompletedChapterIds().has(chapter.id);
+  host.innerHTML=ui.renderChapter(course,chapter,resolved,neighbours,complete);
+  host.onclick=handleChapterClick;
+}
+// Один делегированный обработчик: присваивание заменяет прежний,
+// поэтому повторный рендер не накапливает слушателей.
+function handleChapterClick(event){
+  const target=event.target.closest&&event.target.closest('[data-chapter-open],[data-chapter-course],[data-chapter-start],[data-chapter-catalog]');
+  if(!target) return;
+  if(target.dataset.chapterCatalog){nav('catalog');return;}
+  const position=getChapterPosition();
+  if(target.dataset.chapterCourse){nav('catalog');return;}
+  if(target.dataset.chapterOpen&&position){openChapter(position.slug,target.dataset.chapterOpen);return;}
+  if(target.dataset.chapterStart&&position) startChapter(position.slug,target.dataset.chapterStart);
+}
+// Прохождение живёт в существующих разделах: своей механики у главы нет.
+function startChapter(courseSlug,chapterId){
+  const ui=requireChapterUI();
+  const course=ui.findCourse(COURSES,courseSlug);
+  const chapter=course?ui.findChapter(course,chapterId):null;
+  if(!chapter) return;
+  const page=ui.targetPage(chapter);
+  const source=chapter.source||{};
+  nav(page);
+  if(page==='study'&&source.week) setStudyPosition(source.week,source.day||1);
 }
