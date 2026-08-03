@@ -10,7 +10,7 @@ var BASE_QUESTIONS = [], SUBNET_PROBLEMS = [], TS_SCENARIOS = [], CMD_TASKS = []
     DOCKERFILE_TASKS = [], K8S_TASKS = [], PORTS_TASKS = [], LABS_TASKS = [], TIPS = [],
     INCIDENTS = [],
     STUDY_MAP = null, STUDY_TESTS = null, SENIOR_CASES = [], BEST_PRACTICES = null,
-    QUESTION_SOURCES = null, INTERVIEW_PRACTICE = null, EXTERNAL_TASKS = null;
+    QUESTION_SOURCES = null, INTERVIEW_PRACTICE = null, EXTERNAL_TASKS = null, COURSES = null;
 
 const DATA_FILES = {
   base_questions: 'tasks/base_questions.json',
@@ -33,7 +33,8 @@ const DATA_FILES = {
   best_practices: 'tasks/best_practices.json',
   external_tasks: 'tasks/external_tasks.json',
   question_sources: 'tasks/question_sources.json',
-  interview_practice: 'tasks/interview_practice.json'
+interview_practice: 'tasks/interview_practice.json',
+courses: 'tasks/courses.json'
 };
 
 const DATA_VARS = {
@@ -41,7 +42,7 @@ const DATA_VARS = {
   cmd: 'CMD_TASKS', code: 'CODE_TASKS', git: 'GIT_TASKS', regex: 'REGEX_TASKS',
   ansible_pb: 'ANSIBLE_PB_TASKS', dockerfile: 'DOCKERFILE_TASKS', k8s: 'K8S_TASKS',
   ports: 'PORTS_TASKS', labs: 'LABS_TASKS', tips: 'TIPS', incidents: 'INCIDENTS', study_map: 'STUDY_MAP',
-  study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES', question_sources: 'QUESTION_SOURCES', interview_practice: 'INTERVIEW_PRACTICE', external_tasks: 'EXTERNAL_TASKS'
+  study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES', question_sources: 'QUESTION_SOURCES', interview_practice: 'INTERVIEW_PRACTICE', external_tasks: 'EXTERNAL_TASKS', courses: 'COURSES'
 };
 
 function dataSize(data){
@@ -257,7 +258,7 @@ let coachQuestionIds=null;
 let currentPracticeTopic='';
 
 // ═══ NAV ═══
-const PAGE_TITLES={home:'Главная',interview:'Собеседование',study:'Учёба',practices:'Best Practices',exam:'Экзамен',analytics:'Аналитика',
+const PAGE_TITLES={home:'Главная',interview:'Собеседование',catalog:'Курсы',study:'Учёба',practices:'Best Practices',exam:'Экзамен',analytics:'Аналитика',
   subnet:'Тренажёр подсетей',ts:'Troubleshooting-симулятор',
   cmd:'Command Builder',code:'Code Reviewer',
   ansible:'Ansible Playbook',dockerfile:'Dockerfile',k8s:'K8s YAML',ports:'Порты TCP',labs:'Debugging',
@@ -276,6 +277,7 @@ function nav(page){
   closeSidebar();
   if(page==='home') renderHome();
   if(page==='study'){cameFromStudy=false;interviewMode=false;renderStudy();}
+  if(page==='catalog') renderCatalog();
   if(page==='practices') renderBestPractices();
   if(page==='external') renderExternalTasks();
   if(page==='analytics') renderAnalytics();
@@ -1538,7 +1540,7 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 function requireOfflineUI(){if(typeof IPMaxOfflineUI==='undefined') throw new Error('Модуль offline-отчёта не загружен.');return IPMaxOfflineUI;}
 function offlineAssetList(){
-  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./sources-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   return shell.concat(Object.values(DATA_FILES).map(file=>'./'+file));
 }
 async function probeOfflineAssets(assets){
@@ -1739,4 +1741,75 @@ function openEvidenceModal(taskId){
     closeAccessibleModal('evidence-modal');
     renderExternalTasks();
   });
+}
+
+// ═══ CATALOG ═══
+// Прогресс каталога считается из УЖЕ существующих ключей localStorage:
+// отдельного хранилища у курсов нет, поэтому и миграция не нужна.
+function catalogCompletedChapterIds(){
+  const done=new Set();
+  const studyProgress=getStudyProgress();
+  const miniAnswers=lsGet('study_answers',{});
+  const weeklyResults=lsGet('study_weekly_results',{});
+  const caseProgress=lsGet('senior_case_prog',{});
+  const labsProgress=lsGet('labs_prog',{});
+  const tsProgress=lsGet('ts_scores',{});
+  let externalDone={};
+  try{externalDone=JSON.parse(localStorage.getItem('external_tasks_completed')||'{}');}catch{externalDone={};}
+  ((COURSES&&COURSES.courses)||[]).forEach(course=>{
+    (course.chapters||[]).forEach(chapter=>{
+      const source=chapter.source||{};
+      let complete=false;
+      if(chapter.type==='lesson') complete=studyProgress[chapter.legacyProgressKey]==='done';
+      else if(chapter.kind==='mini') complete=!!(miniAnswers[source.id]&&miniAnswers[source.id].completedAt);
+      else if(chapter.kind==='weekly') complete=!!weeklyResults[source.id];
+      else if(chapter.kind==='incident') complete=(caseProgress[source.id]||{}).status==='done';
+      else if(chapter.kind==='fix-bug') complete=labsProgress[source.id]!==undefined;
+      else if(chapter.kind==='external') complete=!!externalDone[source.id];
+      else if(chapter.type==='simulator') complete=!!tsProgress[source.id];
+      if(complete) done.add(chapter.id);
+    });
+  });
+  return done;
+}
+function requireCatalogUI(){if(typeof IPMaxCatalogUI==='undefined') throw new Error('Модуль каталога курсов не загружен.');return IPMaxCatalogUI;}
+let catalogCategory=null;
+function renderCatalog(){
+  const filters=document.getElementById('catalog-filters');
+  const host=document.getElementById('catalog-grid-host');
+  const summaryHost=document.getElementById('catalog-summary');
+  if(!filters||!host||!summaryHost) return;
+  const ui=requireCatalogUI();
+  if(!ui.coursesOf(COURSES).length){
+    summaryHost.innerHTML='';filters.innerHTML='';
+    host.innerHTML='<div class="empty-state"><p>Каталог курсов недоступен.</p></div>';
+    return;
+  }
+  if(!catalogCategory) catalogCategory=ui.ALL_CATEGORY;
+  const completed=catalogCompletedChapterIds();
+  summaryHost.innerHTML=ui.renderSummary(ui.catalogSummary(COURSES,completed));
+  filters.innerHTML=ui.renderFilters(COURSES,catalogCategory);
+  host.innerHTML=ui.renderGrid(COURSES,catalogCategory,completed);
+  filters.onclick=handleCatalogClick;
+  host.onclick=handleCatalogClick;
+}
+// Один делегированный обработчик на страницу: пережимает повторные рендеры.
+function handleCatalogClick(event){
+  const target=event.target.closest&&event.target.closest('[data-catalog-category],[data-catalog-open],[data-catalog-course]');
+  if(!target) return;
+  if(target.dataset.catalogCategory){catalogCategory=target.dataset.catalogCategory;renderCatalog();return;}
+  const slug=target.dataset.catalogOpen||target.dataset.catalogCourse;
+  if(slug) openCatalogCourse(slug);
+}
+// Страницы главы пока нет: открываем соответствующий день на вкладке «Учёба».
+function openCatalogCourse(slug){
+  const ui=requireCatalogUI();
+  const course=ui.coursesOf(COURSES).find(item=>item.slug===slug);
+  if(!course) return;
+  const next=ui.nextChapter(course,catalogCompletedChapterIds())||course.chapters[0];
+  const source=(next&&next.source)||{};
+  const week=source.week||course.weeks[0];
+  const day=source.day||1;
+  nav('study');
+  setStudyPosition(week,day);
 }

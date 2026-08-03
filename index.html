@@ -25,6 +25,7 @@
   <div class="sb-nav">
     <button type="button" class="sb-item active" onclick="nav('home')" data-page="home"><span class="icon">🏠</span>Главная</button>
     <button type="button" class="sb-item" onclick="nav('study')" data-page="study"><span class="icon">🎓</span>Учёба</button>
+    <button type="button" class="sb-item" onclick="nav('catalog')" data-page="catalog"><span class="icon">📚</span>Курсы</button>
     <button type="button" class="sb-item" onclick="nav('practices')" data-page="practices"><span class="icon">✦</span>Best Practices</button>
     <button type="button" class="sb-item" onclick="nav('external')" data-page="external"><span class="icon">🎯</span>Задания</button>
     <button type="button" class="sb-item" onclick="nav('exam')" data-page="exam"><span class="icon">📋</span>Экзамен</button>
@@ -123,6 +124,20 @@
         <div id="study-senior-case"></div>
       </aside>
     </div>
+  </div>
+
+  <!-- CATALOG -->
+  <div class="page" id="page-catalog">
+    <section class="catalog-hero">
+      <div class="catalog-hero-copy">
+        <div class="practice-kicker">Учебный план как набор курсов</div>
+        <h2>Курсы</h2>
+        <p>Тот же план на 32 недели, разложенный по темам: уроки, тесты, лабораторные и симуляторы идут в том порядке, в котором их удобно проходить.</p>
+      </div>
+      <div id="catalog-summary"></div>
+    </section>
+    <div class="catalog-filters" id="catalog-filters" aria-label="Категории курсов"></div>
+    <div id="catalog-grid-host"></div>
   </div>
 
   <!-- BEST PRACTICES -->
@@ -423,6 +438,7 @@
 <script src="./offline-ui.js"></script>
 <script src="./sources-ui.js"></script>
 <script src="./best-practices-ui.js"></script>
+<script src="./catalog-ui.js"></script>
 <script src="./external-tasks-ui.js"></script>
 <script src="./interview-practice-ui.js"></script>
 <script src="./analytics-ui.js"></script>
