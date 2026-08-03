@@ -100,7 +100,15 @@ function createAppServer(options = {}) {
   const allowRequest = createRateLimiter(options.rateLimit || 20, options.rateWindowMs || 60000);
 
   return http.createServer(async (request, response) => {
-    const url = new URL(request.url, 'http://localhost');
+    // request.url приходит от клиента и может быть невалидным ('//', '/\\').
+    // Без перехвата исключение вылетает из async-обработчика: ответ не
+    // отправляется, запрос висит, и процесс сервера падает целиком.
+    let url;
+    try {
+      url = new URL(request.url, 'http://localhost');
+    } catch {
+      return sendJson(response, 400, { error: 'Bad request' });
+    }
     if (url.pathname === '/api/ai/status') {
       if (request.method !== 'GET') return sendJson(response, 405, { error: 'Method not allowed' });
       return sendJson(response, 200, aiService.status());

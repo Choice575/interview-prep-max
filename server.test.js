@@ -99,3 +99,41 @@ test('adapts an OpenAI-compatible response without leaking the API key', async (
   assert.equal(captured.options.headers.Authorization, 'Bearer server-secret');
   assert.doesNotMatch(captured.options.body, /server-secret/);
 });
+
+// Запрос с таймаутом на сокет. Нужен именно здесь: при регрессии обработчик
+// не отправляет ответ, и незакрытый сокет держит event loop — процесс
+// node --test не выходит даже после провала теста (проверено: висит >45 с).
+// Таймаут превращает регрессию в быстрое падение, а не в зависший CI.
+function requestWithTimeout(server, method, path, ms = 4000) {
+  const port = server.address().port;
+  return new Promise((resolve, reject) => {
+    const outgoing = http.request({ host: '127.0.0.1', port, method, path }, response => {
+      response.resume();
+      response.on('end', () => resolve({ status: response.statusCode }));
+    });
+    outgoing.setTimeout(ms, () => {
+      outgoing.destroy(new Error(`${path}: ответ не получен за ${ms} мс`));
+    });
+    outgoing.on('error', reject);
+    outgoing.end();
+  });
+}
+
+test('survives malformed request targets instead of crashing', async () => {
+  await withServer(createAiService({ IPMAX_AI_PROVIDER: 'mock' }), async server => {
+    // Коды замерены на фактическом поведении Node, а не предположены:
+    //   '//' и '/\\'  — new URL бросает ERR_INVALID_URL -> перехват -> 400
+    //   '/%%', '/%zz' — URL валиден, decodeURIComponent бросает,
+    //                   safeStaticPath уже это ловит -> 403
+    // '//evil.example.com' сюда НЕ входит: он разбирается штатно
+    // (host=evil.example.com, pathname='/') и отдаёт index.html -> 200.
+    const expected = [['//', 400], ['/\\', 400], ['/%%', 403], ['/%zz', 403], ['/..%2f..%2fetc', 403]];
+    for (const [target, status] of expected) {
+      const response = await requestWithTimeout(server, 'GET', target);
+      assert.equal(response.status, status, `${target}: ожидался ${status}, получен ${response.status}`);
+    }
+    // Главное: процесс жив и продолжает обслуживать запросы.
+    const alive = await requestWithTimeout(server, 'GET', '/api/ai/status');
+    assert.equal(alive.status, 200, 'сервер не выжил после некорректных запросов');
+  });
+});
