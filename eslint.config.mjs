@@ -165,9 +165,12 @@ export default [
   },
   {
     // Node-only tooling and tests.
+    // NOTE: scripts/**/*.js must be listed explicitly. Without it no config
+    // block matched those files, so ESLint walked them with zero rules — an
+    // undefined global in a generator passed `npm run lint` silently.
     files: [
       'server.js', 'test-server.js', 'validate.js', 'verify-release.js',
-      'playwright.config.js', '*.test.js', 'e2e/**/*.js'
+      'playwright.config.js', '*.test.js', 'e2e/**/*.js', 'scripts/**/*.js'
     ],
     languageOptions: {
       ecmaVersion: 2023,
