@@ -296,6 +296,7 @@ function nav(page){
   if(page==='interview') renderInterviewPractice();
   if(page==='git') renderGit();
   if(page==='regex') renderRegex();
+  syncHashWithPage(page);
 }
 function resetCoachSelection(){coachSessionLimit=0;coachQuestionIds=null;}
 function startMode(m){resetCoachSelection();currentMode=m;document.querySelectorAll('#mode-chips .chip').forEach(c=>c.classList.remove('active'));nav('exam');}
@@ -1502,8 +1503,8 @@ async function initApp(){
     });
   }
 
-  // Рендерим
-  renderHome();
+  // Рендерим: маршрут из адресной строки имеет приоритет над главной.
+  if(!startRouting()) renderHome();
 
   // Онбординг
   if(!getOnboardingProfile()){
@@ -1541,7 +1542,7 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 function requireOfflineUI(){if(typeof IPMaxOfflineUI==='undefined') throw new Error('Модуль offline-отчёта не загружен.');return IPMaxOfflineUI;}
 function offlineAssetList(){
-  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./router.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   return shell.concat(Object.values(DATA_FILES).map(file=>'./'+file));
 }
 async function probeOfflineAssets(assets){
@@ -1864,4 +1865,79 @@ function startChapter(courseSlug,chapterId){
   const source=chapter.source||{};
   nav(page);
   if(page==='study'&&source.week) setStudyPosition(source.week,source.day||1);
+}
+
+// ═══ ROUTING ═══
+// Хеш-роутинг: глубокие ссылки на курс и главу, работает кнопка «назад».
+// Хеш выбран вместо History API сознательно: GitHub Pages не умеет
+// отдавать index.html на произвольный путь без трюка с 404.html.
+function requireRouter(){if(typeof IPMaxRouter==='undefined') throw new Error('Роутер не загружен.');return IPMaxRouter;}
+// Пока применяем маршрут из хеша, запись хеша выключена — иначе
+// nav() -> syncHash -> hashchange -> nav() зацикливается.
+let applyingRoute=false;
+// Хеш, который записали мы сами из nav(). Браузер присылает hashchange
+// асинхронно, когда applyingRoute уже сброшен, поэтому синхронного флага
+// недостаточно: эхо-событие вызывало бы nav() второй раз и стирало то,
+// что вызывающий код настроил ПОСЛЕ nav() — состояние блица и mock-интервью.
+let selfWrittenHash=null;
+function currentRoute(){
+  const router=requireRouter();
+  if(location.hash) return router.parseHash(location.hash);
+  return null;
+}
+function syncHashWithPage(page){
+  if(applyingRoute||typeof IPMaxRouter==='undefined') return;
+  const router=IPMaxRouter;
+  let route={page:page,courseSlug:null,chapterId:null};
+  if(page==='chapter'){
+    const position=getChapterPosition();
+    if(position){route.courseSlug=position.slug;route.chapterId=position.chapterId;}
+  }
+  const existing=location.hash?router.parseHash(location.hash):null;
+  if(existing&&router.sameRoute(existing,route)) return;
+  const hash=router.buildHash(route);
+  if(location.hash!==hash){selfWrittenHash=hash;location.hash=hash;}
+}
+// Применяет маршрут из адресной строки. Глава требует сохранить позицию
+// до nav(), иначе renderChapterPage() не найдёт, что рисовать.
+function applyRoute(route){
+  if(!route) return;
+  const router=requireRouter();
+  applyingRoute=true;
+  try{
+    if(route.page==='chapter'&&route.courseSlug){
+      const course=typeof IPMaxChapterUI!=='undefined'?IPMaxChapterUI.findCourse(COURSES,route.courseSlug):null;
+      if(!course){nav('catalog');return;}
+      const chapter=route.chapterId?IPMaxChapterUI.findChapter(course,route.chapterId):null;
+      const targetId=(chapter||course.chapters[0]||{}).id;
+      if(!targetId){nav('catalog');return;}
+      lsSet('chapter_position',{slug:course.slug,chapterId:targetId});
+      nav('chapter');
+      return;
+    }
+    nav(router.isValidPage(route.page)?route.page:'home');
+  }finally{
+    applyingRoute=false;
+  }
+}
+// Собственное эхо от записи хеша в nav() игнорируем: повторный nav()
+// перерисовал бы страницу и сбросил состояние, которое вызывающий код
+// выставил уже после nav() (блиц, mock-интервью). Навигация пользователя
+// приходит с другим хешем и обрабатывается как обычно.
+function handleHashChange(){
+  const hash=location.hash;
+  const echo=selfWrittenHash!==null&&hash===selfWrittenHash;
+  selfWrittenHash=null;
+  if(echo) return;
+  const route=currentRoute();
+  if(!route) return;
+  applyRoute(route);
+}
+// Вызывается один раз после загрузки данных: адресная строка важнее
+// сохранённой позиции, иначе глубокая ссылка не сработает.
+function startRouting(){
+  window.addEventListener('hashchange',handleHashChange);
+  const route=currentRoute();
+  if(route){applyRoute(route);return true;}
+  return false;
 }

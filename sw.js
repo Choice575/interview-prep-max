@@ -7,7 +7,7 @@ const SHELL_ASSETS = [
   './', './index.html', './styles.css',
   './version.js', './date.js', './storage.js',
   './progress.js', './coach.js', './ai-coach.js',
-  './progress-io.js', './offline-ui.js', './sources-ui.js', './best-practices-ui.js', './catalog-ui.js', './chapter-ui.js', './external-tasks-ui.js', './interview-practice-ui.js', './analytics-ui.js', './home-ui.js',
+  './progress-io.js', './offline-ui.js', './sources-ui.js', './best-practices-ui.js', './catalog-ui.js', './chapter-ui.js', './router.js', './external-tasks-ui.js', './interview-practice-ui.js', './analytics-ui.js', './home-ui.js',
   './exam-ui.js', './study-ui.js', './coach-ui.js',
   './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png',
   './assets/icon-512.png'
