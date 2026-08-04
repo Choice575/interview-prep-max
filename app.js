@@ -10,7 +10,8 @@ var BASE_QUESTIONS = [], SUBNET_PROBLEMS = [], TS_SCENARIOS = [], CMD_TASKS = []
     DOCKERFILE_TASKS = [], K8S_TASKS = [], PORTS_TASKS = [], LABS_TASKS = [], TIPS = [],
     INCIDENTS = [],
     STUDY_MAP = null, STUDY_TESTS = null, SENIOR_CASES = [], BEST_PRACTICES = null,
-    QUESTION_SOURCES = null, INTERVIEW_PRACTICE = null, EXTERNAL_TASKS = null, COURSES = null;
+    QUESTION_SOURCES = null, INTERVIEW_PRACTICE = null, EXTERNAL_TASKS = null, COURSES = null,
+    QUESTION_BANK = null;
 
 const DATA_FILES = {
   base_questions: 'tasks/base_questions.json',
@@ -34,7 +35,8 @@ const DATA_FILES = {
   external_tasks: 'tasks/external_tasks.json',
   question_sources: 'tasks/question_sources.json',
 interview_practice: 'tasks/interview_practice.json',
-courses: 'tasks/courses.json'
+courses: 'tasks/courses.json',
+question_bank: 'tasks/question_bank.json'
 };
 
 const DATA_VARS = {
@@ -42,7 +44,7 @@ const DATA_VARS = {
   cmd: 'CMD_TASKS', code: 'CODE_TASKS', git: 'GIT_TASKS', regex: 'REGEX_TASKS',
   ansible_pb: 'ANSIBLE_PB_TASKS', dockerfile: 'DOCKERFILE_TASKS', k8s: 'K8S_TASKS',
   ports: 'PORTS_TASKS', labs: 'LABS_TASKS', tips: 'TIPS', incidents: 'INCIDENTS', study_map: 'STUDY_MAP',
-  study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES', question_sources: 'QUESTION_SOURCES', interview_practice: 'INTERVIEW_PRACTICE', external_tasks: 'EXTERNAL_TASKS', courses: 'COURSES'
+  study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES', question_sources: 'QUESTION_SOURCES', interview_practice: 'INTERVIEW_PRACTICE', external_tasks: 'EXTERNAL_TASKS', courses: 'COURSES', question_bank: 'QUESTION_BANK'
 };
 
 function dataSize(data){
@@ -258,7 +260,7 @@ let coachQuestionIds=null;
 let currentPracticeTopic='';
 
 // ═══ NAV ═══
-const PAGE_TITLES={home:'Главная',interview:'Собеседование',catalog:'Курсы',chapter:'Глава',study:'Учёба',practices:'Best Practices',exam:'Экзамен',analytics:'Аналитика',
+const PAGE_TITLES={home:'Главная',interview:'Собеседование',catalog:'Курсы',chapter:'Глава',study:'Учёба',practices:'Best Practices',qbank:'Банк вопросов',exam:'Экзамен',analytics:'Аналитика',
   subnet:'Тренажёр подсетей',ts:'Troubleshooting-симулятор',
   cmd:'Command Builder',code:'Code Reviewer',
   ansible:'Ansible Playbook',dockerfile:'Dockerfile',k8s:'K8s YAML',ports:'Порты TCP',labs:'Debugging',
@@ -281,6 +283,7 @@ function nav(page){
   if(page==='chapter') renderChapterPage();
   if(page==='practices') renderBestPractices();
   if(page==='external') renderExternalTasks();
+  if(page==='qbank') renderQuestionBank();
   if(page==='analytics') renderAnalytics();
   if(page==='subnet') renderSubnet();
   if(page==='ts') renderTsList();
@@ -1542,7 +1545,7 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 function requireOfflineUI(){if(typeof IPMaxOfflineUI==='undefined') throw new Error('Модуль offline-отчёта не загружен.');return IPMaxOfflineUI;}
 function offlineAssetList(){
-  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./router.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./router.js','./question-bank-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   return shell.concat(Object.values(DATA_FILES).map(file=>'./'+file));
 }
 async function probeOfflineAssets(assets){
@@ -1812,6 +1815,75 @@ function openCatalogCourse(slug){
   openChapter(slug,next.id);
 }
 
+// ═══ QUESTION BANK ═══
+// Банк вопросов: развёрнутый ответ вместо теста с вариантами. Ответ скрыт до
+// клика — сначала своя формулировка, потом сверка. Выбранная категория
+// запоминается, поиск и уровень живут только в текущем сеансе.
+function requireQuestionBankUI(){if(typeof IPMaxQuestionBankUI==='undefined') throw new Error('Модуль банка вопросов не загружен.');return IPMaxQuestionBankUI;}
+let qbankCategory=null,qbankQuery='',qbankLevel='all',qbankExpanded=null;
+function renderQuestionBank(restoreFocus){
+  const tabs=document.getElementById('qbank-tabs');
+  const panel=document.getElementById('qbank-panel');
+  if(!tabs||!panel) return;
+  const ui=requireQuestionBankUI();
+  const categories=ui.categoriesOf(QUESTION_BANK);
+  if(!categories.length){tabs.innerHTML='';panel.innerHTML='<div class="empty-state"><p>Банк вопросов недоступен.</p></div>';return;}
+  const category=ui.selectCategory(QUESTION_BANK,qbankCategory,lsGet('qbank_category',null));
+  qbankCategory=category.slug;
+  lsSet('qbank_category',category.slug);
+  document.getElementById('qbank-category-count').textContent=categories.length;
+  document.getElementById('qbank-question-count').textContent=ui.totalQuestions(QUESTION_BANK);
+  const questions=ui.filterQuestions(category,qbankQuery,qbankLevel);
+  tabs.innerHTML=ui.renderTabs(QUESTION_BANK,category.slug);
+  tabs.onclick=handleQuestionBankTabs;
+  tabs.onkeydown=moveQuestionBankTab;
+  panel.setAttribute('aria-labelledby','qbank-tab-'+category.slug);
+  panel.innerHTML=ui.renderPanel(category,questions,qbankExpanded);
+  panel.onclick=handleQuestionBankToggle;
+  const search=document.getElementById('qbank-search');
+  if(search){search.value=qbankQuery;search.oninput=handleQuestionBankSearch;}
+  const chips=document.getElementById('qbank-level-chips');
+  if(chips){
+    chips.querySelectorAll('[data-qbank-level]').forEach(chip=>chip.classList.toggle('active',chip.dataset.qbankLevel===qbankLevel));
+    chips.onclick=handleQuestionBankLevel;
+  }
+  const status=document.getElementById('qbank-sr-status');
+  if(status) status.textContent=category.title+': показано '+questions.length+' из '+ui.questionsOf(category).length;
+  if(restoreFocus) requestAnimationFrame(()=>{const tab=document.getElementById('qbank-tab-'+category.slug);if(tab) tab.focus();});
+}
+// Делегированные обработчики: разметка пересобирается на каждый рендер,
+// поэтому слушатели висят на контейнерах, а не на кнопках.
+function handleQuestionBankTabs(event){
+  const target=event.target.closest&&event.target.closest('[data-qbank-category]');
+  if(!target) return;
+  qbankCategory=target.dataset.qbankCategory;qbankExpanded=null;renderQuestionBank(true);
+}
+function handleQuestionBankToggle(event){
+  const target=event.target.closest&&event.target.closest('[data-qbank-toggle]');
+  if(!target) return;
+  const id=target.dataset.qbankToggle;
+  qbankExpanded=qbankExpanded===id?null:id;
+  renderQuestionBank();
+  requestAnimationFrame(()=>{const button=document.querySelector('[data-qbank-toggle="'+id+'"]');if(button) button.focus();});
+}
+function handleQuestionBankSearch(event){
+  qbankQuery=event.target.value;qbankExpanded=null;renderQuestionBank();
+}
+function handleQuestionBankLevel(event){
+  const chip=event.target.closest&&event.target.closest('[data-qbank-level]');
+  if(!chip) return;
+  qbankLevel=chip.dataset.qbankLevel;qbankExpanded=null;renderQuestionBank();
+}
+function moveQuestionBankTab(event){
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+  event.preventDefault();
+  const buttons=[...document.querySelectorAll('#qbank-tabs [role="tab"]')];
+  if(!buttons.length) return;
+  const current=buttons.indexOf(document.activeElement);
+  const next=requireQuestionBankUI().nextTabIndex(event.key,current<0?0:current,buttons.length);
+  qbankCategory=buttons[next].dataset.qbankCategory;qbankExpanded=null;renderQuestionBank(true);
+}
+
 // ═══ CHAPTER ═══
 // Страница главы: структура берётся из courses.json, текст — из исходных
 // датасетов по ссылке source (в courses.json прозы нет, тонкий режим).
@@ -1929,8 +2001,10 @@ function handleHashChange(){
   const echo=selfWrittenHash!==null&&hash===selfWrittenHash;
   selfWrittenHash=null;
   if(echo) return;
-  const route=currentRoute();
-  if(!route) return;
+  // Пустой хеш после «назад» — возврат к адресу без маршрута, то есть на
+  // главную. Без этой ветки страница осталась бы прежней: currentRoute()
+  // отдаёт null, и обработчик выходил молча.
+  const route=currentRoute()||{page:'home',courseSlug:null,chapterId:null};
   applyRoute(route);
 }
 // Вызывается один раз после загрузки данных: адресная строка важнее

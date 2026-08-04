@@ -37,13 +37,14 @@ const sourcesUiScriptIndex = html.indexOf('<script src="./sources-ui.js"></scrip
 const catalogUiScriptIndex = html.indexOf('<script src="./catalog-ui.js"></script>');
 const chapterUiScriptIndex = html.indexOf('<script src="./chapter-ui.js"></script>');
 const routerScriptIndex = html.indexOf('<script src="./router.js"></script>');
+const questionBankUiScriptIndex = html.indexOf('<script src="./question-bank-ui.js"></script>');
 const analyticsUiScriptIndex = html.indexOf('<script src="./analytics-ui.js"></script>');
 const homeUiScriptIndex = html.indexOf('<script src="./home-ui.js"></script>');
 const examUiScriptIndex = html.indexOf('<script src="./exam-ui.js"></script>');
 const studyUiScriptIndex = html.indexOf('<script src="./study-ui.js"></script>');
 const coachUiScriptIndex = html.indexOf('<script src="./coach-ui.js"></script>');
 const appScriptIndex = html.indexOf('<script src="./app.js"></script>');
-expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && aiCoachScriptIndex > coachScriptIndex && progressIoScriptIndex > aiCoachScriptIndex && offlineUiScriptIndex > progressIoScriptIndex && sourcesUiScriptIndex > offlineUiScriptIndex && catalogUiScriptIndex > sourcesUiScriptIndex && chapterUiScriptIndex > catalogUiScriptIndex && routerScriptIndex > chapterUiScriptIndex && analyticsUiScriptIndex > routerScriptIndex && homeUiScriptIndex > analyticsUiScriptIndex && examUiScriptIndex > homeUiScriptIndex && studyUiScriptIndex > examUiScriptIndex && coachUiScriptIndex > studyUiScriptIndex && appScriptIndex > coachUiScriptIndex, 'index.html должен загружать browser-модули до app.js в установленном порядке');
+expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && aiCoachScriptIndex > coachScriptIndex && progressIoScriptIndex > aiCoachScriptIndex && offlineUiScriptIndex > progressIoScriptIndex && sourcesUiScriptIndex > offlineUiScriptIndex && catalogUiScriptIndex > sourcesUiScriptIndex && chapterUiScriptIndex > catalogUiScriptIndex && routerScriptIndex > chapterUiScriptIndex && questionBankUiScriptIndex > routerScriptIndex && analyticsUiScriptIndex > questionBankUiScriptIndex && homeUiScriptIndex > analyticsUiScriptIndex && examUiScriptIndex > homeUiScriptIndex && studyUiScriptIndex > examUiScriptIndex && coachUiScriptIndex > studyUiScriptIndex && appScriptIndex > coachUiScriptIndex, 'index.html должен загружать browser-модули до app.js в установленном порядке');
 expect(manifest.start_url === './' && manifest.scope === './', 'manifest должен использовать относительные start_url и scope');
 
 const requiredIcons = [

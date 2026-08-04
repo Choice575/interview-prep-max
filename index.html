@@ -28,6 +28,7 @@
     <button type="button" class="sb-item" onclick="nav('catalog')" data-page="catalog"><span class="icon">📚</span>Курсы</button>
     <button type="button" class="sb-item" onclick="nav('practices')" data-page="practices"><span class="icon">✦</span>Best Practices</button>
     <button type="button" class="sb-item" onclick="nav('external')" data-page="external"><span class="icon">🎯</span>Задания</button>
+    <button type="button" class="sb-item" onclick="nav('qbank')" data-page="qbank"><span class="icon">🗂️</span>Банк вопросов</button>
     <button type="button" class="sb-item" onclick="nav('exam')" data-page="exam"><span class="icon">📋</span>Экзамен</button>
     <button type="button" class="sb-item" onclick="nav('analytics')" data-page="analytics"><span class="icon">📊</span>Аналитика</button>
     <div class="sb-divider"></div>
@@ -164,6 +165,38 @@
         <div class="practice-tabs" id="practice-tabs" role="tablist" aria-label="Темы Best Practices"></div>
       </div>
       <div class="practice-panel" id="practice-panel" role="tabpanel" tabindex="0"></div>
+    </section>
+  </div>
+
+  <!-- QUESTION BANK -->
+  <div class="page" id="page-qbank">
+    <section class="qbank-hero">
+      <div class="qbank-hero-copy">
+        <div class="practice-kicker">Вопросы с реальных собеседований</div>
+        <h2>Банк вопросов</h2>
+        <p>Развёрнутые ответы с ключевыми тезисами, командами и подводными камнями. Ответ скрыт: сначала сформулируйте свой, потом сверьтесь.</p>
+      </div>
+      <div class="qbank-stats" aria-label="Состав банка вопросов">
+        <div><strong id="qbank-category-count">0</strong><span>категорий</span></div>
+        <div><strong id="qbank-question-count">0</strong><span>вопросов</span></div>
+      </div>
+    </section>
+    <section class="qbank-shell">
+      <div class="qbank-tabs-wrap">
+        <div class="qbank-tabs" id="qbank-tabs" role="tablist" aria-label="Категории банка вопросов"></div>
+      </div>
+      <div class="qbank-controls">
+        <label class="sr-only" for="qbank-search">Поиск по вопросам</label>
+        <input class="form-input" id="qbank-search" type="search" placeholder="Поиск по вопросам и ответам...">
+        <div class="filter-row" id="qbank-level-chips" role="group" aria-label="Уровень вопросов">
+          <button type="button" class="chip active" data-qbank-level="all">Все</button>
+          <button type="button" class="chip" data-qbank-level="Junior">Junior</button>
+          <button type="button" class="chip" data-qbank-level="Middle">Middle</button>
+          <button type="button" class="chip" data-qbank-level="Senior">Senior</button>
+        </div>
+      </div>
+      <div id="qbank-sr-status" class="sr-only" role="status" aria-live="polite"></div>
+      <div class="qbank-panel" id="qbank-panel" role="tabpanel" tabindex="0"></div>
     </section>
   </div>
 
@@ -446,6 +479,7 @@
 <script src="./catalog-ui.js"></script>
 <script src="./chapter-ui.js"></script>
 <script src="./router.js"></script>
+<script src="./question-bank-ui.js"></script>
 <script src="./external-tasks-ui.js"></script>
 <script src="./interview-practice-ui.js"></script>
 <script src="./analytics-ui.js"></script>

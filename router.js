@@ -8,7 +8,7 @@
   // Страницы приложения: значения data-page в боковом меню плюс catalog и chapter.
   // Список закрытый: неизвестный хеш уводит на главную, а не в пустую страницу.
   const PAGES = [
-    'home', 'study', 'catalog', 'chapter', 'practices', 'external', 'exam', 'analytics',
+    'home', 'study', 'catalog', 'chapter', 'practices', 'external', 'qbank', 'exam', 'analytics',
     'subnet', 'ts', 'cmd', 'labs', 'code', 'ansible', 'dockerfile', 'k8s', 'ports',
     'git', 'regex', 'tips', 'interview'
   ];
