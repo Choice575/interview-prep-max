@@ -117,3 +117,143 @@ test('normalizes journal entries and rejects incomplete notes', () => {
   assert.equal(coach.isJournalEntry(notes[0]), true);
   assert.deepEqual(coach.appendJournalEntry(notes, { topic: '', note: '' }, now + 1), notes);
 });
+
+test('readiness weights add up to 100', () => {
+  const total = coach.READINESS_COMPONENTS.reduce((sum, item) => sum + item.weight, 0);
+  assert.equal(total, 100);
+});
+
+test('readiness index is zero for an untouched profile', () => {
+  const index = coach.buildReadinessIndex({});
+  assert.equal(index.score, 0);
+  assert.equal(index.band, 'low');
+  assert.equal(index.components.length, coach.READINESS_COMPONENTS.length);
+  index.components.forEach(component => assert.equal(component.score, 0));
+});
+
+test('readiness index reaches 100 only when every component is complete', () => {
+  const index = coach.buildReadinessIndex({
+    topicStats: [{ topic: 'Linux', inRole: true, readiness: 100 }],
+    metrics: {
+      trainerPasses: 100, incidentsDone: 20, seniorCases: 20,
+      weeklyTests: 10, blitzDays: 30, studyDays: 100, bestDailyStreak: 40
+    }
+  });
+  assert.equal(index.score, 100);
+  assert.equal(index.band, 'high');
+  assert.equal(index.nextAction, null);
+  assert.equal(index.weakest, null);
+});
+
+test('readiness index never leaves the 0-100 range on absurd input', () => {
+  const index = coach.buildReadinessIndex({
+    topicStats: [{ topic: 'Linux', inRole: true, readiness: 5000 }],
+    metrics: { trainerPasses: 1e6, studyDays: -50, bestDailyStreak: Infinity, weeklyTests: NaN }
+  });
+  assert.ok(index.score >= 0 && index.score <= 100);
+  index.components.forEach(component => {
+    assert.ok(component.score >= 0 && component.score <= 100);
+    assert.ok(component.contribution <= component.weight);
+  });
+});
+
+test('each component contributes at most its own weight', () => {
+  const index = coach.buildReadinessIndex({
+    topicStats: [{ topic: 'Linux', inRole: true, readiness: 60 }],
+    metrics: { trainerPasses: 30, weeklyTests: 2, studyDays: 15, bestDailyStreak: 7 }
+  });
+  const sum = index.components.reduce((total, item) => total + item.contribution, 0);
+  assert.equal(index.score, sum);
+  index.components.forEach(component => {
+    assert.equal(component.headroom, Math.round((1 - component.score / 100) * component.weight));
+  });
+});
+
+test('readiness index points at the component with the largest headroom', () => {
+  const index = coach.buildReadinessIndex({
+    topicStats: [{ topic: 'Linux', inRole: true, readiness: 100 }],
+    metrics: { trainerPasses: 0, weeklyTests: 4, studyDays: 60, bestDailyStreak: 14 }
+  });
+  assert.equal(index.nextAction.id, 'practice');
+  assert.ok(index.nextAction.gain > 0);
+});
+
+test('theory action names the weakest topic that still has questions', () => {
+  // Every other component is complete, so theory has the largest headroom and
+  // must be the one the hint talks about.
+  const index = coach.buildReadinessIndex({
+    topicStats: [
+      { topic: 'Linux', inRole: true, readiness: 80, action: { type: 'questions', topic: 'Linux' } },
+      { topic: 'Terraform', inRole: true, readiness: 10, action: { type: 'questions', topic: 'Terraform' } }
+    ],
+    metrics: {
+      trainerPasses: 100, incidentsDone: 20, seniorCases: 20,
+      weeklyTests: 10, blitzDays: 30, studyDays: 100, bestDailyStreak: 40
+    }
+  });
+  assert.equal(index.focusTopic, 'Terraform');
+  assert.equal(index.nextAction.id, 'theory');
+  assert.ok(index.nextAction.hint.includes('Terraform'));
+});
+
+test('focusTopic ignores topics that have no questions to answer', () => {
+  const index = coach.buildReadinessIndex({
+    topicStats: [
+      { topic: 'Regex', inRole: true, readiness: 0, action: { type: 'trainer', page: 'regex' } },
+      { topic: 'Linux', inRole: true, readiness: 40, action: { type: 'questions', topic: 'Linux' } }
+    ],
+    metrics: {}
+  });
+  assert.equal(index.focusTopic, 'Regex');
+});
+
+test('readiness index scores role topics only when the role is set', () => {
+  const stats = [
+    { topic: 'Linux', inRole: true, readiness: 100 },
+    { topic: 'Regex', inRole: false, readiness: 0 }
+  ];
+  const index = coach.buildReadinessIndex({ topicStats: stats, metrics: {} });
+  const theory = index.components.find(item => item.id === 'theory');
+  assert.equal(theory.score, 100);
+});
+
+test('readiness bands follow the 40 and 70 thresholds', () => {
+  const build = readiness => coach.buildReadinessIndex({
+    topicStats: [{ topic: 'Linux', inRole: true, readiness }],
+    metrics: {
+      trainerPasses: 100, incidentsDone: 20, seniorCases: 20,
+      weeklyTests: 10, blitzDays: 30, studyDays: 100, bestDailyStreak: 40
+    }
+  });
+  assert.equal(build(0).score, 65);
+  assert.equal(build(0).band, 'medium');
+  assert.equal(build(100).band, 'high');
+});
+
+test('buildPlan exposes the readiness index', () => {
+  const plan = coach.buildPlan({
+    questions: [
+      { id: 1, topic: 'Linux', level: 'Middle', q: 'a' },
+      { id: 2, topic: 'Terraform', level: 'Middle', q: 'b' }
+    ],
+    progress: { 1: { correct: 2, wrong: 0 } },
+    skillEvents: [],
+    profile: { role: 'DevOps', level: 'Middle', date: '' },
+    metrics: { trainerPasses: 10, studyDays: 5, bestDailyStreak: 3 },
+    now: Date.UTC(2026, 6, 21)
+  });
+  assert.ok(plan.readinessIndex);
+  assert.ok(plan.readinessIndex.score >= 0 && plan.readinessIndex.score <= 100);
+  assert.ok(plan.readinessIndex.nextAction);
+});
+
+test('buildPlan still works without metrics', () => {
+  const plan = coach.buildPlan({
+    questions: [{ id: 1, topic: 'Linux', level: 'Middle', q: 'a' }],
+    progress: {},
+    skillEvents: [],
+    profile: { role: 'DevOps', level: 'Middle', date: '' },
+    now: Date.UTC(2026, 6, 21)
+  });
+  assert.equal(plan.readinessIndex.score, 0);
+});

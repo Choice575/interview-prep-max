@@ -258,9 +258,13 @@ let updateReloadPending=false;
 let coachSessionLimit=0;
 let coachQuestionIds=null;
 let currentPracticeTopic='';
+// Ежедневный блиц использует движок обычного блица, но без таймера и с
+// закрытием дня в конце. Флаг различает два режима в общих обработчиках.
+let dailyBlitzActive=false;
 
 // ═══ NAV ═══
-const PAGE_TITLES={home:'Главная',interview:'Собеседование',catalog:'Курсы',chapter:'Глава',study:'Учёба',practices:'Best Practices',qbank:'Банк вопросов',exam:'Экзамен',analytics:'Аналитика',
+const PAGE_TITLES={home:'Сегодня',interview:'Ответы вслух',catalog:'Курсы',chapter:'Глава',study:'Учебный план',practices:'Best Practices',qbank:'Банк вопросов',exam:'Вопросы с вариантами',analytics:'Аналитика',
+  trainers:'Тренажёры',achievements:'Достижения',external:'Задания на практику',
   subnet:'Тренажёр подсетей',ts:'Troubleshooting-симулятор',
   cmd:'Command Builder',code:'Code Reviewer',
   ansible:'Ansible Playbook',dockerfile:'Dockerfile',k8s:'K8s YAML',ports:'Порты TCP',labs:'Debugging',
@@ -284,6 +288,8 @@ function nav(page){
   if(page==='practices') renderBestPractices();
   if(page==='external') renderExternalTasks();
   if(page==='qbank') renderQuestionBank();
+  if(page==='trainers') renderTrainersHub();
+  if(page==='achievements') renderAchievementsPage();
   if(page==='analytics') renderAnalytics();
   if(page==='subnet') renderSubnet();
   if(page==='ts') renderTsList();
@@ -310,6 +316,9 @@ document.getElementById('sidebar-overlay').onclick=closeSidebar;
 function stopActiveSessions(){
   if(blitzState.timer){clearInterval(blitzState.timer);blitzState.timer=null;}
   blitzState.active=false;blitzState.deadline=0;
+  // Без сброса флага следующий обычный блиц дописал бы ответы в счёт
+  // сегодняшнего ежедневного и закрыл бы день чужим результатом.
+  dailyBlitzActive=false;
   if(mockState.timer){clearInterval(mockState.timer);mockState.timer=null;}
   mockState.active=false;mockState.deadline=0;mockState.questionDeadline=0;
   if(cmdMuscleActive){cmdMuscleActive=false;renderCmd();}
@@ -986,7 +995,16 @@ const homeUI=typeof IPMaxHomeUI!=='undefined'?IPMaxHomeUI.create({
   openTopic:topic=>{currentTopic=topic;nav('exam');}
 }):null;
 function requireHomeUI(){if(!homeUI) throw new Error('Модуль главной страницы не загружен.');return homeUI;}
-function renderHome(){return requireHomeUI().renderHome();}
+function renderHome(){
+  const result=requireHomeUI().renderHome();
+  // Карточки «Сегодня» и статуса живут в отдельных модулях, но обновляться
+  // должны тем же вызовом, что и остальная главная.
+  if(dailyUI) dailyUI.render();
+  if(gamificationUI){gamificationUI.renderHomeReadiness();gamificationUI.renderHomeLevel();}
+  updateTrainersCount();
+  updateAchievementsDot();
+  return result;
+}
 function renderMasteryCards(){return requireHomeUI().renderMasteryCards();}
 function startCoachFocus(topic,trainerPage,plan){
   if(!plan) return;
@@ -1015,6 +1033,146 @@ function startCoachControlMode(plan){
   });
   currentTopic='all';currentLevel='all';currentCategory='all';currentMode='all';currentView='standard';interviewMode=true;controlMode=true;cameFromStudy=false;
   nav('exam');
+}
+
+// ═══ GAMIFICATION / DAILY / TRAINERS ═══
+// Один сборщик состояния для XP, достижений и индекса готовности: метрики
+// считаются из того, что уже сохранено, поэтому импорт прогресса с другого
+// устройства сразу даёт правильный уровень без отдельного счётчика.
+function getDailyBlitzState(){
+  if(typeof IPMaxDaily==='undefined') return null;
+  return IPMaxDaily.stateForDay(lsGet('daily_blitz',null),Date.now());
+}
+function readExternalTasksCompleted(){
+  try{
+    const raw=localStorage.getItem('external_tasks_completed');
+    const parsed=raw?JSON.parse(raw):null;
+    return parsed&&typeof parsed==='object'&&!Array.isArray(parsed)?parsed:{};
+  }catch(error){
+    console.warn('external tasks read error:',error);
+    return {};
+  }
+}
+function collectGamificationState(){
+  const blitz=getDailyBlitzState();
+  return {
+    questionProgress:getQProg(),
+    skillEvents:getSkillEvents(),
+    studyProgress:lsGet('study_progress',{}),
+    seniorCaseProgress:lsGet('senior_case_prog',{}),
+    // Задания на практику пишутся напрямую в localStorage, минуя appStorage,
+    // поэтому читаем их тем же способом, а не через lsGet.
+    externalTasks:readExternalTasksCompleted(),
+    weeklyResults:lsGet('study_weekly_results',{}),
+    journal:getCoachJournal(),
+    qbankRevealed:lsGet('qbank_revealed',{}),
+    subnetProgress:lsGet('subnet_prog',{}),
+    labsProgress:lsGet('labs_prog',{}),
+    tsScores:lsGet('ts_scores',{}),
+    dailyBlitz:blitz||{},
+    bestAnswerStreak:lsGet('streak_best',0),
+    seenAchievements:(lsGet('gamification',{})||{}).seenAchievements||[]
+  };
+}
+function getGamificationProfile(){
+  if(typeof IPMaxGamification==='undefined') return null;
+  return IPMaxGamification.buildProfile(collectGamificationState());
+}
+// Индекс готовности живёт в плане тренера, но плану нужны метрики —
+// поэтому собираем их здесь и передаём внутрь.
+function getReadinessIndex(){
+  const profile=getOnboardingProfile();
+  if(!profile||typeof InterviewCoach==='undefined') return null;
+  const plan=InterviewCoach.buildPlan({
+    questions:getAllQ(),progress:getQProg(),skillEvents:getSkillEvents(),
+    profile,metrics:getGamificationProfile()?.metrics,now:Date.now()
+  });
+  return plan?plan.readinessIndex:null;
+}
+function markAchievementsSeen(achievements){
+  if(typeof IPMaxGamification==='undefined') return;
+  lsSet('gamification',IPMaxGamification.markAchievementsSeen(lsGet('gamification',{}),achievements));
+  updateAchievementsDot();
+}
+function updateAchievementsDot(){
+  const dot=document.getElementById('sb-ach-dot');
+  if(!dot) return;
+  const profile=getGamificationProfile();
+  dot.hidden=!profile||profile.freshCount<=0;
+}
+const gamificationUI=typeof IPMaxGamificationUI!=='undefined'?IPMaxGamificationUI.create({
+  getState:collectGamificationState,getReadinessIndex,
+  navigate:nav,openAchievements:()=>nav('achievements'),markSeen:markAchievementsSeen
+}):null;
+function renderAchievementsPage(){
+  if(gamificationUI) gamificationUI.renderAchievements();
+}
+// Ежедневный блиц переиспользует движок обычного блица, но берёт готовый
+// набор вопросов на сегодня и по завершении закрывает день.
+function startDailyBlitz(){
+  if(typeof IPMaxDaily==='undefined') return;
+  const set=IPMaxDaily.selectQuestions({questions:getAllQ(),topics:getAllTopics(),now:Date.now()});
+  if(!set.questions.length){alert('Вопросы ещё не загружены.');return;}
+  blitzState.questions=set.questions;
+  nav('exam');
+  // Строго после nav(): переход вызывает stopActiveSessions(), который гасит
+  // и blitzState.active, и dailyBlitzActive. Выставленный раньше флаг
+  // обнулился бы, и день не закрылся бы по завершении.
+  dailyBlitzActive=true;
+  blitzState.idx=0;blitzState.score=0;blitzState.active=true;
+  blitzState.timeLeft=0;blitzState.deadline=0;blitzState.timer=null;
+  document.getElementById('exam-controls').style.display='none';
+  document.getElementById('progress-info').style.display='none';
+  document.getElementById('seg-bar').style.display='none';
+  renderBlitzQ();
+}
+function recordDailyBlitzAnswer(correct){
+  if(!dailyBlitzActive||typeof IPMaxDaily==='undefined') return;
+  const now=Date.now();
+  lsSet('daily_blitz',IPMaxDaily.recordAnswer(lsGet('daily_blitz',null),{correct:!!correct,size:blitzState.questions.length},now));
+}
+function finishDailyBlitz(){
+  if(!dailyBlitzActive||typeof IPMaxDaily==='undefined') return;
+  dailyBlitzActive=false;
+  lsSet('daily_blitz',IPMaxDaily.completeDay(lsGet('daily_blitz',null),Date.now()));
+  updateAchievementsDot();
+}
+const dailyUI=typeof IPMaxDailyUI!=='undefined'?IPMaxDailyUI.create({
+  now:()=>Date.now(),getQuestions:getAllQ,getTopics:getAllTopics,
+  getState:()=>lsGet('daily_blitz',null),getBestPractices:()=>BEST_PRACTICES,
+  startBlitz:startDailyBlitz,
+  reviewMistakes:()=>{startMode('mistakes');},
+  openPractices:slug=>{currentPracticeTopic=slug||'';nav('practices');}
+}):null;
+// Хаб тренажёров: размеры берём из загруженных датасетов, а не из констант,
+// иначе добавление задачи в JSON тихо даст «11 из 10 решено».
+function trainerTotals(){
+  return {
+    ts:(TS_SCENARIOS||[]).length,labs:(LABS_TASKS||[]).length,code:(CODE_TASKS||[]).length,
+    subnet:(SUBNET_PROBLEMS||[]).length,ports:(PORTS_TASKS||[]).length,cmd:(CMD_TASKS||[]).length,
+    git:(GIT_TASKS||[]).length,regex:(REGEX_TASKS||[]).length,dockerfile:(DOCKERFILE_TASKS||[]).length,
+    k8s:(K8S_TASKS||[]).length,ansible_pb:(ANSIBLE_PB_TASKS||[]).length
+  };
+}
+function trainerProgress(){
+  return {
+    ts_scores:lsGet('ts_scores',{}),labs_prog:lsGet('labs_prog',{}),code_prog:lsGet('code_prog',{}),
+    subnet_prog:lsGet('subnet_prog',{}),pt_prog:lsGet('pt_prog',{}),cmd_prog:lsGet('cmd_prog',{}),
+    git_prog:lsGet('git_prog',{}),regex_prog:lsGet('regex_prog',{}),df_prog:lsGet('df_prog',{}),
+    k8s_prog:lsGet('k8s_prog',{}),ans_prog:lsGet('ans_prog',{})
+  };
+}
+const trainersUI=typeof IPMaxTrainersUI!=='undefined'?IPMaxTrainersUI.create({
+  getProgress:trainerProgress,getTotals:trainerTotals,navigate:nav
+}):null;
+function renderTrainersHub(){
+  if(trainersUI) trainersUI.render();
+}
+function updateTrainersCount(){
+  const label=document.getElementById('sb-trainers-count');
+  if(!label||!trainersUI||typeof IPMaxTrainersUI==='undefined') return;
+  const summary=IPMaxTrainersUI.summarise(trainersUI.statuses());
+  label.textContent=summary.total?summary.done+'/'+summary.total:'';
 }
 
 // ═══ ANALYTICS ═══
@@ -1329,8 +1487,12 @@ function renderBlitzQ(){
     '<div style="background:var(--bg2);border:2px solid var(--primary);border-radius:14px;padding:24px;max-width:700px;margin:0 auto">'+
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'+
     '<div style="display:flex;gap:6px">'+ttag(q.topic)+ltag(q.level)+'</div>'+
-    '<div style="font-size:18px;font-weight:800" id="blitz-timer" role="timer" aria-label="Осталось времени на блиц">'+Math.floor(blitzState.timeLeft/60)+':'+('0'+(blitzState.timeLeft%60)).slice(-2)+'</div>'+
-    '<div style="font-size:13px;color:var(--text2)">Вопрос '+(blitzState.idx+1)+'/20</div></div>'+
+    // У ежедневного блица нет обратного отсчёта, поэтому таймер не рисуем:
+    // иначе он застыл бы на 0:00. Размер набора тоже берём из состояния,
+    // а не «/20» константой — ежедневный блиц короче.
+    (dailyBlitzActive?'<div style="font-size:13px;font-weight:700;color:var(--primary-h)">Ежедневный блиц</div>':
+      '<div style="font-size:18px;font-weight:800" id="blitz-timer" role="timer" aria-label="Осталось времени на блиц">'+Math.floor(blitzState.timeLeft/60)+':'+('0'+(blitzState.timeLeft%60)).slice(-2)+'</div>')+
+    '<div style="font-size:13px;color:var(--text2)">Вопрос '+(blitzState.idx+1)+'/'+blitzState.questions.length+'</div></div>'+
     '<div class="q-text" style="font-size:16px;margin-bottom:20px">'+esc(q.q)+'</div>'+
     '<div class="q-options">'+
     order.map((origIdx,visPos)=>'<button type="button" class="q-opt" id="blitz-opt-'+visPos+'" data-orig-idx="'+origIdx+'" data-answer="'+q.answer+'" onclick="blitzPick('+q.id+','+origIdx+','+q.answer+')"><span class="opt-letter">'+L[visPos]+'</span><span>'+esc(opts[origIdx])+'</span></button>').join('')+
@@ -1355,16 +1517,31 @@ function blitzPick(qid,chosen,correct){
   if(q&&q.explanation){const exp=document.getElementById('blitz-exp-'+qid);if(exp){exp.innerHTML='💡 '+esc(q.explanation);exp.style.display='block';}}
   document.getElementById('blitz-next-btn').style.display='block';
   const respTime=questionStartTime[qid]?Math.round((Date.now()-questionStartTime[qid])/1000):0;
-  recordQuestionResult(q,{outcome:ok?'pass':'fail',source:'blitz',responseSeconds:respTime,history:true});
+  recordQuestionResult(q,{outcome:ok?'pass':'fail',source:dailyBlitzActive?'daily-blitz':'blitz',responseSeconds:respTime,history:true});
+  recordDailyBlitzAnswer(ok);
 }
 function blitzNext(){blitzState.idx++;blitzState.active=true;if(blitzState.idx>=blitzState.questions.length){endBlitz();return;}renderBlitzQ();}
 function endBlitz(){
   clearInterval(blitzState.timer);blitzState.timer=null;blitzState.active=false;blitzState.deadline=0;
+  const wasDaily=dailyBlitzActive;
+  finishDailyBlitz();
   restoreExamControls();
   const s=blitzState.score,total=blitzState.questions.length;
-  const grade=s>=18?'🏆 Отлично!':s>=14?'👍 Хорошо':s>=10?'📚 Удовлетворительно':'💪 Нужно подтянуть';
+  // Пороги считаем в долях, а не в абсолютных числах: ежедневный блиц из
+  // 5 вопросов никогда не дал бы «отлично» при пороге s>=18.
+  const share=total?s/total:0;
+  const grade=share>=0.9?'🏆 Отлично!':share>=0.7?'👍 Хорошо':share>=0.5?'📚 Удовлетворительно':'💪 Нужно подтянуть';
   document.getElementById('questions-container').innerHTML=
-    '<div style="text-align:center;padding:40px 20px"><div style="font-size:60px;margin-bottom:10px">'+(s>=18?'🏆':s>=14?'🎯':s>=10?'📚':'💪')+'</div><div style="font-size:28px;font-weight:800;margin-bottom:8px">Блиц завершён!</div><div style="font-size:48px;font-weight:800;color:var(--primary-h);margin-bottom:12px">'+s+' / '+total+'</div><div style="font-size:16px;color:var(--text2);margin-bottom:20px">'+grade+'</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn btn-primary" onclick="startBlitz()">🔄 Ещё блиц</button><button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
+    '<div style="text-align:center;padding:40px 20px"><div style="font-size:60px;margin-bottom:10px">'+(share>=0.9?'🏆':share>=0.7?'🎯':share>=0.5?'📚':'💪')+'</div>'+
+    '<div style="font-size:28px;font-weight:800;margin-bottom:8px">'+(wasDaily?'Блиц на сегодня пройден!':'Блиц завершён!')+'</div>'+
+    '<div style="font-size:48px;font-weight:800;color:var(--primary-h);margin-bottom:12px">'+s+' / '+total+'</div>'+
+    '<div style="font-size:16px;color:var(--text2);margin-bottom:20px">'+grade+'</div>'+
+    // Ежедневный блиц один на день: кнопка «ещё раз» вернула бы те же вопросы
+    // и не засчитала бы второй стрик, поэтому предлагаем другой сценарий.
+    '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'+
+    (wasDaily?'<button class="btn btn-primary" onclick="startMode(\'smart\')">🧠 Продолжить умным режимом</button>'
+      :'<button class="btn btn-primary" onclick="startBlitz()">🔄 Ещё блиц</button>')+
+    '<button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
   document.getElementById('single-controls').style.display='none';
 }
 
@@ -1545,7 +1722,7 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 function requireOfflineUI(){if(typeof IPMaxOfflineUI==='undefined') throw new Error('Модуль offline-отчёта не загружен.');return IPMaxOfflineUI;}
 function offlineAssetList(){
-  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./router.js','./question-bank-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./router.js','./gamification.js','./gamification-ui.js','./daily.js','./daily-ui.js','./trainers-ui.js','./question-bank-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   return shell.concat(Object.values(DATA_FILES).map(file=>'./'+file));
 }
 async function probeOfflineAssets(assets){

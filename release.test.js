@@ -86,11 +86,20 @@ function request(server, pathname) {
   });
 }
 
-test('publishes version 13.7.0 with a complete offline shell', async () => {
+// Версию читаем из единственного источника правды, а не дублируем строкой:
+// иначе каждый релиз роняет тесты, которые к самому релизу отношения не имеют.
+const RELEASE_VERSION = (() => {
+  const source = fs.readFileSync(path.join(__dirname, 'version.js'), 'utf8');
+  const match = source.match(/self\.IPMAX_VERSION\s*=\s*'(\d+\.\d+\.\d+)'/);
+  assert.ok(match, 'version.js должен содержать semver IPMAX_VERSION');
+  return match[1];
+})();
+
+test('publishes the current version with a complete offline shell', async () => {
   const worker = loadServiceWorker();
 
-  assert.equal(worker.context.self.IPMAX_VERSION, '13.7.0');
-  assert.equal(worker.context.self.IPMAX_CACHE_NAME, 'ipmax-v13.7.0');
+  assert.equal(worker.context.self.IPMAX_VERSION, RELEASE_VERSION);
+  assert.equal(worker.context.self.IPMAX_CACHE_NAME, 'ipmax-v' + RELEASE_VERSION);
   await dispatchExtendable(worker.handlers.get('install'));
   assert.ok(worker.precached().includes('./study-ui.js'));
   assert.ok(worker.added().includes('./tasks/study_map.json'));
@@ -131,7 +140,9 @@ test('never caches unsuccessful responses', async () => {
 });
 
 test('deletes only stale Interview Prep Max caches on activation', async () => {
-  const worker = loadServiceWorker(['ipmax-v13.1.0', 'ipmax-v13.7.0', 'another-app-v4']);
+  // Текущий кеш строится из версии, иначе тест начинает удалять актуальный
+  // кеш и «проходит» по неверной причине после каждого релиза.
+  const worker = loadServiceWorker(['ipmax-v13.1.0', 'ipmax-v' + RELEASE_VERSION, 'another-app-v4']);
 
   await dispatchExtendable(worker.handlers.get('activate'));
   assert.deepEqual(worker.deleted, ['ipmax-v13.1.0']);
@@ -142,12 +153,20 @@ test('serves every release bootstrap file without HTTP caching', async () => {
   const server = createAppServer();
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   try {
-    for (const file of ['/version.js', '/sw.js', '/study-ui.js']) {
+    // Каждый файл из offline-shell обязан реально отдаваться сервером.
+    // publicFiles в server.js — allowlist: забытый там модуль отвечает 403,
+    // страница молча теряет скрипт, а атомарный addAll роняет установку SW.
+    const shell = fs.readFileSync(path.join(root, 'sw.js'), 'utf8')
+      .match(/const SHELL_ASSETS = \[([\s\S]*?)\];/)[1];
+    const localScripts = [...shell.matchAll(/'\.\/([\w-]+\.js)'/g)].map(match => '/' + match[1]);
+    assert.ok(localScripts.length > 20, 'ожидался полный список shell-скриптов');
+    for (const file of ['/version.js', '/sw.js', ...localScripts]) {
       const response = await request(server, file);
-      assert.equal(response.status, 200, file);
+      assert.equal(response.status, 200, file + ' должен отдаваться, а не 403');
       assert.equal(response.headers['cache-control'], 'no-cache', file);
     }
-    assert.match((await request(server, '/version.js')).body, /IPMAX_VERSION = '13\.7\.0'/);
+    assert.match((await request(server, '/version.js')).body,
+      new RegExp("IPMAX_VERSION = '" + RELEASE_VERSION.replace(/\./g, '\\.') + "'"));
   } finally {
     await new Promise(resolve => server.close(resolve));
   }
@@ -157,5 +176,6 @@ test('passes the release integrity verifier', () => {
   const result = spawnSync(process.execPath, ['verify-release.js'], { cwd: root, encoding: 'utf8' });
 
   assert.equal(result.status, 0, result.stderr || result.stdout);
-  assert.match(result.stdout, /Release 13\.7\.0 integrity check passed/);
+  assert.ok(result.stdout.includes('Release ' + RELEASE_VERSION + ' integrity check passed'),
+    'верификатор должен подтвердить текущую версию, got: ' + result.stdout);
 });

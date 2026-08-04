@@ -41,6 +41,9 @@ test('renders the extracted home UI and routes its actions', async ({ page }) =>
   await expect(page.locator('#blitz-btn')).toBeVisible();
   expect(await page.locator('.quick-actions [onclick]').count()).toBe(0);
 
+  // Карточки тем свёрнуты: первый экран отдан действию на сегодня.
+  // Раскрываем блок, иначе они есть в DOM, но кликнуть по ним нельзя.
+  await page.locator('#home-topics-more > summary').click();
   const firstCard = page.locator('#mastery-cards .mastery-card').first();
   const topic = await firstCard.locator('.mastery-name').textContent();
   await firstCard.click();
@@ -202,7 +205,12 @@ test('exports a versioned progress backup through the extracted module', async (
   const backup = JSON.parse(Buffer.concat(chunks).toString('utf8'));
 
   expect(download.suggestedFilename()).toMatch(/^ipmax_\d{4}-\d{2}-\d{2}\.json$/);
-  expect(backup.version).toBe('13.7.0');
+  // Сверяем с version.js, а не с константой: иначе каждый релиз ломает тест,
+  // который проверяет экспорт прогресса, а не номер версии.
+  expect(backup.version).toBe(
+    require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'version.js'), 'utf8')
+      .match(/self\.IPMAX_VERSION\s*=\s*'(\d+\.\d+\.\d+)'/)[1]
+  );
   expect(backup.qprog['1']).toEqual({ correct: 2, wrong: 1 });
   expect(backup.onboarding.role).toBe(profile.role);
 });

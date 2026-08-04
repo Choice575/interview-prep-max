@@ -23,39 +23,38 @@
     <p id="sb-counter">DevOps Edition 2025 · загрузка...</p>
   </div>
   <div class="sb-nav">
-    <button type="button" class="sb-item active" onclick="nav('home')" data-page="home"><span class="icon">🏠</span>Главная</button>
-    <button type="button" class="sb-item" onclick="nav('study')" data-page="study"><span class="icon">🎓</span>Учёба</button>
+    <button type="button" class="sb-item active" onclick="nav('home')" data-page="home"><span class="icon">🏠</span>Сегодня</button>
+
+    <div class="sb-section">Учёба</div>
+    <button type="button" class="sb-item" onclick="nav('study')" data-page="study"><span class="icon">🎓</span>Учебный план</button>
     <button type="button" class="sb-item" onclick="nav('catalog')" data-page="catalog"><span class="icon">📚</span>Курсы</button>
-    <button type="button" class="sb-item" onclick="nav('practices')" data-page="practices"><span class="icon">✦</span>Best Practices</button>
-    <button type="button" class="sb-item" onclick="nav('external')" data-page="external"><span class="icon">🎯</span>Задания</button>
+
+    <div class="sb-section">Практика</div>
+    <button type="button" class="sb-item" onclick="nav('exam')" data-page="exam"><span class="icon">📝</span>Вопросы с вариантами</button>
     <button type="button" class="sb-item" onclick="nav('qbank')" data-page="qbank"><span class="icon">🗂️</span>Банк вопросов</button>
-    <button type="button" class="sb-item" onclick="nav('exam')" data-page="exam"><span class="icon">📋</span>Экзамен</button>
+    <button type="button" class="sb-item" onclick="nav('trainers')" data-page="trainers"><span class="icon">🎯</span>Тренажёры<span class="sb-count" id="sb-trainers-count"></span></button>
+    <button type="button" class="sb-item" onclick="nav('interview')" data-page="interview"><span class="icon">🎤</span>Ответы вслух</button>
+    <button type="button" class="sb-item" onclick="nav('external')" data-page="external"><span class="icon">🚀</span>Задания на практику</button>
+
+    <div class="sb-section">Прогресс</div>
     <button type="button" class="sb-item" onclick="nav('analytics')" data-page="analytics"><span class="icon">📊</span>Аналитика</button>
-    <div class="sb-divider"></div>
-    <div class="sb-section">Тренажёры</div>
-    <button type="button" class="sb-item" onclick="nav('subnet')" data-page="subnet"><span class="icon">🌐</span>Подсети</button>
-    <button type="button" class="sb-item" onclick="nav('ts')" data-page="ts"><span class="icon">🔧</span>Диагностика</button>
-    <button type="button" class="sb-item" onclick="nav('cmd')" data-page="cmd"><span class="icon">💻</span>Команды</button>
-    <button type="button" class="sb-item" onclick="nav('labs')" data-page="labs"><span class="icon">🔬</span>Debugging</button>
-    <button type="button" class="sb-item" onclick="nav('code')" data-page="code"><span class="icon">🐛</span>Код</button>
-    <button type="button" class="sb-item" onclick="nav('ansible')" data-page="ansible"><span class="icon">📦</span>Ansible</button>
-    <button type="button" class="sb-item" onclick="nav('dockerfile')" data-page="dockerfile"><span class="icon">🐳</span>Dockerfile</button>
-    <button type="button" class="sb-item" onclick="nav('k8s')" data-page="k8s"><span class="icon">☸️</span>K8s YAML</button>
-    <button type="button" class="sb-item" onclick="nav('ports')" data-page="ports"><span class="icon">🔌</span>Порты</button>
-    <button type="button" class="sb-item" onclick="nav('git')" data-page="git"><span class="icon">🔀</span>Git</button>
-    <button type="button" class="sb-item" onclick="nav('regex')" data-page="regex"><span class="icon">🔍</span>Regex</button>
-    <div class="sb-divider"></div>
+    <button type="button" class="sb-item" onclick="nav('achievements')" data-page="achievements"><span class="icon">🏅</span>Достижения<span class="sb-dot" id="sb-ach-dot" hidden></span></button>
+
+    <div class="sb-section">Справочник</div>
+    <button type="button" class="sb-item" onclick="nav('practices')" data-page="practices"><span class="icon">✦</span>Best Practices</button>
     <button type="button" class="sb-item" onclick="nav('tips')" data-page="tips"><span class="icon">💡</span>Советы</button>
-    <div class="sb-export-sep"></div>
-    <button type="button" class="sb-item" onclick="exportProgress()"><span class="icon">📋</span>Копировать прогресс</button>
-    <button type="button" class="sb-item" onclick="pasteProgressFromClipboard()"><span class="icon">📥</span>Вставить прогресс</button>
-    <button type="button" class="sb-item" onclick="nav('interview')" data-page="interview"><span class="icon">🎤</span>Собеседование</button>
-    <button type="button" class="sb-item" onclick="showSourcesReport()"><span class="icon">🔎</span>Источники</button>
-    <button type="button" class="sb-item" onclick="checkOfflineReady()"><span class="icon">📶</span>Проверить оффлайн</button>
     <input type="file" id="import-inp" accept=".json" style="display:none" onchange="importProgress(this)">
   </div>
   <div class="sb-bottom">
-    <button type="button" class="sb-item" onclick="toggleTheme()"><span class="icon" id="theme-icon">☀️</span><span id="theme-label">Светлая тема</span></button>
+    <!-- Commands, not pages. They used to sit among the nav items looking
+         identical to them, so "Копировать прогресс" read like a section you
+         could open. Separate group, separate style, no data-page attribute. -->
+    <div class="sb-section">Данные</div>
+    <button type="button" class="sb-cmd" onclick="exportProgress()"><span class="icon">📋</span>Копировать прогресс</button>
+    <button type="button" class="sb-cmd" onclick="pasteProgressFromClipboard()"><span class="icon">📥</span>Вставить прогресс</button>
+    <button type="button" class="sb-cmd" onclick="showSourcesReport()"><span class="icon">🔎</span>Источники данных</button>
+    <button type="button" class="sb-cmd" onclick="checkOfflineReady()"><span class="icon">📶</span>Проверить оффлайн</button>
+    <button type="button" class="sb-cmd" onclick="toggleTheme()"><span class="icon" id="theme-icon">☀️</span><span id="theme-label">Светлая тема</span></button>
   </div>
 </nav>
 <div id="main">
@@ -80,8 +79,21 @@
     <div style="font-size:13px;color:var(--text2)" id="load-status">Инициализация</div>
   </div>
 
-  <!-- HOME -->
+  <!-- HOME — «Сегодня»: что делать сейчас, а не список всего, что есть -->
   <div class="page active" id="page-home">
+    <!-- Row 1: today's action. The blitz is the entry point for a 5-minute
+         session, the skill card gives one thing to remember. -->
+    <section class="home-today">
+      <div id="daily-blitz-card"></div>
+      <div id="daily-skill-card"></div>
+    </section>
+
+    <!-- Row 2: where you stand. One index with its components, one level. -->
+    <section class="home-status">
+      <div id="home-readiness-card"></div>
+      <div id="home-level-card"></div>
+    </section>
+
     <div id="home-streak-banner" class="streak-banner" style="display:none">
       <div class="streak-num" id="home-streak-num">0</div>
       <div><div style="font-weight:700">Серия правильных ответов 🔥</div><div style="font-size:12px;color:var(--text2)" id="home-best-streak">Лучшая серия: 0</div></div>
@@ -90,20 +102,38 @@
       <div class="card-title">🎯 Персональный план</div>
       <div id="daily-plan-content"></div>
     </div>
-    <div class="home-grid" id="mastery-cards"></div>
-    <div class="sep"></div>
-    <h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text2)">Быстрый старт</h3>
-    <div class="quick-actions">
-      <button class="btn btn-primary" data-home-action="startMode" data-home-value="mix20">⚡ Микс 20 вопросов</button>
-      <button class="btn btn-outline" data-home-action="startMode" data-home-value="mix10">🎯 Микс 10</button>
-      <button class="btn btn-outline" data-home-action="startMode" data-home-value="smart">🧠 Умный режим</button>
-      <button class="btn btn-outline" data-home-action="startMode" data-home-value="mistakes">❌ Работа над ошибками</button>
-      <button class="btn btn-outline" data-home-action="navigate" data-home-value="subnet">🌐 Тренажёр подсетей</button>
-      <button class="btn btn-outline" data-home-action="navigate" data-home-value="ts">🔧 Troubleshooting</button>
-    </div>
-    <div class="sep"></div>
-    <h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text2)">Последние ответы</h3>
-    <div id="home-history"></div>
+
+    <details class="home-more" id="home-topics-more">
+      <summary><span>Готовность по темам</span><span class="home-more-hint">развернуть</span></summary>
+      <div class="home-grid" id="mastery-cards"></div>
+    </details>
+
+    <section class="home-block">
+      <h3 class="home-block-title">Быстрый старт</h3>
+      <p class="home-block-hint">Короткие сессии, если сегодня нет времени на план</p>
+      <div class="quick-actions">
+        <button class="btn btn-primary" data-home-action="startMode" data-home-value="mix20">⚡ Микс 20 вопросов</button>
+        <button class="btn btn-outline" data-home-action="startMode" data-home-value="mix10">🎯 Микс 10</button>
+        <button class="btn btn-outline" data-home-action="startMode" data-home-value="smart">🧠 Умный режим</button>
+        <button class="btn btn-outline" data-home-action="startMode" data-home-value="mistakes">❌ Работа над ошибками</button>
+        <button class="btn btn-outline" data-home-action="navigate" data-home-value="trainers">🎯 Тренажёры</button>
+      </div>
+    </section>
+
+    <section class="home-block">
+      <h3 class="home-block-title">Последние ответы</h3>
+      <div id="home-history"></div>
+    </section>
+  </div>
+
+  <!-- TRAINERS HUB — заменяет 11 отдельных пунктов меню -->
+  <div class="page" id="page-trainers">
+    <div id="trainers-host"></div>
+  </div>
+
+  <!-- ACHIEVEMENTS -->
+  <div class="page" id="page-achievements">
+    <div id="achievements-host"></div>
   </div>
 
   <!-- STUDY -->
@@ -479,6 +509,11 @@
 <script src="./catalog-ui.js"></script>
 <script src="./chapter-ui.js"></script>
 <script src="./router.js"></script>
+<script src="./gamification.js"></script>
+<script src="./gamification-ui.js"></script>
+<script src="./daily.js"></script>
+<script src="./daily-ui.js"></script>
+<script src="./trainers-ui.js"></script>
 <script src="./question-bank-ui.js"></script>
 <script src="./external-tasks-ui.js"></script>
 <script src="./interview-practice-ui.js"></script>

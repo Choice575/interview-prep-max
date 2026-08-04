@@ -742,3 +742,198 @@ button.study-recommendation{cursor:pointer}.study-recommendation:hover{border-co
 .qbank-pitfall strong{display:block;font-size:10px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--yellow);margin-bottom:5px}
 .qbank-pitfall p{font-size:12px;line-height:1.65;color:var(--text2)}
 @media(max-width:760px){.qbank-hero{grid-template-columns:minmax(0,1fr)}.qbank-panel{padding:16px}.qbank-question{padding:12px 13px}.qbank-answer{padding:0 13px 13px 13px}}
+
+/* ═══ SIDEBAR: разделение навигации и команд ═══ */
+/* Команды («Копировать прогресс») раньше выглядели как разделы, потому что
+   имели тот же класс, что и пункты навигации. Отдельный класс без active-состояния
+   и без левой полосы даёт понять: это действие, а не страница. */
+.sb-cmd{display:flex;align-items:center;gap:10px;width:100%;padding:7px 16px;font:inherit;font-size:12px;font-weight:500;text-align:left;color:var(--text3);background:transparent;cursor:pointer;transition:color .15s,background .15s;border:0}
+.sb-cmd:hover{background:var(--bg3);color:var(--text2)}
+.sb-cmd:focus-visible{outline:2px solid var(--primary-h);outline-offset:-2px}
+.sb-cmd .icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;opacity:.75}
+.sb-count{margin-left:auto;padding:1px 6px;border-radius:20px;background:var(--bg3);font-size:10px;font-weight:800;color:var(--text3);font-variant-numeric:tabular-nums}
+.sb-item.active .sb-count{background:color-mix(in srgb,var(--primary) 30%,transparent);color:var(--primary-h)}
+.sb-dot{margin-left:auto;width:7px;height:7px;border-radius:50%;background:var(--yellow);flex-shrink:0}
+.sb-bottom{padding:8px 0 12px}
+
+/* ═══ HOME «Сегодня» ═══ */
+/* Две строки по два блока: сверху действие на сегодня, снизу — статус.
+   Порядок намеренный: сначала «что делать», потом «где я нахожусь». */
+.home-today,.home-status{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;margin-bottom:16px;align-items:start}
+.home-status{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}
+.home-block{margin-top:22px}
+.home-block-title{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:4px}
+.home-block-hint{font-size:12px;color:var(--text3);margin-bottom:12px}
+/* Готовность по темам — 11 карточек, которые раньше занимали первый экран
+   и отодвигали действие вниз. Сворачиваем, оставляя один клик до них. */
+.home-more{margin-top:20px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);overflow:hidden}
+.home-more>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;font-size:13px;font-weight:700;cursor:pointer;list-style:none;color:var(--text)}
+.home-more>summary::-webkit-details-marker{display:none}
+.home-more>summary:hover{background:var(--bg3)}
+.home-more>summary:focus-visible{outline:2px solid var(--primary-h);outline-offset:-2px}
+.home-more-hint{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.home-more[open] .home-more-hint::after{content:''}
+.home-more[open]>summary{border-bottom:1px solid var(--border)}
+.home-more .home-grid{margin:0;padding:16px}
+
+/* ═══ ЕЖЕДНЕВНЫЙ БЛИЦ ═══ */
+.daily-card{border:1px solid var(--primary);border-radius:16px;padding:20px;background:linear-gradient(150deg,color-mix(in srgb,var(--primary-dim) 40%,var(--bg2)),var(--bg2))}
+.daily-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+.daily-kicker{font-size:10px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--primary-h);margin-bottom:5px}
+.daily-title{font-size:18px;line-height:1.25;font-weight:800;margin-bottom:4px}
+.daily-sub{font-size:12px;color:var(--text2)}
+.daily-streak{display:flex;flex-direction:column;align-items:center;flex-shrink:0;padding:8px 12px;border:1px solid var(--border2);border-radius:12px;background:color-mix(in srgb,var(--bg) 45%,transparent)}
+.daily-streak-num{font-size:19px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.daily-streak-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.daily-bar{height:6px;border-radius:3px;background:color-mix(in srgb,var(--bg) 55%,transparent);overflow:hidden;margin-bottom:7px}
+.daily-bar-fill{height:100%;border-radius:3px;background:var(--primary);transition:width .4s}
+.daily-meta{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--text3);font-variant-numeric:tabular-nums;margin-bottom:14px}
+.daily-topics{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.daily-topic{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border:1px solid var(--border);border-radius:20px;background:color-mix(in srgb,var(--bg) 40%,transparent);font-size:11px;font-weight:600;color:var(--text2)}
+.daily-topic b{color:var(--primary-h);font-size:10px}
+.daily-start{width:100%;justify-content:center;font-size:14px;padding:12px}
+.daily-done{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px;border:1px solid var(--green);border-radius:12px;background:color-mix(in srgb,var(--green-dim) 40%,transparent)}
+.daily-done-icon{font-size:26px;line-height:1}
+.daily-done-title{font-size:14px;font-weight:800}
+.daily-done-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.daily-done .btn{margin-left:auto}
+.daily-empty{padding:13px;border:1px dashed var(--border2);border-radius:10px;font-size:12px;color:var(--text3);text-align:center}
+
+/* ═══ НАВЫК ДНЯ ═══ */
+.skill-card{border:1px solid var(--border);border-radius:16px;padding:20px;background:var(--bg2);height:100%}
+.skill-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.skill-icon{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;border:1px solid var(--border2);border-radius:11px;background:linear-gradient(145deg,var(--bg3),var(--primary-dim));font-size:20px}
+.skill-kicker{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--yellow);margin-bottom:4px}
+.skill-title{font-size:15px;line-height:1.35;font-weight:700}
+.skill-why{font-size:12px;line-height:1.65;color:var(--text2);margin-bottom:12px}
+.skill-action{padding:11px 13px;border-left:3px solid var(--primary);border-radius:0 8px 8px 0;background:var(--bg3);font-size:12px;line-height:1.6;color:var(--text)}
+.skill-action b{color:var(--primary-h)}
+.skill-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+.skill-counter{font-size:11px;color:var(--text3);font-variant-numeric:tabular-nums}
+
+@media(max-width:900px){
+  .home-today,.home-status{grid-template-columns:minmax(0,1fr)}
+}
+
+/* ═══ ИНДЕКС ГОТОВНОСТИ ═══ */
+.gm-readiness{border:1px solid var(--border);border-radius:16px;padding:20px;background:var(--bg2);height:100%}
+.gm-ri-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.gm-ri-kicker{font-size:10px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.gm-ri-score{font-size:40px;font-weight:800;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.gm-ri-score span{font-size:19px;margin-left:2px}
+.gm-ri-band{font-size:13px;font-weight:700;margin-top:6px}
+.gm-ri-note{font-size:11px;line-height:1.5;color:var(--text3);margin-top:3px;max-width:230px}
+/* Кольцо повторяет число, но читается мгновенно и без цифр —
+   conic-gradient вместо canvas, чтобы работало без JS-отрисовки. */
+.gm-ri-ring{flex-shrink:0;display:grid;place-items:center;width:76px;height:76px;border-radius:50%;
+  background:conic-gradient(var(--primary) calc(var(--gm-ring,0)*1%),color-mix(in srgb,var(--bg3) 80%,transparent) 0)}
+.gm-ri-ring span{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:var(--bg2);font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.gm-ri-weights{font-size:10px;color:var(--text3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em}
+.gm-ri-rows{display:flex;flex-direction:column;gap:9px;margin-bottom:14px}
+.gm-ri-row{display:grid;grid-template-columns:minmax(96px,auto) minmax(0,1fr) 38px;align-items:center;gap:10px}
+.gm-ri-label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600}
+.gm-ri-weight{font-size:9px;font-weight:800;color:var(--text3);padding:1px 5px;border-radius:20px;background:var(--bg3)}
+.gm-ri-value{font-size:11px;font-weight:700;color:var(--text2);text-align:right;font-variant-numeric:tabular-nums}
+/* Подсказка — кнопка, а не текст: она ведёт туда, где индекс вырастет. */
+.gm-ri-hint{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:12px 14px;border:1px solid var(--primary);border-radius:11px;background:var(--primary-dim);color:var(--primary-h);font:inherit;font-size:12px;font-weight:600;line-height:1.45;text-align:left;cursor:pointer;transition:background .15s}
+.gm-ri-hint:hover{background:color-mix(in srgb,var(--primary) 34%,transparent)}
+.gm-ri-hint:focus-visible{outline:2px solid var(--primary-h);outline-offset:2px}
+.gm-ri-hint-gain{flex-shrink:0;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.gm-ri-hint-done{border-color:var(--green);background:color-mix(in srgb,var(--green-dim) 40%,transparent);color:var(--green);cursor:default}
+.gm-tone-high{background:var(--green)}.gm-tone-medium{background:var(--yellow)}.gm-tone-low{background:var(--red)}
+.gm-tone-text-high{color:var(--green)}.gm-tone-text-medium{color:var(--yellow)}.gm-tone-text-low{color:var(--red)}
+
+/* ═══ УРОВЕНЬ И ДОСТИЖЕНИЯ ═══ */
+.gm-level-card{border:1px solid var(--border);border-radius:16px;padding:20px;background:var(--bg2);height:100%}
+.gm-level-top{display:flex;align-items:flex-start;gap:13px;margin-bottom:14px}
+.gm-level-icon{display:grid;place-items:center;flex:0 0 46px;width:46px;height:46px;border:1px solid var(--border2);border-radius:13px;background:linear-gradient(145deg,var(--bg3),var(--primary-dim));font-size:23px}
+.gm-level-copy{flex:1 1 auto;min-width:0}
+.gm-level-kicker{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+.gm-level-title{font-size:16px;font-weight:800;line-height:1.25}
+.gm-level-sub{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.45}
+.gm-badge-count{position:relative;flex-shrink:0;padding:6px 10px;border:1px solid var(--border2);border-radius:20px;background:var(--bg3);color:var(--text2);font:inherit;font-size:11px;font-weight:800;cursor:pointer;transition:border-color .15s,color .15s;font-variant-numeric:tabular-nums}
+.gm-badge-count:hover{border-color:var(--primary);color:var(--primary-h)}
+.gm-badge-count:focus-visible{outline:2px solid var(--primary-h);outline-offset:2px}
+.gm-dot{position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;background:var(--yellow);border:2px solid var(--bg2)}
+.gm-bar{height:7px;border-radius:4px;background:var(--bg3);overflow:hidden}
+.gm-bar-sm{height:5px}
+.gm-bar-fill{height:100%;border-radius:4px;background:var(--primary);transition:width .5s}
+.gm-level-foot{font-size:11px;color:var(--text3);margin-top:7px}
+.gm-quest{margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--bg3)}
+.gm-quest-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.gm-quest-kicker{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.gm-quest-xp{font-size:10px;font-weight:800;color:var(--green);padding:2px 7px;border-radius:20px;background:var(--green-dim)}
+.gm-quest-title{font-size:13px;font-weight:700;margin-bottom:3px}
+.gm-quest-desc{font-size:11px;line-height:1.5;color:var(--text2);margin-bottom:9px}
+.gm-quest-meta{font-size:10px;color:var(--text3);margin-top:5px;margin-bottom:11px;font-variant-numeric:tabular-nums}
+.gm-section-title{font-size:13px;font-weight:700;color:var(--text2);margin:24px 0 12px}
+.gm-ach-page{max-width:100%}
+.gm-ladder{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:9px;margin:0;padding:0}
+.gm-ladder-item{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid var(--border);border-radius:11px;background:var(--bg2);opacity:.55}
+.gm-ladder-on{opacity:1}
+.gm-ladder-now{border-color:var(--primary);background:linear-gradient(135deg,var(--primary-dim),var(--bg2))}
+.gm-ladder-icon{font-size:19px;flex-shrink:0}
+.gm-ladder-copy{display:flex;flex-direction:column;min-width:0}
+.gm-ladder-copy b{font-size:12px;font-weight:700}
+.gm-ladder-copy span{font-size:10px;color:var(--text3);font-variant-numeric:tabular-nums}
+.gm-ladder-flag{margin-left:auto;flex-shrink:0;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--primary-h)}
+.gm-ach-group{margin-bottom:22px}
+.gm-ach-group-title{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:11px;padding-bottom:7px;border-bottom:1px solid var(--border)}
+.gm-ach-group-title span{font-variant-numeric:tabular-nums;color:var(--text2)}
+.gm-ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:11px}
+.gm-ach{padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);opacity:.72;transition:opacity .15s,border-color .15s}
+.gm-ach-on{opacity:1;border-color:var(--green)}
+.gm-ach-head{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.gm-ach-state{font-size:15px;flex-shrink:0}
+.gm-ach-head h4{flex:1 1 auto;min-width:0;font-size:13px;font-weight:700}
+.gm-ach-xp{flex-shrink:0;font-size:9px;font-weight:800;color:var(--green);padding:2px 6px;border-radius:20px;background:var(--green-dim)}
+.gm-ach-desc{font-size:11px;line-height:1.55;color:var(--text2);margin-bottom:10px}
+.gm-ach-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:7px;font-size:10px;color:var(--text3);font-variant-numeric:tabular-nums}
+.gm-ach-done{font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.05em}
+.gm-ach-go{padding:0;border:0;background:transparent;color:var(--primary-h);font:inherit;font-size:10px;font-weight:700;cursor:pointer}
+.gm-ach-go:hover{text-decoration:underline}
+
+/* ═══ ХАБ ТРЕНАЖЁРОВ ═══ */
+.tr-summary{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto);gap:16px;align-items:center;padding:20px;margin-bottom:22px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(140deg,var(--bg2),color-mix(in srgb,var(--primary-dim) 24%,var(--bg2)))}
+.tr-summary-main{display:flex;align-items:center;gap:16px;min-width:0}
+.tr-summary-score{font-size:38px;font-weight:800;line-height:1;letter-spacing:-.03em;color:var(--primary-h);font-variant-numeric:tabular-nums}
+.tr-summary-score span{font-size:18px}
+.tr-summary-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.tr-summary-copy b{font-size:15px;font-weight:800}
+.tr-summary-copy span{font-size:12px;color:var(--text2)}
+.tr-next{display:flex;flex-direction:column;gap:2px;padding:13px 16px;border:1px solid var(--primary);border-radius:12px;background:var(--primary-dim);color:var(--primary-h);font:inherit;text-align:left;cursor:pointer;transition:background .15s}
+.tr-next:hover{background:color-mix(in srgb,var(--primary) 34%,transparent)}
+.tr-next:focus-visible{outline:2px solid var(--primary-h);outline-offset:2px}
+.tr-next-kicker{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.85}
+.tr-next-title{font-size:14px;font-weight:800}
+.tr-next-meta{font-size:11px;opacity:.85}
+.tr-next-done{border-color:var(--green);background:color-mix(in srgb,var(--green-dim) 34%,transparent);color:var(--green);cursor:default}
+.tr-group{margin-bottom:24px}
+.tr-group-title{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:11px;padding-bottom:7px;border-bottom:1px solid var(--border)}
+.tr-group-title span{font-variant-numeric:tabular-nums;color:var(--text2)}
+.tr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:11px}
+/* Карточка вместо пункта меню: видно навык, форму задания и прогресс —
+   выбор понятен до клика. */
+.tr-card{display:flex;align-items:flex-start;gap:12px;width:100%;padding:15px;border:1px solid var(--border);border-radius:13px;background:var(--bg2);color:var(--text);font:inherit;text-align:left;cursor:pointer;transition:border-color .15s,transform .15s}
+.tr-card:hover:not([disabled]){border-color:var(--primary);transform:translateY(-2px)}
+.tr-card:focus-visible{outline:2px solid var(--primary-h);outline-offset:2px}
+.tr-card[disabled]{opacity:.45;cursor:not-allowed}
+.tr-done{border-color:var(--green)}
+.tr-icon{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border:1px solid var(--border2);border-radius:11px;background:var(--bg3);font-size:19px}
+.tr-body{display:flex;flex-direction:column;flex:1 1 auto;min-width:0;gap:4px}
+.tr-title-row{display:flex;align-items:center;justify-content:space-between;gap:9px}
+.tr-title{font-size:13px;font-weight:700}
+.tr-badge{flex-shrink:0;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);padding:2px 7px;border-radius:20px;background:var(--bg3);font-variant-numeric:tabular-nums}
+.tr-active .tr-badge{color:var(--primary-h);background:var(--primary-dim)}
+.tr-done .tr-badge{color:var(--green);background:var(--green-dim)}
+.tr-skill{font-size:11px;font-weight:600;color:var(--text2);line-height:1.45}
+.tr-task{font-size:11px;color:var(--text3);line-height:1.5}
+.tr-bar{display:block;height:4px;border-radius:2px;background:var(--bg3);overflow:hidden;margin-top:5px}
+.tr-bar-fill{display:block;height:100%;border-radius:2px;background:var(--primary);transition:width .4s}
+.tr-done .tr-bar-fill{background:var(--green)}
+
+@media(max-width:760px){
+  .tr-summary{grid-template-columns:minmax(0,1fr)}
+  .gm-ri-row{grid-template-columns:minmax(84px,auto) minmax(0,1fr) 34px}
+  .gm-ri-head{flex-direction:column-reverse;align-items:flex-start}
+}

@@ -81,6 +81,11 @@ const appGlobals = {
   IPMaxCatalogUI: 'readonly',
   IPMaxChapterUI: 'readonly',
   IPMaxRouter: 'readonly',
+  IPMaxGamification: 'readonly',
+  IPMaxGamificationUI: 'readonly',
+  IPMaxDaily: 'readonly',
+  IPMaxDailyUI: 'readonly',
+  IPMaxTrainersUI: 'readonly',
   IPMaxQuestionBankUI: 'readonly',
   IPMaxExternalTasksUI: 'readonly',
   IPMaxInterviewPracticeUI: 'readonly',
@@ -158,7 +163,8 @@ export default [
     files: [
       'coach.js', 'coach-ui.js', 'ai-coach.js', 'storage.js', 'progress.js', 'progress-io.js',
       'date.js', 'home-ui.js', 'exam-ui.js', 'study-ui.js', 'analytics-ui.js', 'offline-ui.js',
-      'sources-ui.js', 'best-practices-ui.js', 'catalog-ui.js', 'chapter-ui.js', 'router.js', 'question-bank-ui.js', 'external-tasks-ui.js', 'interview-practice-ui.js', 'study-curriculum-rules.js', 'question-quality.js'
+      'sources-ui.js', 'best-practices-ui.js', 'catalog-ui.js', 'chapter-ui.js', 'router.js', 'question-bank-ui.js', 'external-tasks-ui.js', 'interview-practice-ui.js', 'study-curriculum-rules.js', 'question-quality.js',
+      'gamification.js', 'gamification-ui.js', 'daily.js', 'daily-ui.js', 'trainers-ui.js'
     ],
     languageOptions: {
       ecmaVersion: 2023,

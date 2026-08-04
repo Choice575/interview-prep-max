@@ -9,7 +9,10 @@
   const IMPORT_RECORD_KEYS = [
     'mistakes', 'stats', 'qprog', 'ts_scores', 'cmd_prog', 'code_prog', 'subnet_prog', 'git_prog',
     'regex_prog', 'ans_prog', 'df_prog', 'k8s_prog', 'pt_prog', 'labs_prog', 'daily', 'study_progress',
-    'study_answers', 'study_weekly_results', 'senior_case_prog', 'coach_control'
+    'study_answers', 'study_weekly_results', 'senior_case_prog', 'coach_control',
+    // Daily blitz and achievement state must travel with the progress file:
+    // without them an import resets the streak and re-fires "new badge" dots.
+    'daily_blitz', 'gamification', 'qbank_revealed'
   ];
   const IMPORT_ARRAY_KEYS = ['history', 'custom', 'skill_events', 'coach_journal'];
 

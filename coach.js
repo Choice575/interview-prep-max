@@ -108,6 +108,83 @@
       needsAttention
     };
   }
+  // A single number the user can watch move. Per-topic readiness already
+  // existed but nobody could tell what would raise it, so each component
+  // carries its weight, its own progress and the action that moves it.
+  const READINESS_COMPONENTS = [
+    { id: 'theory', label: 'Теория', weight: 35, hint: 'Отвечайте на вопросы приоритетной темы', page: 'exam' },
+    { id: 'practice', label: 'Практика', weight: 25, hint: 'Пройдите сценарий в Debugging или Troubleshooting', page: 'ts' },
+    { id: 'tests', label: 'Контрольные', weight: 20, hint: 'Сдайте недельную контрольную в разделе «Учёба»', page: 'study' },
+    { id: 'plan', label: 'План', weight: 10, hint: 'Закройте учебный день по плану', page: 'study' },
+    { id: 'discipline', label: 'Дисциплина', weight: 10, hint: 'Пройдите ежедневный блиц и держите стрик', page: 'home' }
+  ];
+  // Targets that count as a fully covered component. Chosen so the index is
+  // reachable in a 32-week plan at 5-8 hours a week, not asymptotic.
+  const READINESS_TARGETS = { practice: 60, tests: 12, plan: 60, streak: 14 };
+
+  function ratio(value, target) {
+    if (!Number.isFinite(target) || target <= 0) return 0;
+    return Math.max(0, Math.min(1, safeNumber(value) / target));
+  }
+
+  /**
+   * Aggregates the whole progress store into one 0-100 index plus the single
+   * action with the largest gain. `topicStats` comes from buildPlan, so theory
+   * reuses the existing per-topic readiness instead of a second formula.
+   */
+  function buildReadinessIndex(input) {
+    const state = input && typeof input === 'object' ? input : {};
+    const topicStats = Array.isArray(state.topicStats) ? state.topicStats : [];
+    const metrics = state.metrics && typeof state.metrics === 'object' ? state.metrics : {};
+    const roleTopics = topicStats.filter(stat => stat && stat.inRole);
+    const scored = roleTopics.length ? roleTopics : topicStats;
+    const theory = scored.length
+      ? scored.reduce((sum, stat) => sum + Math.max(0, Math.min(100, safeNumber(stat.readiness))), 0) / scored.length / 100
+      : 0;
+    const shares = {
+      theory,
+      practice: ratio(safeNumber(metrics.trainerPasses) + safeNumber(metrics.incidentsDone) * 5 + safeNumber(metrics.seniorCases) * 3, READINESS_TARGETS.practice),
+      tests: ratio(safeNumber(metrics.weeklyTests) * 3 + safeNumber(metrics.blitzDays), READINESS_TARGETS.tests),
+      plan: ratio(metrics.studyDays, READINESS_TARGETS.plan),
+      discipline: ratio(Math.max(safeNumber(metrics.dailyStreak), safeNumber(metrics.bestDailyStreak)), READINESS_TARGETS.streak)
+    };
+    const components = READINESS_COMPONENTS.map(component => {
+      const share = Math.max(0, Math.min(1, shares[component.id] || 0));
+      // Headroom is what this component can still add to the total index —
+      // the basis for ranking the next action by real gain, not by gut feel.
+      const headroom = Math.round((1 - share) * component.weight);
+      return {
+        ...component,
+        score: Math.round(share * 100),
+        contribution: Math.round(share * component.weight),
+        headroom
+      };
+    });
+    const score = Math.max(0, Math.min(100, components.reduce((sum, item) => sum + item.contribution, 0)));
+    const weakest = components.filter(item => item.score < 100)
+      .sort((left, right) => right.headroom - left.headroom || right.weight - left.weight)[0] || null;
+    const focusTopic = scored.filter(stat => stat && stat.action)
+      .sort((left, right) => safeNumber(left.readiness) - safeNumber(right.readiness))[0] || null;
+    const band = score >= 70 ? 'high' : score >= 40 ? 'medium' : 'low';
+    // Show a gain the user can actually reach in one sitting, so the hint
+    // stays honest instead of promising the component's whole headroom.
+    const nextGain = weakest ? Math.max(1, Math.min(weakest.headroom, Math.round(weakest.weight / 5))) : 0;
+    return {
+      score, band, components,
+      weakest,
+      focusTopic: focusTopic ? focusTopic.topic : null,
+      nextAction: weakest
+        ? {
+          id: weakest.id,
+          label: weakest.label,
+          page: weakest.id === 'theory' && focusTopic && focusTopic.action && focusTopic.action.page ? focusTopic.action.page : weakest.page,
+          hint: weakest.id === 'theory' && focusTopic ? 'Отвечайте на вопросы по теме «' + focusTopic.topic + '»' : weakest.hint,
+          gain: nextGain
+        }
+        : null
+    };
+  }
+
   function questionPriority(question, progress, now) {
     const item = progress && progress[question.id] && typeof progress[question.id] === 'object' ? progress[question.id] : null;
     if (!item) return 40;
@@ -228,11 +305,13 @@
     const controlSize = daysUntil !== null && daysUntil >= 0 && daysUntil <= 7 ? 15 : daysUntil !== null && daysUntil >= 0 && daysUntil <= 21 ? 12 : 10;
     const plan = { ...basePlan, baseSessionSize: basePlan.sessionSize, sessionSize: weeklyReview.adjustedSessionSize, weeklyReview, controlSize };
     plan.controlSession = buildControlSession({ questions, progress, plan, size: controlSize, now });
+    plan.readinessIndex = buildReadinessIndex({ topicStats: stats, metrics: input.metrics });
     return plan;
   }
 
   return {
-    buildPlan, buildWeeklyReview, buildControlSession, appendJournalEntry, isJournalEntry,
-    getDaysUntil, getSessionSize, ROLE_LABELS, LEVELS, TRAINER_PAGES, JOURNAL_LIMIT
+    buildPlan, buildWeeklyReview, buildControlSession, buildReadinessIndex, appendJournalEntry, isJournalEntry,
+    getDaysUntil, getSessionSize, ROLE_LABELS, LEVELS, TRAINER_PAGES, JOURNAL_LIMIT,
+    READINESS_COMPONENTS, READINESS_TARGETS
   };
 });

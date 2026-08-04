@@ -17,7 +17,12 @@
     senior_case_prog: 'ipmax_senior_case_prog', onboarding: 'ipmax_onboarding', onboarding_complete: 'ipmax_onboarding_complete',
     skill_events: 'ipmax_skill_events', coach_journal: 'ipmax_coach_journal', coach_control: 'ipmax_coach_control',
     storage_schema: 'ipmax_storage_schema', curriculum_version: 'ipmax_curriculum_version',
-    progress_backup: 'ipmax_progress_backup'
+    progress_backup: 'ipmax_progress_backup',
+    // Written by endDiagnostic() since the diagnostic test shipped, but the key
+    // was never declared here — so every write was silently dropped.
+    diagnostic_result: 'ipmax_diagnostic_result',
+    daily_blitz: 'ipmax_daily_blitz', gamification: 'ipmax_gamification',
+    qbank_revealed: 'ipmax_qbank_revealed'
   };
 
   // `options` carries the timer host for debounced writes ({ setTimeout,
