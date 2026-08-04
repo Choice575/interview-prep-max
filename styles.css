@@ -932,6 +932,40 @@ button.study-recommendation{cursor:pointer}.study-recommendation:hover{border-co
 .tr-bar-fill{display:block;height:100%;border-radius:2px;background:var(--primary);transition:width .4s}
 .tr-done .tr-bar-fill{background:var(--green)}
 
+/* ═══ РАЗБОР ИНЦИДЕНТА ═══ */
+/* Порядок блоков повторяет работу инженера: обстановка → симптомы →
+   вывод команды → вопрос. Ответ выбирается по данным, а не по формулировке. */
+.inc-card{border:2px solid var(--red)}
+.inc-title{font-size:15px;font-weight:800;margin-bottom:12px}
+.inc-context{padding:13px 15px;margin-bottom:14px;border-left:3px solid var(--red);border-radius:0 9px 9px 0;background:var(--bg3);font-size:13px;line-height:1.6;color:var(--text2)}
+.inc-impact{margin-top:8px;font-size:12px;color:var(--text3)}
+.inc-impact b{color:var(--red)}
+.inc-block-title{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);margin-bottom:7px}
+.inc-signals{margin-bottom:14px}
+.inc-signals ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.inc-signals li{position:relative;padding-left:17px;font-size:12.5px;line-height:1.55;color:var(--text2)}
+.inc-signals li::before{content:'•';position:absolute;left:5px;color:var(--red);font-weight:800}
+.inc-evidence{margin-bottom:16px}
+.inc-cmd,.inc-out{margin:0;padding:10px 13px;border:1px solid var(--border);background:var(--bg);overflow-x:auto}
+.inc-cmd{border-radius:9px 9px 0 0;border-bottom:0}
+.inc-cmd code{color:var(--primary-h)}
+.inc-out{border-radius:0 0 9px 9px}
+.inc-out code{color:var(--text2)}
+.inc-cmd code,.inc-out code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11.5px;line-height:1.6;white-space:pre}
+/* Подсказка закрыта: она помогает, если человек застрял, но не должна
+   попадаться на глаза до попытки ответить. */
+.inc-hint{margin-top:12px;border:1px dashed var(--border2);border-radius:9px;background:var(--bg2)}
+.inc-hint>summary{padding:9px 13px;font-size:12px;font-weight:700;color:var(--text3);cursor:pointer;list-style:none}
+.inc-hint>summary::-webkit-details-marker{display:none}
+.inc-hint>summary::before{content:'💡 ';}
+.inc-hint>summary:hover{color:var(--text2)}
+.inc-hint>summary:focus-visible{outline:2px solid var(--primary-h);outline-offset:-2px}
+.inc-hint>div{padding:0 13px 11px;font-size:12.5px;line-height:1.6;color:var(--text2)}
+
+@media(max-width:600px){
+  .inc-cmd code,.inc-out code{font-size:10.5px}
+}
+
 @media(max-width:760px){
   .tr-summary{grid-template-columns:minmax(0,1fr)}
   .gm-ri-row{grid-template-columns:minmax(84px,auto) minmax(0,1fr) 34px}

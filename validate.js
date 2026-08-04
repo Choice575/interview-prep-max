@@ -326,6 +326,25 @@ if (incidents) {
         if (!Array.isArray(phase.options) || phase.options.length < 2) err(`${phasePrefix}: нужно минимум 2 варианта`);
         if (!Number.isInteger(phase.answer)) err(`${phasePrefix}: answer должен быть целым числом`);
         else if (Array.isArray(phase.options) && (phase.answer < 0 || phase.answer >= phase.options.length)) err(`${phasePrefix}: answer=${phase.answer} вне диапазона вариантов`);
+        if (Array.isArray(phase.options)) {
+          if (new Set(phase.options).size !== phase.options.length) err(`${phasePrefix}: одинаковые варианты ответа`);
+          // Самый длинный вариант нельзя делать верным: длина превращается
+          // в подсказку, и сценарий проходится без знания темы.
+          const lengths = phase.options.map(option => String(option).length);
+          const longest = Math.max(...lengths);
+          if (lengths.filter(value => value === longest).length === 1 && lengths[phase.answer] === longest) {
+            err(`${phasePrefix}: верный вариант самый длинный — подсказка по длине`);
+          }
+        }
+        if (phase.signals !== undefined) {
+          if (!Array.isArray(phase.signals) || phase.signals.length === 0) err(`${phasePrefix}: signals должен быть непустым массивом`);
+          else if (phase.signals.some(item => typeof item !== 'string' || !item.trim())) err(`${phasePrefix}: signals содержит пустые значения`);
+        }
+        if (phase.evidence !== undefined) {
+          if (typeof phase.evidence !== 'object' || phase.evidence === null || Array.isArray(phase.evidence)) err(`${phasePrefix}: evidence должен быть объектом`);
+          else if (!phase.evidence.command) err(`${phasePrefix}: evidence без command`);
+        }
+        if (phase.hint !== undefined && (typeof phase.hint !== 'string' || !phase.hint.trim())) err(`${phasePrefix}: hint не может быть пустым`);
       });
     });
   }

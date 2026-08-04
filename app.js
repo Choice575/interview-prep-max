@@ -1856,21 +1856,42 @@ function renderIncidentPhase(){
   const ph=inc.phases[incState.phase];
   if(!ph){endIncidentSim();return;}
   const L=["A","B","C","D"];const opts=ph.options||[];
+  // Варианты перемешиваем при каждом показе: без этого порядок в JSON
+  // становится частью ответа, и сценарий проходится по позиции, а не по знанию.
+  const order=[...Array(opts.length).keys()];
+  for(let i=order.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[order[i],order[j]]=[order[j],order[i]];}
+  const ev=ph.evidence||null;
   document.getElementById("questions-container").innerHTML=
-    '<div class="q-card" style="border:2px solid var(--red);max-width:700px;margin:0 auto">'+
+    '<div class="q-card inc-card" style="max-width:760px;margin:0 auto">'+
     '<div class="q-meta">'+ttag(inc.topic)+'<span class="tag tag-sr">'+esc(inc.level)+'</span><span class="tag tag-sc">Фаза '+(incState.phase+1)+'/'+inc.phases.length+'</span></div>'+
-    '<div style="font-size:14px;font-weight:700;margin-bottom:10px">'+esc(ph.title)+'</div>'+
+    '<div class="inc-title">'+esc(ph.title)+'</div>'+
+    (incState.phase===0?'<div class="inc-context">'+esc(inc.context)+
+      (inc.impact?'<div class="inc-impact"><b>Влияние:</b> '+esc(inc.impact)+'</div>':'')+'</div>':'')+
+    // Симптомы и вывод команды — то, что инженер видит до постановки диагноза.
+    (Array.isArray(ph.signals)&&ph.signals.length?
+      '<div class="inc-signals"><div class="inc-block-title">Что известно</div><ul>'+
+      ph.signals.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul></div>':'')+
+    (ev&&ev.command?'<div class="inc-evidence"><div class="inc-block-title">Вывод команды</div>'+
+      '<pre class="inc-cmd"><code>$ '+esc(ev.command)+'</code></pre>'+
+      (ev.output?'<pre class="inc-out"><code>'+esc(ev.output)+'</code></pre>':'')+'</div>':'')+
     '<div class="q-text">'+esc(ph.question)+'</div>'+
     '<div class="q-options">'+
-    opts.map((o,i)=>'<button type="button" class="q-opt" id="inc-opt-'+i+'" onclick="incPick('+i+','+ph.answer+')"><span class="opt-letter">'+L[i]+'</span><span>'+esc(o)+'</span></button>').join('')+
-    '</div><div id="inc-exp" style="display:none" class="q-explanation"></div>'+
-    '<div style="text-align:center;margin-top:14px;display:none" id="inc-next-btn"><button class="btn btn-primary" onclick="incState.phase++;renderIncidentPhase();">Следующая фаза →</button></div></div>';
+    order.map((origIdx,visPos)=>'<button type="button" class="q-opt" id="inc-opt-'+visPos+'" data-orig-idx="'+origIdx+'" onclick="incPick('+origIdx+','+ph.answer+')"><span class="opt-letter">'+L[visPos]+'</span><span>'+esc(opts[origIdx])+'</span></button>').join('')+
+    '</div>'+
+    (ph.hint?'<details class="inc-hint"><summary>Подсказка</summary><div>'+esc(ph.hint)+'</div></details>':'')+
+    '<div id="inc-exp" style="display:none" class="q-explanation"></div>'+
+    '<div style="text-align:center;margin-top:14px;display:none" id="inc-next-btn"><button class="btn btn-primary" onclick="incState.phase++;renderIncidentPhase();">'+
+    (incState.phase+1>=inc.phases.length?'Итоги разбора →':'Следующая фаза →')+'</button></div></div>';
 }
 function incPick(chosen,correct){
   const ok=chosen===correct;incState.answers.push({phase:incState.phase,ok});
   if(ok) incState.score++;
   const opts=document.querySelectorAll("#questions-container .q-opt");
-  opts.forEach(o=>{o.classList.add("disabled");const oi=parseInt(o.id.split("-").pop());if(oi===correct)o.classList.add("correct-opt");else if(oi===chosen)o.classList.add("wrong-opt");});
+  // Подсвечиваем по исходному индексу варианта, а не по позиции на экране:
+  // после перемешивания они больше не совпадают.
+  opts.forEach(o=>{o.classList.add("disabled");const oi=parseInt(o.dataset.origIdx,10);if(oi===correct)o.classList.add("correct-opt");else if(oi===chosen)o.classList.add("wrong-opt");});
+  const hint=document.querySelector('#questions-container .inc-hint');
+  if(hint) hint.open=false;
   const ph=incState.incident.phases[incState.phase];
   const el=document.getElementById("inc-exp");
   if(el&&ph.explanation){el.innerHTML="💡 "+esc(ph.explanation);el.style.display="block";}
@@ -1881,7 +1902,10 @@ function endIncidentSim(){
   restoreExamControls();
   const total=incState.incident.phases.length;const s=incState.score;
   const grade=s===total?"🏆 Отлично!":s>=total*0.7?"👍 Хорошо":"📚 Нужно подтянуть";
-  const phases=["triage","diagnosis","remediation","postmortem"];
+  // Названия фаз берём из сценария: жёсткий список из четырёх строк молча
+  // разъезжался бы с данными, если у инцидента другой набор фаз.
+  const PHASE_RU={triage:'Триаж',diagnosis:'Диагностика',remediation:'Исправление',postmortem:'Postmortem'};
+  const phases=incState.incident.phases.map(p=>PHASE_RU[p.phase]||p.phase);
   document.getElementById("questions-container").innerHTML=
     '<div style="text-align:center;padding:30px 20px;max-width:700px;margin:0 auto">'+
     '<div style="font-size:48px;margin-bottom:8px">🚨</div>'+
