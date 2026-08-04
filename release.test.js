@@ -86,11 +86,11 @@ function request(server, pathname) {
   });
 }
 
-test('publishes version 13.6.0 with a complete offline shell', async () => {
+test('publishes version 13.7.0 with a complete offline shell', async () => {
   const worker = loadServiceWorker();
 
-  assert.equal(worker.context.self.IPMAX_VERSION, '13.6.0');
-  assert.equal(worker.context.self.IPMAX_CACHE_NAME, 'ipmax-v13.6.0');
+  assert.equal(worker.context.self.IPMAX_VERSION, '13.7.0');
+  assert.equal(worker.context.self.IPMAX_CACHE_NAME, 'ipmax-v13.7.0');
   await dispatchExtendable(worker.handlers.get('install'));
   assert.ok(worker.precached().includes('./study-ui.js'));
   assert.ok(worker.added().includes('./tasks/study_map.json'));
@@ -131,7 +131,7 @@ test('never caches unsuccessful responses', async () => {
 });
 
 test('deletes only stale Interview Prep Max caches on activation', async () => {
-  const worker = loadServiceWorker(['ipmax-v13.1.0', 'ipmax-v13.6.0', 'another-app-v4']);
+  const worker = loadServiceWorker(['ipmax-v13.1.0', 'ipmax-v13.7.0', 'another-app-v4']);
 
   await dispatchExtendable(worker.handlers.get('activate'));
   assert.deepEqual(worker.deleted, ['ipmax-v13.1.0']);
@@ -147,7 +147,7 @@ test('serves every release bootstrap file without HTTP caching', async () => {
       assert.equal(response.status, 200, file);
       assert.equal(response.headers['cache-control'], 'no-cache', file);
     }
-    assert.match((await request(server, '/version.js')).body, /IPMAX_VERSION = '13\.6\.0'/);
+    assert.match((await request(server, '/version.js')).body, /IPMAX_VERSION = '13\.7\.0'/);
   } finally {
     await new Promise(resolve => server.close(resolve));
   }
@@ -157,5 +157,5 @@ test('passes the release integrity verifier', () => {
   const result = spawnSync(process.execPath, ['verify-release.js'], { cwd: root, encoding: 'utf8' });
 
   assert.equal(result.status, 0, result.stderr || result.stdout);
-  assert.match(result.stdout, /Release 13\.6\.0 integrity check passed/);
+  assert.match(result.stdout, /Release 13\.7\.0 integrity check passed/);
 });
