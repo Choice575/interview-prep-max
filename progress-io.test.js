@@ -71,6 +71,50 @@ test('rejects malformed progress and reserved object keys', () => {
   assert.equal(Object.prototype.admin, undefined);
 });
 
+test('carries the second study program through export and import', () => {
+  const values = {
+    study_program: 'mlops',
+    mlops_progress: { w5d3: 'done' },
+    mlops_position: { week: 5, day: 3 }
+  };
+  const exported = ProgressIO.createExportData({
+    version: '14.3.0',
+    now: () => Date.UTC(2026, 6, 24),
+    get: (key, fallback) => key in values ? values[key] : fallback,
+    getOnboardingProfile: () => null,
+    getSkillEvents: () => [],
+    getCoachJournal: () => [],
+    getCoachControlSession: () => null
+  });
+  assert.equal(exported.study_program, 'mlops');
+  assert.deepEqual(exported.mlops_progress, { w5d3: 'done' });
+  assert.deepEqual(exported.mlops_position, { week: 5, day: 3 });
+
+  const prepared = ProgressIO.prepareImport({ version: '14.3.0', ...values }, dependencies);
+  assert.equal(prepared.entries.study_program, 'mlops');
+  assert.deepEqual(prepared.entries.mlops_progress, { w5d3: 'done' });
+  assert.deepEqual(prepared.entries.mlops_position, { week: 5, day: 3 });
+});
+
+test('rejects a malformed second-program position or unknown program name', () => {
+  assert.throws(
+    () => ProgressIO.validateProgressImport({ mlops_position: { week: 0, day: 3 } }, dependencies),
+    /Некорректные поля: mlops_position/
+  );
+  assert.throws(
+    () => ProgressIO.validateProgressImport({ mlops_position: 'week5' }, dependencies),
+    /Некорректные поля: mlops_position/
+  );
+  assert.throws(
+    () => ProgressIO.validateProgressImport({ study_program: 'kubernetes' }, dependencies),
+    /Некорректные поля: study_program/
+  );
+  assert.throws(
+    () => ProgressIO.validateProgressImport({ mlops_progress: ['w1d1'] }, dependencies),
+    /Некорректные поля: mlops_progress/
+  );
+});
+
 test('keeps imported data untouched when the storage batch fails', () => {
   let imported = false;
   const io = ProgressIO.create({

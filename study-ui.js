@@ -179,6 +179,65 @@
       '</section>';
   }
 
+  // Переключатель учебных программ. Программ теперь две (devops, mlops), и у
+  // каждой свой прогресс: подпись и счётчик недель берутся из самих карт, иначе
+  // после правки датасета в интерфейсе останется «32 недели» при 24 реальных.
+  function renderProgramSwitch(programs, activeId, escapeHtml) {
+    const list = Array.isArray(programs) ? programs.filter(item => item && item.id) : [];
+    if (list.length < 2) return '';
+    const esc = typeof escapeHtml === 'function' ? escapeHtml : defaultEscape;
+    const active = list.some(item => item.id === activeId) ? activeId : list[0].id;
+
+    const buttons = list.map(item => {
+      const weeks = Number(item.totalWeeks) || 0;
+      const detailed = Number(item.detailedWeeks);
+      const partial = Number.isFinite(detailed) && detailed > 0 && detailed < weeks;
+      return '<button type="button" class="study-program' + (item.id === active ? ' is-active' : '') + '" ' +
+        'data-study-program="' + esc(item.id) + '"' + (item.id === active ? ' aria-current="true"' : '') + '>' +
+        '<strong>' + esc(item.title || item.id) + '</strong>' +
+        '<small>' + weeks + ' недель' +
+          (partial ? ' · детализировано ' + detailed : '') +
+        '</small>' +
+      '</button>';
+    }).join('');
+
+    return '<section class="study-program-switch" aria-label="Учебная программа">' +
+      '<div class="study-program-label">Учебная программа</div>' +
+      '<div class="study-program-list">' + buttons + '</div>' +
+    '</section>';
+  }
+
+  // Неделя может быть описана на уровне карты (цель, артефакт, критерии), но ещё
+  // не разбита по дням: во второй учебной программе так живут 18 недель из 24.
+  // Без этой ветки renderStudy() берёт week.days[0] у пустого массива и падает,
+  // унося за собой всю страницу учебного плана.
+  function isPlannedWeek(week) {
+    if (!week || typeof week !== 'object' || Array.isArray(week)) return false;
+    return !Array.isArray(week.days) || week.days.length === 0;
+  }
+
+  function renderPlannedWeekNotice(week, escapeHtml) {
+    if (!isPlannedWeek(week)) return '';
+    const esc = typeof escapeHtml === 'function' ? escapeHtml : defaultEscape;
+    const stage = String(week.roadmapStage || '').trim();
+    const topics = Array.isArray(week.mainTopics)
+      ? week.mainTopics.filter(value => String(value || '').trim())
+      : [];
+    const goal = String(week.goal || '').trim();
+
+    return '<section class="study-card study-planned-week">' +
+      '<div class="study-planned-kicker">Неделя описана, дни ещё не детализированы</div>' +
+      '<h3>' + esc(week.title || ('Неделя ' + (week.week || ''))) + '</h3>' +
+      (goal ? '<p class="study-planned-goal">' + esc(goal) + '</p>' : '') +
+      (stage ? '<p class="study-planned-stage"><span>Этап роадмапа</span>' + esc(stage) + '</p>' : '') +
+      (topics.length
+        ? '<div class="study-planned-topics">' + topics.map(value => '<span>' + esc(value) + '</span>').join('') + '</div>'
+        : '') +
+      '<p class="study-planned-hint">Цель, production-слой, артефакт и критерии завершения ниже уже актуальны. ' +
+        'Разбивка на пять учебных дней и мини-тесты для этой недели пока не готовы.</p>' +
+    '</section>';
+  }
+
   function clampWeeklyScore(value, maximum) {
     const max = Number.isFinite(Number(maximum)) ? Math.max(0, Math.round(Number(maximum))) : 0;
     const score = Number(value);
@@ -314,6 +373,10 @@
     });
 
     return {
+      // Подпись программы приходит из загруженной карты, а не из константы:
+      // это единственный способ не соврать про число недель после правки данных.
+      programId: typeof stored.programId === 'string' ? stored.programId : 'devops',
+      programTitle: typeof stored.programTitle === 'string' ? stored.programTitle : '',
       totalDays: days.length,
       doneDays,
       percent: days.length ? Math.round(doneDays / days.length * 100) : 0,
@@ -350,7 +413,10 @@
     }).join('');
 
     return '<section class="study-overview" aria-labelledby="study-overview-title">' +
-      '<div class="study-overview-head"><div><div class="study-overview-kicker">Roadmap 5.1 · 32 недели</div>' +
+      // Подпись выводится из данных: хардкод «Roadmap 5.1 · 32 недели» соврал бы
+      // на любой другой программе и после правки самого датасета.
+      '<div class="study-overview-head"><div><div class="study-overview-kicker">' +
+        esc(overview.programTitle || 'Учебный план') + ' · ' + (Number(overview.totalWeeks) || 0) + ' недель</div>' +
         '<h2 id="study-overview-title">Общий прогресс курса</h2></div>' + nextMarkup + '</div>' +
       '<div class="study-overview-progress"><div class="study-overview-progress-copy"><strong>' + percent + '%</strong><span>' +
         overview.doneDays + ' из ' + overview.totalDays + ' учебных дней</span></div>' +
@@ -365,5 +431,5 @@
     '</section>';
   }
 
-  return { STATUS_GROUPS, formatReviewDate, renderExpectedResult, renderWeekNavigator, renderWeekContext, renderWeekOutcome, renderAITrack, renderTechnologyStatus, clampWeeklyScore, evaluateWeeklyAttempt, buildStudyOverview, renderStudyOverview };
+  return { STATUS_GROUPS, formatReviewDate, renderExpectedResult, renderWeekNavigator, renderWeekContext, renderWeekOutcome, renderAITrack, renderTechnologyStatus, renderProgramSwitch, isPlannedWeek, renderPlannedWeekNotice, clampWeeklyScore, evaluateWeeklyAttempt, buildStudyOverview, renderStudyOverview };
 });

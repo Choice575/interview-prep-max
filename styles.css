@@ -376,6 +376,25 @@ button.study-recommendation{cursor:pointer}.study-recommendation:hover{border-co
 .study-tech-overviewOnly{--tech-color:var(--orange);--tech-bg:var(--orange-dim)}
 .study-tech-optional{--tech-color:var(--text2);--tech-bg:var(--bg3)}
 .study-tech-note{margin-top:10px;padding-top:9px;border-top:1px dashed var(--border2);font-size:11px;line-height:1.5;color:var(--text2)}
+/* Переключатель учебных программ: появляется только когда загружено 2+ карты. */
+.study-program-switch{margin-bottom:14px;padding:14px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg2)}
+.study-program-label{margin-bottom:9px;font-size:9px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;color:var(--text2)}
+.study-program-list{display:flex;flex-wrap:wrap;gap:8px}
+.study-program{display:flex;flex-direction:column;gap:3px;min-width:170px;padding:10px 14px;border:1px solid var(--border);border-radius:9px;background:var(--bg3);color:var(--text);font:inherit;text-align:left;cursor:pointer;transition:border-color .15s,background .15s}
+.study-program:hover{border-color:var(--border2)}
+.study-program strong{font-size:13px;font-weight:800}
+.study-program small{font-size:11px;color:var(--text2)}
+.study-program.is-active{border-color:var(--primary);background:var(--primary-dim)}
+.study-program.is-active small{color:var(--text)}
+/* Неделя описана, но ещё не разбита по дням: честная заглушка вместо пустоты. */
+.study-planned-week{border-style:dashed}
+.study-planned-kicker{margin-bottom:6px;font-size:9px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;color:var(--orange)}
+.study-planned-goal{margin:0 0 10px;font-size:13px;line-height:1.55;color:var(--text)}
+.study-planned-stage{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:12px;color:var(--text2)}
+.study-planned-stage span{padding:2px 7px;border-radius:5px;background:var(--bg3);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.study-planned-topics{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.study-planned-topics span{padding:3px 9px;border:1px solid var(--border2);border-radius:20px;font-size:11px;color:var(--text2)}
+.study-planned-hint{margin:0;padding-top:9px;border-top:1px dashed var(--border2);font-size:11px;line-height:1.5;color:var(--text2)}
 .study-days{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
 .study-day{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;transition:all .15s;min-height:74px;color:var(--text);font:inherit;text-align:left}
 .study-day:hover{border-color:var(--border2);background:var(--bg3)}

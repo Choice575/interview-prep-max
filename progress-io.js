@@ -13,7 +13,11 @@
     // Daily blitz and achievement state must travel with the progress file:
     // without them an import resets the streak and re-fires "new badge" dots.
     'daily_blitz', 'gamification', 'qbank_revealed',
-    'inc_prog'
+    'inc_prog',
+    // Прогресс MLOps-программы хранится отдельно от study_progress, поэтому в
+    // перенос он должен попасть своим ключом: иначе переезд на другое
+    // устройство молча обнуляет вторую учебную программу.
+    'mlops_progress'
   ];
   const IMPORT_ARRAY_KEYS = ['history', 'custom', 'skill_events', 'coach_journal'];
 
@@ -109,6 +113,12 @@
     if ('study_position' in data && (!isRecord(data.study_position) || !Number.isInteger(data.study_position.week) ||
       !Number.isInteger(data.study_position.day) || data.study_position.week < 1 || data.study_position.week > 100 ||
       data.study_position.day < 1 || data.study_position.day > 31)) invalid.push('study_position');
+    // Позиция во второй программе валидируется так же, как study_position:
+    // без этой ветки битая координата пройдёт импорт молча и уронит рендер.
+    if ('mlops_position' in data && (!isRecord(data.mlops_position) || !Number.isInteger(data.mlops_position.week) ||
+      !Number.isInteger(data.mlops_position.day) || data.mlops_position.week < 1 || data.mlops_position.week > 100 ||
+      data.mlops_position.day < 1 || data.mlops_position.day > 31)) invalid.push('mlops_position');
+    if ('study_program' in data && !['devops', 'mlops'].includes(data.study_program)) invalid.push('study_program');
     if ('onboarding' in data && (typeof deps.normaliseProfile !== 'function' || !deps.normaliseProfile(data.onboarding))) invalid.push('onboarding');
     if ('onboarding_complete' in data && typeof data.onboarding_complete !== 'boolean') invalid.push('onboarding_complete');
     if (Array.isArray(data.custom) && !validateCustomQuestions(data.custom, deps.baseQuestions)) invalid.push('custom');
@@ -133,6 +143,8 @@
     });
     if ('streak_best' in data) entries.streak_best = data.streak_best;
     if ('study_position' in data) entries.study_position = data.study_position;
+    if ('mlops_position' in data) entries.mlops_position = data.mlops_position;
+    if ('study_program' in data) entries.study_program = data.study_program;
     if ('onboarding' in data) entries.onboarding = deps.normaliseProfile(data.onboarding);
     if ('onboarding_complete' in data) entries.onboarding_complete = data.onboarding_complete;
     else if ('onboarding' in data) entries.onboarding_complete = true;
@@ -156,6 +168,8 @@
       pt_prog: get('pt_prog', {}), labs_prog: get('labs_prog', {}), daily: get('daily', {}),
       study_progress: get('study_progress', {}), study_position: get('study_position', { week: 1, day: 1 }),
       study_answers: get('study_answers', {}), study_weekly_results: get('study_weekly_results', {}),
+      study_program: get('study_program', 'devops'),
+      mlops_progress: get('mlops_progress', {}), mlops_position: get('mlops_position', { week: 1, day: 1 }),
       senior_case_prog: get('senior_case_prog', {}),
       skill_events: typeof source.getSkillEvents === 'function' ? source.getSkillEvents() : [],
       coach_journal: typeof source.getCoachJournal === 'function' ? source.getCoachJournal() : [],

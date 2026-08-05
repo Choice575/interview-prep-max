@@ -19,7 +19,7 @@ const publicFiles = new Set([
   'tasks/base_questions.json', 'tasks/subnet.json', 'tasks/ts.json', 'tasks/cmd.json', 'tasks/code.json',
   'tasks/git.json', 'tasks/regex.json', 'tasks/ansible_pb.json', 'tasks/dockerfile.json', 'tasks/k8s.json',
   'tasks/ports.json', 'tasks/labs.json', 'tasks/tips.json', 'tasks/incidents.json', 'tasks/study_map.json',
-  'tasks/study_tests.json', 'tasks/senior_cases.json', 'tasks/best_practices.json', 'tasks/question_sources.json', 'tasks/interview_practice.json', 'tasks/external_tasks.json', 'tasks/courses.json', 'tasks/question_bank.json'
+  'tasks/study_tests.json', 'tasks/mlops_map.json', 'tasks/mlops_tests.json', 'tasks/senior_cases.json', 'tasks/best_practices.json', 'tasks/question_sources.json', 'tasks/interview_practice.json', 'tasks/external_tasks.json', 'tasks/courses.json', 'tasks/question_bank.json'
 ]);
 
 function sendJson(response, status, body) {

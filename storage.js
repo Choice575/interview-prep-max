@@ -25,7 +25,12 @@
     qbank_revealed: 'ipmax_qbank_revealed',
     // Разобранные инциденты: без этого ключа хаб тренажёров не мог бы показать
     // прогресс по ним, а сами сценарии оставались бы «сессионными».
-    inc_prog: 'ipmax_inc_prog'
+    inc_prog: 'ipmax_inc_prog',
+    // Учебных программ теперь несколько (devops, mlops), поэтому прогресс по
+    // каждой хранится отдельно: общий study_progress склеил бы неделю 5 DevOps
+    // с неделей 5 MLOps и затёр бы обе. Выбранная программа — тоже состояние.
+    study_program: 'ipmax_study_program',
+    mlops_progress: 'ipmax_mlops_progress', mlops_position: 'ipmax_mlops_position'
   };
 
   // `options` carries the timer host for debounced writes ({ setTimeout,

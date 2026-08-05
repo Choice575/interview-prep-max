@@ -9,7 +9,7 @@ var BASE_QUESTIONS = [], SUBNET_PROBLEMS = [], TS_SCENARIOS = [], CMD_TASKS = []
     CODE_TASKS = [], GIT_TASKS = [], REGEX_TASKS = [], ANSIBLE_PB_TASKS = [],
     DOCKERFILE_TASKS = [], K8S_TASKS = [], PORTS_TASKS = [], LABS_TASKS = [], TIPS = [],
     INCIDENTS = [],
-    STUDY_MAP = null, STUDY_TESTS = null, SENIOR_CASES = [], BEST_PRACTICES = null,
+    STUDY_MAP = null, STUDY_TESTS = null, MLOPS_MAP = null, MLOPS_TESTS = null, SENIOR_CASES = [], BEST_PRACTICES = null,
     QUESTION_SOURCES = null, INTERVIEW_PRACTICE = null, EXTERNAL_TASKS = null, COURSES = null,
     QUESTION_BANK = null;
 
@@ -30,6 +30,8 @@ const DATA_FILES = {
   incidents: 'tasks/incidents.json',
   study_map: 'tasks/study_map.json',
   study_tests: 'tasks/study_tests.json',
+  mlops_map: 'tasks/mlops_map.json',
+  mlops_tests: 'tasks/mlops_tests.json',
   senior_cases: 'tasks/senior_cases.json',
   best_practices: 'tasks/best_practices.json',
   external_tasks: 'tasks/external_tasks.json',
@@ -44,7 +46,7 @@ const DATA_VARS = {
   cmd: 'CMD_TASKS', code: 'CODE_TASKS', git: 'GIT_TASKS', regex: 'REGEX_TASKS',
   ansible_pb: 'ANSIBLE_PB_TASKS', dockerfile: 'DOCKERFILE_TASKS', k8s: 'K8S_TASKS',
   ports: 'PORTS_TASKS', labs: 'LABS_TASKS', tips: 'TIPS', incidents: 'INCIDENTS', study_map: 'STUDY_MAP',
-  study_tests: 'STUDY_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES', question_sources: 'QUESTION_SOURCES', interview_practice: 'INTERVIEW_PRACTICE', external_tasks: 'EXTERNAL_TASKS', courses: 'COURSES', question_bank: 'QUESTION_BANK'
+  study_tests: 'STUDY_TESTS', mlops_map: 'MLOPS_MAP', mlops_tests: 'MLOPS_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES', question_sources: 'QUESTION_SOURCES', interview_practice: 'INTERVIEW_PRACTICE', external_tasks: 'EXTERNAL_TASKS', courses: 'COURSES', question_bank: 'QUESTION_BANK'
 };
 
 function dataSize(data){
@@ -697,37 +699,84 @@ function endMockInterview(){
 }
 
 // ═══ STUDY TAB ═══
-function getStudyPosition(){return lsGet('study_position',{week:1,day:1});}
+// Учебных программ две, и у каждой собственные ключи прогресса: общий
+// study_progress склеил бы неделю 5 DevOps с неделей 5 MLOps и затёр бы обе.
+// У каждой программы свой набор тестов. Тесты MLOps наполняются блоками,
+// поэтому день без мини-теста — рабочее состояние: рендер опирается на
+// daysStatus и показывает такой день без блока теста, а не падает.
+// Карта и тесты берутся функциями, а не по строковому имени через window: так
+// связь с переменной видна статически, и опечатка в имени падает сразу, а не
+// превращается в тихий null при переключении программы.
+const STUDY_PROGRAMS={
+  devops:{id:'devops',title:'DevOps + AI',getMap:()=>STUDY_MAP,getTests:()=>STUDY_TESTS,progressKey:'study_progress',positionKey:'study_position'},
+  mlops:{id:'mlops',title:'MLOps',getMap:()=>MLOPS_MAP,getTests:()=>MLOPS_TESTS,progressKey:'mlops_progress',positionKey:'mlops_position'}
+};
+function activeProgramId(){const id=lsGet('study_program','devops');return STUDY_PROGRAMS[id]?id:'devops';}
+function activeProgram(){return STUDY_PROGRAMS[activeProgramId()];}
+function programMap(program){const p=program||activeProgram();return p&&typeof p.getMap==='function'?p.getMap():null;}
+function programTests(program){const p=program||activeProgram();return p&&typeof p.getTests==='function'?p.getTests():null;}
+function availableStudyPrograms(){
+  return Object.values(STUDY_PROGRAMS).filter(p=>{
+    const map=programMap(p);
+    return !!(map&&Array.isArray(map.weeks)&&map.weeks.length);
+  }).map(p=>{
+    const map=programMap(p);
+    // Счётчики выводим из карты, а не из константы: иначе после правки датасета
+    // интерфейс продолжит показывать прежнее число недель.
+    // Короткое имя — для подписи; полный title карты содержит и версию, и число
+    // недель, из-за чего в интерфейсе получался дубль «24 недели · 24 недель».
+    return {id:p.id,title:map.shortTitle||p.title,totalWeeks:map.weeks.length,
+      detailedWeeks:map.weeks.filter(w=>Array.isArray(w.days)&&w.days.length).length};
+  });
+}
+function setStudyProgram(id){
+  if(!STUDY_PROGRAMS[id]||id===activeProgramId())return;
+  lsSet('study_program',id);
+  renderStudy();
+}
+function getStudyPosition(){return lsGet(activeProgram().positionKey,{week:1,day:1});}
 function setStudyPosition(week,day){
   const targetWeek=getStudyWeek(Number(week));
-  const targetDay=targetWeek&&(targetWeek.days||[]).find(item=>item.day===Number(day));
-  if(!targetWeek||!targetDay)return;
-  lsSet('study_position',{week:targetWeek.week,day:targetDay.day});renderStudy();
+  if(!targetWeek)return;
+  // У недели без разбивки по дням искать день бессмысленно: требование
+  // существующего targetDay делало такие недели недостижимыми через селектор.
+  const targetDay=(targetWeek.days||[]).find(item=>item.day===Number(day));
+  if((targetWeek.days||[]).length&&!targetDay)return;
+  lsSet(activeProgram().positionKey,{week:targetWeek.week,day:targetDay?targetDay.day:1});renderStudy();
 }
-function getStudyProgress(){return lsGet('study_progress',{});}
-function setStudyDayStatus(week,day,status){const p=getStudyProgress();p['w'+week+'d'+day]=status;lsSet('study_progress',p);renderStudy();}
-function getStudyWeek(week){return (STUDY_MAP?.weeks||[]).find(w=>w.week===week);}
+function getStudyProgress(){return lsGet(activeProgram().progressKey,{});}
+function setStudyDayStatus(week,day,status){const p=getStudyProgress();p['w'+week+'d'+day]=status;lsSet(activeProgram().progressKey,p);renderStudy();}
+function getStudyWeek(week){return (programMap()?.weeks||[]).find(w=>w.week===week);}
 function getStudyDay(week,day){const w=getStudyWeek(week);return w?(w.days||[]).find(d=>d.day===day):null;}
 function getMiniTest(week,day){
   const testId=getStudyDay(week,day)?.miniTestId;
-  return testId?(STUDY_TESTS?.miniTests||[]).find(t=>t.id===testId):null;
+  return testId?(programTests()?.miniTests||[]).find(t=>t.id===testId):null;
 }
-function getWeeklyTest(week){return (STUDY_TESTS?.weeklyTests||[]).find(t=>t.week===week);}
+function getWeeklyTest(week){return (programTests()?.weeklyTests||[]).find(t=>t.week===week);}
 function getSeniorCaseList(){return Array.isArray(SENIOR_CASES)?SENIOR_CASES:(SENIOR_CASES?.cases||[]);}
 function getSeniorCasesForDay(week,day){return getSeniorCaseList().filter(c=>c.week===week&&(!c.day||c.day===day));}
 function getStudyOverview(){
   if(typeof IPMaxStudyUI==='undefined')return null;
-  return IPMaxStudyUI.buildStudyOverview(STUDY_MAP?.weeks||[],STUDY_TESTS?.miniTests||[],STUDY_TESTS?.weeklyTests||[],{
+  const program=activeProgram();const map=programMap(program);const tests=programTests(program);
+  return IPMaxStudyUI.buildStudyOverview(map?.weeks||[],tests?.miniTests||[],tests?.weeklyTests||[],{
+    programId:program.id,programTitle:map?.shortTitle||program.title,
     progress:getStudyProgress(),miniAnswers:lsGet('study_answers',{}),weeklyResults:lsGet('study_weekly_results',{}),activePosition:getStudyPosition()
   });
 }
 function statusLabel(s){return {locked:'закрыт',todo:'к изучению',in_progress:'в процессе',review:'повторить',done:'готово'}[s||'todo']||s;}
 function escAttr(s){return esc(s).replace(/'/g,'&#39;');}
 function renderStudy(){
-  if(!STUDY_MAP||!STUDY_TESTS){return;}
+  // Карта обязательна, тесты — нет: у MLOps своего mlops_tests.json ещё не
+  // существует, и требование STUDY_TESTS оставило бы страницу пустой.
+  if(!programMap()){return;}
+  renderStudyProgramSwitch();
   const pos=getStudyPosition();
   const week=getStudyWeek(pos.week)||getStudyWeek(1);
   if(!week){document.getElementById('study-current').innerHTML='<div class="empty-state"><p>Учебный план не найден</p></div>';return;}
+  // Недели второй программы могут быть описаны без разбивки по дням: тогда
+  // week.days пуст и week.days[0] дал бы undefined, роняя весь рендер плана.
+  const planned=typeof IPMaxStudyUI!=='undefined'&&IPMaxStudyUI.isPlannedWeek(week);
+  if(planned){renderStudyPlannedWeek(week);return;}
   const day=getStudyDay(week.week,pos.day)||week.days[0];
   const actualPos={week:week.week,day:day.day};
   const mini=getMiniTest(actualPos.week,actualPos.day);
@@ -746,6 +795,33 @@ function renderStudy(){
   renderStudyTrainers(week);
   renderStudySeniorCase(cases[0]);
 }
+function renderStudyProgramSwitch(){
+  const el=document.getElementById('study-program-switch');
+  if(!el||typeof IPMaxStudyUI==='undefined')return;
+  el.innerHTML=IPMaxStudyUI.renderProgramSwitch(availableStudyPrograms(),activeProgramId(),esc);
+  el.onclick=event=>{
+    const button=event.target.closest?.('[data-study-program]');
+    if(button&&el.contains(button))setStudyProgram(button.dataset.studyProgram);
+  };
+}
+// Рендер недели без разбивки по дням: карта, контекст и критерии показываются,
+// блоки дня, мини-теста и прогресса по дням очищаются, чтобы не остались висеть
+// данные предыдущей просмотренной недели.
+function renderStudyPlannedWeek(week){
+  const overview=getStudyOverview();
+  renderStudyOverviewSummary(overview);
+  renderStudyWeekNavigator(week.week,overview);
+  renderStudyCurrent(week,null);
+  const notice=typeof IPMaxStudyUI!=='undefined'?IPMaxStudyUI.renderPlannedWeekNotice(week,esc):'';
+  document.getElementById('study-days').innerHTML='';
+  document.getElementById('study-today').innerHTML=notice;
+  renderStudyWeekOutcome(week);
+  renderStudyAITrack(week);
+  document.getElementById('study-test').innerHTML='';
+  document.getElementById('study-progress').innerHTML='';
+  renderStudyTrainers(week);
+  renderStudySeniorCase(null);
+}
 function renderStudyOverviewSummary(overview){
   const el=document.getElementById('study-overview');
   if(!el)return;
@@ -758,7 +834,9 @@ function renderStudyOverviewSummary(overview){
 function renderStudyWeekNavigator(activeWeek,overview){
   const el=document.getElementById('study-roadmap');
   if(!el)return;
-  const weeks=STUDY_MAP?.weeks||[];
+  // Навигатор строится по активной программе: STUDY_MAP здесь давал 32 недели
+  // DevOps даже после переключения на MLOps.
+  const weeks=programMap()?.weeks||[];
   el.innerHTML=typeof IPMaxStudyUI!=='undefined'?IPMaxStudyUI.renderWeekNavigator(weeks,activeWeek,esc,overview?.weekStates):'';
   el.onclick=event=>{
     const direct=event.target.closest?.('[data-study-week]');
@@ -779,7 +857,10 @@ function renderStudyCurrent(week,day){
     '<section class="study-hero"><div class="study-kicker">Неделя '+week.week+' · '+esc(week.targetLevel||'')+'</div>'+
     '<div class="study-title">'+esc(week.title)+'</div>'+
     '<div class="study-goal">'+esc(week.goal||'')+'</div>'+
-    '<div class="study-meta"><span class="tag tag-lx">День '+day.day+'</span><span class="tag tag-sc">'+esc(day.title)+'</span></div>'+
+    // day отсутствует у недель без разбивки по дням — тогда показываем состав
+    // недели, а не «День undefined».
+    (day?'<div class="study-meta"><span class="tag tag-lx">День '+day.day+'</span><span class="tag tag-sc">'+esc(day.title)+'</span></div>'
+        :'<div class="study-meta"><span class="tag tag-tr">'+esc((week.mainTopics||[]).join(', '))+'</span></div>')+
     weekContext+technologyStatus+'</section>';
 }
 function renderStudyDays(week,activeDay){
@@ -822,7 +903,7 @@ function setStudyCriterion(weekNumber,index,isComplete){
   const completed=Array.isArray(progress[key])?progress[key].slice(0,criteria.length):[];
   completed[index]=Boolean(isComplete);
   progress[key]=completed;
-  lsSet('study_progress',progress);
+  lsSet(activeProgram().progressKey,progress);
   renderStudyWeekOutcome(week);
 }
 function renderStudyAITrack(week){
@@ -884,9 +965,9 @@ function renderWeeklyTest(test){
     '<div class="study-actions"><button class="btn btn-primary" onclick="saveWeeklyTest(\''+escAttr(test.id)+'\')">Сохранить попытку и проверить</button></div></section>';
 }
 function weeklyTestDomId(testId,field){return 'study-weekly-'+String(testId).replace(/[^a-zA-Z0-9_-]/g,'-')+'-'+field;}
-function weeklyPassScore(){return Number(STUDY_TESTS?.grading?.weeklyTest?.passScore)||70;}
+function weeklyPassScore(){return Number(programTests()?.grading?.weeklyTest?.passScore)||70;}
 function saveWeeklyTest(testId){
-  const test=(STUDY_TESTS?.weeklyTests||[]).find(item=>item.id===testId);if(!test||typeof IPMaxStudyUI==='undefined')return;
+  const test=(programTests()?.weeklyTests||[]).find(item=>item.id===testId);if(!test||typeof IPMaxStudyUI==='undefined')return;
   const prefix=weeklyTestDomId(test.id,'');
   const value=field=>document.getElementById(prefix+field)?.value||'';
   const checked=field=>document.getElementById(prefix+field)?.checked===true;
@@ -918,7 +999,7 @@ function saveWeeklyTest(testId){
     const progress=getStudyProgress();
     progress['w'+test.week+'d5']='done';
     if(getStudyWeek(test.week+1)&&(!progress['w'+(test.week+1)+'d1']||progress['w'+(test.week+1)+'d1']==='locked'))progress['w'+(test.week+1)+'d1']='todo';
-    lsSet('study_progress',progress);
+    lsSet(activeProgram().progressKey,progress);
   }
   renderStudy();
   if(evaluation.passed){alert('Неделя зачтена: '+evaluation.total+' / '+evaluation.maxScore+'. Следующая неделя разблокирована.');return;}
@@ -931,14 +1012,14 @@ function saveWeeklyTest(testId){
 }
 // Autosave a draft while typing so leaving the page no longer discards it.
 function scheduleStudyAnswerSave(testId){
-  const test=(STUDY_TESTS?.miniTests||[]).find(t=>t.id===testId);if(!test)return;
+  const test=(programTests()?.miniTests||[]).find(t=>t.id===testId);if(!test)return;
   const store=lsGet('study_answers',{});const cur=store[testId]||{};
   cur.answers=(test.questions||[]).map((q,i)=>document.getElementById('study-answer-'+testId+'-'+i)?.value||'');
   cur.draftAt=new Date().toISOString();store[testId]=cur;
   lsSetDebounced('study_answers',store);
 }
 function saveStudyAnswers(testId,silent){
-  const test=(STUDY_TESTS?.miniTests||[]).find(t=>t.id===testId);if(!test)return;
+  const test=(programTests()?.miniTests||[]).find(t=>t.id===testId);if(!test)return;
   const store=lsGet('study_answers',{});const cur=store[testId]||{};
   cur.answers=(test.questions||[]).map((q,i)=>document.getElementById('study-answer-'+testId+'-'+i)?.value||'');
   cur.completedAt=new Date().toISOString();store[testId]=cur;lsSet('study_answers',store);if(!silent)alert('Ответы сохранены');

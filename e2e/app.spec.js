@@ -457,6 +457,66 @@ test('navigates the complete roadmap through the selector and week map', async (
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_study_position')).week)).toBe(10);
 });
 
+test('switches to the MLOps curriculum and keeps its progress separate', async ({ page }) => {
+  await setProgress(page, {
+    ipmax_onboarding: profile,
+    ipmax_onboarding_complete: true,
+    // Позиция в DevOps-плане должна дожить до возврата: ключи прогресса у
+    // программ разные, и переключение не имеет права их склеить.
+    ipmax_study_position: { week: 7, day: 2 },
+  });
+  await page.goto('/');
+  await page.locator('[data-page="study"]').click();
+
+  await expect(page.locator('[data-study-week-select] option')).toHaveCount(32);
+  await expect(page.locator('.study-overview-kicker')).toContainText('32 недель');
+
+  await page.locator('[data-study-program="mlops"]').click();
+
+  // Вторая программа короче и живёт в собственном ключе позиции.
+  await expect(page.locator('[data-study-week-select] option')).toHaveCount(24);
+  await expect(page.locator('.study-overview-kicker')).toContainText('MLOps · 24 недель');
+  await expect(page.locator('[data-study-program="mlops"]')).toHaveAttribute('aria-current', 'true');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('ipmax_study_program'))).toBe('"mlops"');
+
+  // Детализированная неделя показывает пять дней, как в основном плане.
+  await expect(page.locator('#study-days .study-day')).toHaveCount(5);
+
+  // Мини-тест берётся из mlops_tests.json, а не из набора DevOps: неделя 1 дня 1
+  // покрыта, поэтому вопросы должны отрисоваться.
+  await expect(page.locator('#study-test .study-question')).toHaveCount(5);
+  await expect(page.locator('#study-test h3')).toContainText('Изолированное окружение Python');
+
+  // Навигация внутри второй программы работает так же, как в основном плане.
+  // Состояние «неделя без дней» намеренно не проверяется здесь: это переходное
+  // состояние данных, а рендер заглушки закрыт unit-тестами study-ui.
+  await page.locator('[data-study-week-select]').selectOption('13');
+  await expect(page.locator('[data-study-week-select]')).toHaveValue('13');
+  await expect(page.locator('#study-days .study-day')).toHaveCount(5);
+  await expect(page.locator('#study-week-outcome .study-criterion')).not.toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_mlops_position')).week)).toBe(13);
+
+  // Недельный тест второй программы берётся из mlops_tests.json и обязан
+  // отрисовать все четыре части. Схема совпадает с devops, но совпадение схемы
+  // не доказывает рендер: пятничный тест MLOps проверяется здесь фактически.
+  await page.locator('[data-study-week-select]').selectOption('1');
+  await page.locator('#study-days .study-day').nth(4).click();
+  const mlopsWeekly = page.locator('.study-weekly-test');
+  await expect(mlopsWeekly).toBeVisible();
+  await expect(mlopsWeekly.locator('h3')).toContainText('Python-проект для ML');
+  // Практика, теория, debug и Senior Challenge — по одной самооценке на часть.
+  await expect(mlopsWeekly.locator('input[type="number"]')).toHaveCount(4);
+  await expect(mlopsWeekly.locator('.study-weekly-part')).toHaveCount(4);
+  await expect(mlopsWeekly.locator('.study-weekly-question')).not.toHaveCount(0);
+  await expect(mlopsWeekly).toContainText('Кейс: mlops-env-001');
+
+  // Возврат в DevOps: позиция сохранилась, MLOps не затёр её.
+  await page.locator('[data-study-program="devops"]').click();
+  await expect(page.locator('[data-study-week-select]')).toHaveValue('7');
+  await expect(page.locator('[data-study-week-select] option')).toHaveCount(32);
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_study_position')).week)).toBe(7);
+});
+
 test('completes a study week, unlocks the next one and restores it after reload', async ({ page }) => {
   await setProgress(page, {
     ipmax_onboarding: profile,

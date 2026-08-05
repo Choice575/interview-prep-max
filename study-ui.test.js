@@ -242,3 +242,123 @@ test('renders overall progress, recommendations and week state accessibly', () =
   assert.match(navigator, /aria-label="Неделя 1, завершена"/);
   assert.equal(StudyUI.renderStudyOverview(null), '');
 });
+
+test('marks a week described without a day breakdown as planned', () => {
+  const planned = { week: 13, title: 'Orchestration', days: [] };
+  const detailed = { week: 1, title: 'Python', days: [{ day: 1, title: 'venv' }] };
+
+  assert.equal(StudyUI.isPlannedWeek(planned), true);
+  assert.equal(StudyUI.isPlannedWeek({ week: 14, title: 'No days key' }), true);
+  assert.equal(StudyUI.isPlannedWeek(detailed), false);
+  assert.equal(StudyUI.isPlannedWeek(null), false);
+  assert.equal(StudyUI.isPlannedWeek([]), false);
+});
+
+test('renders a planned-week notice instead of a broken day card', () => {
+  const markup = StudyUI.renderPlannedWeekNotice({
+    week: 16,
+    title: 'Serving в Kubernetes',
+    goal: 'Развернуть модель с autoscaling',
+    roadmapStage: '07 Model Serving',
+    mainTopics: ['Serving', 'Kubernetes'],
+    days: [],
+  });
+
+  assert.match(markup, /дни ещё не детализированы/);
+  assert.match(markup, /Serving в Kubernetes/);
+  assert.match(markup, /Развернуть модель с autoscaling/);
+  assert.match(markup, /07 Model Serving/);
+  assert.match(markup, /Kubernetes/);
+  // Детализированная неделя не должна получать эту заглушку.
+  assert.equal(StudyUI.renderPlannedWeekNotice({ week: 1, days: [{ day: 1 }] }), '');
+  assert.equal(StudyUI.renderPlannedWeekNotice(null), '');
+});
+
+test('escapes every interpolated value in the planned-week notice', () => {
+  const markup = StudyUI.renderPlannedWeekNotice({
+    week: 9,
+    title: '<script>alert(1)</script>',
+    goal: 'Goal & <img src=x onerror=alert(2)>',
+    roadmapStage: '<b>stage</b>',
+    mainTopics: ['<i>topic</i>'],
+    days: [],
+  });
+
+  // Значимая проверка — что опасная конструкция не осталась тегом. Подстрока
+  // `onerror=alert` в виде текста внутри <p> безвредна: угловые скобки
+  // экранированы, поэтому атрибутом она не становится.
+  assert.equal(markup.includes('<script>'), false);
+  assert.equal(markup.includes('<img'), false);
+  assert.match(markup, /&lt;script&gt;/);
+  assert.match(markup, /Goal &amp; &lt;img/);
+  assert.match(markup, /&lt;i&gt;topic&lt;\/i&gt;/);
+});
+
+test('renders the program switch only when a second curriculum is loaded', () => {
+  const programs = [
+    { id: 'devops', title: 'DevOps + AI', totalWeeks: 32, detailedWeeks: 32 },
+    { id: 'mlops', title: 'MLOps', totalWeeks: 24, detailedWeeks: 6 },
+  ];
+  const markup = StudyUI.renderProgramSwitch(programs, 'mlops');
+
+  assert.match(markup, /data-study-program="devops"/);
+  assert.match(markup, /data-study-program="mlops"/);
+  // Активной должна быть именно выбранная программа, а не первая в списке.
+  assert.match(markup, /class="study-program is-active" data-study-program="mlops" aria-current="true"/);
+  assert.match(markup, /32 недель/);
+  // Частично готовая программа обязана честно сообщать, сколько недель разобрано.
+  assert.match(markup, /24 недель · детализировано 6/);
+
+  // Одна программа — переключать нечего, блок не занимает место.
+  assert.equal(StudyUI.renderProgramSwitch([programs[0]], 'devops'), '');
+  assert.equal(StudyUI.renderProgramSwitch([], 'devops'), '');
+  assert.equal(StudyUI.renderProgramSwitch(null, 'devops'), '');
+});
+
+test('falls back to the first program when the stored id is unknown', () => {
+  const programs = [
+    { id: 'devops', title: 'DevOps', totalWeeks: 32, detailedWeeks: 32 },
+    { id: 'mlops', title: 'MLOps', totalWeeks: 24, detailedWeeks: 24 },
+  ];
+  const markup = StudyUI.renderProgramSwitch(programs, 'deleted-program');
+
+  assert.match(markup, /class="study-program is-active" data-study-program="devops"/);
+  assert.equal(markup.includes('data-study-program="deleted-program"'), false);
+  // Полностью готовая программа не должна получать приписку о детализации.
+  assert.equal(markup.includes('детализировано'), false);
+});
+
+test('escapes program titles and ids in the switch', () => {
+  const markup = StudyUI.renderProgramSwitch([
+    { id: 'devops', title: 'DevOps', totalWeeks: 32 },
+    { id: '"><script>alert(1)</script>', title: '<img src=x>', totalWeeks: 24 },
+  ], 'devops');
+
+  assert.equal(markup.includes('<script>'), false);
+  assert.equal(markup.includes('<img'), false);
+  assert.match(markup, /&lt;img src=x&gt;/);
+});
+
+test('takes the overview caption from the loaded curriculum, not a constant', () => {
+  const overview = StudyUI.buildStudyOverview(
+    [{ week: 1, title: 'Python для ML', days: [{ day: 1, title: 'venv' }] }],
+    [],
+    [],
+    { programId: 'mlops', programTitle: 'MLOps' }
+  );
+
+  assert.equal(overview.programId, 'mlops');
+  assert.equal(overview.programTitle, 'MLOps');
+
+  const markup = StudyUI.renderStudyOverview(overview);
+  assert.match(markup, /MLOps · 1 недель/);
+  // Прежний хардкод не должен возвращаться ни в каком виде.
+  assert.equal(markup.includes('Roadmap 5.1'), false);
+  assert.equal(markup.includes('32 недели'), false);
+
+  // Без переданной подписи остаётся нейтральный вариант, а не чужое название.
+  const bare = StudyUI.buildStudyOverview([{ week: 1, days: [] }], [], [], {});
+  assert.equal(bare.programId, 'devops');
+  assert.match(StudyUI.renderStudyOverview(bare), /Учебный план · 1 недель/);
+});
+

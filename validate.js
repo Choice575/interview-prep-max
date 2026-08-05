@@ -714,6 +714,323 @@ if (studyMap && studyTests) {
   });
 }
 
+// ═══ 7. Вторая учебная программа: MLOps ═══
+// Правила отличаются от devops-плана (24 недели вместо 32, своя версия), поэтому
+// пороги живут в профиле, а не в общих константах. Недели допускаются в двух
+// состояниях: 'detailed' — ровно 5 дней, 'planned' — дней нет вовсе. Второй
+// вариант законен, пока программа наполняется, но пустой days[] обязан быть
+// объявлен явно, иначе UI покажет «День undefined».
+const MLOPS_PROFILE = {
+  file: 'mlops_map.json',
+  profile: 'mlops',
+  version: '1.0.0',
+  weeks: 24,
+};
+
+console.log('\n🤖 Проверка учебной программы MLOps (mlops_map.json)...');
+const mlopsMap = readJsonTask(MLOPS_PROFILE.file, 'MLOps map');
+
+if (mlopsMap) {
+  const weeks = Array.isArray(mlopsMap.weeks) ? mlopsMap.weeks : [];
+  if (mlopsMap.profile !== MLOPS_PROFILE.profile) err(`${MLOPS_PROFILE.file}: profile must be "${MLOPS_PROFILE.profile}"`);
+  if (mlopsMap.version !== MLOPS_PROFILE.version) err(`${MLOPS_PROFILE.file}: expected curriculum ${MLOPS_PROFILE.version}`);
+  if (!Array.isArray(mlopsMap.weeks)) err(`${MLOPS_PROFILE.file}: нет массива weeks`);
+  if (weeks.length !== MLOPS_PROFILE.weeks) err(`${MLOPS_PROFILE.file}: expected ${MLOPS_PROFILE.weeks} weeks, found ${weeks.length}`);
+  if (mlopsMap.durationWeeks !== MLOPS_PROFILE.weeks) err(`${MLOPS_PROFILE.file}: durationWeeks must be ${MLOPS_PROFILE.weeks}`);
+  scanKnownSecrets(mlopsMap, MLOPS_PROFILE.file);
+
+  const weekNumbers = new Set();
+  const expectedResults = new Set();
+  const miniTestIds = new Set();
+  const dayValues = new Map([
+    ['title', new Set()],
+    ['objective', new Set()],
+    ['practice', new Set()],
+    ['pitfalls', new Set()],
+  ]);
+  let detailedWeeks = 0;
+  let detailedDays = 0;
+
+  weeks.forEach(w => {
+    const prefix = `MLOpsWeek#${w.week || '?'}`;
+    if (!Number.isInteger(w.week) || w.week < 1 || w.week > MLOPS_PROFILE.weeks) {
+      err(`${prefix}: week must be an integer from 1 to ${MLOPS_PROFILE.weeks}`);
+    } else {
+      if (weekNumbers.has(w.week)) err(`${prefix}: duplicate week number`);
+      weekNumbers.add(w.week);
+    }
+
+    ['title', 'targetLevel', 'goal', 'productionLayer', 'artifact', 'curriculumVersion'].forEach(field => {
+      if (!isNonEmptyString(w[field])) err(`${prefix}: ${field} must be a non-empty string`);
+    });
+    if (w.curriculumVersion !== mlopsMap.version) err(`${prefix}: curriculumVersion must match map version`);
+    validateStringArray(w.mainTopics, prefix, 'mainTopics');
+
+    if (!Array.isArray(w.completionCriteria) || w.completionCriteria.length < 4 ||
+      w.completionCriteria.some(item => !isNonEmptyString(item))) {
+      err(`${prefix}: completionCriteria must contain at least four non-empty items`);
+    }
+    if (!w.aiTrack || typeof w.aiTrack !== 'object' || Array.isArray(w.aiTrack) || w.aiTrack.optional !== true ||
+      !isNonEmptyString(w.aiTrack.title) || !isNonEmptyString(w.aiTrack.result)) {
+      err(`${prefix}: aiTrack must define optional=true, title and result`);
+    }
+    if (!w.seniorChallenge || typeof w.seniorChallenge !== 'object' || Array.isArray(w.seniorChallenge) ||
+      !isNonEmptyString(w.seniorChallenge.title) || !isNonEmptyString(w.seniorChallenge.task) ||
+      !Array.isArray(w.seniorChallenge.expectedSkills) || w.seniorChallenge.expectedSkills.length < 3) {
+      err(`${prefix}: seniorChallenge must define title, task and at least three expectedSkills`);
+    }
+    if (w.prerequisites && (!Array.isArray(w.prerequisites) || w.prerequisites.some(item => !isNonEmptyString(item)))) {
+      err(`${prefix}: prerequisites must be an array of non-empty strings`);
+    }
+
+    // Технологический радар: у MLOps он критичен, потому что часть стека из
+    // исходного роадмапа успела сменить лицензию или умереть. Дата ревизии и
+    // источник обязательны — без них статус нельзя перепроверить.
+    if (w.technologyStatus) {
+      const statusValues = [];
+      STUDY_TECHNOLOGY_STATUS_FIELDS.forEach(field => {
+        const values = w.technologyStatus[field];
+        if (!Array.isArray(values)) {
+          err(`${prefix}: technologyStatus.${field} must be an array`);
+          return;
+        }
+        values.forEach(value => {
+          if (!isNonEmptyString(value)) err(`${prefix}: technologyStatus.${field} contains an empty value`);
+          else statusValues.push(value);
+        });
+      });
+      if (!statusValues.length) err(`${prefix}: technologyStatus must classify at least one technology`);
+      if (new Set(statusValues).size !== statusValues.length) err(`${prefix}: a technology cannot have multiple statuses`);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(w.technologyStatus.lastReviewed || ''))) {
+        err(`${prefix}: technologyStatus.lastReviewed must use YYYY-MM-DD`);
+      }
+      if (!isNonEmptyString(w.technologyStatus.source)) err(`${prefix}: technologyStatus.source must name a control source`);
+      if (!isNonEmptyString(w.technologyStatus.note)) err(`${prefix}: technologyStatus.note must explain the classification`);
+    }
+
+    const days = Array.isArray(w.days) ? w.days : null;
+    if (!days) {
+      err(`${prefix}: days must be an array (empty is allowed for a planned week)`);
+      return;
+    }
+
+    const declaredStatus = w.daysStatus;
+    const isDetailed = days.length > 0;
+    if (declaredStatus !== 'detailed' && declaredStatus !== 'planned') {
+      err(`${prefix}: daysStatus must be "detailed" or "planned"`);
+    } else if (isDetailed !== (declaredStatus === 'detailed')) {
+      err(`${prefix}: daysStatus="${declaredStatus}" contradicts days.length=${days.length}`);
+    }
+
+    if (!isDetailed) return;
+    detailedWeeks++;
+    if (days.length !== 5) err(`${prefix}: a detailed week needs exactly 5 days, found ${days.length}`);
+
+    const dayNumbers = new Set();
+    days.forEach(d => {
+      detailedDays++;
+      const dp = `${prefix}/Day#${d.day || '?'}`;
+      if (!Number.isInteger(d.day) || d.day < 1 || d.day > 5) err(`${dp}: day must be an integer from 1 to 5`);
+      else {
+        if (dayNumbers.has(d.day)) err(`${dp}: duplicate day number`);
+        dayNumbers.add(d.day);
+      }
+
+      ['title', 'level', 'objective', 'expectedResult'].forEach(field => {
+        if (!isNonEmptyString(d[field])) err(`${dp}: ${field} must be a non-empty string`);
+      });
+      if (isNonEmptyString(d.expectedResult)) {
+        if (d.expectedResult.trim().length < 80) err(`${dp}: expectedResult must describe a verifiable outcome`);
+        if (!STUDY_RESULT_EVIDENCE_PATTERN.test(d.expectedResult)) {
+          err(`${dp}: expectedResult must name observable evidence`);
+        }
+        const normalized = d.expectedResult.trim().toLowerCase();
+        if (expectedResults.has(normalized)) err(`${dp}: expectedResult duplicates another study day`);
+        expectedResults.add(normalized);
+      }
+      validateStringArray(d.practice, dp, 'practice');
+      validateStringArray(d.pitfalls, dp, 'pitfalls');
+
+      if (isNonEmptyString(d.objective) && STUDY_GENERIC_OBJECTIVE_PATTERN.test(d.objective)) {
+        err(`${dp}: objective still uses the generic topic template`);
+      }
+      if (Array.isArray(d.practice) && STUDY_GENERIC_PRACTICE_PATTERN.test(d.practice.join(' '))) {
+        err(`${dp}: practice still uses the generic roadmap template`);
+      }
+      for (const [field, seen] of dayValues) {
+        const value = JSON.stringify(d[field]).toLowerCase();
+        if (seen.has(value)) err(`${dp}: ${field} duplicates another study day`);
+        seen.add(value);
+      }
+
+      if (Object.prototype.hasOwnProperty.call(d, 'miniTest')) err(`${dp}: embedded miniTest is forbidden; use miniTestId`);
+      if (!isNonEmptyString(d.miniTestId)) {
+        err(`${dp}: miniTestId must be a non-empty string`);
+      } else {
+        if (miniTestIds.has(d.miniTestId)) err(`${dp}: duplicate miniTestId ${d.miniTestId}`);
+        miniTestIds.add(d.miniTestId);
+        // Координата внутри id — единственная защита от рассинхрона, пока
+        // mlops_tests.json не существует: без неё день 3 может ссылаться на
+        // тест дня 1, и это никто не заметит.
+        const expectedPrefix = `mini-mlops-w${w.week}d${d.day}`;
+        if (!d.miniTestId.startsWith(expectedPrefix)) {
+          err(`${dp}: miniTestId must start with ${expectedPrefix}, found ${d.miniTestId}`);
+        }
+      }
+    });
+    for (let day = 1; day <= 5; day++) {
+      if (!dayNumbers.has(day)) err(`${prefix}: missing day ${day}`);
+    }
+  });
+
+  for (let week = 1; week <= MLOPS_PROFILE.weeks; week++) {
+    if (!weekNumbers.has(week)) err(`${MLOPS_PROFILE.file}: missing week ${week}`);
+  }
+
+  // detailedWeeks — производное поле; если его считать руками, оно разойдётся с
+  // данными на первой же добавленной неделе.
+  const declaredDetailed = Array.isArray(mlopsMap.detailedWeeks) ? mlopsMap.detailedWeeks : null;
+  const actualDetailed = weeks.filter(w => Array.isArray(w.days) && w.days.length).map(w => w.week);
+  if (!declaredDetailed) err(`${MLOPS_PROFILE.file}: detailedWeeks must be an array`);
+  else if (JSON.stringify(declaredDetailed) !== JSON.stringify(actualDetailed)) {
+    err(`${MLOPS_PROFILE.file}: detailedWeeks ${JSON.stringify(declaredDetailed)} does not match weeks with days ${JSON.stringify(actualDetailed)}`);
+  }
+
+  ok(`MLOps: ${weeks.length} недель, из них детализировано ${detailedWeeks} (${detailedDays} дней)`);
+
+  // ═══ Тесты MLOps ═══
+  // Наполняется блоками, поэтому отсутствие теста для дня — не ошибка. Ошибка —
+  // тест, который ссылается на несуществующий день, ломает подсчёт баллов или
+  // дублирует вопрос: такой тест нельзя пройти или он ничего не проверяет.
+  // Файла может не быть, пока тесты не начали писать: это не ошибка данных.
+  // Как только он появился, проверяется по полной программе.
+  const mlopsTestsPath = path.join(TASKS_DIR, 'mlops_tests.json');
+  const mlopsTests = fs.existsSync(mlopsTestsPath) ? readJsonTask('mlops_tests.json', 'MLOps tests') : null;
+  // Не warn: в strict-режиме предупреждение роняет verify:release, а отсутствие
+  // ещё не написанных тестов — законное состояние, а не дефект данных.
+  if (!mlopsTests) console.log('  ℹ️  MLOps: mlops_tests.json отсутствует, мини-тесты пока не заданы');
+  if (mlopsTests) {
+    const dayIndex = new Map();
+    weeks.forEach(w => (Array.isArray(w.days) ? w.days : []).forEach(d => {
+      if (isNonEmptyString(d.miniTestId)) dayIndex.set(d.miniTestId, { week: w.week, day: d.day });
+    }));
+
+    if (mlopsTests.profile !== MLOPS_PROFILE.profile) err('mlops_tests.json: profile must be "mlops"');
+    if (mlopsTests.version !== mlopsMap.version) err(`mlops_tests.json: version must match mlops_map.json (${mlopsMap.version})`);
+    scanKnownSecrets(mlopsTests, 'mlops_tests.json');
+
+    const grading = mlopsTests.grading || {};
+    if (Number(grading.miniTest?.maxScore) !== 5) err('mlops_tests.json: grading.miniTest.maxScore must be 5');
+    if (Number(grading.miniTest?.passScore) !== 4) err('mlops_tests.json: grading.miniTest.passScore must be 4');
+    if (Number(grading.weeklyTest?.maxScore) !== 100) err('mlops_tests.json: grading.weeklyTest.maxScore must be 100');
+    if (Number(grading.weeklyTest?.passScore) !== 70) err('mlops_tests.json: grading.weeklyTest.passScore must be 70');
+
+    const testIds = new Set();
+    const questionText = new Set();
+    const miniTests = Array.isArray(mlopsTests.miniTests) ? mlopsTests.miniTests : [];
+    if (!Array.isArray(mlopsTests.miniTests)) err('mlops_tests.json: нет массива miniTests');
+
+    const coveredByWeek = new Map();
+    miniTests.forEach(test => {
+      const prefix = `MLOpsMiniTest#${test.id || '?'}`;
+      if (!isNonEmptyString(test.id)) { err(`${prefix}: id must be a non-empty string`); return; }
+      if (testIds.has(test.id)) err(`${prefix}: duplicate test id`);
+      testIds.add(test.id);
+      if (!isNonEmptyString(test.title)) err(`${prefix}: title must be a non-empty string`);
+
+      const target = dayIndex.get(test.id);
+      if (!target) {
+        err(`${prefix}: no study day references this id`);
+      } else if (test.week !== target.week || test.day !== target.day) {
+        err(`${prefix}: declares w${test.week}d${test.day} but the map links it to w${target.week}d${target.day}`);
+      } else {
+        coveredByWeek.set(target.week, (coveredByWeek.get(target.week) || 0) + 1);
+      }
+
+      const questions = Array.isArray(test.questions) ? test.questions : null;
+      if (!questions) { err(`${prefix}: questions must be an array`); return; }
+      // Ровно пять вопросов по одному баллу: при меньшем числе проходной балл 4
+      // недостижим, и день невозможно закрыть в принципе.
+      if (questions.length !== 5) err(`${prefix}: needs exactly 5 questions, found ${questions.length}`);
+      let total = 0;
+      questions.forEach((q, index) => {
+        const qp = `${prefix}/Q${index + 1}`;
+        if (!isNonEmptyString(q.q)) err(`${qp}: q must be a non-empty string`);
+        if (!isNonEmptyString(q.expected)) err(`${qp}: expected answer must be filled`);
+        if (Number(q.score) !== 1) err(`${qp}: score must be 1`);
+        total += Number(q.score) || 0;
+        if (isNonEmptyString(q.q)) {
+          const normalized = q.q.trim().toLowerCase();
+          if (questionText.has(normalized)) err(`${qp}: question duplicates another MLOps test`);
+          questionText.add(normalized);
+        }
+      });
+      if (total !== 5) err(`${prefix}: question scores must sum to 5, got ${total}`);
+    });
+
+    const weeklyTests = Array.isArray(mlopsTests.weeklyTests) ? mlopsTests.weeklyTests : [];
+    if (!Array.isArray(mlopsTests.weeklyTests)) err('mlops_tests.json: нет массива weeklyTests');
+    const weeklyWeeks = new Set();
+    weeklyTests.forEach(test => {
+      const prefix = `MLOpsWeeklyTest#${test.id || '?'}`;
+      if (!isNonEmptyString(test.id)) { err(`${prefix}: id must be a non-empty string`); return; }
+      if (testIds.has(test.id)) err(`${prefix}: id is shared with another test`);
+      testIds.add(test.id);
+      if (!Number.isInteger(test.week) || test.week < 1 || test.week > MLOPS_PROFILE.weeks) {
+        err(`${prefix}: week must be an integer from 1 to ${MLOPS_PROFILE.weeks}`);
+      } else {
+        if (weeklyWeeks.has(test.week)) err(`${prefix}: duplicate weekly test for week ${test.week}`);
+        weeklyWeeks.add(test.week);
+      }
+      if (!isNonEmptyString(test.title)) err(`${prefix}: title must be a non-empty string`);
+      if (Number(test.maxScore) !== 100) err(`${prefix}: maxScore must be 100`);
+
+      const parts = test.parts;
+      if (!parts || typeof parts !== 'object' || Array.isArray(parts)) { err(`${prefix}: parts must be an object`); return; }
+      let sum = 0;
+      ['practice', 'theory', 'debug', 'seniorChallenge'].forEach(name => {
+        const part = parts[name];
+        if (!part || typeof part !== 'object' || Array.isArray(part)) { err(`${prefix}: parts.${name} is missing`); return; }
+        const score = Number(part.score);
+        if (!Number.isInteger(score) || score <= 0) err(`${prefix}: parts.${name}.score must be a positive integer`);
+        sum += Number.isFinite(score) ? score : 0;
+        // theory задаётся списком вопросов и не имеет отдельного task — так же,
+        // как в devops-плане; требовать task для неё значило бы разойтись со схемой.
+        if (name !== 'theory' && !isNonEmptyString(part.task)) {
+          err(`${prefix}: parts.${name}.task must describe the assignment`);
+        }
+      });
+      if (Array.isArray(parts.practice?.mustInclude)) {
+        if (parts.practice.mustInclude.length < 4 || parts.practice.mustInclude.some(item => !isNonEmptyString(item))) {
+          err(`${prefix}: parts.practice.mustInclude needs at least four non-empty checkpoints`);
+        }
+      } else err(`${prefix}: parts.practice.mustInclude must be an array`);
+      if (Array.isArray(parts.theory?.questions)) {
+        if (parts.theory.questions.length < 3 || parts.theory.questions.some(item => !isNonEmptyString(item))) {
+          err(`${prefix}: parts.theory.questions needs at least three non-empty questions`);
+        }
+      } else err(`${prefix}: parts.theory.questions must be an array`);
+      if (!isNonEmptyString(parts.debug?.expected)) err(`${prefix}: parts.debug.expected must state the answer`);
+      // Сумма частей обязана совпадать с maxScore, иначе проходной балл 70
+      // означает разную долю в разных неделях.
+      if (sum !== 100) err(`${prefix}: part scores must sum to 100, got ${sum}`);
+    });
+
+    // coveredWeeks — производное поле: неделя покрыта, когда у всех её пяти дней
+    // есть мини-тест. Считаем из данных, чтобы поле не разошлось с ними.
+    const actualCovered = weeks
+      .filter(w => Array.isArray(w.days) && w.days.length === (coveredByWeek.get(w.week) || 0) && w.days.length > 0)
+      .map(w => w.week);
+    const declaredCovered = Array.isArray(mlopsTests.coveredWeeks) ? mlopsTests.coveredWeeks : null;
+    if (!declaredCovered) err('mlops_tests.json: coveredWeeks must be an array');
+    else if (JSON.stringify(declaredCovered) !== JSON.stringify(actualCovered)) {
+      err(`mlops_tests.json: coveredWeeks ${JSON.stringify(declaredCovered)} does not match weeks with a full set of mini-tests ${JSON.stringify(actualCovered)}`);
+    }
+
+    ok(`MLOps тесты: ${miniTests.length} мини-тестов и ${weeklyTests.length} недельных, полностью покрыто недель: ${actualCovered.length}`);
+  }
+}
+
 // ═══ Итог ═══
 console.log(`\n${'═'.repeat(50)}`);
 console.log(`Проверка завершена: ${errors} ошибок, ${warnings} предупреждений`);
