@@ -268,7 +268,7 @@ const PAGE_TITLES={home:'Сегодня',interview:'Ответы вслух',cat
   subnet:'Тренажёр подсетей',ts:'Troubleshooting-симулятор',
   cmd:'Command Builder',code:'Code Reviewer',
   ansible:'Ansible Playbook',dockerfile:'Dockerfile',k8s:'K8s YAML',ports:'Порты TCP',labs:'Debugging',
-  git:'Git-тренажёр',regex:'Regex-тренажёр',tips:'Советы'};
+  git:'Git-тренажёр',regex:'Regex-тренажёр',tips:'Советы',incidents:'Разбор инцидентов'};
 function nav(page){
   stopActiveSessions();
   if(page!=='exam') coachQuestionIds=null;
@@ -293,6 +293,7 @@ function nav(page){
   if(page==='analytics') renderAnalytics();
   if(page==='subnet') renderSubnet();
   if(page==='ts') renderTsList();
+  if(page==='incidents') renderIncidentList();
   if(page==='cmd') renderCmd();
   if(page==='labs') renderLabs();
   if(page==='code') renderCode();
@@ -1151,7 +1152,8 @@ function trainerTotals(){
     ts:(TS_SCENARIOS||[]).length,labs:(LABS_TASKS||[]).length,code:(CODE_TASKS||[]).length,
     subnet:(SUBNET_PROBLEMS||[]).length,ports:(PORTS_TASKS||[]).length,cmd:(CMD_TASKS||[]).length,
     git:(GIT_TASKS||[]).length,regex:(REGEX_TASKS||[]).length,dockerfile:(DOCKERFILE_TASKS||[]).length,
-    k8s:(K8S_TASKS||[]).length,ansible_pb:(ANSIBLE_PB_TASKS||[]).length
+    k8s:(K8S_TASKS||[]).length,ansible_pb:(ANSIBLE_PB_TASKS||[]).length,
+    incidents:(INCIDENTS||[]).length
   };
 }
 function trainerProgress(){
@@ -1159,7 +1161,8 @@ function trainerProgress(){
     ts_scores:lsGet('ts_scores',{}),labs_prog:lsGet('labs_prog',{}),code_prog:lsGet('code_prog',{}),
     subnet_prog:lsGet('subnet_prog',{}),pt_prog:lsGet('pt_prog',{}),cmd_prog:lsGet('cmd_prog',{}),
     git_prog:lsGet('git_prog',{}),regex_prog:lsGet('regex_prog',{}),df_prog:lsGet('df_prog',{}),
-    k8s_prog:lsGet('k8s_prog',{}),ans_prog:lsGet('ans_prog',{})
+    k8s_prog:lsGet('k8s_prog',{}),ans_prog:lsGet('ans_prog',{}),
+    inc_prog:lsGet('inc_prog',{})
   };
 }
 const trainersUI=typeof IPMaxTrainersUI!=='undefined'?IPMaxTrainersUI.create({
@@ -1245,6 +1248,35 @@ function tsChoose(i){const scen=TS_SCENARIOS.find(s=>s.id===tsState.scenarioId);
 function tsEndScenario(scen){document.getElementById('ts-end').style.display='block';const pts=Math.min(100,Math.max(0,tsState.totalPoints));document.getElementById('ts-end-score').textContent=pts;tsScores[scen.id]=pts;lsSet('ts_scores',tsScores);recordSkillEvent({source:'troubleshooting',topic:scen.topic||'',skill:'Troubleshooting',score:pts,possible:100});}
 function tsBack(){renderTsList();}function tsRestart(){tsStart(tsState.scenarioId);}
 
+// ═══ ПОРЯДОК ВАРИАНТОВ В ТРЕНАЖЁРАХ ═══
+// В датасетах тренажёров правильный ответ всегда лежит первым (answer: 0), а
+// варианты выводились в порядке файла — стратегия «всегда A» давала 100% на
+// восьми тренажёрах. Перемешиваем при показе.
+//
+// Порядок запоминается на сессию по (тренажёр, задание): рендер вызывается
+// заново после каждого ответа, и без кеша кнопки переставлялись бы под курсором
+// сразу после клика.
+const trainerOptionOrders={};
+function optionOrder(trainer,taskId,count){
+  const key=trainer+':'+taskId;
+  const cached=trainerOptionOrders[key];
+  if(cached&&cached.length===count) return cached;
+  const order=[...Array(count).keys()];
+  for(let i=order.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[order[i],order[j]]=[order[j],order[i]];}
+  trainerOptionOrders[key]=order;
+  return order;
+}
+// Подсветка после ответа идёт по исходному индексу из data-orig-idx: позиция
+// кнопки на экране больше не совпадает с индексом варианта в датасете.
+function applyOptionState(selector,answer,chosen,correctClass,wrongClass){
+  document.querySelectorAll(selector).forEach(el=>{
+    el.classList.add('disabled');
+    const orig=parseInt(el.dataset.origIdx,10);
+    if(orig===answer) el.classList.add(correctClass);
+    else if(orig===chosen) el.classList.add(wrongClass);
+  });
+}
+
 // ═══ LABS / DEBUGGING ═══
 let labsDone={};
 function renderLabs(){
@@ -1257,50 +1289,50 @@ function renderLabs(){
     '</div><div style="font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5">📋 '+esc(t.scenario)+'</div>'+
     (t.code?'<div class="code-block">'+esc(t.code)+'</div>':'')+
     '<div class="code-question" style="color:var(--yellow)">'+esc(t.question)+'</div>'+
-    '<div class="code-opts">'+t.opts.map((o,i)=>'<button type="button" class="code-opt'+(done!==undefined?' disabled':'')+'" id="labopt-'+t.id+'-'+i+'" onclick="pickLab('+t.id+','+i+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[i]+'.</span><span>'+esc(o)+'</span></button>').join('')+'</div>'+
+    '<div class="code-opts">'+optionOrder('lab',t.id,t.opts.length).map((oi,vp)=>'<button type="button" class="code-opt'+(done!==undefined?' disabled':'')+'" id="labopt-'+t.id+'-'+vp+'" data-orig-idx="'+oi+'" onclick="pickLab('+t.id+','+oi+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[vp]+'.</span><span>'+esc(t.opts[oi])+'</span></button>').join('')+'</div>'+
     '<div class="code-fix" id="labfix-'+t.id+'">🔧 '+esc(t.bug)+'\n\n✅ '+esc(t.fix)+'</div></div>';
   }).join('');Object.entries(labsDone).forEach(([id,chosen])=>applyLabState(parseInt(id),chosen));updateLabsProg();
 }
-function applyLabState(id,chosen){const t=LABS_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#lab-'+id+' .code-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong');});document.getElementById('labfix-'+id).style.display='block';}
+function applyLabState(id,chosen){const t=LABS_TASKS.find(x=>x.id===id);if(!t) return;applyOptionState('#lab-'+id+' .code-opt',t.answer,chosen,'correct','wrong');document.getElementById('labfix-'+id).style.display='block';}
 function pickLab(tid,chosen){if(labsDone[tid]!==undefined) return;const task=LABS_TASKS.find(t=>t.id===tid);labsDone[tid]=chosen;lsSet('labs_prog',labsDone);recordTrainerResult('lab',task?.topic||'',!!task&&task.answer===chosen,'Debugging');applyLabState(tid,chosen);updateLabsProg();}
 function updateLabsProg(){const done=Object.keys(labsDone).length;const ok=Object.entries(labsDone).filter(([id,c])=>LABS_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('labs-pb').style.width=(done/LABS_TASKS.length*100)+'%';document.getElementById('labs-score-lbl').textContent=ok+' / '+LABS_TASKS.length+' правильно';}
 
 // ═══ COMMAND BUILDER ═══
 let cmdDone={}, cmdMuscleIdx=0, cmdMuscleQs=[];
-function renderCmd(){cmdDone=lsGet('cmd_prog',{});const L=['A','B','C','D'];document.getElementById('cmd-container').innerHTML='<div style="margin-bottom:12px"><button class="btn btn-outline btn-sm" onclick="startCmdMuscle()">💪 Muscle Memory (ввод команд)</button></div>'+CMD_TASKS.map((t,idx)=>{const done=cmdDone[t.id];return '<div class="cmd-card" id="cmd-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:11px;font-weight:700;color:var(--text3)">Задача '+(idx+1)+'/40</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅ Верно':'❌ Ошибка')+'</span>':'')+'</div><div class="cmd-task-text">'+esc(t.task)+'</div><div class="cmd-opts">'+t.opts.map((o,i)=>'<button type="button" class="cmd-opt'+(done!==undefined?' disabled':'')+'" id="co-'+t.id+'-'+i+'" onclick="pickCmd('+t.id+','+i+')"><span style="font-weight:700;color:var(--text3)">'+L[i]+'.</span><code>'+esc(o)+'</code></button>').join('')+'</div><div class="cmd-exp" id="cexp-'+t.id+'">'+esc(t.exp)+'</div></div>';}).join('');Object.entries(cmdDone).forEach(([id,chosen])=>applyCmdState(parseInt(id),chosen));updateCmdProg();}
+function renderCmd(){cmdDone=lsGet('cmd_prog',{});const L=['A','B','C','D'];document.getElementById('cmd-container').innerHTML='<div style="margin-bottom:12px"><button class="btn btn-outline btn-sm" onclick="startCmdMuscle()">💪 Muscle Memory (ввод команд)</button></div>'+CMD_TASKS.map((t,idx)=>{const done=cmdDone[t.id];return '<div class="cmd-card" id="cmd-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:11px;font-weight:700;color:var(--text3)">Задача '+(idx+1)+'/40</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅ Верно':'❌ Ошибка')+'</span>':'')+'</div><div class="cmd-task-text">'+esc(t.task)+'</div><div class="cmd-opts">'+optionOrder('cmd',t.id,t.opts.length).map((oi,vp)=>'<button type="button" class="cmd-opt'+(done!==undefined?' disabled':'')+'" id="co-'+t.id+'-'+vp+'" data-orig-idx="'+oi+'" onclick="pickCmd('+t.id+','+oi+')"><span style="font-weight:700;color:var(--text3)">'+L[vp]+'.</span><code>'+esc(t.opts[oi])+'</code></button>').join('')+'</div><div class="cmd-exp" id="cexp-'+t.id+'">'+esc(t.exp)+'</div></div>';}).join('');Object.entries(cmdDone).forEach(([id,chosen])=>applyCmdState(parseInt(id),chosen));updateCmdProg();}
 function startCmdMuscle(){cmdMuscleActive=true;cmdMuscleQs=shuffle(CMD_TASKS).slice(0,10);cmdMuscleIdx=0;document.getElementById('cmd-container').innerHTML='<div id="muscle-area"></div>';renderMuscleQ();}
 function renderMuscleQ(){if(cmdMuscleIdx>=cmdMuscleQs.length){cmdMuscleActive=false;renderCmd();return;}const t=cmdMuscleQs[cmdMuscleIdx];document.getElementById('muscle-area').innerHTML='<div class="card" style="max-width:600px;margin:0 auto;text-align:center"><div style="font-size:12px;color:var(--text3);margin-bottom:8px">'+(cmdMuscleIdx+1)+' / 10</div><div class="cmd-task-text" style="font-size:15px;margin-bottom:14px">'+esc(t.task)+'</div><input class="form-input" id="muscle-inp" style="width:100%;font-family:JetBrains Mono,monospace;font-size:14px;text-align:center;margin-bottom:10px" placeholder="Введите команду..." onkeydown="if(event.key===\'Enter\')checkMuscle()"><button class="btn btn-primary" onclick="checkMuscle()">Проверить</button><div id="muscle-fb" style="display:none;margin-top:12px"></div><div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="cmdMuscleIdx++;renderMuscleQ()">Пропустить</button></div></div>';setTimeout(()=>document.getElementById('muscle-inp')?.focus(),100);}
 function normalizeCommand(command){return command.trim().replace(/\s+/g,' ');}
 function checkMuscle(){const inp=document.getElementById('muscle-inp');const fb=document.getElementById('muscle-fb');const t=cmdMuscleQs[cmdMuscleIdx];const correct=t.opts[t.answer];const userCmd=normalizeCommand(inp.value);const ok=userCmd===normalizeCommand(correct);fb.style.display='block';if(ok){fb.innerHTML='<span style="color:var(--green);font-weight:700">✅ Верно!</span>';if(cmdDone[t.id]===undefined){cmdDone[t.id]=t.answer;lsSet('cmd_prog',cmdDone);}}else{fb.innerHTML='<span style="color:var(--red);font-weight:700">❌ Правильно:</span><br><code style="color:var(--green)">'+esc(correct)+'</code><br><div style="font-size:12px;color:var(--text2);margin-top:4px">💡 '+esc(t.exp)+'</div>';}recordTrainerResult('command-muscle','Linux',ok,'Commands');inp.disabled=true;setTimeout(()=>{cmdMuscleIdx++;renderMuscleQ();},ok?800:2000);}
-function applyCmdState(id,chosen){const t=CMD_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#cmd-'+id+' .cmd-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong');});document.getElementById('cexp-'+id).style.display='block';}
+function applyCmdState(id,chosen){const t=CMD_TASKS.find(x=>x.id===id);if(!t) return;applyOptionState('#cmd-'+id+' .cmd-opt',t.answer,chosen,'correct','wrong');document.getElementById('cexp-'+id).style.display='block';}
 function pickCmd(tid,chosen){if(cmdDone[tid]!==undefined) return;const task=CMD_TASKS.find(t=>t.id===tid);cmdDone[tid]=chosen;lsSet('cmd_prog',cmdDone);recordTrainerResult('command','Linux',!!task&&task.answer===chosen,'Commands');applyCmdState(tid,chosen);updateCmdProg();}
 function updateCmdProg(){const done=Object.keys(cmdDone).length;const ok=Object.entries(cmdDone).filter(([id,c])=>CMD_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('cmd-progress-fill').style.width=(done/CMD_TASKS.length*100)+'%';document.getElementById('cmd-score-display').textContent=ok+' / '+CMD_TASKS.length+' правильно';}
 
 // ═══ CODE REVIEWER ═══
 let codeDone={};
-function renderCode(){codeDone=lsGet('code_prog',{});const L=['A','B','C','D'];document.getElementById('code-container').innerHTML=CODE_TASKS.map((t,idx)=>{const done=codeDone[t.id];const tool=t.tool==='Terraform'?'tag-tf':'tag-ans';const hlCode=t.tool==='Terraform'?highlightHCL(t.code):highlightYAML(t.code);const hlFix=t.tool==='Terraform'?highlightHCL(t.fix):highlightYAML(t.fix);return '<div class="code-card" id="code-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="tag '+tool+'">'+t.tool+'</span><span style="font-size:14px;font-weight:700">'+esc(t.title)+'</span><span style="margin-left:auto;font-size:11px;color:var(--text3)">'+(idx+1)+'/15</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅':'❌')+'</span>':'')+'</div><div class="code-question">🔍 Найдите ошибку в этом коде:</div><div class="code-block">'+hlCode+'</div><div class="code-opts">'+t.opts.map((o,i)=>'<button type="button" class="code-opt'+(done!==undefined?' disabled':'')+'" id="codeopt-'+t.id+'-'+i+'" onclick="pickCode('+t.id+','+i+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[i]+'.</span><span>'+esc(o)+'</span></button>').join('')+'</div><div class="code-fix" id="cfix-'+t.id+'">✅ Исправление:\n'+hlFix+'</div></div>';}).join('');Object.entries(codeDone).forEach(([id,chosen])=>applyCodeState(parseInt(id),chosen));updateCodeProg();}
-function applyCodeState(id,chosen){const t=CODE_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#code-'+id+' .code-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong');});document.getElementById('cfix-'+id).style.display='block';}
+function renderCode(){codeDone=lsGet('code_prog',{});const L=['A','B','C','D'];document.getElementById('code-container').innerHTML=CODE_TASKS.map((t,idx)=>{const done=codeDone[t.id];const tool=t.tool==='Terraform'?'tag-tf':'tag-ans';const hlCode=t.tool==='Terraform'?highlightHCL(t.code):highlightYAML(t.code);const hlFix=t.tool==='Terraform'?highlightHCL(t.fix):highlightYAML(t.fix);return '<div class="code-card" id="code-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="tag '+tool+'">'+t.tool+'</span><span style="font-size:14px;font-weight:700">'+esc(t.title)+'</span><span style="margin-left:auto;font-size:11px;color:var(--text3)">'+(idx+1)+'/15</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅':'❌')+'</span>':'')+'</div><div class="code-question">🔍 Найдите ошибку в этом коде:</div><div class="code-block">'+hlCode+'</div><div class="code-opts">'+optionOrder('code',t.id,t.opts.length).map((oi,vp)=>'<button type="button" class="code-opt'+(done!==undefined?' disabled':'')+'" id="codeopt-'+t.id+'-'+vp+'" data-orig-idx="'+oi+'" onclick="pickCode('+t.id+','+oi+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[vp]+'.</span><span>'+esc(t.opts[oi])+'</span></button>').join('')+'</div><div class="code-fix" id="cfix-'+t.id+'">✅ Исправление:\n'+hlFix+'</div></div>';}).join('');Object.entries(codeDone).forEach(([id,chosen])=>applyCodeState(parseInt(id),chosen));updateCodeProg();}
+function applyCodeState(id,chosen){const t=CODE_TASKS.find(x=>x.id===id);if(!t) return;applyOptionState('#code-'+id+' .code-opt',t.answer,chosen,'correct','wrong');document.getElementById('cfix-'+id).style.display='block';}
 function pickCode(tid,chosen){if(codeDone[tid]!==undefined) return;const task=CODE_TASKS.find(t=>t.id===tid);codeDone[tid]=chosen;lsSet('code_prog',codeDone);recordTrainerResult('code',task?.tool||'',!!task&&task.answer===chosen,'Code review');applyCodeState(tid,chosen);updateCodeProg();}
 function updateCodeProg(){const done=Object.keys(codeDone).length;const ok=Object.entries(codeDone).filter(([id,c])=>CODE_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('code-progress-fill').style.width=(done/CODE_TASKS.length*100)+'%';document.getElementById('code-score-display').textContent=ok+' / '+CODE_TASKS.length+' правильно';}
 
 // ═══ ANSIBLE TRAINER ═══
 let ansDone={};
-function renderAnsible(){ansDone=lsGet('ans_prog',{});const L=['A','B','C','D'];document.getElementById('ans-container').innerHTML=ANSIBLE_PB_TASKS.map(t=>{const done=ansDone[t.id];return '<div class="code-card" id="ans-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="tag tag-ans">Ansible</span><span style="font-size:14px;font-weight:700">'+esc(t.title)+'</span><span style="margin-left:auto;font-size:11px;color:var(--text3)">'+(ANSIBLE_PB_TASKS.indexOf(t)+1)+'/10</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅':'❌')+'</span>':'')+'</div><div class="code-question">📋 Задача: '+esc(t.task)+'</div><div class="code-block">'+highlightYAML(t.code)+'</div><div class="code-question" style="color:var(--red)">🔍 Найдите ошибку:</div><div class="code-opts">'+t.opts.map((o,i)=>'<button type="button" class="code-opt'+(done!==undefined?' disabled':'')+'" id="ansopt-'+t.id+'-'+i+'" onclick="pickAns('+t.id+','+i+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[i]+'.</span><span>'+esc(o)+'</span></button>').join('')+'</div><div class="code-fix" id="afix-'+t.id+'">✅ Исправление:\n'+highlightYAML(t.fix)+'</div></div>';}).join('');Object.entries(ansDone).forEach(([id,chosen])=>applyAnsState(parseInt(id),chosen));updateAnsProg();}
-function applyAnsState(id,chosen){const t=ANSIBLE_PB_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#ans-'+id+' .code-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong');});document.getElementById('afix-'+id).style.display='block';}
+function renderAnsible(){ansDone=lsGet('ans_prog',{});const L=['A','B','C','D'];document.getElementById('ans-container').innerHTML=ANSIBLE_PB_TASKS.map(t=>{const done=ansDone[t.id];return '<div class="code-card" id="ans-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="tag tag-ans">Ansible</span><span style="font-size:14px;font-weight:700">'+esc(t.title)+'</span><span style="margin-left:auto;font-size:11px;color:var(--text3)">'+(ANSIBLE_PB_TASKS.indexOf(t)+1)+'/10</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅':'❌')+'</span>':'')+'</div><div class="code-question">📋 Задача: '+esc(t.task)+'</div><div class="code-block">'+highlightYAML(t.code)+'</div><div class="code-question" style="color:var(--red)">🔍 Найдите ошибку:</div><div class="code-opts">'+optionOrder('ans',t.id,t.opts.length).map((oi,vp)=>'<button type="button" class="code-opt'+(done!==undefined?' disabled':'')+'" id="ansopt-'+t.id+'-'+vp+'" data-orig-idx="'+oi+'" onclick="pickAns('+t.id+','+oi+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[vp]+'.</span><span>'+esc(t.opts[oi])+'</span></button>').join('')+'</div><div class="code-fix" id="afix-'+t.id+'">✅ Исправление:\n'+highlightYAML(t.fix)+'</div></div>';}).join('');Object.entries(ansDone).forEach(([id,chosen])=>applyAnsState(parseInt(id),chosen));updateAnsProg();}
+function applyAnsState(id,chosen){const t=ANSIBLE_PB_TASKS.find(x=>x.id===id);if(!t) return;applyOptionState('#ans-'+id+' .code-opt',t.answer,chosen,'correct','wrong');document.getElementById('afix-'+id).style.display='block';}
 function pickAns(tid,chosen){if(ansDone[tid]!==undefined) return;const task=ANSIBLE_PB_TASKS.find(t=>t.id===tid);ansDone[tid]=chosen;lsSet('ans_prog',ansDone);recordTrainerResult('ansible','Ansible',!!task&&task.answer===chosen,'Code review');applyAnsState(tid,chosen);updateAnsProg();}
 function updateAnsProg(){const done=Object.keys(ansDone).length;const ok=Object.entries(ansDone).filter(([id,c])=>ANSIBLE_PB_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('ans-pb').style.width=(done/ANSIBLE_PB_TASKS.length*100)+'%';document.getElementById('ans-score-lbl').textContent=ok+' / '+ANSIBLE_PB_TASKS.length+' правильно';}
 
 // ═══ DOCKERFILE TRAINER ═══
 let dfDone={};
-function renderDockerfile(){dfDone=lsGet('df_prog',{});const L=['A','B','C','D'];document.getElementById('df-container').innerHTML=DOCKERFILE_TASKS.map(t=>{const done=dfDone[t.id];return '<div class="code-card" id="df-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="tag tag-docker">Docker</span><span style="font-size:14px;font-weight:700">'+esc(t.title)+'</span><span style="margin-left:auto;font-size:11px;color:var(--text3)">'+(DOCKERFILE_TASKS.indexOf(t)+1)+'/10</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅':'❌')+'</span>':'')+'</div><div class="code-block">'+highlightDockerfile(t.code)+'</div><div class="code-question" style="color:var(--red)">🔍 В чём проблема?</div><div class="code-opts">'+t.opts.map((o,i)=>'<button type="button" class="code-opt'+(done!==undefined?' disabled':'')+'" id="dfopt-'+t.id+'-'+i+'" onclick="pickDf('+t.id+','+i+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[i]+'.</span><span>'+esc(o)+'</span></button>').join('')+'</div><div class="code-fix" id="dfix-'+t.id+'">✅ Правильный вариант:\n'+esc(t.fix)+'</div></div>';}).join('');Object.entries(dfDone).forEach(([id,chosen])=>applyDfState(parseInt(id),chosen));updateDfProg();}
-function applyDfState(id,chosen){const t=DOCKERFILE_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#df-'+id+' .code-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong');});document.getElementById('dfix-'+id).style.display='block';}
+function renderDockerfile(){dfDone=lsGet('df_prog',{});const L=['A','B','C','D'];document.getElementById('df-container').innerHTML=DOCKERFILE_TASKS.map(t=>{const done=dfDone[t.id];return '<div class="code-card" id="df-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="tag tag-docker">Docker</span><span style="font-size:14px;font-weight:700">'+esc(t.title)+'</span><span style="margin-left:auto;font-size:11px;color:var(--text3)">'+(DOCKERFILE_TASKS.indexOf(t)+1)+'/10</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅':'❌')+'</span>':'')+'</div><div class="code-block">'+highlightDockerfile(t.code)+'</div><div class="code-question" style="color:var(--red)">🔍 В чём проблема?</div><div class="code-opts">'+optionOrder('df',t.id,t.opts.length).map((oi,vp)=>'<button type="button" class="code-opt'+(done!==undefined?' disabled':'')+'" id="dfopt-'+t.id+'-'+vp+'" data-orig-idx="'+oi+'" onclick="pickDf('+t.id+','+oi+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[vp]+'.</span><span>'+esc(t.opts[oi])+'</span></button>').join('')+'</div><div class="code-fix" id="dfix-'+t.id+'">✅ Правильный вариант:\n'+esc(t.fix)+'</div></div>';}).join('');Object.entries(dfDone).forEach(([id,chosen])=>applyDfState(parseInt(id),chosen));updateDfProg();}
+function applyDfState(id,chosen){const t=DOCKERFILE_TASKS.find(x=>x.id===id);if(!t) return;applyOptionState('#df-'+id+' .code-opt',t.answer,chosen,'correct','wrong');document.getElementById('dfix-'+id).style.display='block';}
 function pickDf(tid,chosen){if(dfDone[tid]!==undefined) return;const task=DOCKERFILE_TASKS.find(t=>t.id===tid);dfDone[tid]=chosen;lsSet('df_prog',dfDone);recordTrainerResult('dockerfile','Docker',!!task&&task.answer===chosen,'Code review');applyDfState(tid,chosen);updateDfProg();}
 function updateDfProg(){const done=Object.keys(dfDone).length;const ok=Object.entries(dfDone).filter(([id,c])=>DOCKERFILE_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('df-pb').style.width=(done/DOCKERFILE_TASKS.length*100)+'%';document.getElementById('df-score-lbl').textContent=ok+' / '+DOCKERFILE_TASKS.length+' правильно';}
 
 // ═══ K8S TRAINER ═══
 let k8sDone={};
-function renderK8s(){k8sDone=lsGet('k8s_prog',{});const L=['A','B','C','D'];document.getElementById('k8s-container').innerHTML=K8S_TASKS.map(t=>{const done=k8sDone[t.id];return '<div class="code-card" id="k8sc-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="tag tag-k8s">K8s</span><span style="font-size:14px;font-weight:700">'+esc(t.title)+'</span><span style="margin-left:auto;font-size:11px;color:var(--text3)">'+(K8S_TASKS.indexOf(t)+1)+'/10</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅':'❌')+'</span>':'')+'</div><div class="code-block">'+highlightYAML(t.code)+'</div><div class="code-question" style="color:var(--red)">🔍 В чём проблема?</div><div class="code-opts">'+t.opts.map((o,i)=>'<button type="button" class="code-opt'+(done!==undefined?' disabled':'')+'" id="k8sopt-'+t.id+'-'+i+'" onclick="pickK8s('+t.id+','+i+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[i]+'.</span><span>'+esc(o)+'</span></button>').join('')+'</div><div class="code-fix" id="k8sfix-'+t.id+'">✅ Исправление:\n'+highlightYAML(t.fix)+'</div></div>';}).join('');Object.entries(k8sDone).forEach(([id,chosen])=>applyK8sState(parseInt(id),chosen));updateK8sProg();}
-function applyK8sState(id,chosen){const t=K8S_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#k8sc-'+id+' .code-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong');});document.getElementById('k8sfix-'+id).style.display='block';}
+function renderK8s(){k8sDone=lsGet('k8s_prog',{});const L=['A','B','C','D'];document.getElementById('k8s-container').innerHTML=K8S_TASKS.map(t=>{const done=k8sDone[t.id];return '<div class="code-card" id="k8sc-'+t.id+'"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="tag tag-k8s">K8s</span><span style="font-size:14px;font-weight:700">'+esc(t.title)+'</span><span style="margin-left:auto;font-size:11px;color:var(--text3)">'+(K8S_TASKS.indexOf(t)+1)+'/10</span>'+(done!==undefined?'<span style="color:'+(done===t.answer?'var(--green)':'var(--red)')+'">'+(done===t.answer?'✅':'❌')+'</span>':'')+'</div><div class="code-block">'+highlightYAML(t.code)+'</div><div class="code-question" style="color:var(--red)">🔍 В чём проблема?</div><div class="code-opts">'+optionOrder('k8s',t.id,t.opts.length).map((oi,vp)=>'<button type="button" class="code-opt'+(done!==undefined?' disabled':'')+'" id="k8sopt-'+t.id+'-'+vp+'" data-orig-idx="'+oi+'" onclick="pickK8s('+t.id+','+oi+')"><span style="font-weight:700;color:var(--text3);flex-shrink:0">'+L[vp]+'.</span><span>'+esc(t.opts[oi])+'</span></button>').join('')+'</div><div class="code-fix" id="k8sfix-'+t.id+'">✅ Исправление:\n'+highlightYAML(t.fix)+'</div></div>';}).join('');Object.entries(k8sDone).forEach(([id,chosen])=>applyK8sState(parseInt(id),chosen));updateK8sProg();}
+function applyK8sState(id,chosen){const t=K8S_TASKS.find(x=>x.id===id);if(!t) return;applyOptionState('#k8sc-'+id+' .code-opt',t.answer,chosen,'correct','wrong');document.getElementById('k8sfix-'+id).style.display='block';}
 function pickK8s(tid,chosen){if(k8sDone[tid]!==undefined) return;const task=K8S_TASKS.find(t=>t.id===tid);k8sDone[tid]=chosen;lsSet('k8s_prog',k8sDone);recordTrainerResult('k8s','Kubernetes',!!task&&task.answer===chosen,'Code review');applyK8sState(tid,chosen);updateK8sProg();}
 function updateK8sProg(){const done=Object.keys(k8sDone).length;const ok=Object.entries(k8sDone).filter(([id,c])=>K8S_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('k8s-pb').style.width=(done/K8S_TASKS.length*100)+'%';document.getElementById('k8s-score-lbl').textContent=ok+' / '+K8S_TASKS.length+' правильно';}
 
@@ -1314,15 +1346,15 @@ function updatePtProg(){const done=Object.keys(ptDone).length;document.getElemen
 
 // ═══ GIT TRAINER ═══
 let gitDone={};
-function renderGit(){gitDone=lsGet('git_prog',{});const L=['A','B','C','D'];document.getElementById('git-container').innerHTML=GIT_TASKS.map(t=>{const done=gitDone[t.id];return '<div class="git-card" id="gt-'+t.id+'"><div class="git-num">Задача #'+t.id+'</div><div class="git-task">'+esc(t.task)+'</div><div class="git-opts">'+t.opts.map((o,i)=>'<button type="button" class="git-opt'+(done!==undefined?' disabled':'')+'" id="go-'+t.id+'-'+i+'" onclick="pickGit('+t.id+','+i+')"><span style="font-weight:600;margin-right:8px;color:var(--text3)">'+L[i]+')</span>'+esc(o)+'</button>').join('')+'</div><div class="git-exp" id="gexp-'+t.id+'">💡 '+esc(t.exp)+'</div></div>';}).join('');Object.entries(gitDone).forEach(([id,c])=>applyGitState(parseInt(id),c));updateGitProg();}
-function applyGitState(id,chosen){const t=GIT_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#gt-'+id+' .git-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong-pick');});document.getElementById('gexp-'+id).style.display='block';}
+function renderGit(){gitDone=lsGet('git_prog',{});const L=['A','B','C','D'];document.getElementById('git-container').innerHTML=GIT_TASKS.map(t=>{const done=gitDone[t.id];return '<div class="git-card" id="gt-'+t.id+'"><div class="git-num">Задача #'+t.id+'</div><div class="git-task">'+esc(t.task)+'</div><div class="git-opts">'+optionOrder('git',t.id,t.opts.length).map((oi,vp)=>'<button type="button" class="git-opt'+(done!==undefined?' disabled':'')+'" id="go-'+t.id+'-'+vp+'" data-orig-idx="'+oi+'" onclick="pickGit('+t.id+','+oi+')"><span style="font-weight:600;margin-right:8px;color:var(--text3)">'+L[vp]+')</span>'+esc(t.opts[oi])+'</button>').join('')+'</div><div class="git-exp" id="gexp-'+t.id+'">💡 '+esc(t.exp)+'</div></div>';}).join('');Object.entries(gitDone).forEach(([id,c])=>applyGitState(parseInt(id),c));updateGitProg();}
+function applyGitState(id,chosen){const t=GIT_TASKS.find(x=>x.id===id);if(!t) return;applyOptionState('#gt-'+id+' .git-opt',t.answer,chosen,'correct','wrong-pick');document.getElementById('gexp-'+id).style.display='block';}
 function pickGit(tid,chosen){if(gitDone[tid]!==undefined) return;const task=GIT_TASKS.find(t=>t.id===tid);gitDone[tid]=chosen;lsSet('git_prog',gitDone);recordTrainerResult('git','Git',!!task&&task.answer===chosen);applyGitState(tid,chosen);updateGitProg();}
 function updateGitProg(){const done=Object.keys(gitDone).length;const ok=Object.entries(gitDone).filter(([id,c])=>GIT_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('git-pb').style.width=(done/GIT_TASKS.length*100)+'%';document.getElementById('git-score-lbl').textContent=ok+' / '+GIT_TASKS.length+' правильно';}
 
 // ═══ REGEX TRAINER ═══
 let rxDone={};
-function renderRegex(){rxDone=lsGet('regex_prog',{});const L=['A','B','C','D'];document.getElementById('rx-container').innerHTML=REGEX_TASKS.map(t=>{const done=rxDone[t.id];return '<div class="rx-card" id="rx-'+t.id+'"><div class="rx-num">Задача #'+t.id+'</div><div class="rx-task">'+esc(t.task)+'</div>'+(t.context?'<div class="rx-ctx">$ '+esc(t.context)+'</div>':'')+'<div class="rx-opts">'+t.opts.map((o,i)=>'<button type="button" class="rx-opt'+(done!==undefined?' disabled':'')+'" id="ro-'+t.id+'-'+i+'" onclick="pickRx('+t.id+','+i+')"><span style="font-weight:600;margin-right:8px;color:var(--text3)">'+L[i]+')</span>'+esc(o)+'</button>').join('')+'</div><div class="rx-exp" id="rexp-'+t.id+'">💡 '+esc(t.exp)+'</div></div>';}).join('');Object.entries(rxDone).forEach(([id,c])=>applyRxState(parseInt(id),c));updateRxProg();}
-function applyRxState(id,chosen){const t=REGEX_TASKS.find(x=>x.id===id);if(!t) return;document.querySelectorAll('#rx-'+id+' .rx-opt').forEach((el,i)=>{el.classList.add('disabled');if(i===t.answer)el.classList.add('correct');else if(i===chosen)el.classList.add('wrong-pick');});document.getElementById('rexp-'+id).style.display='block';}
+function renderRegex(){rxDone=lsGet('regex_prog',{});const L=['A','B','C','D'];document.getElementById('rx-container').innerHTML=REGEX_TASKS.map(t=>{const done=rxDone[t.id];return '<div class="rx-card" id="rx-'+t.id+'"><div class="rx-num">Задача #'+t.id+'</div><div class="rx-task">'+esc(t.task)+'</div>'+(t.context?'<div class="rx-ctx">$ '+esc(t.context)+'</div>':'')+'<div class="rx-opts">'+optionOrder('rx',t.id,t.opts.length).map((oi,vp)=>'<button type="button" class="rx-opt'+(done!==undefined?' disabled':'')+'" id="ro-'+t.id+'-'+vp+'" data-orig-idx="'+oi+'" onclick="pickRx('+t.id+','+oi+')"><span style="font-weight:600;margin-right:8px;color:var(--text3)">'+L[vp]+')</span>'+esc(t.opts[oi])+'</button>').join('')+'</div><div class="rx-exp" id="rexp-'+t.id+'">💡 '+esc(t.exp)+'</div></div>';}).join('');Object.entries(rxDone).forEach(([id,c])=>applyRxState(parseInt(id),c));updateRxProg();}
+function applyRxState(id,chosen){const t=REGEX_TASKS.find(x=>x.id===id);if(!t) return;applyOptionState('#rx-'+id+' .rx-opt',t.answer,chosen,'correct','wrong-pick');document.getElementById('rexp-'+id).style.display='block';}
 function pickRx(tid,chosen){if(rxDone[tid]!==undefined) return;const task=REGEX_TASKS.find(t=>t.id===tid);rxDone[tid]=chosen;lsSet('regex_prog',rxDone);recordTrainerResult('regex','Regex',!!task&&task.answer===chosen);applyRxState(tid,chosen);updateRxProg();}
 function updateRxProg(){const done=Object.keys(rxDone).length;const ok=Object.entries(rxDone).filter(([id,c])=>REGEX_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('rx-pb').style.width=(done/REGEX_TASKS.length*100)+'%';document.getElementById('rx-score-lbl').textContent=ok+' / '+REGEX_TASKS.length+' правильно';}
 
@@ -1839,10 +1871,36 @@ function toggleMasteryGrid(){
 }
 
 // ═══ INCIDENT SIMULATION ═══
-let incState={incident:null,phase:0,score:0,answers:[]};
-function startIncidentSim(){
+let incState={incident:null,phase:0,score:0,answers:[]},incDone={};
+// Список сценариев: до этого инциденты открывались только случайным выбором с
+// главной, и восемь разборов негде было увидеть.
+function renderIncidentList(){
+  incDone=lsGet('inc_prog',{});
+  const host=document.getElementById('inc-cards');
+  if(!host) return;
+  if(!INCIDENTS.length){host.innerHTML='<p style="color:var(--text2);font-size:13px">Сценарии не загружены.</p>';return;}
+  host.innerHTML=INCIDENTS.map(inc=>{
+    const res=incDone[inc.id];
+    const total=(inc.phases||[]).length;
+    const badge=res?'<span class="inc-card-badge'+(res.score===total?' inc-ok':'')+'">'+res.score+' из '+total+'</span>':'';
+    return '<button type="button" class="inc-sc-card'+(res?' done':'')+'" onclick="startIncidentById(\''+esc(inc.id)+'\')">'+
+      '<div class="inc-sc-head"><span class="inc-sc-title">'+esc(inc.title)+'</span>'+badge+'</div>'+
+      '<div class="inc-sc-meta">'+ttag(inc.topic)+'<span class="tag tag-sr">'+esc(inc.level)+'</span></div>'+
+      '<div class="inc-sc-ctx">'+esc(inc.context)+'</div>'+
+      (inc.impact?'<div class="inc-sc-impact">Влияние: '+esc(inc.impact)+'</div>':'')+
+      '</button>';
+  }).join('');
+}
+function startIncidentById(id){
+  const found=INCIDENTS.find(inc=>String(inc.id)===String(id));
+  if(!found) return;
+  startIncidentSim(found);
+}
+function startIncidentSim(preset){
   if(!INCIDENTS.length){alert("Нет сценариев инцидентов");return;}
-  incState.incident=INCIDENTS[Math.floor(Math.random()*INCIDENTS.length)];
+  // Без аргумента — случайный сценарий (кнопка «Другой инцидент» и быстрый
+  // старт с главной), с аргументом — выбранный в списке.
+  incState.incident=preset||INCIDENTS[Math.floor(Math.random()*INCIDENTS.length)];
   incState.phase=0;incState.score=0;incState.answers=[];
   nav("exam");
   document.getElementById("exam-controls").style.display="none";
@@ -1902,6 +1960,17 @@ function endIncidentSim(){
   restoreExamControls();
   const total=incState.incident.phases.length;const s=incState.score;
   const grade=s===total?"🏆 Отлично!":s>=total*0.7?"👍 Хорошо":"📚 Нужно подтянуть";
+  // Результат сохраняем, иначе хаб тренажёров всегда показывал бы ноль, а
+  // разобранные сценарии было бы не отличить от нетронутых.
+  // Лучший результат не понижаем: повторный разбор с ошибкой не должен
+  // «отбирать» уже достигнутое.
+  incDone=lsGet('inc_prog',{});
+  const prev=incDone[incState.incident.id];
+  if(!prev||typeof prev.score!=='number'||prev.score<s){
+    incDone[incState.incident.id]={score:s,total,at:Date.now()};
+    lsSet('inc_prog',incDone);
+  }
+  updateTrainersCount();
   // Названия фаз берём из сценария: жёсткий список из четырёх строк молча
   // разъезжался бы с данными, если у инцидента другой набор фаз.
   const PHASE_RU={triage:'Триаж',diagnosis:'Диагностика',remediation:'Исправление',postmortem:'Postmortem'};
@@ -1916,6 +1985,7 @@ function endIncidentSim(){
     phases.map((p,i)=>{const a=incState.answers[i];return '<div style="font-size:13px;padding:4px 0">'+(a&&a.ok?"✅":"❌")+' '+p+'</div>';}).join('')+
     '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px">'+
     '<button class="btn btn-primary" onclick="startIncidentSim()">🔄 Другой инцидент</button>'+
+    '<button class="btn btn-outline" onclick="nav(\'incidents\')">← К списку</button>'+
     '<button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
 }
 function renderExternalTasks(){

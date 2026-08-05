@@ -52,7 +52,7 @@
     "task": "Следить за последними 100 строками лога в реальном времени",
     "opts": [
       "tail -n 100 -f /var/log/app.log",
-      "cat /var/log/app.log | tail",
+      "cat /var/log/app.log | tail -n 100 -f",
       "less +F /var/log/app.log",
       "watch tail /var/log/app.log"
     ],
@@ -64,7 +64,7 @@
     "task": "Создать tar архив директории /app, исключая папку node_modules",
     "opts": [
       "tar -czf app.tar.gz --exclude=node_modules /app",
-      "tar -czf app.tar.gz /app --skip node_modules",
+      "tar -czf app.tar.gz /app --skip-dir=node_modules",
       "zip -r app.zip /app -x node_modules",
       "tar -czf app.tar.gz /app -ignore node_modules"
     ],
@@ -124,7 +124,7 @@
     "task": "Применить Terraform только к конкретному ресурсу без подтверждения",
     "opts": [
       "terraform apply -target=aws_instance.web -auto-approve",
-      "terraform apply aws_instance.web",
+      "terraform apply -resource=aws_instance.web -auto-approve",
       "terraform plan -target=aws_instance.web",
       "terraform apply --only aws_instance.web"
     ],
@@ -184,7 +184,7 @@
     "task": "Запустить playbook только с тегами deploy, пропустить тег cleanup",
     "opts": [
       "ansible-playbook site.yml --tags deploy --skip-tags cleanup",
-      "ansible-playbook site.yml -t deploy --ignore cleanup",
+      "ansible-playbook site.yml --tags deploy --exclude-tags cleanup",
       "ansible-playbook site.yml --only-tags deploy",
       "ansible-playbook site.yml --tags deploy -x cleanup"
     ],
@@ -196,7 +196,7 @@
     "task": "Проверить синтаксис playbook без выполнения",
     "opts": [
       "ansible-playbook site.yml --syntax-check",
-      "ansible-playbook site.yml --dry-run",
+      "ansible-playbook site.yml --check --syntax-only",
       "ansible-playbook site.yml --check",
       "ansible-lint site.yml"
     ],
@@ -256,7 +256,7 @@
     "task": "Показать логи контейнера myapp за последние 10 минут",
     "opts": [
       "docker logs --since 10m myapp",
-      "docker logs --tail 10 myapp",
+      "docker logs --tail 10m --follow myapp",
       "docker logs --time 10m myapp",
       "docker logs -n 10m myapp"
     ],
@@ -328,7 +328,7 @@
     "task": "Собрать multi-stage образ из Dockerfile остановившись на stage с именем 'builder'",
     "opts": [
       "docker build --target builder -t myapp:builder .",
-      "docker build --stage builder -t myapp:builder .",
+      "docker build --stop-at-stage builder -t myapp:builder .",
       "docker build -s builder -t myapp:builder .",
       "docker build --from builder -t myapp:builder ."
     ],
@@ -352,7 +352,7 @@
     "task": "Проверить статус healthcheck для контейнера myapp",
     "opts": [
       "docker inspect --format='{{json .State.Health}}' myapp",
-      "docker health myapp",
+      "docker container health --format='{{json .Health}}' myapp",
       "docker status myapp",
       "docker ps --health myapp"
     ],
@@ -364,7 +364,7 @@
     "task": "Получить логи из предыдущего (упавшего) экземпляра контейнера app в pod api-pod",
     "opts": [
       "kubectl logs api-pod -c app --previous",
-      "kubectl logs api-pod -c app --last",
+      "kubectl logs --last-terminated api-pod -c app",
       "kubectl logs api-pod -c app --crashed",
       "kubectl logs --prev api-pod -c app"
     ],
@@ -376,7 +376,7 @@
     "task": "Запустить временный pod с образом busybox для интерактивной отладки сети и удалить его после выхода",
     "opts": [
       "kubectl run debug --image=busybox --rm -it --restart=Never -- sh",
-      "kubectl run debug --image=busybox -it --delete-on-exit -- sh",
+      "kubectl run debug --image=busybox -it --restart=Never --auto-remove -- sh",
       "kubectl create pod debug --image=busybox --interactive",
       "kubectl exec -it --image=busybox -- sh"
     ],
@@ -388,7 +388,7 @@
     "task": "Применить манифест deployment.yaml и сразу проверить статус rollout",
     "opts": [
       "kubectl apply -f deployment.yaml && kubectl rollout status deployment/myapp",
-      "kubectl apply -f deployment.yaml && kubectl get deployment myapp",
+      "kubectl apply -f deployment.yaml --wait && kubectl rollout watch deployment/myapp",
       "kubectl deploy -f deployment.yaml --watch",
       "kubectl apply -f deployment.yaml --rollout-watch"
     ],
@@ -400,7 +400,7 @@
     "task": "Принудительно удалить pod застрявший в статусе Terminating",
     "opts": [
       "kubectl delete pod stuck-pod --force --grace-period=0",
-      "kubectl delete pod stuck-pod --timeout=0",
+      "kubectl delete pod stuck-pod --force --terminate-now=true",
       "kubectl kill pod stuck-pod",
       "kubectl delete pod stuck-pod --now"
     ],
@@ -448,7 +448,7 @@
     "task": "Показать все события (events) в namespace production отсортированные по времени",
     "opts": [
       "kubectl get events -n production --sort-by='.lastTimestamp'",
-      "kubectl describe events -n production",
+      "kubectl get events -n production --order-by='.lastTimestamp'",
       "kubectl get events -n production --watch",
       "kubectl logs events -n production"
     ],

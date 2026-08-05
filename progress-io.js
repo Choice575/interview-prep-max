@@ -12,7 +12,8 @@
     'study_answers', 'study_weekly_results', 'senior_case_prog', 'coach_control',
     // Daily blitz and achievement state must travel with the progress file:
     // without them an import resets the streak and re-fires "new badge" dots.
-    'daily_blitz', 'gamification', 'qbank_revealed'
+    'daily_blitz', 'gamification', 'qbank_revealed',
+    'inc_prog'
   ];
   const IMPORT_ARRAY_KEYS = ['history', 'custom', 'skill_events', 'coach_journal'];
 

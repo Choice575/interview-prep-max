@@ -7,9 +7,9 @@
     "fix": "FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y nginx curl && rm -rf /var/lib/apt/lists/*\nCOPY . /app",
     "opts": [
       "apt-get update и install в разных RUN + нет очистки кэша",
-      "Нельзя использовать ubuntu:22.04",
-      "COPY должен быть перед RUN",
-      "nginx и curl нельзя ставить вместе"
+      "ubuntu:22.04 устарел — apt-get работает только в debian-образах",
+      "COPY обязан идти до всех RUN, иначе слои не попадут в кэш сборки",
+      "nginx и curl конфликтуют при установке одним apt-get install"
     ],
     "answer": 0
   },
@@ -21,9 +21,9 @@
     "fix": "FROM node:18\nCOPY package.json package-lock.json ./\nRUN npm ci --only=production\nCOPY src/ ./src/\nCMD [\"node\", \"app.js\"]",
     "opts": [
       "COPY . . копирует node_modules, .git, тесты в образ",
-      "npm ci не работает с --only=production",
-      "CMD в exec-форме не нужен",
-      "node:18 не поддерживает npm ci"
+      "npm ci требует флаг --production вместо --only=production",
+      "CMD в exec-форме требует указания полного пути до бинарника node",
+      "node:18 не содержит npm ci — нужен отдельный образ node:18-build"
     ],
     "answer": 0
   },
@@ -35,9 +35,9 @@
     "fix": "FROM nginx:alpine\nCOPY nginx.conf /etc/nginx/nginx.conf\nCMD [\"nginx\", \"-g\", \"daemon off;\"]",
     "opts": [
       "CMD в shell-форме — SIGTERM получает sh, а не nginx",
-      "nginx не поддерживает daemon off",
-      "nginx:alpine не существует",
-      "COPY не работает с .conf файлами"
+      "nginx требует daemon on в контейнере, иначе процесс сразу завершится",
+      "nginx:alpine не умеет читать nginx.conf из каталога /etc/nginx",
+      "COPY перед CMD ломает порядок слоёв и инвалидирует кэш сборки"
     ],
     "answer": 0
   },
@@ -49,9 +49,9 @@
     "fix": "FROM python:3.11\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install -r requirements.txt\nCOPY . .\nCMD [\"python\", \"main.py\"]",
     "opts": [
       "COPY . перед RUN pip install — кэш сбрасывается при каждом изменении кода",
-      "WORKDIR должен быть до FROM",
-      "pip install не работает без виртуального окружения",
-      "python:3.11 не поддерживает pip"
+      "WORKDIR указан после COPY, поэтому файлы окажутся в корне образа, а не в каталоге /app",
+      "pip install без активного venv ставит пакеты в системный python и падает",
+      "python:3.11 требует явного pip install --upgrade pip перед установкой"
     ],
     "answer": 0
   },
@@ -63,9 +63,9 @@
     "fix": "FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*\nCMD [\"nginx\", \"-g\", \"daemon off;\"]",
     "opts": [
       "latest — плавающий тег, сборка невоспроизводима",
-      "ubuntu не подходит для Docker",
-      "nginx нельзя запускать в ubuntu",
-      "RUN apt-get update не нужен"
+      "ubuntu слишком тяжёлый базовый образ для nginx — нужен alpine",
+      "apt-get update в одном RUN с install ломает кэширование слоёв",
+      "nginx в контейнере нужно запускать через systemd, а не напрямую"
     ],
     "answer": 0
   },
@@ -77,9 +77,9 @@
     "fix": "FROM node:18-alpine\nRUN addgroup -S appgroup && adduser -S appuser -G appgroup\nWORKDIR /app\nCOPY --chown=appuser:appgroup . .\nUSER appuser\nRUN npm ci --only=production\nCMD [\"node\", \"app.js\"]",
     "opts": [
       "Процесс запускается от root — угроза безопасности",
-      "node:18-alpine не поддерживает npm ci",
-      "WORKDIR /app не нужен",
-      "--only=production не работает в alpine"
+      "node:18-alpine не содержит npm ci — нужен полный образ node:18",
+      "npm ci требует запуска от root, иначе не сможет создать node_modules",
+      "WORKDIR /app обязан идти до FROM, иначе путь не применится к слоям"
     ],
     "answer": 0
   },
@@ -91,9 +91,9 @@
     "fix": "FROM node:18\nENV NODE_ENV=production\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci --only=production\nCOPY . .\nCMD [\"node\", \"app.js\"]",
     "opts": [
       "ENV NODE_ENV=production после npm install — установлены devDependencies",
-      "ENV не работает в Docker",
-      "npm install требует sudo",
-      "package*.json нельзя копировать"
+      "npm install требует прав root, поэтому USER объявляют только после установки",
+      "package*.json с маской нельзя использовать в COPY — нужен явный список файлов",
+      "ENV в Dockerfile не влияет на шаги сборки, только на запуск контейнера"
     ],
     "answer": 0
   },
@@ -105,9 +105,9 @@
     "fix": "FROM alpine:3.19\nRUN apk add --no-cache curl wget git bash\nCOPY script.sh /usr/local/bin/\nCMD [\"/usr/local/bin/script.sh\"]",
     "opts": [
       "4 RUN создают 4 слоя — нужно объединить в один apk add",
-      "alpine не поддерживает apk",
-      "script.sh нельзя копировать в /usr/local/bin",
-      "CMD с путём не работает в alpine"
+      "alpine:3.19 использует apt-get, а apk остался в старых версиях",
+      "script.sh нельзя класть в /usr/local/bin — только в /opt или /srv",
+      "CMD с абсолютным путём требует shell-формы, иначе файл не найдётся"
     ],
     "answer": 0
   },
@@ -119,9 +119,9 @@
     "fix": "FROM nginx:alpine\nCOPY app/ /usr/share/nginx/html/\nCOPY nginx.conf /etc/nginx/nginx.conf\n// Если нужна загрузка: RUN curl -o /etc/nginx/config.json https://example.com/config.json && rm ...",
     "opts": [
       "ADD распаковывает tar.gz автоматически + URL-загрузка без очистки",
-      "ADD не работает в nginx:alpine",
-      "COPY предпочтительнее ADD только для локальных файлов",
-      "nginx.conf должен быть в /etc/nginx/conf.d/"
+      "ADD не поддерживает загрузку по URL — для этого подходит только RUN curl",
+      "nginx.conf обязан лежать в /etc/nginx/conf.d/, а не в корне каталога",
+      "COPY не умеет копировать каталоги целиком, поэтому здесь нужен ADD"
     ],
     "answer": 0
   },
@@ -133,9 +133,9 @@
     "fix": "FROM python:3.11-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\nCOPY . .\nEXPOSE 5000/tcp\nHEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost:5000/health || exit 1\nCMD [\"python\", \"app.py\"]",
     "opts": [
       "EXPOSE без /tcp + нет HEALTHCHECK + pip без --no-cache-dir",
-      "python:3.11-slim не поддерживает pip",
-      "EXPOSE открывает порт автоматически",
-      "HEALTHCHECK замедляет запуск контейнера"
+      "EXPOSE 5000 публикует порт на хосте даже без -p и открывает его наружу",
+      "python:3.11-slim не содержит pip — нужен полный образ python:3.11",
+      "HEALTHCHECK нельзя использовать вместе с CMD в одном Dockerfile"
     ],
     "answer": 0
   }

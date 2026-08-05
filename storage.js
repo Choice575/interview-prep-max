@@ -22,7 +22,10 @@
     // was never declared here — so every write was silently dropped.
     diagnostic_result: 'ipmax_diagnostic_result',
     daily_blitz: 'ipmax_daily_blitz', gamification: 'ipmax_gamification',
-    qbank_revealed: 'ipmax_qbank_revealed'
+    qbank_revealed: 'ipmax_qbank_revealed',
+    // Разобранные инциденты: без этого ключа хаб тренажёров не мог бы показать
+    // прогресс по ним, а сами сценарии оставались бы «сессионными».
+    inc_prog: 'ipmax_inc_prog'
   };
 
   // `options` carries the timer host for debounced writes ({ setTimeout,

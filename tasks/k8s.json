@@ -7,9 +7,9 @@
     "fix": "readinessProbe:\n  httpGet:\n    path: /health\n    port: 8080\n  initialDelaySeconds: 10\n  periodSeconds: 5",
     "opts": [
       "Нет readinessProbe — трафик идёт на непрогретый под",
-      "replicas: 3 слишком много",
-      "matchLabels не совпадает с labels",
-      "containerPort должен быть 80"
+      "Service не найдёт под без hostPort рядом с containerPort",
+      "matchLabels в selector обязан отличаться от labels пода",
+      "Для replicas: 3 обязателен podAntiAffinity"
     ],
     "answer": 0
   },
@@ -21,9 +21,9 @@
     "fix": "livenessProbe:\n  httpGet:\n    path: /healthz\n    port: 8080\n  initialDelaySeconds: 15\n  periodSeconds: 10\n  failureThreshold: 3",
     "opts": [
       "Нет livenessProbe — зависший под не перезапустится",
-      "resources.requests.memory должен быть в Gi",
-      "kind: Pod не поддерживает resources",
-      "Не указан namespace"
+      "restartPolicy: Always сам перезапустит зависший под",
+      "Планировщик учитывает requests только у Deployment",
+      "cpu: 100m означает 100 ядер — нужно писать 0.1"
     ],
     "answer": 0
   },
@@ -35,9 +35,9 @@
     "fix": "Использовать Secret вместо ConfigMap:\napiVersion: v1\nkind: Secret\nmetadata:\n  name: db-credentials\ntype: Opaque\nstringData:\n  DB_PASSWORD: supersecret",
     "opts": [
       "Пароль в открытом виде в ConfigMap — нужно использовать Secret",
-      "config.yaml должен быть в binaryData",
-      "Неверный apiVersion",
-      "ConfigMap не поддерживает многострочные значения"
+      "Ключи ConfigMap нельзя смешивать: файл и переменная в одном data",
+      "Многострочный config.yaml нужно хранить в binaryData",
+      "Блок | требует отступа 4 пробела, иначе YAML не соберётся"
     ],
     "answer": 0
   },
@@ -49,9 +49,9 @@
     "fix": "spec:\n  selector:\n    app: api\n  ports:\n  - port: 80\n    targetPort: 8080\n  type: ClusterIP",
     "opts": [
       "Нет selector — Service не знает куда маршрутизировать трафик",
-      "ClusterIP не поддерживает targetPort",
-      "port и targetPort не могут различаться",
-      "Service должен быть типа NodePort"
+      "targetPort обязан совпадать с port, иначе kube-proxy отбросит пакеты",
+      "У порта обязателен name, без него kube-proxy его не увидит",
+      "ClusterIP не выделит IP без явного поля clusterIP"
     ],
     "answer": 0
   },
@@ -63,9 +63,9 @@
     "fix": "resources:\n  requests:\n    memory: \"128Mi\"\n    cpu: \"100m\"\n  limits:\n    memory: \"256Mi\"\n    cpu: \"500m\"",
     "opts": [
       "Нет limits — контейнер может занять всю память ноды",
-      "requests должны быть равны limits",
-      "cpu запрос задан в милли-ядрах — неверный формат",
-      "Не указан imagePullPolicy"
+      "requests: 128Mi — это жёсткий предел, память сверх него не выдадут",
+      "cpu: 100m трактуется как 100 ядер — под не запланируется",
+      "Указанные requests дают поду QoS-класс BestEffort"
     ],
     "answer": 0
   },
@@ -77,9 +77,9 @@
     "fix": "Добавить imagePullPolicy: Always\nИли использовать версионированные теги: myapp:v1.2.3",
     "opts": [
       "latest без imagePullPolicy: Always — нода кэширует старый образ",
-      "replicas: 2 недостаточно",
-      "Deployment требует strategy",
-      "Неверный apiVersion"
+      "imagePullPolicy: Always требуется только образам из приватного реестра",
+      "Без revisionHistoryLimit откат на прошлую версию невозможен",
+      "Для 2 реплик rollout встанет без явного maxUnavailable"
     ],
     "answer": 0
   },
@@ -91,9 +91,9 @@
     "fix": "securityContext:\n  runAsNonRoot: true\n  runAsUser: 1000\n  allowPrivilegeEscalation: false\n  capabilities:\n    drop:\n    - ALL",
     "opts": [
       "Нет securityContext — контейнер запускается от root с полными правами",
-      "kind: Pod не поддерживает containerPort",
-      "image должен быть в приватном реестре",
-      "Нельзя запускать контейнер не от root"
+      "Без явного runAsUser kubelet запускает контейнер от nobody без прав на сеть",
+      "Права контейнера ограничивает NetworkPolicy, а не securityContext",
+      "containerPort 8080 требует privileged: true в spec пода"
     ],
     "answer": 0
   },
@@ -105,9 +105,9 @@
     "fix": "strategy:\n  type: RollingUpdate\n  rollingUpdate:\n    maxSurge: 1\n    maxUnavailable: 0\n// Гарантирует что все 3 пода всегда доступны",
     "opts": [
       "strategy по умолчанию RollingUpdate — нужно явно задать maxUnavailable: 0 для production",
-      "RollingUpdate не работает с 3 репликами",
-      "Deployment требует minReadySeconds",
-      "matchLabels должен быть словарём"
+      "maxSurge по умолчанию равен 0, поэтому новые поды поднимутся только после остановки старых",
+      "Без явной strategy Deployment обновляет поды напрямую, не создавая ReplicaSet",
+      "Для 3 реплик по умолчанию включается Recreate — все поды гасятся сразу"
     ],
     "answer": 0
   },
@@ -119,9 +119,9 @@
     "fix": "type: LoadBalancer\n// или\ntype: NodePort\nnodePort: 30080",
     "opts": [
       "ClusterIP недоступен извне кластера — нужен LoadBalancer или NodePort",
-      "targetPort 3000 не может отличаться от port 80",
-      "selector не должен совпадать с labels",
-      "Service не поддерживает порты"
+      "ClusterIP публикует порт 80 на каждой ноде, но доступен по внутреннему DNS",
+      "targetPort 3000 вне диапазона 30000-32767 — порт не откроется",
+      "Порт 80 требует прав root у kube-proxy на нодах"
     ],
     "answer": 0
   },
@@ -133,9 +133,9 @@
     "fix": "Для сервисов:\nrestartPolicy: Always\nДля задач с ретраями:\nrestartPolicy: OnFailure\n// Или использовать Job/CronJob вместо Pod",
     "opts": [
       "restartPolicy: Never для сервиса — при падении под не перезапустится",
-      "Pod не поддерживает restartPolicy",
-      "command должен быть массивом строк",
-      "Неверно — для Pod правильный restartPolicy: Never"
+      "restartPolicy: Never допустим только внутри Job, у Pod он игнорируется",
+      "restartPolicy задаётся внутри containers, а не в spec пода",
+      "command в Pod требует обёртки sh -c, иначе не запустится"
     ],
     "answer": 0
   }

@@ -8,9 +8,9 @@
     "fix": "Добавить sensitive = true:\noutput \"db_password\" {\n  value     = aws_db_instance.main.password\n  sensitive = true\n}",
     "opts": [
       "Не указан sensitive = true для секретного output",
-      "Неверный синтаксис output блока",
-      "Нужно добавить description",
-      "Пароль нельзя выводить через output"
+      "aws_db_instance не отдаёт атрибут password — нужен master_password",
+      "Пароль читают через data-источник, output его наружу не отдаёт",
+      "Без description terraform output не маскирует значение"
     ],
     "answer": 0
   },
@@ -23,9 +23,9 @@
     "fix": "Использовать toset(): for_each = toset(var.buckets)\nили изменить тип переменной на set(string)",
     "opts": [
       "for_each не поддерживает list — нужен toset(var.buckets) или set(string)",
-      "each.key нужно заменить на each.value",
-      "variable нужно объявить внутри resource",
-      "Нужно добавить count вместо for_each"
+      "each.key существует только для map — для list обращаются через each.value",
+      "Список литералов в default требует обёртки jsonencode(...)",
+      "for_each требует count = 0, иначе адреса ресурсов конфликтуют"
     ],
     "answer": 0
   },
@@ -38,9 +38,9 @@
     "fix": "Добавить lifecycle:\nlifecycle {\n  create_before_destroy = true\n}",
     "opts": [
       "Нет lifecycle { create_before_destroy = true } — будет downtime при обновлении сертификата",
-      "Нет validation_record ресурса",
-      "certificate_arn нельзя использовать напрямую",
-      "Нужно добавить depends_on"
+      "aws_lb_listener требует явного depends_on: ссылка на .arn не задаёт порядок создания ресурсов",
+      "ACM переиздаёт сертификат с сохранением ARN, поэтому downtime здесь невозможен",
+      "Сертификат нельзя менять in-place — нужен ignore_changes = [domain_name]"
     ],
     "answer": 0
   },
@@ -53,9 +53,9 @@
     "fix": "Добавить provider с alias:\nprovider \"aws\" {\n  alias  = \"us_east_1\"\n  region = \"us-east-1\"\n}\nresource \"aws_acm_certificate\" \"cert\" {\n  provider = aws.us_east_1\n  ...\n}",
     "opts": [
       "ACM для CloudFront должен быть в us-east-1, нужен provider alias",
-      "CloudFront не поддерживает ACM",
-      "Нужно указать aliases в CloudFront distribution",
-      "region должен быть us-west-2"
+      "Сертификат привязывают в viewer_certificate, регион при этом любой",
+      "CloudFront работает только с сертификатами IAM, ACM здесь не подходит",
+      "Для CloudFront нужен провайдер с region = \"global\" через alias"
     ],
     "answer": 0
   },
@@ -68,9 +68,9 @@
     "fix": "Использовать переменные окружения AWS_ACCESS_KEY_ID и AWS_SECRET_ACCESS_KEY, или IAM роль, или ~/.aws/credentials.",
     "opts": [
       "AWS credentials захардкожены в коде — попадут в git",
-      "Неверный формат backend блока",
-      "region должен быть в provider, не backend",
-      "Нужно добавить encrypt = true"
+      "backend \"s3\" не принимает access_key — только profile или role_arn",
+      "Для backend \"s3\" обязателен encrypt = true, иначе init откажет",
+      "key должен совпадать с именем workspace, иначе state перезапишется"
     ],
     "answer": 0
   },
@@ -83,9 +83,9 @@
     "fix": "Использовать for_each с toset:\nfor_each = toset(var.servers)\ntags = { Name = each.key }",
     "opts": [
       "count привязан к индексу — добавление в середину вызовет destroy/recreate всех следующих элементов",
-      "Нужно добавить больше инстансов",
-      "ami нужно вынести в переменную",
-      "Нет lifecycle блока"
+      "count.index в tags вычисляется только на apply, поэтому Terraform пересоздаёт инстансы при каждом plan",
+      "length() в count недопустим: count принимает константу, известную на этапе plan",
+      "variable без явного type Terraform читает как строку, и count получит значение 1"
     ],
     "answer": 0
   },
@@ -98,9 +98,9 @@
     "fix": "Игнорировать только конкретные атрибуты:\nignore_changes = [tags[\"LastModified\"]]",
     "opts": [
       "ignore_changes = all запрещает ВСЕ обновления ресурса, даже легитимные изменения в коде",
-      "Нет create_before_destroy",
-      "image_id нельзя изменять",
-      "Нужно добавить version = \"\""
+      "ignore_changes = all действует только на теги ресурса, остальные атрибуты Terraform обновит",
+      "name_prefix без create_before_destroy даёт конфликт имён шаблона при обновлении",
+      "ignore_changes = all нужно записывать списком [\"all\"], иначе валидация упадёт"
     ],
     "answer": 0
   },
@@ -113,9 +113,9 @@
     "fix": "Привести к единому регистру:\nnotify: restart nginx\nили\nname: Restart Nginx",
     "opts": [
       "Имя в notify (\"Restart Nginx\") не совпадает с именем handler (\"restart nginx\") — регистр важен",
-      "Нужно добавить become: yes в handler",
-      "state должен быть started не restarted",
-      "handlers нужно вынести в отдельный файл"
+      "notify принимает только список, а обычную строку Ansible молча игнорирует и обработчик не вызовет",
+      "Блок handlers обязан идти выше tasks, иначе notify не найдёт обработчик по имени",
+      "template в /etc/nginx без become не вернёт changed, поэтому notify обработчик не дёрнет"
     ],
     "answer": 0
   },
@@ -128,9 +128,9 @@
     "fix": "Добавить в play или задачи:\nbecome: yes",
     "opts": [
       "Нет become: yes — задачи требуют root-привилегий для apt и записи в /etc/",
-      "Нужно добавить become_user: root",
-      "apt не поддерживается без sudo",
-      "Нужно использовать shell вместо apt"
+      "Модуль apt сам поднимает права до root, а для template нужен become_user",
+      "Без gather_facts: yes задачи не наследуют become из group_vars инвентаря",
+      "Для модуля apt обязателен update_cache: yes, иначе будет Permission denied"
     ],
     "answer": 0
   },
@@ -143,9 +143,9 @@
     "fix": "Использовать модуль template:\n- name: Deploy application config\n  template:\n    src: app.conf.j2\n    dest: /etc/app/app.conf",
     "opts": [
       "Нужен модуль template для обработки Jinja2 (.j2), copy копирует файл без рендеринга",
-      "src файл не существует",
-      "Нужно добавить validate параметр",
-      "mode должен быть 0600 для конфига"
+      "copy рендерит Jinja2 только через параметр content, а для src обязателен remote_src: no",
+      "Расширение .j2 в src лишнее: copy ищет файл в каталоге files/ без суффикса",
+      "owner: app задан без group, поэтому mode \"0644\" не применится к файлу"
     ],
     "answer": 0
   },
@@ -158,9 +158,9 @@
     "fix": "Изменить на state: restarted или state: reloaded (применяет конфиг без downtime):\nstate: reloaded",
     "opts": [
       "state: started не перезапустит уже работающий nginx — нужен state: restarted или state: reloaded",
-      "Нужно убрать notify и сделать restart в tasks",
-      "handler вызовется только при changed",
-      "Нужно добавить force: yes"
+      "Handler отработает, но nginx подхватит новый конфиг только после systemctl daemon-reload на хосте",
+      "state: started при changed от template всегда делает restart — дело в самом notify",
+      "Без ключа enabled: yes модуль service игнорирует параметр state в handlers"
     ],
     "answer": 0
   },
@@ -173,9 +173,9 @@
     "fix": "Убрать двойные скобки:\nwhen: env == \"production\"\nили:\nwhen: env is defined and env == \"production\"",
     "opts": [
       "Неверный синтаксис when: двойные скобки deprecated, правильно: when: env == \"production\"",
-      "Нужно использовать register вместо when",
-      "env нужно определить как факт",
-      "Нужны одинарные кавычки вокруг всего выражения"
+      "Непустая строка в when всегда истинна, поэтому всё выражение нужно обернуть в фильтр | bool",
+      "В when к переменным обращаются через vars: when: vars.env == \"production\"",
+      "Нужны одинарные кавычки внутри двойных, иначе Jinja2 не прочитает значение"
     ],
     "answer": 0
   },
@@ -188,9 +188,9 @@
     "fix": "Использовать apt для Debian/Ubuntu:\n  apt:\n    name: [curl, wget, git]\n    state: present\n\nИли универсальный:\n  package:\n    name: ...\n    state: present",
     "opts": [
       "yum работает только на RHEL/CentOS, для Ubuntu/Debian нужен apt или универсальный модуль package",
-      "Нужно добавить update_cache: yes",
-      "state: present нужно заменить на latest",
-      "Модули yum и apt взаимозаменяемы"
+      "Модуль yum принимает в name только одну строку, поэтому список пакетов нужно перебирать через loop",
+      "На Debian модуль yum работает через прослойку apt, но требует state: latest",
+      "Список в name нужно закавычить, иначе YAML склеит curl, wget и git в одну строку"
     ],
     "answer": 0
   },
@@ -203,9 +203,9 @@
     "fix": "Переместить set_fact в tasks или post_tasks. Handlers должны только выполнять действия (restart, reload).",
     "opts": [
       "set_fact в handler недоступен в задачах того же play — handlers изолированы в конце play",
-      "Нужно добавить listen к handler",
-      "ansible_date_time не доступен в handlers",
-      "Нужно использовать vars вместо set_fact"
+      "Handlers выполняются раньше tasks, поэтому факт ansible_date_time на этот момент не собран",
+      "Два handler'а с одним notify требуют listen, иначе сработает только первый",
+      "set_fact пишет факт на весь inventory, значение перезапишется у всех хостов"
     ],
     "answer": 0
   },
@@ -218,9 +218,9 @@
     "fix": "Использовать implicit reference:\nrole = aws_iam_role.lambda_role.arn",
     "opts": [
       "Hardcoded ARN — нет implicit dependency. Нужно role = aws_iam_role.lambda_role.arn для правильного порядка создания",
-      "ARN формат неверный",
-      "Нужно добавить depends_on явно",
-      "runtime не поддерживается"
+      "Функция Lambda ожидает в поле role имя роли, а не полный ARN, поэтому здесь подставляют aws_iam_role.lambda_role.name",
+      "assume_role_policy нельзя подставлять из data — политику задают через jsonencode в ресурсе",
+      "Без атрибута source_code_hash Terraform создаёт функцию раньше IAM-роли и apply падает"
     ],
     "answer": 0
   }

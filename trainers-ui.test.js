@@ -4,8 +4,16 @@ const ui = require('./trainers-ui.js');
 
 const TOTALS = {
   ts: 12, labs: 15, code: 15, subnet: 10, ports: 50,
-  cmd: 40, git: 20, regex: 20, dockerfile: 10, k8s: 10, ansible_pb: 10
+  cmd: 40, git: 20, regex: 20, dockerfile: 10, k8s: 10, ansible_pb: 10,
+  incidents: 11
 };
+
+// Забытый здесь датасет делает тренажёр «недоступным» (total = 0), и тесты на
+// сводку падают с загадочным «11 !== 12» вместо внятного сообщения.
+test('the fixture declares a dataset size for every trainer', () => {
+  const missing = ui.TRAINERS.filter(trainer => !(trainer.datasetKey in TOTALS)).map(trainer => trainer.datasetKey);
+  assert.deepEqual(missing, [], 'TOTALS не покрывает датасеты: ' + missing.join(', '));
+});
 
 test('every trainer has a unique page and a declared dataset', () => {
   const pages = ui.TRAINERS.map(item => item.page);
@@ -147,7 +155,10 @@ test('hub shows the overall score and the continue shortcut', () => {
   const html = ui.renderHub(ui.buildStatus({ progress: { subnet_prog: { 0: 1 } }, totals: TOTALS }));
   assert.match(html, /tr-summary-score/);
   assert.match(html, /Продолжить здесь/);
-  assert.match(html, /из 212 заданий/);
+  // Сумму считаем из фикстуры: захардкоженное «212» ломало этот тест при
+  // каждом добавлении тренажёра, хотя проверяется наличие сводки, а не число.
+  const expectedTotal = ui.TRAINERS.reduce((sum, trainer) => sum + TOTALS[trainer.datasetKey], 0);
+  assert.match(html, new RegExp('из ' + expectedTotal + ' заданий'));
 });
 
 test('hub congratulates instead of suggesting when everything is done', () => {

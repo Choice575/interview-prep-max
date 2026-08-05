@@ -13,7 +13,7 @@
     // The individual trainers keep their own routes: the hub is a way in, not a
     // replacement, and old deep links must not start resolving to the home page.
     'subnet', 'ts', 'cmd', 'labs', 'code', 'ansible', 'dockerfile', 'k8s', 'ports',
-    'git', 'regex', 'tips', 'interview'
+    'git', 'regex', 'tips', 'interview', 'incidents'
   ];
 
   const HOME = { page: 'home', courseSlug: null, chapterId: null };

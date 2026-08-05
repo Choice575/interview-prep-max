@@ -28,7 +28,7 @@
     "task": "Перенести конкретный коммит abc1234 из другой ветки в текущую",
     "opts": [
       "git cherry-pick abc1234",
-      "git rebase abc1234",
+      "git rebase --onto abc1234 HEAD",
       "git merge abc1234",
       "git apply abc1234"
     ],
@@ -52,7 +52,7 @@
     "task": "Начать бисекцию для поиска коммита, сломавшего тест (текущее состояние — плохое)",
     "opts": [
       "git bisect start && git bisect bad",
-      "git bisect run bad",
+      "git bisect init && git bisect mark bad",
       "git bisect begin --bad HEAD",
       "git debug --bisect bad HEAD"
     ],

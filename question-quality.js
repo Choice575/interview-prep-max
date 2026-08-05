@@ -5,6 +5,13 @@ const path = require('path');
 const ROOT = __dirname;
 const QUESTIONS_FILE = path.join(ROOT, 'tasks', 'base_questions.json');
 const BASELINE_FILE = path.join(ROOT, 'question-quality-baseline.json');
+// Датасеты тренажёров лежат в другой схеме (opts/answer вместо options/answer),
+// поэтому раньше не попадали под этот гейт — и подсказка по длине выжила в них,
+// хотя для base_questions.json проверялась с самого начала.
+const TRAINER_FILES = [
+  'labs.json', 'code.json', 'dockerfile.json', 'k8s.json',
+  'ansible_pb.json', 'cmd.json', 'regex.json', 'git.json'
+];
 const ABSOLUTE_WORDS = [
   'всегда', 'никогда', 'только', 'полностью', 'невозможно',
   'исключительно', 'любой', 'никак'
@@ -181,6 +188,48 @@ function readQuestions() {
   return JSON.parse(fs.readFileSync(QUESTIONS_FILE, 'utf8'));
 }
 
+/**
+ * Датасеты тренажёров: правильный ответ не должен выдавать себя длиной, а
+ * варианты — повторяться. Допуск нулевой (в отличие от baseline для
+ * base_questions.json): файлы приведены в порядок, и новая подсказка означает
+ * регрессию, а не унаследованный долг.
+ */
+function analyzeTrainerFile(name) {
+  const full = path.join(ROOT, 'tasks', name);
+  if (!fs.existsSync(full)) return { file: name, missing: true, checked: 0, failures: [`нет файла ${name}`] };
+  const raw = JSON.parse(fs.readFileSync(full, 'utf8'));
+  const items = Array.isArray(raw) ? raw : (raw.tasks || []);
+  const failures = [];
+  let checked = 0;
+
+  items.forEach(item => {
+    const options = item.opts;
+    const answer = item.answer;
+    if (!Array.isArray(options) || !Number.isInteger(answer)) return;
+    if (answer < 0 || answer >= options.length) {
+      failures.push(`${name} id=${item.id}: answer=${answer} вне диапазона`);
+      return;
+    }
+    checked++;
+    const texts = options.map(cleanOption);
+    const lengths = texts.map(text => text.length);
+    const longest = Math.max(...lengths);
+    if (lengths[answer] === longest && lengths.filter(value => value === longest).length === 1) {
+      const runnerUp = Math.max(...lengths.filter((_, index) => index !== answer));
+      failures.push(`${name} id=${item.id}: верный вариант самый длинный (перевес ${longest - runnerUp} симв.)`);
+    }
+    if (new Set(texts).size !== texts.length) {
+      failures.push(`${name} id=${item.id}: одинаковые варианты`);
+    }
+  });
+
+  return { file: name, checked, failures };
+}
+
+function analyzeTrainers(files = TRAINER_FILES) {
+  return files.map(analyzeTrainerFile);
+}
+
 function runCli(args = process.argv.slice(2)) {
   let questions = readQuestions();
   if (args.includes('--fix-positions')) {
@@ -195,6 +244,21 @@ function runCli(args = process.argv.slice(2)) {
     console.log('Baseline обновлён: question-quality-baseline.json');
   }
   printReport(report);
+
+  // Тренажёры проверяем всегда, а не только при --check: отчёт должен показывать
+  // состояние всех датасетов с вариантами ответа, а не одного файла.
+  const trainerReports = analyzeTrainers();
+  const trainerFailures = trainerReports.flatMap(item => item.failures);
+  console.log('\nДатасеты тренажёров:');
+  trainerReports.forEach(item => {
+    const status = item.failures.length ? `проблем: ${item.failures.length}` : 'ок';
+    console.log(`  ${item.file.padEnd(18)} заданий ${String(item.checked).padStart(3)}  ${status}`);
+  });
+  if (trainerFailures.length) {
+    console.error('\nПодсказки в датасетах тренажёров:');
+    trainerFailures.forEach(failure => console.error(`  - ${failure}`));
+    process.exitCode = 1;
+  }
 
   if (args.includes('--check')) {
     if (!fs.existsSync(BASELINE_FILE)) {
@@ -217,8 +281,11 @@ if (require.main === module) runCli();
 
 module.exports = {
   analyzeQuestions,
+  analyzeTrainerFile,
+  analyzeTrainers,
   cleanOption,
   compareToBaseline,
   makeBaseline,
-  rebalanceAnswers
+  rebalanceAnswers,
+  TRAINER_FILES
 };
