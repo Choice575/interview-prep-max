@@ -1,4 +1,5 @@
 const AICoach = require('../ai-coach.js');
+const { createAiSettingsStore } = require('./ai-settings.js');
 
 const SYSTEM_PROMPT = [
   'Ты — технический наставник по DevOps-собеседованиям.',
@@ -15,9 +16,9 @@ function serviceError(message, code, status) {
   return error;
 }
 
-function endpointFromEnv(env) {
-  if (env.IPMAX_AI_ENDPOINT) return env.IPMAX_AI_ENDPOINT;
-  const base = (env.IPMAX_AI_BASE_URL || '').replace(/\/$/, '');
+function endpointFrom(config) {
+  if (config.endpoint) return config.endpoint;
+  const base = String(config.baseUrl || '').replace(/\/+$/, '');
   return base ? base + '/chat/completions' : '';
 }
 
@@ -43,36 +44,54 @@ function createMockReview(payload) {
   return {
     ...local,
     summary: 'AI-разбор готов. ' + local.summary,
-    caution: 'Рекомендации основаны на агрегатах этой контрольной.'
+    caution: 'Рекомендации основаны на агрегатах этой контрольной.',
+    // buildLocalReview ставит source:'local'. Отдавать его из mock-ответа
+    // противоречиво: клиент всё равно перезапишет поле на 'ai', но сам ответ
+    // эндпоинта утверждал бы, что разбор локальный.
+    source: 'mock'
   };
 }
 
-function createAiService(env = process.env, dependencies = {}) {
-  const provider = (env.IPMAX_AI_PROVIDER || '').trim().toLowerCase();
-  const endpoint = endpointFromEnv(env);
-  const apiKey = env.IPMAX_AI_API_KEY || '';
-  const model = env.IPMAX_AI_MODEL || '';
-  const fetchImpl = dependencies.fetchImpl || globalThis.fetch;
+// Конфигурация читается на каждом запросе, а не один раз при старте: иначе
+// настройки, сохранённые из UI, применялись бы только после перезапуска
+// сервера — то есть UI-настройки были бы бесполезны.
+function describe(config) {
+  const provider = String(config.provider || '').trim().toLowerCase();
+  const endpoint = endpointFrom(config);
   const mock = provider === 'mock';
-  const enabled = mock || ((provider === 'openai-compatible' || !provider) && !!endpoint && !!apiKey && !!model);
+  const enabled = mock || ((provider === 'openai-compatible' || !provider) && !!endpoint && !!config.apiKey && !!config.model);
+  return { provider, endpoint, mock, enabled, apiKey: config.apiKey || '', model: config.model || '' };
+}
+
+function createAiService(env = process.env, dependencies = {}) {
+  const settings = dependencies.settingsStore || createAiSettingsStore(env, dependencies);
+  const fetchImpl = dependencies.fetchImpl || globalThis.fetch;
 
   function status() {
+    // Синхронно: роут /api/ai/status отвечает без await, а форма ответа
+    // зафиксирована в server.test.js.
+    const view = describe(settings.resolveSync());
     return {
-      enabled,
-      provider: mock ? 'mock' : enabled ? 'openai-compatible' : 'disabled',
-      model: enabled && !mock ? model : null
+      enabled: view.enabled,
+      provider: view.mock ? 'mock' : view.enabled ? 'openai-compatible' : 'disabled',
+      model: view.enabled && !view.mock ? view.model : null
     };
   }
 
   async function review(rawPayload) {
     const payload = AICoach.normaliseReviewPayload(rawPayload);
     if (!payload.control.attempted) throw serviceError('Control session has no answers', 'INVALID_REVIEW_INPUT', 400);
-    if (!enabled) throw serviceError('AI backend is not configured', 'AI_NOT_CONFIGURED', 503);
+    const config = await settings.resolve();
+    const view = describe(config);
+    const { endpoint, apiKey, model, mock } = view;
+    if (!view.enabled) throw serviceError('AI backend is not configured', 'AI_NOT_CONFIGURED', 503);
     if (mock) return createMockReview(payload);
     if (typeof fetchImpl !== 'function') throw serviceError('Fetch is unavailable on the server', 'AI_UNAVAILABLE', 503);
 
+    const temperature = Number.isFinite(config.temperature) ? config.temperature : 0.2;
+    const maxTokens = Number.isFinite(config.maxTokens) ? config.maxTokens : 700;
     const controller = new AbortController();
-    const timeoutMs = Math.max(1000, Math.min(60000, Number(env.IPMAX_AI_TIMEOUT_MS) || 15000));
+    const timeoutMs = Math.max(1000, Math.min(60000, Number(config.timeoutMs) || 15000));
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     let response;
     try {
@@ -81,8 +100,8 @@ function createAiService(env = process.env, dependencies = {}) {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
         body: JSON.stringify({
           model,
-          temperature: 0.2,
-          max_tokens: 700,
+          temperature,
+          max_tokens: maxTokens,
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
             { role: 'user', content: JSON.stringify(payload) }

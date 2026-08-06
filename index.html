@@ -52,6 +52,8 @@
     <div class="sb-section">Данные</div>
     <button type="button" class="sb-cmd" onclick="exportProgress()"><span class="icon">📋</span>Копировать прогресс</button>
     <button type="button" class="sb-cmd" onclick="pasteProgressFromClipboard()"><span class="icon">📥</span>Вставить прогресс</button>
+    <button type="button" class="sb-cmd" data-modal-trigger="sync-modal" data-sync-action="open"><span class="icon">🔄</span>Синхронизация</button>
+    <button type="button" class="sb-cmd" data-modal-trigger="ai-settings-modal" data-ai-settings-action="open"><span class="icon">🤖</span>Настройки AI</button>
     <button type="button" class="sb-cmd" onclick="showSourcesReport()"><span class="icon">🔎</span>Источники данных</button>
     <button type="button" class="sb-cmd" onclick="checkOfflineReady()"><span class="icon">📶</span>Проверить оффлайн</button>
     <button type="button" class="sb-cmd" onclick="toggleTheme()"><span class="icon" id="theme-icon">☀️</span><span id="theme-label">Светлая тема</span></button>
@@ -497,6 +499,30 @@
   </div>
 </div>
 
+<!-- AI SETTINGS MODAL -->
+<div class="modal-overlay" id="ai-settings-modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ai-settings-title" tabindex="-1">
+    <div class="coach-journal-title-row">
+      <div><span class="coach-focus-kicker">Данные</span><h3 id="ai-settings-title">Настройки AI-функций</h3></div>
+      <button type="button" class="btn-icon" id="ai-settings-close" aria-label="Закрыть настройки AI" data-ai-settings-action="close">✕</button>
+    </div>
+    <p class="coach-journal-lead">Настройки хранятся на сервере и применяются сразу, без перезапуска. API-ключ уходит только на сервер и никогда не возвращается в браузер.</p>
+    <div id="ai-settings-content" aria-live="polite"></div>
+  </div>
+</div>
+
+<!-- SYNC MODAL -->
+<div class="modal-overlay" id="sync-modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="sync-title" tabindex="-1">
+    <div class="coach-journal-title-row">
+      <div><span class="coach-focus-kicker">Данные</span><h3 id="sync-title">Синхронизация между устройствами</h3></div>
+      <button type="button" class="btn-icon" id="sync-close" aria-label="Закрыть синхронизацию" data-sync-action="close">✕</button>
+    </div>
+    <p class="coach-journal-lead">Прогресс сливается без потерь: ответы и пройденные дни с разных устройств складываются. Перезаписаться могут только настройки и позиция в программе — о них будет сказано отдельно.</p>
+    <div id="sync-content" aria-live="polite"></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="evidence-modal" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="evidence-modal-title" tabindex="-1">
     <h3 id="evidence-modal-title" class="sr-only">Отправка доказательства</h3>
@@ -510,6 +536,11 @@
 <script src="./coach.js"></script>
 <script src="./ai-coach.js"></script>
 <script src="./progress-io.js"></script>
+<script src="./sync-merge.js"></script>
+<script src="./sync-client.js"></script>
+<script src="./sync-ui.js"></script>
+<script src="./ai-settings-client.js"></script>
+<script src="./ai-settings-ui.js"></script>
 <script src="./offline-ui.js"></script>
 <script src="./sources-ui.js"></script>
 <script src="./best-practices-ui.js"></script>

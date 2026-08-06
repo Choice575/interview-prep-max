@@ -30,7 +30,14 @@
     // каждой хранится отдельно: общий study_progress склеил бы неделю 5 DevOps
     // с неделей 5 MLOps и затёр бы обе. Выбранная программа — тоже состояние.
     study_program: 'ipmax_study_program',
-    mlops_progress: 'ipmax_mlops_progress', mlops_position: 'ipmax_mlops_position'
+    mlops_progress: 'ipmax_mlops_progress', mlops_position: 'ipmax_mlops_position',
+    // Настройки синхронизации принадлежат устройству, а не прогрессу: токен
+    // не должен попасть в снимок (иначе он уедет на сервер и в экспорт), а
+    // sync_meta хранит последнюю ревизию, чтобы не тянуть снимок повторно.
+    sync_token: 'ipmax_sync_token', sync_meta: 'ipmax_sync_meta',
+    // Токен доступа к настройкам сервера. Как и sync_token, принадлежит
+    // устройству и не входит в снимок синхронизации.
+    admin_token: 'ipmax_admin_token'
   };
 
   // `options` carries the timer host for debounced writes ({ setTimeout,

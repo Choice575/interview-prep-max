@@ -223,11 +223,59 @@ function recordCoachControlAttempt(question,result,input,now){
 function requestCoachAIReview(){
   if(typeof IPMaxAICoach==='undefined') return Promise.reject(new Error('Модуль AI-разбора не загружен.'));
   const payload=IPMaxAICoach.buildReviewPayload({plan:getCoachPlan(),profile:getOnboardingProfile(),session:getCoachControlSession()});
-  return IPMaxAICoach.review(payload,{url:'./api/ai/review',timeoutMs:15000});
+  // Клиент должен ждать дольше сервера: серверный таймаут настраивается до
+  // 60 с, и при клиентских 15 с abort случался бы раньше — вместо понятного
+  // кода AI_TIMEOUT пользователь получал бы невнятную ошибку сети.
+  return IPMaxAICoach.review(payload,{url:'./api/ai/review',timeoutMs:60000});
+}
+// Статус нужен карточке тренера, чтобы честно подписать кнопку разбора до
+// клика. Сбой запроса означает лишь «внешнего AI нет».
+function getCoachAiStatus(){
+  if(typeof fetch!=='function') return Promise.resolve({enabled:false});
+  return fetch('./api/ai/status',{method:'GET'})
+    .then(response=>response.ok?response.json():{enabled:false})
+    .catch(()=>({enabled:false}));
 }
 function setCoachProfile(profile){
   if(!appStorage||typeof appStorage.setMany!=='function') return false;
   return appStorage.setMany({onboarding:profile,onboarding_complete:true}).ok;
+}
+let appSyncClient=null;
+function getSyncClient(){
+  if(appSyncClient) return appSyncClient;
+  if(typeof IPMaxSyncClient==='undefined'||!appStorage) return null;
+  appSyncClient=IPMaxSyncClient.create({storage:appStorage,baseUrl:'./api/sync',now:()=>Date.now()});
+  return appSyncClient;
+}
+function configureSyncUI(){
+  if(typeof IPMaxSyncUI==='undefined') return false;
+  const client=getSyncClient();
+  if(!client) return false;
+  return IPMaxSyncUI.configure({
+    client,escape:esc,openModal:openAccessibleModal,closeModal:closeAccessibleModal,
+    // После применения снимка на экране остались бы прежние счётчики.
+    refresh:()=>{try{renderHome();}catch(e){console.warn('sync refresh error:',e);}},
+    now:()=>Date.now(),alert:message=>alert(message),confirm:message=>confirm(message)
+  });
+}
+let appAiSettingsClient=null;
+function getAiSettingsClient(){
+  if(appAiSettingsClient) return appAiSettingsClient;
+  if(typeof IPMaxAiSettingsClient==='undefined'||!appStorage) return null;
+  appAiSettingsClient=IPMaxAiSettingsClient.create({storage:appStorage});
+  return appAiSettingsClient;
+}
+function configureAiSettingsUI(){
+  if(typeof IPMaxAiSettingsUI==='undefined') return false;
+  const client=getAiSettingsClient();
+  if(!client) return false;
+  return IPMaxAiSettingsUI.configure({
+    client,escape:esc,openModal:openAccessibleModal,closeModal:closeAccessibleModal,
+    // Статус AI изменился — карточка тренера подписывает кнопку по нему,
+    // поэтому её надо пересобрать с нуля, сбросив закешированный статус.
+    refresh:()=>{try{configureCoachUI();renderHome();}catch(e){console.warn('ai settings refresh error:',e);}},
+    confirm:message=>confirm(message)
+  });
 }
 function configureCoachUI(){
   if(typeof InterviewCoachUI==='undefined'||typeof InterviewCoach==='undefined') return false;
@@ -236,6 +284,7 @@ function configureCoachUI(){
     normaliseProfile:normalizeOnboardingProfile,setProfile:setCoachProfile,
     getJournal:getCoachJournal,setJournal:notes=>lsSet('coach_journal',notes),getTopics:getAllTopics,
     getControlSession:getCoachControlSession,requestAiReview:requestCoachAIReview,
+    getAiStatus:getCoachAiStatus,
     openModal:openAccessibleModal,closeModal:closeAccessibleModal,refresh:renderHome,
     startFocus:startCoachFocus,startReview:startCoachReviewMode,startControl:startCoachControlMode,
     now:()=>Date.now(),alert:message=>alert(message),confirm:message=>confirm(message)
@@ -1759,6 +1808,8 @@ async function initApp(){
   }
 
   configureCoachUI();
+  configureSyncUI();
+  configureAiSettingsUI();
 
   // Обновляем счётчик вопросов динамически
   document.getElementById('sb-counter').textContent = 'DevOps Edition · '+getAllQ().length+' вопросов';
@@ -1835,7 +1886,7 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 function requireOfflineUI(){if(typeof IPMaxOfflineUI==='undefined') throw new Error('Модуль offline-отчёта не загружен.');return IPMaxOfflineUI;}
 function offlineAssetList(){
-  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./router.js','./gamification.js','./gamification-ui.js','./daily.js','./daily-ui.js','./trainers-ui.js','./question-bank-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./sync-merge.js','./sync-client.js','./sync-ui.js','./ai-settings-client.js','./ai-settings-ui.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./router.js','./gamification.js','./gamification-ui.js','./daily.js','./daily-ui.js','./trainers-ui.js','./question-bank-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   return shell.concat(Object.values(DATA_FILES).map(file=>'./'+file));
 }
 async function probeOfflineAssets(assets){

@@ -160,6 +160,33 @@
     return { summary, strengths, gaps, nextSteps, caution: '', source: 'local' };
   }
 
+  // Коды приходят из server/ai-service.js. Без перевода в текст пользователь
+  // видел только «Backend недоступен» и не мог отличить незаданный провайдер
+  // от таймаута или неверного ключа — то есть не знал, что именно починить.
+  const FALLBACK_HINTS = {
+    AI_NOT_CONFIGURED: 'Внешний AI не настроен на сервере. Задайте провайдера в разделе «Настройки AI».',
+    AI_TIMEOUT: 'Провайдер не ответил вовремя. Увеличьте таймаут в настройках AI (30 000–45 000 мс).',
+    AI_UNAVAILABLE: 'Сервер не смог связаться с провайдером. Проверьте адрес API и доступность сети.',
+    AI_BAD_RESPONSE: 'Провайдер вернул ответ в неожидаемом формате. Попробуйте другую модель.',
+    AI_PROVIDER_ERROR: 'Провайдер отклонил запрос. Проверьте API-ключ и название модели.',
+    INVALID_REVIEW_INPUT: 'В контрольной пока нет ответов, которые можно разобрать.'
+  };
+
+  /**
+   * Человеческое объяснение, почему разбор локальный. Возвращает пустую строку,
+   * когда сказать нечего конкретного: пустой подписи лучше, чем догадка.
+   */
+  function describeFallback(code, status, message) {
+    const known = FALLBACK_HINTS[text(code, 40)];
+    if (known) return known;
+    if (status === 429) return 'Слишком много запросов на разбор. Подождите минуту и повторите.';
+    if (status === 404) return 'Backend разбора не найден: приложение открыто как статический сайт.';
+    if (Number.isFinite(status) && status >= 500) return 'Сервер разбора временно недоступен.';
+    if (/abort/i.test(text(message, 300))) return 'Запрос разбора превысил ожидание и был прерван.';
+    if (!status) return 'Backend недоступен — данные не покидали браузер.';
+    return '';
+  }
+
   async function requestReview(rawPayload, options) {
     const config = options || {};
     const fetchImpl = config.fetchImpl || (typeof fetch === 'function' ? fetch.bind(globalThis) : null);
@@ -175,9 +202,20 @@
       });
       let data = null;
       try { data = await response.json(); } catch (_) {}
-      if (!response.ok) throw new Error(data && data.error ? data.error : `AI backend returned ${response.status}`);
+      if (!response.ok) {
+        const failure = new Error(data && data.error ? data.error : `AI backend returned ${response.status}`);
+        // Код и статус нужны выше, чтобы объяснить причину пользователю.
+        failure.status = response.status;
+        failure.code = data && data.code ? data.code : '';
+        throw failure;
+      }
       const review = normaliseReview(data && data.review ? data.review : data);
-      if (!review) throw new Error('AI backend returned an invalid review');
+      if (!review) {
+        const invalid = new Error('AI backend returned an invalid review');
+        invalid.status = response.status;
+        invalid.code = 'AI_BAD_RESPONSE';
+        throw invalid;
+      }
       return { ...review, source: 'ai' };
     } finally {
       clearTimeout(timeout);
@@ -188,12 +226,23 @@
     try {
       return await requestReview(payload, options);
     } catch (error) {
-      return { ...buildLocalReview(payload), fallbackReason: text(error && error.message, 300) };
+      const code = text(error && error.code, 40);
+      const status = Number.isFinite(error && error.status) ? error.status : 0;
+      const message = text(error && error.message, 300);
+      return {
+        ...buildLocalReview(payload),
+        // fallbackReason — техническая строка для диагностики, fallbackHint —
+        // то, что показывается пользователю.
+        fallbackReason: message,
+        fallbackCode: code,
+        fallbackStatus: status || null,
+        fallbackHint: describeFallback(code, status, message)
+      };
     }
   }
 
   return {
     normaliseAttempt, normaliseControlSession, normaliseReviewPayload, normaliseReview,
-    buildReviewPayload, buildLocalReview, requestReview, review
+    buildReviewPayload, buildLocalReview, requestReview, review, describeFallback, FALLBACK_HINTS
   };
 });

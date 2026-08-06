@@ -48,6 +48,60 @@ test('uses a deterministic local review when the backend is unavailable', async 
   assert.equal(result.fallbackReason, 'offline');
 });
 
+test('explains why the review fell back instead of just saying "unavailable"', async () => {
+  // Раньше наружу отдавался только текст ошибки, и пользователь не мог
+  // отличить незаданный провайдер от таймаута или неверного ключа.
+  const payload = AICoach.normaliseReviewPayload({
+    control: { attempted: 2, total: 2, accuracy: 50, topics: [{ topic: 'Linux', attempted: 2, accuracy: 50, averageSeconds: 20 }] }
+  });
+  const cases = [
+    ['AI_NOT_CONFIGURED', 503, /Настройки AI/],
+    ['AI_TIMEOUT', 504, /таймаут/i],
+    ['AI_PROVIDER_ERROR', 502, /ключ/i],
+    ['AI_BAD_RESPONSE', 502, /формат/i],
+    ['AI_UNAVAILABLE', 502, /адрес API/i]
+  ];
+  for (const [code, status, pattern] of cases) {
+    const result = await AICoach.review(payload, {
+      fetchImpl: async () => ({ ok: false, status, json: async () => ({ error: 'backend says no', code }) })
+    });
+    assert.equal(result.source, 'local', code);
+    assert.equal(result.fallbackCode, code);
+    assert.equal(result.fallbackStatus, status);
+    assert.match(result.fallbackHint, pattern, code);
+    // Техническая причина сохраняется отдельно для диагностики.
+    assert.equal(result.fallbackReason, 'backend says no');
+  }
+});
+
+test('a rate limit and a static deployment get distinct explanations', async () => {
+  const payload = AICoach.normaliseReviewPayload({ control: { attempted: 1, total: 1, accuracy: 100, topics: [] } });
+  const limited = await AICoach.review(payload, {
+    fetchImpl: async () => ({ ok: false, status: 429, json: async () => ({ error: 'Too many AI review requests' }) })
+  });
+  assert.match(limited.fallbackHint, /Подождите минуту/);
+
+  // GitHub Pages: backend отсутствует по определению.
+  const missing = await AICoach.review(payload, {
+    fetchImpl: async () => ({ ok: false, status: 404, json: async () => { throw new Error('no body'); } })
+  });
+  assert.match(missing.fallbackHint, /статический сайт/);
+});
+
+test('an invalid review body is reported as a bad response, not a silent local review', async () => {
+  const payload = AICoach.normaliseReviewPayload({ control: { attempted: 1, total: 1, accuracy: 100, topics: [] } });
+  const result = await AICoach.review(payload, {
+    fetchImpl: async () => ({ ok: true, status: 200, json: async () => ({ review: { summary: '' } }) })
+  });
+  assert.equal(result.fallbackCode, 'AI_BAD_RESPONSE');
+  assert.match(result.fallbackHint, /формат/i);
+});
+
+test('an unknown failure does not invent an explanation', () => {
+  // Пустая подпись честнее догадки: UI покажет нейтральный текст.
+  assert.equal(AICoach.describeFallback('SOMETHING_NEW', 200, 'weird'), '');
+});
+
 test('normalises a successful backend review', async () => {
   const result = await AICoach.requestReview({ control: { attempted: 1, total: 1, accuracy: 100 } }, {
     fetchImpl: async (_url, request) => {

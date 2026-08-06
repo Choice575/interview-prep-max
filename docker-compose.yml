@@ -1,0 +1,69 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    # Порт наружу НЕ публикуется: доступ только через Caddy по HTTPS.
+    # Иначе приложение осталось бы доступно по http://IP:4173 в обход TLS,
+    # а Service Worker в PWA работает лишь в secure context.
+    expose:
+      - "4173"
+    environment:
+      IPMAX_HOST: 0.0.0.0
+      IPMAX_PORT: 4173
+      IPMAX_SYNC_DIR: /data
+      # Токен синхронизации: обязателен, минимум 24 символа, иначе процесс
+      # падает на старте. Генерация — в DEPLOY.md.
+      IPMAX_SYNC_TOKEN: ${IPMAX_SYNC_TOKEN:?IPMAX_SYNC_TOKEN обязателен}
+      # За реверс-прокси без этого флага все устройства делят один счётчик
+      # rate limit: одно исчерпывает квоту для остальных.
+      IPMAX_TRUST_PROXY: "true"
+      # Токен для правки настроек AI из интерфейса. Пустой — раздел настроек
+      # доступен только на чтение переменных ниже. Отдельный от sync-токена
+      # намеренно: одна утечка не должна отдавать и прогресс, и ключ провайдера.
+      IPMAX_ADMIN_TOKEN: ${IPMAX_ADMIN_TOKEN:-}
+      # AI-разбор опционален: без переменных приложение использует локальный
+      # детерминированный разбор. Настройки, сохранённые из UI, лежат в томе
+      # ipmax-data и перекрывают эти значения.
+      IPMAX_AI_PROVIDER: ${IPMAX_AI_PROVIDER:-}
+      IPMAX_AI_BASE_URL: ${IPMAX_AI_BASE_URL:-}
+      IPMAX_AI_MODEL: ${IPMAX_AI_MODEL:-}
+      IPMAX_AI_API_KEY: ${IPMAX_AI_API_KEY:-}
+      IPMAX_AI_TEMPERATURE: ${IPMAX_AI_TEMPERATURE:-0.2}
+      IPMAX_AI_MAX_TOKENS: ${IPMAX_AI_MAX_TOKENS:-700}
+      IPMAX_AI_TIMEOUT_MS: ${IPMAX_AI_TIMEOUT_MS:-45000}
+    volumes:
+      # Снимок прогресса переживает пересборку образа только на именованном
+      # томе. Без него docker compose up --build стирает весь прогресс.
+      - ipmax-data:/data
+    networks:
+      - ipmax
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      # Домен и почта для Let's Encrypt. С DuckDNS это вида
+      # ipmax-mikhail.duckdns.org — переезд на свой домен = правка одной строки.
+      IPMAX_DOMAIN: ${IPMAX_DOMAIN:?IPMAX_DOMAIN обязателен}
+      IPMAX_ACME_EMAIL: ${IPMAX_ACME_EMAIL:?IPMAX_ACME_EMAIL обязателен}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Сертификаты и ключи ACME-аккаунта. Без тома Caddy заново запрашивает
+      # сертификат при каждом рестарте и упирается в лимиты Let's Encrypt.
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - app
+    networks:
+      - ipmax
+
+volumes:
+  ipmax-data:
+  caddy-data:
+  caddy-config:
+
+networks:
+  ipmax:

@@ -6,6 +6,11 @@
   let services = null;
   let bound = false;
   let reviewRequest = 0;
+  // Статус внешнего AI кешируется на сессию: без него кнопка обещала бы
+  // «AI-разбор» даже при ненастроенном провайдере, и правда выяснялась бы
+  // только после клика. На сервере ответ уже отдаётся с no-store.
+  let aiStatus = null;
+  let aiStatusPending = false;
 
   function escapeHtml(value) {
     if (services && typeof services.escape === 'function') return services.escape(value);
@@ -43,8 +48,47 @@
     return focus.practiceCount ? focus.practiceScore + '% практика · ' + focus.accuracy + '% тесты' : focus.accuracy + '% точность · ' + focus.coverage + '% охват';
   }
 
+  /**
+   * Подпись и заголовок кнопки разбора по реальному состоянию backend.
+   * Пока статус неизвестен, обещать внешний AI нельзя — но и блокировать
+   * кнопку нельзя: локальный разбор работает всегда.
+   */
+  function aiButtonCopy(hasAttempts) {
+    if (!hasAttempts) return { label: 'AI-разбор', title: 'Сначала ответьте на вопросы контрольной' };
+    if (!aiStatus) return { label: 'AI-разбор', title: 'Проверяю, настроен ли внешний AI' };
+    if (aiStatus.enabled) {
+      const model = aiStatus.provider === 'mock' ? 'заглушка' : (aiStatus.model || 'модель не указана');
+      return { label: 'AI-разбор', title: 'Внешний AI: ' + model };
+    }
+    // Честная подпись: разбор будет, но локальный.
+    return { label: 'Локальный разбор', title: 'Внешний AI не настроен — разбор построит приложение' };
+  }
+
+  /**
+   * Однократно запрашивает статус и перерисовывает карточку. Ошибку глушим:
+   * недоступный статус означает лишь «внешнего AI нет», а не сбой страницы.
+   */
+  function ensureAiStatus() {
+    if (aiStatus || aiStatusPending || !services || typeof services.getAiStatus !== 'function') return;
+    aiStatusPending = true;
+    Promise.resolve()
+      .then(() => services.getAiStatus())
+      .then(status => {
+        aiStatus = status && typeof status === 'object' ? status : { enabled: false };
+      })
+      .catch(() => { aiStatus = { enabled: false }; })
+      .then(() => {
+        aiStatusPending = false;
+        render();
+      });
+  }
+
   function configure(input) {
     services = input || null;
+    // Провайдера могли только что сменить в настройках AI: закешированный
+    // статус стал бы врать.
+    aiStatus = null;
+    aiStatusPending = false;
     if (!bound && typeof document !== 'undefined') {
       document.addEventListener('click', handleAction);
       bound = true;
@@ -75,6 +119,9 @@
     const focusAction = focus ? ' data-topic="' + escapeAttr(focus.topic) + '" data-page="' + escapeAttr(focus.action && focus.action.page || '') + '"' : ' disabled';
     const adjustment = review.extraQuestions ? '<div class="coach-adjustment">План скорректирован: +' + review.extraQuestions + ' вопросов в сессию, пока недельный темп ниже цели.</div>' : '';
     const controlTopics = control.topics && control.topics.length ? ' · ' + control.topics.map(escapeHtml).join(', ') : '';
+    const aiCopy = aiButtonCopy(controlAttempts > 0);
+    // Запрос статуса имеет смысл только когда кнопка активна.
+    if (controlAttempts) ensureAiStatus();
     content.innerHTML =
       '<div class="coach-head"><div><div class="coach-role">' + escapeHtml(plan.roleLabel) + ' · ' + escapeHtml(plan.level) + '</div><div class="coach-date">' + formatInterviewTiming(plan.daysUntil) + '</div></div>' +
       '<button type="button" class="btn-icon" title="Изменить цель подготовки" aria-label="Изменить цель подготовки" data-coach-action="edit-goal">⚙</button></div>' +
@@ -85,7 +132,7 @@
       '<div class="coach-actions"><button type="button" class="btn btn-primary btn-sm" data-coach-action="start-focus"' + focusAction + '>Начать фокус</button>' +
       '<button type="button" class="btn btn-outline btn-sm" data-coach-action="start-review"' + (plan.dueCount ? '' : ' disabled title="Нет повторений на сегодня"') + '>Повторить SRS (' + plan.dueCount + ')</button>' +
       '<button type="button" class="btn btn-outline btn-sm" data-coach-action="start-control"' + (control.size ? '' : ' disabled') + '>Контрольная · ' + control.size + controlTopics + '</button>' +
-      '<button type="button" class="btn btn-ai btn-sm" data-coach-action="open-ai-review"' + (controlAttempts ? '' : ' disabled title="Сначала ответьте на вопросы контрольной"') + '>AI-разбор' + (controlAttempts ? ' · ' + controlAttempts + '/' + controlTotal : '') + '</button>' +
+      '<button type="button" class="btn btn-ai btn-sm" data-coach-action="open-ai-review"' + (controlAttempts ? ' title="' + escapeAttr(aiCopy.title) + '"' : ' disabled title="' + escapeAttr(aiCopy.title) + '"') + '>' + escapeHtml(aiCopy.label) + (controlAttempts ? ' · ' + controlAttempts + '/' + controlTotal : '') + '</button>' +
       '<button type="button" class="btn btn-quiet btn-sm" data-coach-action="open-journal">Журнал навыков' + (noteCount ? ' · ' + noteCount : '') + '</button></div>';
   }
 
@@ -158,8 +205,11 @@
     const section = (title, items, className) => items && items.length
       ? '<section class="coach-ai-section ' + className + '"><h4>' + title + '</h4><ul>' + items.map(item => '<li>' + escapeHtml(item) + '</li>').join('') + '</ul></section>'
       : '';
+    // При локальном разборе показываем конкретную причину: без неё видно
+    // только «Backend недоступен», и непонятно, что именно починить.
+    const localNote = result.fallbackHint || 'Backend недоступен — данные не покидали браузер.';
     target.innerHTML = '<div class="coach-ai-result-head"><span class="coach-ai-badge">' + badge + '</span>' +
-      (result.source === 'local' ? '<span>Backend недоступен — данные не покидали браузер.</span>' : '<span>Переданы только агрегаты контрольной.</span>') + '</div>' +
+      (result.source === 'local' ? '<span>' + escapeHtml(localNote) + '</span>' : '<span>Переданы только агрегаты контрольной.</span>') + '</div>' +
       '<p class="coach-ai-summary">' + escapeHtml(result.summary) + '</p>' +
       '<div class="coach-ai-grid">' + section('Сильные стороны', result.strengths, 'coach-ai-strengths') + section('Пробелы', result.gaps, 'coach-ai-gaps') + '</div>' +
       section('Следующие шаги', result.nextSteps, 'coach-ai-next') +

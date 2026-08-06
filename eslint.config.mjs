@@ -53,6 +53,7 @@ const nodeGlobals = {
   clearTimeout: 'readonly',
   setInterval: 'readonly',
   clearInterval: 'readonly',
+  setImmediate: 'readonly',
   URL: 'readonly',
   globalThis: 'readonly',
   global: 'writable',
@@ -90,6 +91,11 @@ const appGlobals = {
   IPMaxExternalTasksUI: 'readonly',
   IPMaxInterviewPracticeUI: 'readonly',
   IPMaxAICoach: 'readonly',
+  IPMaxSyncMerge: 'readonly',
+  IPMaxSyncClient: 'readonly',
+  IPMaxSyncUI: 'readonly',
+  IPMaxAiSettingsClient: 'readonly',
+  IPMaxAiSettingsUI: 'readonly',
   IPMaxCoach: 'readonly',
   IPMaxProgress: 'readonly',
   IPMaxProgressIO: 'readonly',
@@ -107,7 +113,11 @@ const appGlobals = {
 
 const rules = {
   // Real defects only.
-  'no-unused-vars': ['warn', { args: 'none', varsIgnorePattern: '^_' }],
+  // caughtErrors в ESLint 9 по умолчанию 'all', а varsIgnorePattern на
+  // параметры catch не распространяется. Поэтому принятый в проекте
+  // `catch (_)` считался дефектом: 20+ ложных warning на устоявшейся
+  // конвенции, которые съедали запас до порога lint:strict.
+  'no-unused-vars': ['warn', { args: 'none', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }],
   'no-undef': 'error',
   'no-unreachable': 'error',
   'no-dupe-keys': 'error',
@@ -164,7 +174,9 @@ export default [
       'coach.js', 'coach-ui.js', 'ai-coach.js', 'storage.js', 'progress.js', 'progress-io.js',
       'date.js', 'home-ui.js', 'exam-ui.js', 'study-ui.js', 'analytics-ui.js', 'offline-ui.js',
       'sources-ui.js', 'best-practices-ui.js', 'catalog-ui.js', 'chapter-ui.js', 'router.js', 'question-bank-ui.js', 'external-tasks-ui.js', 'interview-practice-ui.js', 'study-curriculum-rules.js', 'question-quality.js',
-      'gamification.js', 'gamification-ui.js', 'daily.js', 'daily-ui.js', 'trainers-ui.js'
+      'gamification.js', 'gamification-ui.js', 'daily.js', 'daily-ui.js', 'trainers-ui.js',
+      'sync-merge.js', 'sync-client.js', 'sync-ui.js',
+      'ai-settings-client.js', 'ai-settings-ui.js'
     ],
     languageOptions: {
       ecmaVersion: 2023,
@@ -180,6 +192,10 @@ export default [
     // undefined global in a generator passed `npm run lint` silently.
     files: [
       'server.js', 'test-server.js', 'validate.js', 'verify-release.js',
+      // server/**/*.js попадал в ту же ловушку, что и scripts/**: ни один блок
+      // его не матчил, поэтому серверные модули (ai-service, sync-service)
+      // проверялись с нулём правил и no-undef в них молча проходил.
+      'server/**/*.js',
       'playwright.config.js', '*.test.js', 'e2e/**/*.js', 'scripts/**/*.js'
     ],
     languageOptions: {

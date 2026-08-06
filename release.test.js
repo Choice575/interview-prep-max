@@ -172,6 +172,36 @@ test('serves every release bootstrap file without HTTP caching', async () => {
   }
 });
 
+test('npm start reads .env without requiring the file to exist', () => {
+  // Строгий --env-file роняет запуск, если файла нет: на чистом клоне и в
+  // контейнере (где переменные приходят из окружения) .env отсутствует.
+  const start = JSON.parse(read('package.json')).scripts.start;
+  assert.match(start, /--env-file-if-exists=\.env/, 'ожидался мягкий флаг --env-file-if-exists');
+  assert.doesNotMatch(start, /--env-file=/, 'строгий --env-file сломал бы запуск без файла');
+
+  // Оба сценария проверяем реальным запуском, а не только чтением скрипта.
+  const missing = spawnSync(process.execPath, ['--env-file-if-exists=.env.missing-probe', '-e', 'process.exit(0)'], { cwd: root, encoding: 'utf8' });
+  assert.equal(missing.status, 0, 'отсутствующий .env не должен ронять запуск: ' + missing.stderr);
+
+  const probe = path.join(root, '.env.release-probe');
+  fs.writeFileSync(probe, 'IPMAX_ENV_PROBE=loaded-from-file\n', 'utf8');
+  try {
+    const loaded = spawnSync(process.execPath, ['--env-file-if-exists=.env.release-probe', '-e', 'process.stdout.write(String(process.env.IPMAX_ENV_PROBE))'], { cwd: root, encoding: 'utf8' });
+    assert.equal(loaded.stdout, 'loaded-from-file', 'переменные из .env должны попадать в process.env');
+  } finally {
+    fs.rmSync(probe, { force: true });
+  }
+});
+
+test('secrets are kept out of git and the image', () => {
+  // .env содержит IPMAX_ADMIN_TOKEN и ключ провайдера: он не должен попасть
+  // ни в коммит, ни в слои образа. .env.example, наоборот, нужен.
+  assert.match(read('.gitignore'), /^\.env$/m);
+  const dockerignore = read('.dockerignore');
+  assert.match(dockerignore, /^\.env$/m);
+  assert.match(dockerignore, /^!\.env\.example$/m, 'шаблон должен оставаться доступным');
+});
+
 test('passes the release integrity verifier', () => {
   const result = spawnSync(process.execPath, ['verify-release.js'], { cwd: root, encoding: 'utf8' });
 

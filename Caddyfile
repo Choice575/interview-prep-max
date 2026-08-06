@@ -1,0 +1,38 @@
+{
+	email {$IPMAX_ACME_EMAIL}
+}
+
+{$IPMAX_DOMAIN} {
+	# Caddy сам получает и продлевает сертификат Let's Encrypt по домену.
+	# HTTP автоматически редиректится на HTTPS — отдельный блок не нужен.
+
+	encode gzip
+
+	header {
+		# PWA обязана работать в secure context, поэтому фиксируем HTTPS на год.
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		# Приложение не встраивает сторонний код; connect-src 'self' не даёт
+		# утечь прогрессу на чужой домен, если в разметку попадёт инъекция.
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'"
+		-Server
+	}
+
+	# Снимок прогресса и токен не должны попадать в промежуточные кеши.
+	@api path /api/*
+	header @api Cache-Control "no-store"
+
+	reverse_proxy app:4173 {
+		# X-Forwarded-For проставляет Caddy; приложение доверяет заголовку
+		# только при IPMAX_TRUST_PROXY=true, поэтому подделать его снаружи
+		# нельзя — прокси перезаписывает значение клиента.
+		header_up X-Forwarded-For {remote_host}
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}

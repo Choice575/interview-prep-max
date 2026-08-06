@@ -1,0 +1,26 @@
+# Секреты не должны попасть в слои образа: они читаются из окружения.
+.env
+.env.*
+!.env.example
+
+# Тесты, отчёты и инструменты разработки в образе не нужны.
+node_modules/
+*.test.js
+playwright-report/
+test-results/
+scripts/
+.hermes/
+.git/
+.github/
+data/
+
+# Документация и служебные файлы
+*.md
+!README.md
+Dockerfile
+.dockerignore
+docker-compose.yml
+eslint.config.*
+validate.js
+verify-release.js
+question-quality.js

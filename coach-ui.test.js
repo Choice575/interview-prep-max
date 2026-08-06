@@ -348,6 +348,251 @@ test('render stays silent when the card is absent or services are missing', () =
   }
 });
 
+function planWithAttempts() {
+  return {
+    getControlSession: () => ({ attempts: [{}, {}, {}], questionIds: [1, 2, 3, 4, 5] })
+  };
+}
+
+test('the review button admits it is local when no external AI is configured', async () => {
+  // Раньше кнопка обещала «AI-разбор» всегда, и правда выяснялась после клика.
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['daily-plan-card', 'daily-plan-content']);
+  global.document = document;
+  try {
+    ui.configure(makeServices(document, {
+      ...planWithAttempts(),
+      getAiStatus: async () => ({ enabled: false, provider: 'disabled', model: null })
+    }));
+    ui.render();
+    await new Promise(resolve => setImmediate(resolve));
+
+    const html = document.getElementById('daily-plan-content').innerHTML;
+    assert.match(html, /Локальный разбор · 3\/5/);
+    assert.match(html, /Внешний AI не настроен/);
+    // Кнопка остаётся активной: локальный разбор работает всегда.
+    assert.doesNotMatch(html, /data-coach-action="open-ai-review"[^>]*disabled/);
+  } finally {
+    delete global.document;
+  }
+});
+
+test('a configured provider is named in the button title', async () => {
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['daily-plan-card', 'daily-plan-content']);
+  global.document = document;
+  try {
+    ui.configure(makeServices(document, {
+      ...planWithAttempts(),
+      getAiStatus: async () => ({ enabled: true, provider: 'openai-compatible', model: 'cc/claude-opus-5' })
+    }));
+    ui.render();
+    await new Promise(resolve => setImmediate(resolve));
+
+    const html = document.getElementById('daily-plan-content').innerHTML;
+    assert.match(html, /AI-разбор · 3\/5/);
+    assert.match(html, /Внешний AI: cc\/claude-opus-5/);
+  } finally {
+    delete global.document;
+  }
+});
+
+test('the mock provider is labelled as a stub, not as a real model', async () => {
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['daily-plan-card', 'daily-plan-content']);
+  global.document = document;
+  try {
+    ui.configure(makeServices(document, {
+      ...planWithAttempts(),
+      getAiStatus: async () => ({ enabled: true, provider: 'mock', model: null })
+    }));
+    ui.render();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.match(document.getElementById('daily-plan-content').innerHTML, /Внешний AI: заглушка/);
+  } finally {
+    delete global.document;
+  }
+});
+
+test('the status is requested once, not on every render', async () => {
+  // Иначе каждая перерисовка карточки била бы по сети.
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['daily-plan-card', 'daily-plan-content']);
+  global.document = document;
+  let calls = 0;
+  try {
+    ui.configure(makeServices(document, {
+      ...planWithAttempts(),
+      getAiStatus: async () => { calls += 1; return { enabled: true, provider: 'mock', model: null }; }
+    }));
+    ui.render();
+    ui.render();
+    await new Promise(resolve => setImmediate(resolve));
+    ui.render();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(calls, 1, 'статус должен кешироваться на сессию');
+  } finally {
+    delete global.document;
+  }
+});
+
+test('a failing status check degrades to the local label instead of breaking the card', async () => {
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['daily-plan-card', 'daily-plan-content']);
+  global.document = document;
+  try {
+    ui.configure(makeServices(document, {
+      ...planWithAttempts(),
+      getAiStatus: async () => { throw new Error('network down'); }
+    }));
+    assert.doesNotThrow(() => ui.render());
+    await new Promise(resolve => setImmediate(resolve));
+
+    const html = document.getElementById('daily-plan-content').innerHTML;
+    assert.match(html, /Локальный разбор/);
+    assert.match(html, /вопросов сегодня/, 'остальная карточка должна остаться целой');
+  } finally {
+    delete global.document;
+  }
+});
+
+test('the status is not requested while the button is disabled', async () => {
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['daily-plan-card', 'daily-plan-content']);
+  global.document = document;
+  let calls = 0;
+  try {
+    ui.configure(makeServices(document, {
+      getControlSession: () => null,
+      getAiStatus: async () => { calls += 1; return { enabled: true }; }
+    }));
+    ui.render();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(calls, 0, 'без ответов контрольной запрос статуса бессмысленен');
+  } finally {
+    delete global.document;
+  }
+});
+
+test('reconfiguring drops a stale status so a provider change is picked up', async () => {
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['daily-plan-card', 'daily-plan-content']);
+  global.document = document;
+  try {
+    ui.configure(makeServices(document, {
+      ...planWithAttempts(),
+      getAiStatus: async () => ({ enabled: false, provider: 'disabled', model: null })
+    }));
+    ui.render();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.match(document.getElementById('daily-plan-content').innerHTML, /Локальный разбор/);
+
+    // Пользователь настроил провайдера в разделе «Настройки AI».
+    ui.configure(makeServices(document, {
+      ...planWithAttempts(),
+      getAiStatus: async () => ({ enabled: true, provider: 'openai-compatible', model: 'new-model' })
+    }));
+    ui.render();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.match(document.getElementById('daily-plan-content').innerHTML, /Внешний AI: new-model/);
+  } finally {
+    delete global.document;
+  }
+});
+
+test('a hostile model name cannot escape the button title', async () => {
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['daily-plan-card', 'daily-plan-content']);
+  global.document = document;
+  try {
+    ui.configure(makeServices(document, {
+      ...planWithAttempts(),
+      getAiStatus: async () => ({ enabled: true, provider: 'openai-compatible', model: '" onmouseover="bad()' })
+    }));
+    ui.render();
+    await new Promise(resolve => setImmediate(resolve));
+    const html = document.getElementById('daily-plan-content').innerHTML;
+    assert.doesNotMatch(html, /onmouseover="bad\(\)/);
+    assert.match(html, /&quot;/);
+  } finally {
+    delete global.document;
+  }
+});
+
+async function openReview(document, ui, reviewResult) {
+  ui.configure(makeServices(document, {
+    getControlSession: () => ({ attempts: [{}, {}], questionIds: [1, 2, 3] }),
+    requestAiReview: async () => reviewResult
+  }));
+  const handler = document.listeners.find(([name]) => name === 'click')[1];
+  const trigger = new FakeElement('button');
+  trigger.dataset = { coachAction: 'open-ai-review' };
+  handler({ target: { closest: () => trigger } });
+  // openAIReview асинхронный: ждём завершения запроса и перерисовки.
+  await new Promise(resolve => setImmediate(resolve));
+  return document.getElementById('coach-ai-content').innerHTML;
+}
+
+test('a local review explains the reason instead of a generic message', async () => {
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['coach-ai-content']);
+  global.document = document;
+  try {
+    const html = await openReview(document, ui, {
+      source: 'local', summary: 'Итог', strengths: [], gaps: [], nextSteps: [],
+      fallbackCode: 'AI_TIMEOUT',
+      fallbackHint: 'Провайдер не ответил вовремя. Увеличьте таймаут в настройках AI (30 000–45 000 мс).'
+    });
+    assert.match(html, /Локальный разбор/);
+    assert.match(html, /Увеличьте таймаут/);
+    assert.doesNotMatch(html, /Backend недоступен/, 'общая формулировка должна уступить конкретной');
+  } finally {
+    delete global.document;
+  }
+});
+
+test('a local review without a hint still says something sensible', async () => {
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['coach-ai-content']);
+  global.document = document;
+  try {
+    const html = await openReview(document, ui, { source: 'local', summary: 'Итог', strengths: [], gaps: [], nextSteps: [] });
+    assert.match(html, /Backend недоступен/);
+  } finally {
+    delete global.document;
+  }
+});
+
+test('the fallback hint is escaped, not injected as markup', async () => {
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['coach-ai-content']);
+  global.document = document;
+  try {
+    const html = await openReview(document, ui, {
+      source: 'local', summary: 'Итог', strengths: [], gaps: [], nextSteps: [],
+      fallbackHint: '<img src=x onerror=bad>'
+    });
+    assert.doesNotMatch(html, /<img src=x/);
+    assert.match(html, /&lt;img/);
+  } finally {
+    delete global.document;
+  }
+});
+
+test('a successful AI review keeps the privacy note, not a failure reason', async () => {
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['coach-ai-content']);
+  global.document = document;
+  try {
+    const html = await openReview(document, ui, { source: 'ai', summary: 'Итог', strengths: ['Linux'], gaps: [], nextSteps: ['Шаг'] });
+    assert.match(html, /Внешний AI/);
+    assert.match(html, /Переданы только агрегаты/);
+    assert.doesNotMatch(html, /Backend недоступен/);
+  } finally {
+    delete global.document;
+  }
+});
+
 test('configure binds the click delegate exactly once', () => {
   const ui = loadCoachUI();
   const document = new FakeDocument(['daily-plan-card', 'daily-plan-content']);

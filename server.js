@@ -2,14 +2,25 @@ const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
 const { createAiService } = require('./server/ai-service.js');
+const { createSyncService } = require('./server/sync-service.js');
+const { createAiSettingsStore } = require('./server/ai-settings.js');
+const { requireBearer } = require('./server/auth.js');
 
 const MAX_BODY_BYTES = 16 * 1024;
+// Снимок прогресса на порядки больше AI-агрегатов: history допускает 1000
+// записей, qprog — по записи на каждый вопрос. Общий лимит 16 КБ отклонял бы
+// любой реальный синк, поэтому у него свой предел.
+const MAX_SYNC_BODY_BYTES = 2 * 1024 * 1024;
 const contentTypes = {
   '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json', '.png': 'image/png'
 };
 const publicFiles = new Set([
-  'index.html', 'styles.css', 'version.js', 'date.js', 'storage.js', 'progress.js', 'coach.js', 'ai-coach.js', 'progress-io.js', 'offline-ui.js', 'sources-ui.js', 'best-practices-ui.js', 'catalog-ui.js', 'chapter-ui.js', 'router.js',
+  'index.html', 'styles.css', 'version.js', 'date.js', 'storage.js', 'progress.js', 'coach.js', 'ai-coach.js', 'progress-io.js',
+  // Модули синхронизации нужны браузеру, поэтому они публичные. Серверная
+  // часть (server/sync-service.js) сюда НЕ попадает и остаётся закрытой.
+  'sync-merge.js', 'sync-client.js', 'sync-ui.js', 'ai-settings-client.js', 'ai-settings-ui.js',
+  'offline-ui.js', 'sources-ui.js', 'best-practices-ui.js', 'catalog-ui.js', 'chapter-ui.js', 'router.js',
   // Новый модуль, не добавленный сюда, отдаётся как 403: страница молча теряет
   // скрипт, а sw.js не устанавливается вовсе — SHELL_ASSETS кешируется
   // атомарным addAll, и один недоступный файл роняет всю установку.
@@ -34,7 +45,8 @@ function sendJson(response, status, body) {
   response.end(data);
 }
 
-function readJson(request) {
+function readJson(request, limitBytes) {
+  const limit = Number.isFinite(limitBytes) && limitBytes > 0 ? limitBytes : MAX_BODY_BYTES;
   return new Promise((resolve, reject) => {
     if (!String(request.headers['content-type'] || '').toLowerCase().startsWith('application/json')) {
       const error = new Error('Content-Type must be application/json');
@@ -43,7 +55,7 @@ function readJson(request) {
       return;
     }
     const declared = Number(request.headers['content-length']);
-    if (Number.isFinite(declared) && declared > MAX_BODY_BYTES) {
+    if (Number.isFinite(declared) && declared > limit) {
       const error = new Error('Request body is too large');
       error.status = 413;
       reject(error);
@@ -54,10 +66,10 @@ function readJson(request) {
     let size = 0;
     request.on('data', chunk => {
       size += chunk.length;
-      if (size <= MAX_BODY_BYTES) chunks.push(chunk);
+      if (size <= limit) chunks.push(chunk);
     });
     request.on('end', () => {
-      if (size > MAX_BODY_BYTES) {
+      if (size > limit) {
         const error = new Error('Request body is too large');
         error.status = 413;
         reject(error);
@@ -78,6 +90,11 @@ function createRateLimiter(limit = 20, windowMs = 60000) {
   const clients = new Map();
   return address => {
     const now = Date.now();
+    // Без вычистки истёкших окон Map растёт неограниченно: каждый новый IP
+    // добавляет запись, которая никогда не удаляется.
+    if (clients.size > 1000) {
+      for (const [key, value] of clients) if (value.resetAt <= now) clients.delete(key);
+    }
     const current = clients.get(address);
     if (!current || current.resetAt <= now) {
       clients.set(address, { count: 1, resetAt: now + windowMs });
@@ -86,6 +103,19 @@ function createRateLimiter(limit = 20, windowMs = 60000) {
     current.count++;
     return current.count <= limit;
   };
+}
+
+/**
+ * Определяет адрес клиента. За реверс-прокси socket.remoteAddress — это адрес
+ * прокси, и все устройства делят один счётчик лимита: одно исчерпывает квоту
+ * для остальных. Но доверять X-Forwarded-For можно ТОЛЬКО когда мы знаем, что
+ * перед нами прокси, иначе клиент подделает заголовок и обойдёт лимит.
+ */
+function clientAddress(request, trustProxy) {
+  const socketAddress = request.socket.remoteAddress || 'unknown';
+  if (!trustProxy) return socketAddress;
+  const forwarded = String(request.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  return forwarded || socketAddress;
 }
 
 function safeStaticPath(root, pathname) {
@@ -101,8 +131,22 @@ function safeStaticPath(root, pathname) {
 
 function createAppServer(options = {}) {
   const root = path.resolve(options.root || __dirname);
-  const aiService = options.aiService || createAiService(options.env || process.env, options.dependencies);
+  const env = options.env || process.env;
+  const aiService = options.aiService || createAiService(env, options.dependencies);
+  const aiSettings = options.aiSettings || createAiSettingsStore(env, options.dependencies);
+  const syncService = options.syncService || createSyncService(env, options.dependencies);
+  // Отдельный токен для правки настроек: общий с синком означал бы, что одна
+  // утечка отдаёт и прогресс, и API-ключ провайдера.
+  const adminToken = String(env.IPMAX_ADMIN_TOKEN || '').trim();
   const allowRequest = createRateLimiter(options.rateLimit || 20, options.rateWindowMs || 60000);
+  // Синк вызывается чаще AI-разбора (пуш после каждой сессии), поэтому у него
+  // свой, более щедрый счётчик — иначе один активный день упирается в лимит.
+  const allowSync = createRateLimiter(options.syncRateLimit || 120, options.rateWindowMs || 60000);
+  // За прокси X-Forwarded-For нужен, но доверять ему можно только когда прокси
+  // действительно есть: иначе клиент подделает заголовок и обойдёт лимит.
+  const trustProxy = options.trustProxy !== undefined
+    ? !!options.trustProxy
+    : String(env.IPMAX_TRUST_PROXY || '').toLowerCase() === 'true';
 
   return http.createServer(async (request, response) => {
     // request.url приходит от клиента и может быть невалидным ('//', '/\\').
@@ -120,7 +164,7 @@ function createAppServer(options = {}) {
     }
     if (url.pathname === '/api/ai/review') {
       if (request.method !== 'POST') return sendJson(response, 405, { error: 'Method not allowed' });
-      if (!allowRequest(request.socket.remoteAddress || 'unknown')) return sendJson(response, 429, { error: 'Too many AI review requests' });
+      if (!allowRequest(clientAddress(request, trustProxy))) return sendJson(response, 429, { error: 'Too many AI review requests' });
       try {
         const payload = await readJson(request);
         const review = await aiService.review(payload);
@@ -128,6 +172,59 @@ function createAppServer(options = {}) {
       } catch (error) {
         const status = Number.isInteger(error && error.status) ? error.status : 500;
         return sendJson(response, status, { error: status >= 500 ? 'AI review is temporarily unavailable' : error.message, code: error && error.code || undefined });
+      }
+    }
+    if (url.pathname === '/api/ai/settings') {
+      if (!['GET', 'POST', 'DELETE'].includes(request.method)) return sendJson(response, 405, { error: 'Method not allowed' });
+      if (!allowRequest(clientAddress(request, trustProxy))) return sendJson(response, 429, { error: 'Too many settings requests' });
+      try {
+        // Читать настройки тоже только по токену: baseUrl и модель — это
+        // сведения о внутренней конфигурации сервера, наружу они не нужны.
+        requireBearer(request.headers.authorization, adminToken, 'ADMIN_NOT_CONFIGURED');
+        if (request.method === 'GET') return sendJson(response, 200, { settings: await aiSettings.read() });
+        if (request.method === 'DELETE') return sendJson(response, 200, { settings: await aiSettings.clear() });
+        const payload = await readJson(request);
+        const settings = await aiSettings.write(payload);
+        return sendJson(response, 200, { settings });
+      } catch (error) {
+        const status = Number.isInteger(error && error.status) ? error.status : 500;
+        return sendJson(response, status, {
+          error: status >= 500 ? 'Settings are temporarily unavailable' : error.message,
+          code: error && error.code || undefined
+        });
+      }
+    }
+    if (url.pathname === '/api/admin/status') {
+      if (request.method !== 'GET') return sendJson(response, 405, { error: 'Method not allowed' });
+      // Публично: UI должен знать, можно ли вообще открывать настройки, до
+      // того как получит токен. Ничего секретного здесь не раскрывается.
+      return sendJson(response, 200, { enabled: !!adminToken });
+    }
+    if (url.pathname === '/api/sync/status') {
+      if (request.method !== 'GET') return sendJson(response, 405, { error: 'Method not allowed' });
+      // Статус не требует токена: клиенту надо знать, включён ли синк, до
+      // того как он получит от пользователя токен. Состояние здесь не течёт.
+      const status = syncService.status();
+      return sendJson(response, 200, { enabled: status.enabled, hasSnapshot: status.hasSnapshot, revision: status.revision, maxBytes: status.maxBytes });
+    }
+    if (url.pathname === '/api/sync') {
+      if (request.method !== 'GET' && request.method !== 'POST') return sendJson(response, 405, { error: 'Method not allowed' });
+      if (!allowSync(clientAddress(request, trustProxy))) return sendJson(response, 429, { error: 'Too many sync requests' });
+      try {
+        syncService.authorise(request.headers.authorization);
+        if (request.method === 'GET') {
+          const result = await syncService.pull();
+          return sendJson(response, 200, { snapshot: result.snapshot });
+        }
+        const payload = await readJson(request, MAX_SYNC_BODY_BYTES);
+        const result = await syncService.push(payload);
+        return sendJson(response, 200, { snapshot: result.snapshot, conflicts: result.conflicts });
+      } catch (error) {
+        const status = Number.isInteger(error && error.status) ? error.status : 500;
+        return sendJson(response, status, {
+          error: status >= 500 ? 'Sync is temporarily unavailable' : error.message,
+          code: error && error.code || undefined
+        });
       }
     }
     if (request.method !== 'GET' && request.method !== 'HEAD') return sendJson(response, 405, { error: 'Method not allowed' });
