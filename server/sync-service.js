@@ -4,6 +4,8 @@ const path = require('node:path');
 const Merge = require('../sync-merge.js');
 const ProgressIO = require('../progress-io.js');
 const Storage = require('../storage.js');
+const AICoach = require('../ai-coach.js');
+const InterviewPractice = require('../interview-practice-ui.js');
 // Разбор и сравнение токена — в общем модуле: две копии этой логики
 // неизбежно разъехались бы.
 const { safeEqual, extractBearer } = require('./auth.js');
@@ -55,12 +57,33 @@ function validateSnapshot(raw, maxBytes) {
   } catch (error) {
     throw serviceError(error.message, 'INVALID_SNAPSHOT', 400);
   }
+  if ('ai_review_history' in state && (
+    !Array.isArray(state.ai_review_history) ||
+    state.ai_review_history.length > AICoach.REVIEW_HISTORY_LIMIT ||
+    !state.ai_review_history.every(entry => AICoach.normaliseReviewHistoryEntry(entry))
+  )) {
+    throw serviceError('Invalid AI review history', 'INVALID_SNAPSHOT', 400);
+  }
+  if ('interview_ai_history' in state && (
+    !Array.isArray(state.interview_ai_history) ||
+    state.interview_ai_history.length > InterviewPractice.INTERVIEW_HISTORY_LIMIT ||
+    !state.interview_ai_history.every(entry => InterviewPractice.normaliseInterviewHistoryEntry(entry))
+  )) {
+    throw serviceError('Invalid interview AI history', 'INVALID_SNAPSHOT', 400);
+  }
 
   const updatedAt = Number(raw.updatedAt);
   if (!Number.isFinite(updatedAt) || updatedAt < 0) {
     throw serviceError('Snapshot updatedAt must be a non-negative number', 'INVALID_SNAPSHOT', 400);
   }
-  return Merge.normaliseSnapshot({ ...raw, updatedAt });
+  const normalisedState = { ...state };
+  if (Array.isArray(state.ai_review_history)) {
+    normalisedState.ai_review_history = state.ai_review_history.map(AICoach.normaliseReviewHistoryEntry).filter(Boolean);
+  }
+  if (Array.isArray(state.interview_ai_history)) {
+    normalisedState.interview_ai_history = state.interview_ai_history.map(InterviewPractice.normaliseInterviewHistoryEntry).filter(Boolean);
+  }
+  return Merge.normaliseSnapshot({ ...raw, state: normalisedState, updatedAt });
 }
 
 function emptySnapshot() {

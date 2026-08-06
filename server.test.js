@@ -1,8 +1,11 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const http = require('node:http');
-const { createAppServer, MAX_BODY_BYTES } = require('./server.js');
+const { createAppServer, MAX_BODY_BYTES, MAX_AI_BODY_BYTES } = require('./server.js');
 const { createAiService } = require('./server/ai-service.js');
+
+const SYNC_TOKEN = 'test-sync-token-at-least-24-characters';
+const AI_AUTH = { Authorization: 'Bearer ' + SYNC_TOKEN };
 
 function request(server, method, path, body, headers = {}) {
   const port = server.address().port;
@@ -19,8 +22,12 @@ function request(server, method, path, body, headers = {}) {
   });
 }
 
-async function withServer(aiService, run) {
-  const server = createAppServer({ aiService });
+async function withServer(aiService, run, options = {}) {
+  const server = createAppServer({
+    ...options,
+    aiService,
+    env: { IPMAX_SYNC_TOKEN: SYNC_TOKEN, ...(options.env || {}) }
+  });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   try { await run(server); }
   finally { await new Promise(resolve => server.close(resolve)); }
@@ -33,6 +40,20 @@ const reviewPayload = {
   focus: 'Linux'
 };
 
+const interviewPayload = {
+  schemaVersion: 1,
+  kind: 'systemDesign',
+  item: {
+    id: 'sd-ci-001', topic: 'CI/CD', level: 'Middle', title: 'Конвейер',
+    context: 'Сервис в контейнере', task: 'Опишите выпуск',
+    constraints: ['Откат до 15 минут'], expectedPoints: ['Версионные образы'],
+    tradeoffs: ['Ручное подтверждение замедляет выпуск'],
+    rubric: ['Назван способ отката', 'Секреты защищены']
+  },
+  answer: 'Соберу версионный образ, сохраню секреты вне репозитория и откатываю по предыдущей метке.',
+  followUpTurn: 0
+};
+
 test('serves AI status and a mock review without exposing configuration', async () => {
   await withServer(createAiService({ IPMAX_AI_PROVIDER: 'mock' }), async server => {
     const status = await request(server, 'GET', '/api/ai/status');
@@ -40,25 +61,81 @@ test('serves AI status and a mock review without exposing configuration', async 
     assert.deepEqual(JSON.parse(status.body), { enabled: true, provider: 'mock', model: null });
     assert.equal(status.headers['cache-control'], 'no-store');
 
-    const result = await request(server, 'POST', '/api/ai/review', reviewPayload);
+    const result = await request(server, 'POST', '/api/ai/review', reviewPayload, AI_AUTH);
     assert.equal(result.status, 200);
     assert.match(JSON.parse(result.body).review.summary, /AI-разбор готов/);
   });
 });
 
-test('rejects missing answers, disabled providers and oversized bodies', async () => {
+test('rejects missing answers, disabled providers and malformed JSON', async () => {
   await withServer(createAiService({}), async server => {
-    const missing = await request(server, 'POST', '/api/ai/review', { control: { attempted: 0 } });
+    const missing = await request(server, 'POST', '/api/ai/review', { control: { attempted: 0 } }, AI_AUTH);
     assert.equal(missing.status, 400);
 
-    const disabled = await request(server, 'POST', '/api/ai/review', reviewPayload);
+    const disabled = await request(server, 'POST', '/api/ai/review', reviewPayload, AI_AUTH);
     assert.equal(disabled.status, 503);
     assert.equal(JSON.parse(disabled.body).error, 'AI review is temporarily unavailable');
 
-    const oversized = 'x'.repeat(MAX_BODY_BYTES + 1);
-    const tooLarge = await request(server, 'POST', '/api/ai/review', oversized);
-    assert.equal(tooLarge.status, 413);
+    const malformed = 'x'.repeat(MAX_BODY_BYTES + 1);
+    const invalid = await request(server, 'POST', '/api/ai/review', malformed, AI_AUTH);
+    assert.equal(invalid.status, 400);
+    assert.match(JSON.parse(invalid.body).error, /invalid JSON/i);
   });
+});
+
+test('accepts a detailed AI payload above the legacy limit but rejects more than 64 KiB', async () => {
+  let received = null;
+  const service = {
+    status: () => ({ enabled: true, provider: 'mock', model: null }),
+    review: async payload => { received = payload; return { summary: 'ok', nextSteps: ['ok'] }; }
+  };
+  await withServer(service, async server => {
+    const detailed = { control: { attempted: 1 }, evidence: 'x'.repeat(MAX_BODY_BYTES + 1024) };
+    const accepted = await request(server, 'POST', '/api/ai/review', detailed, AI_AUTH);
+    assert.equal(accepted.status, 200);
+    assert.equal(received.evidence.length, MAX_BODY_BYTES + 1024);
+
+    const oversized = { control: { attempted: 1 }, evidence: 'x'.repeat(MAX_AI_BODY_BYTES + 1) };
+    const rejected = await request(server, 'POST', '/api/ai/review', oversized, AI_AUTH);
+    assert.equal(rejected.status, 413);
+  });
+});
+
+test('protects AI review with the sync token before consuming the rate limit', async () => {
+  await withServer(createAiService({ IPMAX_AI_PROVIDER: 'mock' }), async server => {
+    const missing = await request(server, 'POST', '/api/ai/review', reviewPayload);
+    assert.equal(missing.status, 401);
+    assert.equal(JSON.parse(missing.body).code, 'SYNC_UNAUTHORIZED');
+
+    for (let index = 0; index < 3; index++) {
+      const wrong = await request(server, 'POST', '/api/ai/review', reviewPayload, {
+        Authorization: 'Bearer wrong-token-' + index
+      });
+      assert.equal(wrong.status, 401, 'неверный токен не должен доходить до AI rate limiter');
+    }
+
+    const owner = await request(server, 'POST', '/api/ai/review', reviewPayload, AI_AUTH);
+    assert.equal(owner.status, 200, 'чужие запросы не должны заблокировать владельца');
+
+    const limited = await request(server, 'POST', '/api/ai/review', reviewPayload, AI_AUTH);
+    assert.equal(limited.status, 429, 'валидные AI-запросы всё равно ограничиваются');
+  }, { rateLimit: 1 });
+});
+
+test('protects interview evaluation with the sync token and returns a normalised mock result', async () => {
+  await withServer(createAiService({ IPMAX_AI_PROVIDER: 'mock' }), async server => {
+    const missing = await request(server, 'POST', '/api/ai/interview', interviewPayload);
+    assert.equal(missing.status, 401);
+    assert.equal(JSON.parse(missing.body).code, 'SYNC_UNAUTHORIZED');
+
+    const result = await request(server, 'POST', '/api/ai/interview', interviewPayload, AI_AUTH);
+    assert.equal(result.status, 200);
+    const evaluation = JSON.parse(result.body).evaluation;
+    assert.equal(evaluation.source, 'mock');
+    assert.equal(evaluation.rubric[0].criterion, 'Назван способ отката');
+    assert.equal(Number.isFinite(evaluation.dimensions.correctness.score), true);
+    assert.match(evaluation.dimensions.correctness.feedback, /тестов/i);
+  }, { rateLimit: 1 });
 });
 
 test('serves only browser assets and blocks server-side files', async () => {
@@ -98,6 +175,78 @@ test('adapts an OpenAI-compatible response without leaking the API key', async (
   assert.equal(review.summary, 'Разбор');
   assert.equal(captured.options.headers.Authorization, 'Bearer server-secret');
   assert.doesNotMatch(captured.options.body, /server-secret/);
+});
+
+test('asks the provider for a strict diagnostic v2 review when question evidence is present', async () => {
+  let captured;
+  const service = createAiService({
+    IPMAX_AI_PROVIDER: 'openai-compatible',
+    IPMAX_AI_ENDPOINT: 'https://provider.example/v1/chat/completions',
+    IPMAX_AI_API_KEY: 'server-secret',
+    IPMAX_AI_MODEL: 'test-model'
+  }, {
+    fetchImpl: async (_url, options) => {
+      captured = JSON.parse(options.body);
+      return { ok: true, json: async () => ({ choices: [{ message: { content: JSON.stringify({
+        schemaVersion: 2,
+        verdict: { levelEstimate: 'Middle-', readiness: 58, summary: 'Путаете probes.' },
+        diagnostics: [{ concept: 'Probes', severity: 'high', problemType: 'concept_confusion', evidence: ['Выбран liveness'], explanation: 'Readiness управляет endpoints.', confidence: 0.9 }],
+        actionPlan: [{ priority: 1, task: 'Сравнить probes', practice: '5 сценариев', successCriterion: '4/5', page: 'exam', topic: 'Kubernetes' }],
+        studyPlan: [{ day: 1, title: 'Probes', actions: ['Повторить'], successCriterion: 'Объяснить' }],
+        retest: { topics: ['Kubernetes'], categories: ['scenario'], levels: ['Middle'], size: 5, successCriterion: '4/5' },
+        caution: ''
+      }) } }] }) };
+    }
+  });
+  const payload = {
+    ...reviewPayload, schemaVersion: 2,
+    control: { ...reviewPayload.control, questionDetails: [{
+      questionId: '1', topic: 'Kubernetes', level: 'Middle', category: 'scenario',
+      question: 'Почему Service не видит Pod?', result: 'incorrect', selectedAnswer: 'liveness',
+      correctAnswer: 'readiness', explanation: 'Readiness управляет endpoints.', responseSeconds: 70
+    }] }
+  };
+  const review = await service.review(payload);
+
+  assert.equal(review.schemaVersion, 2);
+  assert.equal(review.actionPlan[0].successCriterion, '4/5');
+  assert.equal(captured.max_tokens >= 1800, true);
+  assert.match(captured.messages[0].content, /evidence/);
+  assert.match(captured.messages[0].content, /successCriterion/);
+});
+
+test('asks the provider for a strict rubric-bound interview evaluation', async () => {
+  let captured;
+  const service = createAiService({
+    IPMAX_AI_PROVIDER: 'openai-compatible',
+    IPMAX_AI_ENDPOINT: 'https://provider.example/v1/chat/completions',
+    IPMAX_AI_API_KEY: 'server-secret',
+    IPMAX_AI_MODEL: 'test-model'
+  }, {
+    fetchImpl: async (_url, options) => {
+      captured = JSON.parse(options.body);
+      return { ok: true, json: async () => ({ choices: [{ message: { content: JSON.stringify({
+        schemaVersion: 1, overallScore: 72, summary: 'Основа есть.',
+        dimensions: {
+          correctness: { score: 80, feedback: 'Верно.' }, completeness: { score: 70, feedback: 'Добавить шаги.' },
+          structure: { score: 75, feedback: 'Понятно.' }, tradeoffs: { score: 60, feedback: 'Мало компромиссов.' }
+        },
+        rubric: [
+          { criterion: 'Подмена', met: true, evidence: 'Есть откат', feedback: 'Хорошо.' },
+          { criterion: 'Подмена', met: true, evidence: 'Секреты вне repo', feedback: 'Хорошо.' }
+        ],
+        gaps: ['Метрики'], improvedAnswer: 'Улучшенный ответ.',
+        followUps: [{ question: 'Как проверите откат?', reason: 'Проверка процедуры.' }], caution: ''
+      }) } }] }) };
+    }
+  });
+
+  const evaluation = await service.evaluateInterview(interviewPayload);
+  assert.equal(evaluation.rubric[0].criterion, 'Назван способ отката');
+  assert.equal(evaluation.overallScore, 72);
+  assert.match(captured.messages[0].content, /rubric/i);
+  assert.match(captured.messages[0].content, /до трёх/i);
+  assert.equal(captured.max_tokens >= 1800, true);
 });
 
 // Запрос с таймаутом на сокет. Нужен именно здесь: при регрессии обработчик

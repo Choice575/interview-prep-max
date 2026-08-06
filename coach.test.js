@@ -109,6 +109,32 @@ test('builds a unique adaptive control session across priority topics', () => {
   assert.ok(session.questionIds.includes(3));
 });
 
+test('builds a safe retest only from existing questions and allowlisted filters', () => {
+  const pool = [
+    { id: 1, topic: 'Kubernetes', level: 'Middle', category: 'scenario' },
+    { id: 2, topic: 'Kubernetes', level: 'Middle', category: 'scenario' },
+    { id: 3, topic: 'Kubernetes', level: 'Middle', category: 'definition' },
+    { id: 4, topic: 'Linux', level: 'Middle', category: 'scenario' },
+    { id: 5, topic: 'Kubernetes', level: 'Senior', category: 'scenario' }
+  ];
+  const result = coach.buildRetestSession({
+    questions: pool,
+    recipe: {
+      topics: ['Kubernetes', '<script>'], categories: ['scenario', 'evil'],
+      levels: ['Middle', 'Root'], size: 99,
+      generatedQuestions: [{ id: 999, q: 'Нельзя принимать от модели' }]
+    },
+    progress: { 1: { correct: 0, wrong: 2 }, 2: { correct: 1, wrong: 0 } },
+    now: Date.UTC(2026, 7, 6)
+  });
+
+  assert.deepEqual(result.questionIds.sort((a, b) => a - b), [1, 2]);
+  assert.equal(result.size, 2);
+  assert.deepEqual(result.topics, ['Kubernetes']);
+  assert.equal(new Set(result.questionIds).size, result.questionIds.length);
+  assert.equal(result.questionIds.includes(999), false);
+});
+
 test('normalizes journal entries and rejects incomplete notes', () => {
   const now = Date.UTC(2026, 6, 21);
   const notes = coach.appendJournalEntry([], { topic: 'Linux', note: 'Повторить диагностику DNS' }, now);

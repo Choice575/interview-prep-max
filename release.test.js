@@ -193,6 +193,23 @@ test('npm start reads .env without requiring the file to exist', () => {
   }
 });
 
+test('Caddy CSP permits legacy event handlers without allowing external scripts', () => {
+  // Интерфейс пока использует onclick="..." в HTML и динамической разметке.
+  // Разрешаем только атрибутные обработчики; загружаемые <script> по-прежнему
+  // должны приходить исключительно с нашего origin.
+  const caddy = read('Caddyfile');
+  const match = caddy.match(/Content-Security-Policy "([^"]+)"/);
+  assert.ok(match, 'Caddyfile должен задавать Content-Security-Policy');
+  const directives = Object.fromEntries(match[1].split(';').map(part => {
+    const tokens = part.trim().split(/\s+/);
+    return [tokens[0], tokens.slice(1)];
+  }));
+
+  assert.deepEqual(directives['script-src'], ["'self'"]);
+  assert.deepEqual(directives['script-src-elem'], ["'self'"]);
+  assert.deepEqual(directives['script-src-attr'], ["'unsafe-inline'"]);
+});
+
 test('secrets are kept out of git and the image', () => {
   // .env содержит IPMAX_ADMIN_TOKEN и ключ провайдера: он не должен попасть
   // ни в коммит, ни в слои образа. .env.example, наоборот, нужен.

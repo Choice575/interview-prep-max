@@ -9,6 +9,7 @@
   const HISTORY_LIMIT = 1000;
   const EVENT_LIMIT = 500;
   const JOURNAL_LIMIT = 200;
+  const REVIEW_HISTORY_LIMIT = 30;
 
   // Слияние без потерь возможно потому, что почти всё состояние приложения
   // монотонно: счётчики только растут, журналы только дополняются, задание
@@ -51,6 +52,8 @@
     history: 'appendLog',
     skill_events: 'appendLog',
     coach_journal: 'journalLog',
+    ai_review_history: 'reviewHistory',
+    interview_ai_history: 'reviewHistory',
     custom: 'customQuestions',
     daily_blitz: 'dailyBlitz',
     gamification: 'gamification',
@@ -239,6 +242,21 @@
     return [...byId.values()].sort((one, two) => num(one.at, 0) - num(two.at, 0)).slice(-JOURNAL_LIMIT);
   }
 
+  function reviewHistory(left, right) {
+    const byId = new Map();
+    [...(Array.isArray(left) ? left : []), ...(Array.isArray(right) ? right : [])].forEach(item => {
+      if (!isRecord(item) || typeof item.id !== 'string' || !item.id) return;
+      const existing = byId.get(item.id);
+      if (!existing || num(item.at, 0) > num(existing.at, 0) ||
+        (num(item.at, 0) === num(existing.at, 0) && JSON.stringify(item) < JSON.stringify(existing))) {
+        byId.set(item.id, item);
+      }
+    });
+    return [...byId.values()]
+      .sort((one, two) => num(one.at, 0) - num(two.at, 0) || String(one.id).localeCompare(String(two.id)))
+      .slice(-REVIEW_HISTORY_LIMIT);
+  }
+
   function customQuestions(left, right) {
     const a = Array.isArray(left) ? left : [];
     const b = Array.isArray(right) ? right : [];
@@ -325,7 +343,7 @@
 
   const HANDLERS = {
     maxNumberMap, firstWriteMap, truthyMap, doneMap, doneStatusMap, maxScoreMap,
-    statsSum, questionProg, appendLog, journalLog, customQuestions, gamification,
+    statsSum, questionProg, appendLog, journalLog, reviewHistory, customQuestions, gamification,
     dailyBlitz, weeklyResults, newerByCompletedAt, controlSession,
     maxNumber: (left, right) => Math.max(num(left, 0), num(right, 0))
   };
@@ -382,10 +400,10 @@
   }
 
   return {
-    SNAPSHOT_VERSION, MERGE_RULES, HISTORY_LIMIT, EVENT_LIMIT, JOURNAL_LIMIT,
+    SNAPSHOT_VERSION, MERGE_RULES, HISTORY_LIMIT, EVENT_LIMIT, JOURNAL_LIMIT, REVIEW_HISTORY_LIMIT,
     normaliseSnapshot, mergeSnapshots,
     maxNumberMap, firstWriteMap, truthyMap, doneMap, doneStatusMap, maxScoreMap,
-    statsSum, questionProg, appendLog, journalLog, customQuestions, gamification,
+    statsSum, questionProg, appendLog, journalLog, reviewHistory, customQuestions, gamification,
     dailyBlitz, weeklyResults, newerByCompletedAt, controlSession
   };
 });

@@ -16,6 +16,44 @@ const server = http.createServer((request, response) => {
   });
 });
 
+test('wires diagnostic history and AI retest callbacks into the coach UI', () => {
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  assert.match(app, /function saveCoachAIReview\(/);
+  assert.match(app, /function startCoachRetestMode\(/);
+  assert.match(app, /saveAiReview:saveCoachAIReview/);
+  assert.match(app, /startRetest:startCoachRetestMode/);
+  assert.match(app, /normaliseReviewHistoryEntry:IPMaxAICoach\.normaliseReviewHistoryEntry/);
+  assert.match(app, /reviewHistoryLimit:IPMaxAICoach\.REVIEW_HISTORY_LIMIT/);
+});
+
+test('wires written and optional dictated interview answers into bounded AI history', () => {
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+
+  assert.match(html, /id="ip-answer"[^>]*maxlength="6000"/);
+  assert.match(html, /id="ip-ai-evaluate-btn"/);
+  assert.match(html, /id="ip-dictate-btn"/);
+  assert.match(html, /сервер[^<]*браузер|сервис[^<]*браузер/i);
+  assert.match(html, /id="ip-ai-result"[^>]*aria-live="polite"/);
+  assert.match(app, /async function evaluateInterviewAnswer\(/);
+  assert.match(app, /function saveInterviewAIHistory\(/);
+  assert.match(app, /function startInterviewFollowUp\(/);
+  assert.match(app, /function submitInterviewFollowUp\(/);
+  assert.match(app, /leavingInterview[\s\S]*resetInterviewAIState\(\)/);
+  assert.match(app, /SpeechRecognition|webkitSpeechRecognition/);
+  assert.match(app, /normaliseInterviewHistoryEntry:IPMaxInterviewPracticeUI\.normaliseInterviewHistoryEntry/);
+  assert.match(app, /interviewHistoryLimit:IPMaxInterviewPracticeUI\.INTERVIEW_HISTORY_LIMIT/);
+
+  const styles = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
+  assert.match(styles, /\.ip-answer-panel[,{]/);
+  assert.match(styles, /\.ip-privacy-note\{/);
+  assert.match(styles, /\.ip-ai-dimensions\{/);
+  assert.match(styles, /\.ip-ai-rubric-item\{/);
+  assert.match(styles, /\.ip-follow-up-form[,{]/);
+  assert.match(styles, /\.ip-follow-up-form\[hidden\]\{display:none/);
+  assert.match(styles, /@media\(max-width:560px\).*\.ip-ai-dimensions/s);
+});
+
 test('serves the complete app shell and personal-coach modules', async () => {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const port = server.address().port;

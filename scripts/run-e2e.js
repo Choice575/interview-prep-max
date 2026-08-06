@@ -4,6 +4,7 @@ const path = require('node:path');
 
 const projectRoot = path.resolve(__dirname, '..');
 const serverUrl = 'http://127.0.0.1:4173/';
+const testSyncToken = 'e2e-sync-token-at-least-24-characters';
 
 function waitForServer(attempts = 50) {
   return new Promise((resolve, reject) => {
@@ -69,7 +70,7 @@ async function main() {
   const server = spawn(process.execPath, ['test-server.js'], {
     cwd: projectRoot,
     stdio: 'inherit',
-    env: { ...process.env, IPMAX_AI_PROVIDER: 'mock' }
+    env: { ...process.env, IPMAX_AI_PROVIDER: 'mock', IPMAX_SYNC_TOKEN: testSyncToken }
   });
 
   try {

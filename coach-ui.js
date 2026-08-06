@@ -6,6 +6,8 @@
   let services = null;
   let bound = false;
   let reviewRequest = 0;
+  let currentReview = null;
+  let currentReviewTrend = null;
   // Статус внешнего AI кешируется на сессию: без него кнопка обещала бы
   // «AI-разбор» даже при ненастроенном провайдере, и правда выяснялась бы
   // только после клика. На сервере ответ уже отдаётся с no-store.
@@ -198,9 +200,91 @@
     if (services.setJournal(next)) { renderJournal(); render(); }
   }
 
+  function renderWeeklyTrend(trend) {
+    const weekly = trend && trend.weekly;
+    if (!weekly || !weekly.current || !weekly.current.count) return '';
+    const current = weekly.current;
+    const hasBaseline = weekly.previous && weekly.previous.count;
+    return '<section class="coach-ai-section coach-ai-weekly"><h4>Динамика за 7 дней</h4>' +
+      '<div class="coach-ai-weekly-grid"><div><span>Разборов</span><strong>' + escapeHtml(current.count) + '</strong></div>' +
+      '<div><span>Точность</span><strong>' + escapeHtml(current.accuracy) + '%</strong><small>' + (hasBaseline ? formatDelta(weekly.accuracyDelta, '%') + ' к прошлым 7 дням' : 'нет прошлой недели') + '</small></div>' +
+      '<div><span>Готовность</span><strong>' + escapeHtml(current.readiness) + '%</strong><small>' + (hasBaseline ? formatDelta(weekly.readinessDelta, '%') + ' к прошлым 7 дням' : 'нет прошлой недели') + '</small></div></div></section>';
+  }
+
+  function renderReviewHistory(trend) {
+    const recent = trend && Array.isArray(trend.recent) ? trend.recent.slice(0, 5) : [];
+    if (!recent.length) return '';
+    const items = recent.map(entry => {
+      const verdict = entry.review && entry.review.verdict || {};
+      const date = new Date(entry.at).toLocaleDateString('ru-RU', { day: '2-digit', month: 'short' });
+      const source = entry.source === 'local' ? 'Локально' : 'AI';
+      return '<article class="coach-ai-history-item"><div><time>' + escapeHtml(date) + '</time><span>' + source + '</span>' +
+        '<strong>' + escapeHtml(entry.metrics && entry.metrics.accuracy) + '% / ' + escapeHtml(verdict.readiness) + '%</strong></div>' +
+        '<p>' + escapeHtml(verdict.summary) + '</p></article>';
+    }).join('');
+    return '<section class="coach-ai-section coach-ai-history"><h4>История разборов</h4>' + items + '</section>';
+  }
+
+  function renderDiagnosticReview(result, target) {
+    const badge = result.source === 'ai' ? 'Внешний AI' : 'Локальный разбор';
+    const localNote = result.fallbackHint || 'Внешний AI недоступен — показан локальный диагностический разбор.';
+    const verdict = result.verdict || {};
+    const diagnostics = Array.isArray(result.diagnostics) ? result.diagnostics : [];
+    const actions = Array.isArray(result.actionPlan) ? result.actionPlan : [];
+    const days = Array.isArray(result.studyPlan) ? result.studyPlan : [];
+    const retest = result.retest || {};
+    const diagnosisMarkup = diagnostics.map(item =>
+      '<article class="coach-ai-diagnosis coach-ai-severity-' + escapeAttr(item.severity) + '">' +
+      '<div class="coach-ai-diagnosis-head"><strong>' + escapeHtml(item.concept) + '</strong><span>Уверенность ' + Math.round((item.confidence || 0) * 100) + '%</span></div>' +
+      (item.evidence && item.evidence.length ? '<ul class="coach-ai-evidence">' + item.evidence.map(value => '<li>' + escapeHtml(value) + '</li>').join('') + '</ul>' : '') +
+      '<p>' + escapeHtml(item.explanation) + '</p></article>'
+    ).join('');
+    const actionMarkup = actions.map(item =>
+      '<article class="coach-ai-action"><span class="coach-ai-priority">Приоритет ' + escapeHtml(item.priority) + '</span>' +
+      '<strong>' + escapeHtml(item.task) + '</strong>' +
+      (item.practice ? '<p>' + escapeHtml(item.practice) + '</p>' : '') +
+      '<div class="coach-ai-success">Критерий: ' + escapeHtml(item.successCriterion) + '</div></article>'
+    ).join('');
+    const dayMarkup = days.map(item =>
+      '<article class="coach-ai-day"><span>День ' + escapeHtml(item.day) + '</span><strong>' + escapeHtml(item.title) + '</strong>' +
+      (item.actions && item.actions.length ? '<ul>' + item.actions.map(value => '<li>' + escapeHtml(value) + '</li>').join('') + '</ul>' : '') +
+      (item.successCriterion ? '<small>Готово, когда: ' + escapeHtml(item.successCriterion) + '</small>' : '') + '</article>'
+    ).join('');
+    const retestParts = [
+      retest.topics && retest.topics.length ? 'Темы: ' + retest.topics.join(', ') : '',
+      retest.categories && retest.categories.length ? 'Формат: ' + retest.categories.join(', ') : '',
+      retest.levels && retest.levels.length ? 'Уровень: ' + retest.levels.join(', ') : '',
+      retest.size ? 'Вопросов: ' + retest.size : ''
+    ].filter(Boolean);
+    const trend = currentReviewTrend && currentReviewTrend.count > 1 ? currentReviewTrend : null;
+    const trendMarkup = trend
+      ? '<section class="coach-ai-trend" aria-label="Динамика разборов"><span>История: ' + escapeHtml(trend.count) + '</span><strong>Точность: ' + escapeHtml(formatDelta(trend.accuracyDelta, '%')) + '</strong><strong>Готовность: ' + escapeHtml(formatDelta(trend.readinessDelta, '%')) + '</strong></section>'
+      : '';
+    const canRetest = retestParts.length && Array.isArray(retest.topics) && retest.topics.length;
+    target.innerHTML = '<div class="coach-ai-result-head"><span class="coach-ai-badge">' + badge + '</span>' +
+      (result.source === 'local' ? '<span>' + escapeHtml(localNote) + '</span>' : '<span>Переданы только результаты текущей контрольной.</span>') + '</div>' +
+      '<section class="coach-ai-verdict"><div><span>Оценка уровня</span><strong>' + escapeHtml(verdict.levelEstimate || '—') + '</strong></div>' +
+      '<div><span>Готовность</span><strong>' + escapeHtml(verdict.readiness) + '%</strong></div></section>' +
+      trendMarkup +
+      renderWeeklyTrend(currentReviewTrend) +
+      '<p class="coach-ai-summary">' + escapeHtml(verdict.summary) + '</p>' +
+      (diagnosisMarkup ? '<section class="coach-ai-section"><h4>Почему возникли ошибки</h4>' + diagnosisMarkup + '</section>' : '') +
+      (actionMarkup ? '<section class="coach-ai-section coach-ai-next"><h4>Что делать дальше</h4>' + actionMarkup + '</section>' : '') +
+      (dayMarkup ? '<section class="coach-ai-section"><h4>План на ' + days.length + ' ' + (days.length === 1 ? 'день' : days.length < 5 ? 'дня' : 'дней') + '</h4><div class="coach-ai-days">' + dayMarkup + '</div></section>' : '') +
+      (retestParts.length ? '<section class="coach-ai-section coach-ai-retest"><h4>Повторная контрольная</h4><p>' + escapeHtml(retestParts.join(' · ')) + '</p><strong>' + escapeHtml(retest.successCriterion || '') + '</strong></section>' : '') +
+      (result.caution ? '<p class="coach-ai-caution">' + escapeHtml(result.caution) + '</p>' : '') +
+      renderReviewHistory(currentReviewTrend) +
+      (canRetest ? '<button type="button" class="btn btn-primary btn-sm" data-coach-action="start-ai-retest">Запустить повторную контрольную</button>' : '') +
+      '<button type="button" class="btn btn-outline btn-sm" data-coach-action="retry-ai-review">Обновить разбор</button>';
+  }
+
   function renderAIReview(result) {
     const target = document.getElementById('coach-ai-content');
     if (!target) return;
+    if (result && result.schemaVersion === 2) {
+      renderDiagnosticReview(result, target);
+      return;
+    }
     const badge = result.source === 'ai' ? 'Внешний AI' : 'Локальный разбор';
     const section = (title, items, className) => items && items.length
       ? '<section class="coach-ai-section ' + className + '"><h4>' + title + '</h4><ul>' + items.map(item => '<li>' + escapeHtml(item) + '</li>').join('') + '</ul></section>'
@@ -221,10 +305,15 @@
     if (!services.getControlSession || !services.getControlSession()) return;
     const requestId = ++reviewRequest;
     const target = document.getElementById('coach-ai-content');
-    target.innerHTML = '<div class="coach-ai-loading"><span></span><strong>Анализирую контрольную…</strong><small>Отправляются только темы, точность и время ответа.</small></div>';
+    currentReview = null;
+    currentReviewTrend = null;
+    target.innerHTML = '<div class="coach-ai-loading"><span></span><strong>Анализирую контрольную…</strong><small>Отправляются результаты текущей контрольной и до 15 ошибочных или медленных вопросов.</small></div>';
     services.openModal('coach-ai-modal', '#coach-ai-close');
     const result = await services.requestAiReview();
-    if (requestId === reviewRequest) renderAIReview(result);
+    if (requestId !== reviewRequest) return;
+    currentReview = result && result.schemaVersion === 2 ? result : null;
+    currentReviewTrend = currentReview && typeof services.saveAiReview === 'function' ? services.saveAiReview(currentReview) : null;
+    renderAIReview(result);
   }
 
   function handleAction(event) {
@@ -240,7 +329,13 @@
     else if (action === 'start-control') services.startControl(services.getPlan());
     else if (action === 'open-ai-review') openAIReview();
     else if (action === 'retry-ai-review') { openAIReview(); document.getElementById('coach-ai-close')?.focus(); }
-    else if (action === 'close-ai-review') { reviewRequest++; services.closeModal('coach-ai-modal'); }
+    else if (action === 'start-ai-retest' && currentReview && typeof services.startRetest === 'function') {
+      const recipe = currentReview.retest;
+      reviewRequest++;
+      services.closeModal('coach-ai-modal');
+      services.startRetest(recipe);
+    }
+    else if (action === 'close-ai-review') { reviewRequest++; currentReview = null; currentReviewTrend = null; services.closeModal('coach-ai-modal'); }
     else if (action === 'open-journal') openJournal();
     else if (action === 'close-journal') services.closeModal('coach-journal-modal');
     else if (action === 'save-journal') saveJournal();

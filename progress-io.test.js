@@ -9,7 +9,11 @@ const dependencies = {
   eventLimit: 2,
   isJournalEntry: entry => entry && typeof entry.note === 'string',
   journalLimit: 1,
-  normaliseControlSession: session => session && Array.isArray(session.questionIds) ? { ...session, normalised: true } : null
+  normaliseControlSession: session => session && Array.isArray(session.questionIds) ? { ...session, normalised: true } : null,
+  normaliseReviewHistoryEntry: entry => entry && typeof entry.id === 'string' ? { ...entry, normalised: true } : null,
+  reviewHistoryLimit: 30,
+  normaliseInterviewHistoryEntry: entry => entry && typeof entry.id === 'string' && typeof entry.overallScore === 'number' ? { ...entry, interviewNormalised: true } : null,
+  interviewHistoryLimit: 30
 };
 
 test('builds a complete versioned export through the module contract', () => {
@@ -59,6 +63,42 @@ test('validates and prepares only supported bounded import fields', () => {
   assert.equal(prepared.entries.coach_control.normalised, true);
   assert.deepEqual(prepared.entries.study_weekly_results, { 'weekly-w01': { bestScore: 72, passed: true } });
   assert.equal('unknown' in prepared.entries, false);
+});
+
+test('exports and imports only valid bounded AI review history', () => {
+  const values = { ai_review_history: Array.from({ length: 35 }, (_, index) => ({ id: 'review-' + index, at: index })) };
+  const exported = ProgressIO.createExportData({
+    version: '14.3.0', get: (key, fallback) => key in values ? values[key] : fallback,
+    getOnboardingProfile: () => null, getSkillEvents: () => [], getCoachJournal: () => [], getCoachControlSession: () => null
+  });
+  assert.equal(exported.ai_review_history.length, 35);
+
+  const prepared = ProgressIO.prepareImport({ version: '14.3.0', ...values }, dependencies);
+  assert.equal(prepared.entries.ai_review_history.length, 30);
+  assert.equal(prepared.entries.ai_review_history[0].id, 'review-5');
+  assert.equal(prepared.entries.ai_review_history[0].normalised, true);
+  assert.throws(
+    () => ProgressIO.prepareImport({ ai_review_history: [{ broken: true }] }, dependencies),
+    /ai_review_history/
+  );
+});
+
+test('exports and imports only valid bounded interview AI history', () => {
+  const values = { interview_ai_history: Array.from({ length: 35 }, (_, index) => ({ id: 'interview-' + index, at: index, overallScore: index })) };
+  const exported = ProgressIO.createExportData({
+    version: '14.3.0', get: (key, fallback) => key in values ? values[key] : fallback,
+    getOnboardingProfile: () => null, getSkillEvents: () => [], getCoachJournal: () => [], getCoachControlSession: () => null
+  });
+  assert.equal(exported.interview_ai_history.length, 35);
+
+  const prepared = ProgressIO.prepareImport({ version: '14.3.0', ...values }, dependencies);
+  assert.equal(prepared.entries.interview_ai_history.length, 30);
+  assert.equal(prepared.entries.interview_ai_history[0].id, 'interview-5');
+  assert.equal(prepared.entries.interview_ai_history[0].interviewNormalised, true);
+  assert.throws(
+    () => ProgressIO.prepareImport({ interview_ai_history: [{ id: 'broken' }] }, dependencies),
+    /interview_ai_history/
+  );
 });
 
 test('rejects malformed progress and reserved object keys', () => {

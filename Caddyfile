@@ -16,7 +16,7 @@
 		Referrer-Policy "no-referrer"
 		# Приложение не встраивает сторонний код; connect-src 'self' не даёт
 		# утечь прогрессу на чужой домен, если в разметку попадёт инъекция.
-		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; script-src-elem 'self'; script-src-attr 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'"
 		-Server
 	}
 

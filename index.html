@@ -462,12 +462,29 @@
     <aside class="ip-side"><div class="ip-block-title">Задания</div><div id="ip-list"></div></aside>
     <main class="ip-main">
       <div id="ip-detail"></div>
+      <section class="ip-answer-panel" aria-labelledby="ip-answer-title">
+        <div class="ip-block-title" id="ip-answer-title">Ваш ответ</div>
+        <textarea class="form-input" id="ip-answer" rows="8" maxlength="6000" placeholder="Напишите ответ своими словами. Для STAR: ситуация → задача → действия → измеримый результат."></textarea>
+        <div class="ip-answer-tools">
+          <button type="button" class="btn btn-outline btn-sm" id="ip-dictate-btn" onclick="toggleInterviewDictation()">🎙️ Начать диктовку</button>
+          <span id="ip-dictation-status" role="status" aria-live="polite"></span>
+        </div>
+        <p class="ip-privacy-note">Диктовка опциональна: браузер может передавать речь на сервер своего сервиса распознавания. Аудио не отправляется и не хранится сервером Interview Prep Max. Можно полностью работать печатью.</p>
+        <button type="button" class="btn btn-ai" id="ip-ai-evaluate-btn" onclick="evaluateInterviewAnswer()">✨ Оценить ответ с AI</button>
+      </section>
+      <div id="ip-ai-result" aria-live="polite"></div>
+      <section class="ip-follow-up-form" id="ip-follow-up-form" hidden>
+        <div class="ip-block-title">Ответ на уточнение <span id="ip-follow-up-turn"></span></div>
+        <p id="ip-follow-up-question"></p>
+        <textarea class="form-input" id="ip-follow-up-answer" rows="4" maxlength="3000" placeholder="Ответьте только на этот уточняющий вопрос"></textarea>
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitInterviewFollowUp()">Отправить уточнение</button>
+      </section>
       <div id="ip-reference" hidden></div>
       <div id="ip-rubric"></div>
       <div id="ip-score"></div>
       <div class="ip-actions">
         <button type="button" class="btn btn-outline btn-sm" onclick="revealInterviewReference()" id="ip-reveal-btn">Показать рубрику</button>
-        <button type="button" class="btn btn-primary btn-sm" onclick="scoreInterviewAnswer()">Оценить ответ</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="scoreInterviewAnswer()">Оценить вручную</button>
       </div>
     </main>
   </div>
@@ -494,7 +511,7 @@
       <div><span class="coach-focus-kicker">Персональный тренер</span><h3 id="coach-ai-title">Разбор контрольной</h3></div>
       <button type="button" class="btn-icon" id="coach-ai-close" aria-label="Закрыть AI-разбор" data-coach-action="close-ai-review">✕</button>
     </div>
-    <p class="coach-journal-lead">Рекомендации строятся по агрегатам сессии. Тексты вопросов, ответы и заметки в запрос не входят.</p>
+    <p class="coach-journal-lead">Передаются результаты текущей контрольной и до 15 ошибочных или медленных вопросов с выбранным и правильным ответом. Полный прогресс, заметки и история в запрос не входят.</p>
     <div id="coach-ai-content"></div>
   </div>
 </div>

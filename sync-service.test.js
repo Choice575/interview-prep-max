@@ -179,6 +179,39 @@ test('validateSnapshot accepts a realistic payload', () => {
   assert.deepEqual(result.state.study_progress, { w1d1: 'done' });
 });
 
+test('sync validates bounded diagnostic review history entries', () => {
+  const review = {
+    schemaVersion: 2,
+    verdict: { levelEstimate: 'Middle', readiness: 58, summary: 'Нужна практика.' },
+    diagnostics: [{ concept: 'Probes', severity: 'high', problemType: 'concept_confusion', evidence: ['Факт'], explanation: 'Разбор', confidence: 0.8 }],
+    actionPlan: [{ priority: 1, task: 'Повторить', practice: '5 вопросов', successCriterion: '4/5', page: 'exam', topic: 'Kubernetes' }],
+    studyPlan: [], retest: { topics: ['Kubernetes'], categories: ['scenario'], levels: ['Middle'], size: 5, successCriterion: '4/5' }, caution: ''
+  };
+  const valid = snapshot({ ai_review_history: [{
+    id: 'ai-review-1000', at: 1000, source: 'ai', metrics: { accuracy: 50, attempted: 2, total: 2 }, review
+  }] }, 1000);
+  assert.equal(validateSnapshot(valid, 1024 * 1024).state.ai_review_history.length, 1);
+
+  const malformed = snapshot({ ai_review_history: [{ id: 'broken', at: 1000, review: { schemaVersion: 2 } }] }, 1000);
+  assert.throws(() => validateSnapshot(malformed, 1024 * 1024), error => error.code === 'INVALID_SNAPSHOT');
+});
+
+test('sync validates bounded compact interview AI history entries', () => {
+  const entry = {
+    id: 'star-1-1000', at: 1000, kind: 'star', itemId: 'star-1', topic: 'Инцидент', source: 'ai', overallScore: 72,
+    dimensions: { correctness: 70, completeness: 75, structure: 80, tradeoffs: 60 },
+    summary: 'Основа есть.', gaps: ['Добавить результат']
+  };
+  const valid = snapshot({ interview_ai_history: [{ ...entry, answer: 'private answer must be stripped', evidence: ['private evidence'] }] }, 1000);
+  const normalised = validateSnapshot(valid, 1024 * 1024).state.interview_ai_history;
+  assert.equal(normalised.length, 1);
+  assert.equal('answer' in normalised[0], false);
+  assert.equal('evidence' in normalised[0], false);
+
+  const malformed = snapshot({ interview_ai_history: [{ id: 'broken', at: 1000, answer: 'private' }] }, 1000);
+  assert.throws(() => validateSnapshot(malformed, 1024 * 1024), error => error.code === 'INVALID_SNAPSHOT');
+});
+
 test('a corrupt snapshot file falls back to the backup instead of wiping progress', async () => {
   await withService(async (service, dir) => {
     await service.push(snapshot({ qprog: { 1: { correct: 5, wrong: 0, lastSeen: 10 } } }, 1000));

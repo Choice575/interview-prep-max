@@ -214,6 +214,35 @@ test('same control session continued on two devices merges attempts', () => {
   assert.equal(merged.completedAt, null, 'сессия не закрыта, пока отвечены не все вопросы');
 });
 
+test('AI review history merges by id, stays bounded and is commutative', () => {
+  const leftItems = Array.from({ length: 20 }, (_, index) => ({ id: 'left-' + index, at: index, review: { verdict: { readiness: index } } }));
+  const rightItems = Array.from({ length: 20 }, (_, index) => ({ id: 'right-' + index, at: 100 + index, review: { verdict: { readiness: index } } }));
+  rightItems.push({ id: 'left-19', at: 999, review: { verdict: { readiness: 99 } } });
+  const left = snapshot({ ai_review_history: leftItems }, 100);
+  const right = snapshot({ ai_review_history: rightItems }, 200);
+  const one = Merge.mergeSnapshots(left, right).state.ai_review_history;
+  const two = Merge.mergeSnapshots(right, left).state.ai_review_history;
+
+  assert.equal(one.length, 30);
+  assert.deepEqual(one, two);
+  assert.equal(one.find(item => item.id === 'left-19').review.verdict.readiness, 99);
+});
+
+test('interview AI history merges by id, stays bounded and is commutative', () => {
+  const leftItems = Array.from({ length: 20 }, (_, index) => ({ id: 'ip-left-' + index, at: index, overallScore: index }));
+  const rightItems = Array.from({ length: 20 }, (_, index) => ({ id: 'ip-right-' + index, at: 100 + index, overallScore: index }));
+  rightItems.push({ id: 'ip-left-19', at: 999, overallScore: 99 });
+  const left = snapshot({ interview_ai_history: leftItems }, 100);
+  const right = snapshot({ interview_ai_history: rightItems }, 200);
+  const one = Merge.mergeSnapshots(left, right).state.interview_ai_history;
+  const two = Merge.mergeSnapshots(right, left).state.interview_ai_history;
+
+  assert.equal(Merge.MERGE_RULES.interview_ai_history, 'reviewHistory');
+  assert.equal(one.length, 30);
+  assert.deepEqual(one, two);
+  assert.equal(one.find(item => item.id === 'ip-left-19').overallScore, 99);
+});
+
 test('a newer control session replaces an older different one', () => {
   const left = { coach_control: { id: 'ctl-1', startedAt: 1000, questionIds: ['1'], attempts: [] } };
   const right = { coach_control: { id: 'ctl-2', startedAt: 5000, questionIds: ['2'], attempts: [] } };

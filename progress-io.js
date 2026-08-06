@@ -19,7 +19,7 @@
     // устройство молча обнуляет вторую учебную программу.
     'mlops_progress'
   ];
-  const IMPORT_ARRAY_KEYS = ['history', 'custom', 'skill_events', 'coach_journal'];
+  const IMPORT_ARRAY_KEYS = ['history', 'custom', 'skill_events', 'coach_journal', 'ai_review_history', 'interview_ai_history'];
 
   function isRecord(value) {
     return !!value && typeof value === 'object' && !Array.isArray(value);
@@ -124,6 +124,8 @@
     if (Array.isArray(data.custom) && !validateCustomQuestions(data.custom, deps.baseQuestions)) invalid.push('custom');
     if (Array.isArray(data.skill_events) && (typeof deps.isSkillEvent !== 'function' || !data.skill_events.every(deps.isSkillEvent))) invalid.push('skill_events');
     if (Array.isArray(data.coach_journal) && (typeof deps.isJournalEntry !== 'function' || !data.coach_journal.every(deps.isJournalEntry))) invalid.push('coach_journal');
+    if (Array.isArray(data.ai_review_history) && (typeof deps.normaliseReviewHistoryEntry !== 'function' || !data.ai_review_history.every(entry => deps.normaliseReviewHistoryEntry(entry)))) invalid.push('ai_review_history');
+    if (Array.isArray(data.interview_ai_history) && (typeof deps.normaliseInterviewHistoryEntry !== 'function' || !data.interview_ai_history.every(entry => deps.normaliseInterviewHistoryEntry(entry)))) invalid.push('interview_ai_history');
     if ('coach_control' in data && (typeof deps.normaliseControlSession !== 'function' || !deps.normaliseControlSession(data.coach_control))) invalid.push('coach_control');
     if (invalid.length) throw new Error('Некорректные поля: ' + [...new Set(invalid)].join(', ') + '.');
     return data;
@@ -139,6 +141,12 @@
       if (!(key in data)) return;
       if (key === 'skill_events' && Number.isFinite(deps.eventLimit)) entries[key] = data[key].slice(-deps.eventLimit);
       else if (key === 'coach_journal' && Number.isFinite(deps.journalLimit)) entries[key] = data[key].slice(-deps.journalLimit);
+      else if (key === 'ai_review_history' && typeof deps.normaliseReviewHistoryEntry === 'function') {
+        entries[key] = data[key].map(deps.normaliseReviewHistoryEntry).filter(Boolean).slice(-Math.max(1, deps.reviewHistoryLimit || 30));
+      }
+      else if (key === 'interview_ai_history' && typeof deps.normaliseInterviewHistoryEntry === 'function') {
+        entries[key] = data[key].map(deps.normaliseInterviewHistoryEntry).filter(Boolean).slice(-Math.max(1, deps.interviewHistoryLimit || 30));
+      }
       else entries[key] = data[key];
     });
     if ('streak_best' in data) entries.streak_best = data.streak_best;
@@ -173,6 +181,7 @@
       senior_case_prog: get('senior_case_prog', {}),
       skill_events: typeof source.getSkillEvents === 'function' ? source.getSkillEvents() : [],
       coach_journal: typeof source.getCoachJournal === 'function' ? source.getCoachJournal() : [],
+      ai_review_history: get('ai_review_history', []), interview_ai_history: get('interview_ai_history', []),
       coach_control: control || undefined, onboarding: onboarding || undefined, onboarding_complete: !!onboarding
     };
   }
@@ -189,7 +198,11 @@
       eventLimit: source.eventLimit,
       isJournalEntry: source.isJournalEntry,
       journalLimit: source.journalLimit,
-      normaliseControlSession: source.normaliseControlSession
+      normaliseControlSession: source.normaliseControlSession,
+      normaliseReviewHistoryEntry: source.normaliseReviewHistoryEntry,
+      reviewHistoryLimit: source.reviewHistoryLimit,
+      normaliseInterviewHistoryEntry: source.normaliseInterviewHistoryEntry,
+      interviewHistoryLimit: source.interviewHistoryLimit
     });
 
     function exportProgress() {

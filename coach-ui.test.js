@@ -519,10 +519,11 @@ test('a hostile model name cannot escape the button title', async () => {
   }
 });
 
-async function openReview(document, ui, reviewResult) {
+async function openReview(document, ui, reviewResult, overrides) {
   ui.configure(makeServices(document, {
     getControlSession: () => ({ attempts: [{}, {}], questionIds: [1, 2, 3] }),
-    requestAiReview: async () => reviewResult
+    requestAiReview: async () => reviewResult,
+    ...(overrides || {})
   }));
   const handler = document.listeners.find(([name]) => name === 'click')[1];
   const trigger = new FakeElement('button');
@@ -588,6 +589,141 @@ test('a successful AI review keeps the privacy note, not a failure reason', asyn
     assert.match(html, /Внешний AI/);
     assert.match(html, /Переданы только агрегаты/);
     assert.doesNotMatch(html, /Backend недоступен/);
+  } finally {
+    delete global.document;
+  }
+});
+
+test('renders diagnostic evidence, success criteria, study plan and retest recipe', async () => {
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['coach-ai-content']);
+  global.document = document;
+  try {
+    const html = await openReview(document, ui, {
+      schemaVersion: 2, source: 'ai',
+      verdict: { levelEstimate: 'Middle-', readiness: 58, summary: 'Путаете readiness и liveness.' },
+      diagnostics: [{ concept: 'Kubernetes probes', severity: 'high', problemType: 'concept_confusion', evidence: ['Выбран liveness вместо readiness'], explanation: 'Readiness управляет endpoints.', confidence: 0.88 }],
+      actionPlan: [{ priority: 1, task: 'Сравнить probes', practice: 'Решить 5 сценариев', successCriterion: '4/5 и до 45 секунд', page: 'exam', topic: 'Kubernetes' }],
+      studyPlan: [{ day: 1, title: 'Probes', actions: ['Сделать таблицу'], successCriterion: 'Объяснить без подсказки' }],
+      retest: { topics: ['Kubernetes'], categories: ['scenario'], levels: ['Middle'], size: 5, successCriterion: '4/5' },
+      caution: 'Малая выборка'
+    });
+    assert.match(html, /Middle-/);
+    assert.match(html, /58%/);
+    assert.match(html, /Выбран liveness/);
+    assert.match(html, /4\/5 и до 45 секунд/);
+    assert.match(html, /План на 1/);
+    assert.match(html, /Повторная контрольная/);
+  } finally {
+    delete global.document;
+  }
+});
+
+test('renders seven-day dynamics and recent review history without executing old summaries', async () => {
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['coach-ai-content']);
+  global.document = document;
+  const result = {
+    schemaVersion: 2, source: 'ai',
+    verdict: { levelEstimate: 'Middle', readiness: 70, summary: 'Текущий итог' },
+    diagnostics: [],
+    actionPlan: [{ priority: 1, task: 'Повторить', practice: '5 вопросов', successCriterion: '4/5', page: 'exam', topic: 'Linux' }],
+    studyPlan: [], retest: { topics: ['Linux'], categories: [], levels: ['Middle'], size: 5, successCriterion: '4/5' }, caution: ''
+  };
+  try {
+    const html = await openReview(document, ui, result, {
+      saveAiReview: () => ({
+        count: 3, accuracyDelta: 5, readinessDelta: 4,
+        weekly: {
+          current: { count: 2, accuracy: 75, readiness: 68 },
+          previous: { count: 1, accuracy: 60, readiness: 50 },
+          accuracyDelta: 15, readinessDelta: 18
+        },
+        recent: [
+          { id: 'new', at: Date.UTC(2026, 7, 6), source: 'ai', metrics: { accuracy: 75 }, review: { verdict: { readiness: 70, summary: 'Текущий итог' } } },
+          { id: 'old', at: Date.UTC(2026, 7, 1), source: 'local', metrics: { accuracy: 60 }, review: { verdict: { readiness: 52, summary: '<img src=x onerror=bad>' } } }
+        ]
+      })
+    });
+    assert.match(html, /Динамика за 7 дней/);
+    assert.match(html, /75%/);
+    assert.match(html, /\+15%/);
+    assert.match(html, /История разборов/);
+    assert.match(html, /Текущий итог/);
+    assert.match(html, /&lt;img/);
+    assert.doesNotMatch(html, /<img src=x/);
+  } finally {
+    delete global.document;
+  }
+});
+
+test('saves the current diagnostic review, renders its trend and starts its retest recipe', async () => {
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['coach-ai-content']);
+  global.document = document;
+  const saved = [];
+  const retests = [];
+  const result = {
+    schemaVersion: 2, source: 'ai',
+    verdict: { levelEstimate: 'Middle-', readiness: 58, summary: 'Путаете probes.' },
+    diagnostics: [{ concept: 'Probes', severity: 'high', problemType: 'concept_confusion', evidence: ['Факт'], explanation: 'Разбор', confidence: 0.8 }],
+    actionPlan: [{ priority: 1, task: 'Повторить', practice: '5 вопросов', successCriterion: '4/5', page: 'exam', topic: 'Kubernetes' }],
+    studyPlan: [],
+    retest: { topics: ['Kubernetes'], categories: ['scenario'], levels: ['Middle'], size: 5, successCriterion: '4/5' },
+    caution: ''
+  };
+  try {
+    ui.configure(makeServices(document, {
+      getControlSession: () => ({ attempts: [{ score: 0 }, { score: 1 }], questionIds: [1, 2] }),
+      requestAiReview: async () => result,
+      saveAiReview: review => { saved.push(review); return { count: 2, accuracyDelta: 10, readinessDelta: 7 }; },
+      startRetest: recipe => retests.push(recipe)
+    }));
+    const handler = document.listeners.find(([name]) => name === 'click')[1];
+    const open = new FakeElement('button');
+    open.dataset = { coachAction: 'open-ai-review' };
+    handler({ target: { closest: () => open } });
+    await new Promise(resolve => setImmediate(resolve));
+
+    const html = document.getElementById('coach-ai-content').innerHTML;
+    assert.equal(saved.length, 1);
+    assert.equal(saved[0], result);
+    assert.match(html, /Точность: \+10%/);
+    assert.match(html, /Готовность: \+7%/);
+    assert.match(html, /data-coach-action="start-ai-retest"/);
+
+    const retest = new FakeElement('button');
+    retest.dataset = { coachAction: 'start-ai-retest' };
+    handler({ target: { closest: () => retest } });
+    assert.deepEqual(retests, [result.retest]);
+  } finally {
+    delete global.document;
+  }
+});
+
+test('does not save a diagnostic result after the review modal was closed', async () => {
+  const ui = loadCoachUI();
+  const document = new FakeDocument(['coach-ai-content']);
+  global.document = document;
+  const saved = [];
+  let resolveReview;
+  try {
+    ui.configure(makeServices(document, {
+      getControlSession: () => ({ attempts: [{}], questionIds: [1] }),
+      requestAiReview: () => new Promise(resolve => { resolveReview = resolve; }),
+      saveAiReview: review => saved.push(review)
+    }));
+    const handler = document.listeners.find(([name]) => name === 'click')[1];
+    const open = new FakeElement('button');
+    open.dataset = { coachAction: 'open-ai-review' };
+    handler({ target: { closest: () => open } });
+    await new Promise(resolve => setImmediate(resolve));
+    const close = new FakeElement('button');
+    close.dataset = { coachAction: 'close-ai-review' };
+    handler({ target: { closest: () => close } });
+    resolveReview({ schemaVersion: 2, verdict: { levelEstimate: 'Middle', readiness: 50, summary: 'Итог' }, diagnostics: [], actionPlan: [], studyPlan: [], retest: {}, caution: '' });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(saved.length, 0);
   } finally {
     delete global.document;
   }

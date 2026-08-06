@@ -16,6 +16,7 @@
     study_weekly_results: 'ipmax_study_weekly_results',
     senior_case_prog: 'ipmax_senior_case_prog', onboarding: 'ipmax_onboarding', onboarding_complete: 'ipmax_onboarding_complete',
     skill_events: 'ipmax_skill_events', coach_journal: 'ipmax_coach_journal', coach_control: 'ipmax_coach_control',
+    ai_review_history: 'ipmax_ai_review_history', interview_ai_history: 'ipmax_interview_ai_history',
     storage_schema: 'ipmax_storage_schema', curriculum_version: 'ipmax_curriculum_version',
     progress_backup: 'ipmax_progress_backup',
     // Written by endDiagnostic() since the diagnostic test shipped, but the key

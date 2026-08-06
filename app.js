@@ -216,17 +216,35 @@ function recordCoachControlAttempt(question,result,input,now){
   if(input?.source!=='exam'||!Array.isArray(coachQuestionIds)||!coachQuestionIds.map(String).includes(String(question.id))) return;
   const session=getCoachControlSession();
   if(!session||session.attempts.some(attempt=>attempt.questionId===String(question.id))) return;
-  session.attempts.push({questionId:String(question.id),topic:question.topic,score:result.score,responseSeconds:input?.responseSeconds||0,at:now});
+  session.attempts.push({
+    questionId:String(question.id),topic:question.topic,score:result.score,
+    selectedAnswerIndex:Number.isInteger(input?.selectedAnswerIndex)?input.selectedAnswerIndex:undefined,
+    responseSeconds:input?.responseSeconds||0,at:now
+  });
   if(session.attempts.length>=session.questionIds.length) session.completedAt=now;
   lsSet('coach_control',session);
 }
 function requestCoachAIReview(){
   if(typeof IPMaxAICoach==='undefined') return Promise.reject(new Error('Модуль AI-разбора не загружен.'));
-  const payload=IPMaxAICoach.buildReviewPayload({plan:getCoachPlan(),profile:getOnboardingProfile(),session:getCoachControlSession()});
+  const payload=IPMaxAICoach.buildReviewPayload({
+    plan:getCoachPlan(),profile:getOnboardingProfile(),session:getCoachControlSession(),questions:getAllQ()
+  });
   // Клиент должен ждать дольше сервера: серверный таймаут настраивается до
   // 60 с, и при клиентских 15 с abort случался бы раньше — вместо понятного
   // кода AI_TIMEOUT пользователь получал бы невнятную ошибку сети.
-  return IPMaxAICoach.review(payload,{url:'./api/ai/review',timeoutMs:60000});
+  return IPMaxAICoach.review(payload,{url:'./api/ai/review',timeoutMs:60000,token:appStorage?appStorage.get('sync_token',''):''});
+}
+function saveCoachAIReview(review){
+  if(typeof IPMaxAICoach==='undefined'||!review||review.schemaVersion!==2) return null;
+  const session=getCoachControlSession();
+  const attempts=session&&Array.isArray(session.attempts)?session.attempts:[];
+  const attempted=attempts.length;
+  const accuracy=attempted?Math.round(attempts.reduce((sum,item)=>sum+(Number(item.score)||0),0)/attempted*100):0;
+  const history=IPMaxAICoach.appendReviewHistory(lsGet('ai_review_history',[]),review,{
+    accuracy,attempted,total:session&&Array.isArray(session.questionIds)?session.questionIds.length:attempted
+  },Date.now());
+  if(!lsSet('ai_review_history',history)) return null;
+  return IPMaxAICoach.buildReviewTrend(history);
 }
 // Статус нужен карточке тренера, чтобы честно подписать кнопку разбора до
 // клика. Сбой запроса означает лишь «внешнего AI нет».
@@ -284,6 +302,7 @@ function configureCoachUI(){
     normaliseProfile:normalizeOnboardingProfile,setProfile:setCoachProfile,
     getJournal:getCoachJournal,setJournal:notes=>lsSet('coach_journal',notes),getTopics:getAllTopics,
     getControlSession:getCoachControlSession,requestAiReview:requestCoachAIReview,
+    saveAiReview:saveCoachAIReview,startRetest:startCoachRetestMode,
     getAiStatus:getCoachAiStatus,
     openModal:openAccessibleModal,closeModal:closeAccessibleModal,refresh:renderHome,
     startFocus:startCoachFocus,startReview:startCoachReviewMode,startControl:startCoachControlMode,
@@ -322,6 +341,8 @@ const PAGE_TITLES={home:'Сегодня',interview:'Ответы вслух',cat
   git:'Git-тренажёр',regex:'Regex-тренажёр',tips:'Советы',incidents:'Разбор инцидентов'};
 function nav(page){
   stopActiveSessions();
+  const leavingInterview=page!=='interview'&&document.getElementById('page-interview')?.classList.contains('active');
+  if(leavingInterview) resetInterviewAIState();
   if(page!=='exam') coachQuestionIds=null;
   if(page!=='exam'&&page!=='study'){cameFromStudy=false;interviewMode=false;controlMode=false;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -537,7 +558,7 @@ function pick(qid,chosen,correct){
   const best=lsGet('streak_best',0);if(streak>best)lsSet('streak_best',streak);
   updateStreakDisplay();
   const respTime=questionStartTime[qid]?Math.round((Date.now()-questionStartTime[qid])/1000):0;
-  recordQuestionResult(q,{outcome:ok?'pass':'fail',source:'exam',responseSeconds:respTime,syncMistakes:true,history:true});
+  recordQuestionResult(q,{outcome:ok?'pass':'fail',source:'exam',selectedAnswerIndex:chosen,responseSeconds:respTime,syncMistakes:true,history:true});
   if(q&&q.explanation&&!interviewMode){const el=document.getElementById('qexpl-'+qid);if(el){el.innerHTML='💡 '+esc(q.explanation);el.style.display='block';}}
   updateQuestionProgressSummary();
   clearTInterval();
@@ -1165,6 +1186,19 @@ function startCoachControlMode(plan){
   currentTopic='all';currentLevel='all';currentCategory='all';currentMode='all';currentView='standard';interviewMode=true;controlMode=true;cameFromStudy=false;
   nav('exam');
 }
+function startCoachRetestMode(recipe){
+  const session=InterviewCoach.buildRetestSession({questions:getAllQ(),recipe,progress:getQProg(),now:Date.now()});
+  if(!session.questionIds.length){alert('В базе пока недостаточно вопросов для предложенной повторной контрольной.');return;}
+  resetCoachSelection();
+  coachQuestionIds=session.questionIds;
+  const now=Date.now();
+  lsSet('coach_control',{
+    id:'retest-'+now,startedAt:now,completedAt:null,
+    questionIds:session.questionIds.map(String),topics:session.topics,attempts:[]
+  });
+  currentTopic='all';currentLevel='all';currentCategory='all';currentMode='all';currentView='standard';interviewMode=true;controlMode=true;cameFromStudy=false;
+  nav('exam');
+}
 
 // ═══ GAMIFICATION / DAILY / TRAINERS ═══
 // Один сборщик состояния для XP, достижений и индекса готовности: метрики
@@ -1783,7 +1817,10 @@ const progressIO=typeof IPMaxProgressIO!=='undefined'?IPMaxProgressIO.create({
   getBaseQuestions:()=>BASE_QUESTIONS,getOnboardingProfile,getSkillEvents,getCoachJournal,getCoachControlSession,
   normaliseProfile:normalizeOnboardingProfile,isSkillEvent:ProgressTracker.isSkillEvent,eventLimit:ProgressTracker.EVENT_LIMIT,
   isJournalEntry:InterviewCoach.isJournalEntry,journalLimit:InterviewCoach.JOURNAL_LIMIT,
-  normaliseControlSession:IPMaxAICoach.normaliseControlSession,alert:message=>alert(message),prompt:message=>prompt(message),
+  normaliseControlSession:IPMaxAICoach.normaliseControlSession,
+  normaliseReviewHistoryEntry:IPMaxAICoach.normaliseReviewHistoryEntry,reviewHistoryLimit:IPMaxAICoach.REVIEW_HISTORY_LIMIT,
+  normaliseInterviewHistoryEntry:IPMaxInterviewPracticeUI.normaliseInterviewHistoryEntry,interviewHistoryLimit:IPMaxInterviewPracticeUI.INTERVIEW_HISTORY_LIMIT,
+  alert:message=>alert(message),prompt:message=>prompt(message),
   onImported:()=>{
     streak=lsGet('streak_best',0);buildTopicFilters();
     document.getElementById('sb-counter').textContent='DevOps Edition · '+getAllQ().length+' вопросов';nav('home');
@@ -1915,7 +1952,22 @@ async function checkOfflineReady(){
   return report;
 }
 function requireInterviewPracticeUI(){if(typeof IPMaxInterviewPracticeUI==='undefined') throw new Error('Модуль подготовки к собеседованию не загружен.');return IPMaxInterviewPracticeUI;}
-let interviewKind='star', interviewItemId=null;
+let interviewKind='star', interviewItemId=null, interviewRenderedKey='', interviewCurrentPayload=null, interviewCurrentEvaluation=null;
+let interviewFollowUpTurn=0, interviewFollowUpQuestion=null, interviewRecognition=null, interviewRecognitionActive=false, interviewRequestId=0;
+function resetInterviewAIState(){
+  interviewRequestId++;
+  const recognition=interviewRecognition;
+  interviewRecognition=null;interviewRecognitionActive=false;
+  if(recognition){try{recognition.stop();}catch(_) { /* уже остановлена браузером */ }}
+  interviewCurrentPayload=null;interviewCurrentEvaluation=null;interviewFollowUpTurn=0;interviewFollowUpQuestion=null;
+  const answer=document.getElementById('ip-answer');if(answer)answer.value='';
+  const evaluateButton=document.getElementById('ip-ai-evaluate-btn');if(evaluateButton)evaluateButton.disabled=false;
+  const dictateButton=document.getElementById('ip-dictate-btn');if(dictateButton)dictateButton.textContent='🎙️ Начать диктовку';
+  const dictateStatus=document.getElementById('ip-dictation-status');if(dictateStatus)dictateStatus.textContent='';
+  const result=document.getElementById('ip-ai-result');if(result)result.innerHTML='';
+  const form=document.getElementById('ip-follow-up-form');if(form)form.hidden=true;
+  const followAnswer=document.getElementById('ip-follow-up-answer');if(followAnswer)followAnswer.value='';
+}
 function setInterviewKind(kind,btn){
   interviewKind=(kind==='systemDesign')?'systemDesign':'star';
   interviewItemId=null;
@@ -1941,12 +1993,20 @@ function renderInterviewPractice(){
   }).join('');
   listEl.querySelectorAll('[data-ip-id]').forEach(btn=>btn.addEventListener('click',()=>selectInterviewItem(btn.getAttribute('data-ip-id'))));
   const item=ui.findItem(INTERVIEW_PRACTICE,interviewKind,interviewItemId);
+  const renderedKey=interviewKind+':'+interviewItemId;
+  if(interviewRenderedKey&&interviewRenderedKey!==renderedKey) resetInterviewAIState();
+  interviewRenderedKey=renderedKey;
   detailEl.innerHTML=interviewKind==='star'?ui.renderStar(item):ui.renderSystemDesign(item);
   if(refEl){refEl.innerHTML=ui.renderReference(item,interviewKind);refEl.hidden=true;}
   const revealBtn=document.getElementById('ip-reveal-btn');
   if(revealBtn) revealBtn.textContent='Показать рубрику';
   if(rubricEl) rubricEl.innerHTML=ui.renderRubricForm(item,'ip-rb');
   if(scoreEl) scoreEl.innerHTML='';
+  const SpeechRecognition=typeof window!=='undefined'&&(window.SpeechRecognition||window.webkitSpeechRecognition);
+  const dictateBtn=document.getElementById('ip-dictate-btn');
+  const dictateStatus=document.getElementById('ip-dictation-status');
+  if(dictateBtn){dictateBtn.disabled=!SpeechRecognition;dictateBtn.title=SpeechRecognition?'Речь добавится в поле ответа':'Диктовка не поддерживается этим браузером';}
+  if(dictateStatus&&!SpeechRecognition) dictateStatus.textContent='Диктовка недоступна — используйте печать.';
 }
 function revealInterviewReference(){
   const refEl=document.getElementById('ip-reference');
@@ -1962,6 +2022,103 @@ function scoreInterviewAnswer(){
   if(!item||!scoreEl) return;
   const checked=[...document.querySelectorAll('#ip-rubric input[type="checkbox"]:checked')].map(i=>Number(i.value));
   scoreEl.innerHTML=ui.renderScore(ui.score(item,checked));
+}
+function saveInterviewAIHistory(evaluation,payload){
+  const ui=requireInterviewPracticeUI();
+  const history=ui.appendInterviewHistory(lsGet('interview_ai_history',[]),evaluation,payload,Date.now());
+  return lsSet('interview_ai_history',history)?history:null;
+}
+function bindInterviewFollowUps(){
+  const host=document.getElementById('ip-ai-result');
+  if(!host) return;
+  host.querySelectorAll('[data-ip-follow-up-index]').forEach(btn=>btn.addEventListener('click',()=>startInterviewFollowUp(Number(btn.getAttribute('data-ip-follow-up-index')))));
+}
+function renderInterviewAIResult(evaluation,payload){
+  const host=document.getElementById('ip-ai-result');
+  if(!host) return;
+  interviewCurrentEvaluation=evaluation;interviewCurrentPayload=payload;
+  host.innerHTML=requireInterviewPracticeUI().renderInterviewEvaluation(evaluation);
+  saveInterviewAIHistory(evaluation,payload);
+  bindInterviewFollowUps();
+}
+// Вызывается inline-кнопкой в index.html.
+// eslint-disable-next-line no-unused-vars
+async function evaluateInterviewAnswer(){
+  const ui=requireInterviewPracticeUI();
+  const item=ui.findItem(INTERVIEW_PRACTICE,interviewKind,interviewItemId);
+  const answerEl=document.getElementById('ip-answer');
+  const host=document.getElementById('ip-ai-result');
+  const button=document.getElementById('ip-ai-evaluate-btn');
+  if(!item||!answerEl||!host) return;
+  const answer=answerEl.value.trim();
+  if(!answer){host.textContent='Сначала напишите ответ.';answerEl.focus();return;}
+  const payload=ui.buildInterviewPayload({kind:interviewKind,item,answer,followUpTurn:0});
+  const requestId=++interviewRequestId;
+  interviewFollowUpTurn=0;interviewFollowUpQuestion=null;
+  const form=document.getElementById('ip-follow-up-form');if(form)form.hidden=true;
+  host.textContent='AI-интервьюер оценивает ответ…';if(button)button.disabled=true;
+  try{
+    const evaluation=await ui.evaluateInterview(payload,{url:'./api/ai/interview',timeoutMs:60000,token:appStorage?appStorage.get('sync_token',''):''});
+    if(requestId!==interviewRequestId) return;
+    renderInterviewAIResult(evaluation,payload);
+  }finally{if(button&&requestId===interviewRequestId)button.disabled=false;}
+}
+function startInterviewFollowUp(index){
+  if(!interviewCurrentEvaluation||!interviewCurrentPayload||interviewFollowUpTurn>=3) return;
+  const followUps=Array.isArray(interviewCurrentEvaluation.followUps)?interviewCurrentEvaluation.followUps:[];
+  const selected=followUps[index];if(!selected||!selected.question) return;
+  interviewFollowUpQuestion=selected.question;
+  const form=document.getElementById('ip-follow-up-form');
+  const question=document.getElementById('ip-follow-up-question');
+  const turn=document.getElementById('ip-follow-up-turn');
+  const answer=document.getElementById('ip-follow-up-answer');
+  if(!form||!question||!answer) return;
+  question.textContent=selected.question;if(turn)turn.textContent='· ход '+(interviewFollowUpTurn+1)+' из 3';
+  answer.value='';form.hidden=false;answer.focus();
+}
+// Вызывается inline-кнопкой в index.html.
+// eslint-disable-next-line no-unused-vars
+async function submitInterviewFollowUp(){
+  if(!interviewCurrentPayload||!interviewFollowUpQuestion||interviewFollowUpTurn>=3) return;
+  const answerEl=document.getElementById('ip-follow-up-answer');
+  const host=document.getElementById('ip-ai-result');
+  if(!answerEl||!host) return;
+  const followAnswer=answerEl.value.trim();if(!followAnswer){answerEl.focus();return;}
+  const ui=requireInterviewPracticeUI();
+  const nextTurn=interviewFollowUpTurn+1;
+  const payload=ui.buildInterviewPayload({
+    kind:interviewCurrentPayload.kind,item:interviewCurrentPayload.item,answer:interviewCurrentPayload.answer,
+    followUpTurn:nextTurn,followUp:{question:interviewFollowUpQuestion,answer:followAnswer}
+  });
+  const requestId=++interviewRequestId;
+  host.textContent='AI-интервьюер разбирает уточнение…';
+  const evaluation=await ui.evaluateInterview(payload,{url:'./api/ai/interview',timeoutMs:60000,token:appStorage?appStorage.get('sync_token',''):''});
+  if(requestId!==interviewRequestId) return;
+  interviewFollowUpTurn=nextTurn;interviewFollowUpQuestion=null;
+  const form=document.getElementById('ip-follow-up-form');if(form)form.hidden=true;
+  renderInterviewAIResult(evaluation,payload);
+}
+// Вызывается inline-кнопкой в index.html.
+// eslint-disable-next-line no-unused-vars
+function toggleInterviewDictation(){
+  const SpeechRecognition=typeof window!=='undefined'&&(window.SpeechRecognition||window.webkitSpeechRecognition);
+  const status=document.getElementById('ip-dictation-status');
+  const button=document.getElementById('ip-dictate-btn');
+  const answer=document.getElementById('ip-answer');
+  if(!SpeechRecognition||!answer){if(status)status.textContent='Диктовка недоступна — используйте печать.';return;}
+  if(interviewRecognitionActive&&interviewRecognition){interviewRecognition.stop();return;}
+  const recognition=new SpeechRecognition();interviewRecognition=recognition;
+  const recognitionKey=interviewRenderedKey;
+  recognition.lang='ru-RU';recognition.continuous=false;recognition.interimResults=false;
+  recognition.onstart=()=>{if(interviewRecognition!==recognition)return;interviewRecognitionActive=true;if(status)status.textContent='Слушаю…';if(button)button.textContent='⏹️ Остановить';};
+  recognition.onresult=event=>{
+    if(interviewRecognition!==recognition||interviewRenderedKey!==recognitionKey)return;
+    const transcript=Array.from(event.results||[]).map(result=>result[0]&&result[0].transcript||'').join(' ').trim();
+    answer.value=(answer.value+(answer.value&&transcript?' ':'')+transcript).slice(0,6000);
+  };
+  recognition.onerror=()=>{if(interviewRecognition===recognition&&status)status.textContent='Не удалось распознать речь. Продолжите печатью.';};
+  recognition.onend=()=>{if(interviewRecognition!==recognition)return;interviewRecognitionActive=false;interviewRecognition=null;if(button)button.textContent='🎙️ Начать диктовку';if(status&&status.textContent==='Слушаю…')status.textContent='Диктовка завершена.';};
+  recognition.start();
 }
 function requireSourcesUI(){if(typeof IPMaxSourcesUI==='undefined') throw new Error('Модуль источников не загружен.');return IPMaxSourcesUI;}
 function showSourcesReport(){

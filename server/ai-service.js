@@ -1,4 +1,5 @@
 const AICoach = require('../ai-coach.js');
+const InterviewPractice = require('../interview-practice-ui.js');
 const { createAiSettingsStore } = require('./ai-settings.js');
 
 const SYSTEM_PROMPT = [
@@ -7,6 +8,29 @@ const SYSTEM_PROMPT = [
   'Верни строго JSON без markdown: summary, strengths, gaps, nextSteps, caution.',
   'strengths, gaps и nextSteps — массивы максимум из трёх коротких строк.',
   'Ответ пиши по-русски, конкретно и без общих мотивационных фраз.'
+].join(' ');
+
+const DIAGNOSTIC_SYSTEM_PROMPT = [
+  'Ты — технический наставник по DevOps-собеседованиям.',
+  'Разбирай только переданные результаты текущей контрольной и не выдумывай факты.',
+  'Верни строго JSON без markdown со schemaVersion:2 и полями verdict, diagnostics, actionPlan, studyPlan, retest, caution.',
+  'verdict: levelEstimate, readiness 0-100, summary.',
+  'Каждый diagnostics: concept, severity low|medium|high, problemType knowledge_gap|concept_confusion|diagnostic_order|cause_model|inattention|slow_response|unstable_knowledge, evidence, explanation, confidence 0-1.',
+  'evidence содержит только наблюдаемые факты из payload: выбранный ответ, правильный ответ, время или статистику.',
+  'Каждый actionPlan: priority, task, practice, successCriterion, page, topic. successCriterion обязан быть измеримым.',
+  'studyPlan — 3-7 дней: day, title, actions, successCriterion.',
+  'retest: topics, categories, levels, size 3-20, successCriterion; не создавай новые вопросы.',
+  'Ответ пиши по-русски, конкретно, объясняй ошибку и различие понятий.'
+].join(' ');
+
+const INTERVIEW_SYSTEM_PROMPT = [
+  'Ты — технический интервьюер по DevOps.',
+  'Оцени только переданный письменный ответ по переданной rubric; не меняй и не переименовывай критерии.',
+  'Верни строго JSON без markdown: schemaVersion, overallScore, summary, dimensions, rubric, gaps, improvedAnswer, followUps, caution.',
+  'dimensions содержит correctness, completeness, structure, tradeoffs; у каждого score 0-100 и feedback.',
+  'rubric содержит по одному элементу на каждый исходный критерий: criterion, met, evidence, feedback. evidence — только цитата или наблюдаемый факт из ответа.',
+  'followUps — до трёх вопросов только по текущему заданию; не создавай HTML, маршруты, команды или код для выполнения.',
+  'Если данных недостаточно, скажи об этом в feedback, не выдумывай опыт пользователя. Ответ пиши по-русски.'
 ].join(' ');
 
 function serviceError(message, code, status) {
@@ -39,8 +63,42 @@ function parseReviewResponse(response) {
   return review;
 }
 
+function parseInterviewResponse(response, payload) {
+  const content = extractContent(response).trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
+  let parsed;
+  try { parsed = JSON.parse(content); }
+  catch (_) { throw serviceError('AI provider returned invalid JSON', 'AI_BAD_RESPONSE', 502); }
+  const evaluation = InterviewPractice.normaliseInterviewEvaluation(parsed, payload);
+  if (!evaluation) throw serviceError('AI provider returned an incomplete interview evaluation', 'AI_BAD_RESPONSE', 502);
+  return { ...evaluation, source: 'ai' };
+}
+
+function createMockInterviewEvaluation(payload) {
+  const local = InterviewPractice.buildLocalInterviewEvaluation(payload);
+  return {
+    ...local,
+    source: 'mock',
+    dimensions: {
+      ...local.dimensions,
+      correctness: {
+        score: local.overallScore,
+        feedback: 'Тестовый балл mock-провайдера; не использовать как техническое заключение.'
+      }
+    },
+    caution: 'Результат создан тестовым mock-провайдером и нужен только для проверки интерфейса.'
+  };
+}
+
 function createMockReview(payload) {
   const local = AICoach.buildLocalReview(payload);
+  if (local.schemaVersion === 2) {
+    return {
+      ...local,
+      verdict: { ...local.verdict, summary: 'AI-разбор готов. ' + local.verdict.summary },
+      caution: local.caution || 'Рекомендации основаны на результатах этой контрольной.',
+      source: 'mock'
+    };
+  }
   return {
     ...local,
     summary: 'AI-разбор готов. ' + local.summary,
@@ -89,7 +147,10 @@ function createAiService(env = process.env, dependencies = {}) {
     if (typeof fetchImpl !== 'function') throw serviceError('Fetch is unavailable on the server', 'AI_UNAVAILABLE', 503);
 
     const temperature = Number.isFinite(config.temperature) ? config.temperature : 0.2;
-    const maxTokens = Number.isFinite(config.maxTokens) ? config.maxTokens : 700;
+    const diagnostic = payload.schemaVersion === 2;
+    const maxTokens = diagnostic
+      ? Math.max(1800, Number.isFinite(config.maxTokens) ? config.maxTokens : 1800)
+      : Number.isFinite(config.maxTokens) ? config.maxTokens : 700;
     const controller = new AbortController();
     const timeoutMs = Math.max(1000, Math.min(60000, Number(config.timeoutMs) || 15000));
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -103,7 +164,7 @@ function createAiService(env = process.env, dependencies = {}) {
           temperature,
           max_tokens: maxTokens,
           messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
+            { role: 'system', content: diagnostic ? DIAGNOSTIC_SYSTEM_PROMPT : SYSTEM_PROMPT },
             { role: 'user', content: JSON.stringify(payload) }
           ]
         }),
@@ -123,7 +184,52 @@ function createAiService(env = process.env, dependencies = {}) {
     return parseReviewResponse(data);
   }
 
-  return { status, review };
+  async function evaluateInterview(rawPayload) {
+    const payload = InterviewPractice.buildInterviewPayload(rawPayload);
+    if (!payload.item.id || !payload.item.rubric.length || !payload.answer) {
+      throw serviceError('Interview task, rubric and answer are required', 'INVALID_INTERVIEW_INPUT', 400);
+    }
+    const config = await settings.resolve();
+    const view = describe(config);
+    const { endpoint, apiKey, model, mock } = view;
+    if (!view.enabled) throw serviceError('AI backend is not configured', 'AI_NOT_CONFIGURED', 503);
+    if (mock) return createMockInterviewEvaluation(payload);
+    if (typeof fetchImpl !== 'function') throw serviceError('Fetch is unavailable on the server', 'AI_UNAVAILABLE', 503);
+
+    const controller = new AbortController();
+    const timeoutMs = Math.max(1000, Math.min(60000, Number(config.timeoutMs) || 15000));
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    let response;
+    try {
+      response = await fetchImpl(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model,
+          temperature: Number.isFinite(config.temperature) ? config.temperature : 0.2,
+          max_tokens: Math.max(1800, Number.isFinite(config.maxTokens) ? config.maxTokens : 1800),
+          messages: [
+            { role: 'system', content: INTERVIEW_SYSTEM_PROMPT },
+            { role: 'user', content: JSON.stringify(payload) }
+          ]
+        }),
+        signal: controller.signal
+      });
+    } catch (error) {
+      const timeoutFailure = error && error.name === 'AbortError';
+      throw serviceError(timeoutFailure ? 'AI provider timed out' : 'AI provider is unavailable', timeoutFailure ? 'AI_TIMEOUT' : 'AI_UNAVAILABLE', timeoutFailure ? 504 : 502);
+    } finally {
+      clearTimeout(timeout);
+    }
+
+    let data;
+    try { data = await response.json(); }
+    catch (_) { throw serviceError('AI provider returned a non-JSON response', 'AI_BAD_RESPONSE', 502); }
+    if (!response.ok) throw serviceError('AI provider rejected the request', 'AI_PROVIDER_ERROR', 502);
+    return parseInterviewResponse(data, payload);
+  }
+
+  return { status, review, evaluateInterview };
 }
 
-module.exports = { createAiService, parseReviewResponse, serviceError };
+module.exports = { createAiService, parseReviewResponse, parseInterviewResponse, serviceError };

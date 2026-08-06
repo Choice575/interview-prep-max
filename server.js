@@ -7,6 +7,10 @@ const { createAiSettingsStore } = require('./server/ai-settings.js');
 const { requireBearer } = require('./server/auth.js');
 
 const MAX_BODY_BYTES = 16 * 1024;
+// v2-разбор передаёт до 15 ошибочных/медленных вопросов с вариантами и
+// объяснениями. 64 КБ достаточно для bounded payload, но не даёт использовать
+// AI route как приёмник произвольно больших тел.
+const MAX_AI_BODY_BYTES = 64 * 1024;
 // Снимок прогресса на порядки больше AI-агрегатов: history допускает 1000
 // записей, qprog — по записи на каждый вопрос. Общий лимит 16 КБ отклонял бы
 // любой реальный синк, поэтому у него свой предел.
@@ -164,14 +168,31 @@ function createAppServer(options = {}) {
     }
     if (url.pathname === '/api/ai/review') {
       if (request.method !== 'POST') return sendJson(response, 405, { error: 'Method not allowed' });
-      if (!allowRequest(clientAddress(request, trustProxy))) return sendJson(response, 429, { error: 'Too many AI review requests' });
       try {
-        const payload = await readJson(request);
+        // AI расходует оплачиваемый баланс. Проверяем общий пользовательский
+        // sync-token ДО rate limiter: иначе злоумышленник без токена сможет
+        // выжечь квоту владельца одними неавторизованными запросами.
+        syncService.authorise(request.headers.authorization);
+        if (!allowRequest(clientAddress(request, trustProxy))) return sendJson(response, 429, { error: 'Too many AI review requests' });
+        const payload = await readJson(request, MAX_AI_BODY_BYTES);
         const review = await aiService.review(payload);
         return sendJson(response, 200, { review });
       } catch (error) {
         const status = Number.isInteger(error && error.status) ? error.status : 500;
         return sendJson(response, status, { error: status >= 500 ? 'AI review is temporarily unavailable' : error.message, code: error && error.code || undefined });
+      }
+    }
+    if (url.pathname === '/api/ai/interview') {
+      if (request.method !== 'POST') return sendJson(response, 405, { error: 'Method not allowed' });
+      try {
+        syncService.authorise(request.headers.authorization);
+        if (!allowRequest(clientAddress(request, trustProxy))) return sendJson(response, 429, { error: 'Too many AI interview requests' });
+        const payload = await readJson(request, MAX_AI_BODY_BYTES);
+        const evaluation = await aiService.evaluateInterview(payload);
+        return sendJson(response, 200, { evaluation });
+      } catch (error) {
+        const status = Number.isInteger(error && error.status) ? error.status : 500;
+        return sendJson(response, status, { error: status >= 500 ? 'AI interview is temporarily unavailable' : error.message, code: error && error.code || undefined });
       }
     }
     if (url.pathname === '/api/ai/settings') {
@@ -255,4 +276,4 @@ if (require.main === module) {
   process.on('SIGINT', shutdown);
 }
 
-module.exports = { createAppServer, safeStaticPath, MAX_BODY_BYTES };
+module.exports = { createAppServer, safeStaticPath, MAX_BODY_BYTES, MAX_AI_BODY_BYTES };

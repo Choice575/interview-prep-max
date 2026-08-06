@@ -232,6 +232,35 @@
     }
     return { questionIds: selected.map(question => question.id), topics: [...new Set(selected.map(question => question.topic))], size: selected.length };
   }
+  function buildRetestSession(input) {
+    const source = input && typeof input === 'object' ? input : {};
+    const questions = Array.isArray(source.questions) ? source.questions.filter(question => question && (typeof question.id === 'string' || Number.isFinite(question.id))) : [];
+    const recipe = source.recipe && typeof source.recipe === 'object' ? source.recipe : {};
+    const availableTopics = new Set(questions.map(question => question.topic).filter(topic => typeof topic === 'string' && topic));
+    const availableCategories = new Set(questions.map(question => String(question.category || 'definition')));
+    const availableLevels = new Set(questions.map(question => question.level).filter(level => typeof level === 'string' && level));
+    const topics = [...new Set((Array.isArray(recipe.topics) ? recipe.topics : []).filter(topic => availableTopics.has(topic)))].slice(0, 3);
+    const categories = [...new Set((Array.isArray(recipe.categories) ? recipe.categories : []).filter(category => availableCategories.has(category)))].slice(0, 4);
+    const levels = [...new Set((Array.isArray(recipe.levels) ? recipe.levels : []).filter(level => availableLevels.has(level)))].slice(0, 6);
+    if (!topics.length) return { questionIds: [], topics: [], size: 0, recipe: { topics: [], categories: [], levels: [], size: 0 } };
+    const requested = Math.max(3, Math.min(20, Math.round(Number(recipe.size) || 10)));
+    const progress = source.progress && typeof source.progress === 'object' ? source.progress : {};
+    const now = Number.isFinite(source.now) ? source.now : Date.now();
+    const filtered = questions.filter(question => topics.includes(question.topic) &&
+      (!categories.length || categories.includes(String(question.category || 'definition'))) &&
+      (!levels.length || levels.includes(question.level)));
+    const selected = filtered.slice().sort((left, right) =>
+      questionPriority(right, progress, now) - questionPriority(left, progress, now) ||
+      String(left.id).localeCompare(String(right.id), 'en', { numeric: true })
+    ).slice(0, requested);
+    return {
+      questionIds: selected.map(question => question.id),
+      topics: [...new Set(selected.map(question => question.topic))],
+      size: selected.length,
+      recipe: { topics, categories, levels, size: requested }
+    };
+  }
+
   function normaliseJournalEntry(value) {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
     const id = typeof value.id === 'string' ? value.id.slice(0, 80) : '';
@@ -310,7 +339,7 @@
   }
 
   return {
-    buildPlan, buildWeeklyReview, buildControlSession, buildReadinessIndex, appendJournalEntry, isJournalEntry,
+    buildPlan, buildWeeklyReview, buildControlSession, buildRetestSession, buildReadinessIndex, appendJournalEntry, isJournalEntry,
     getDaysUntil, getSessionSize, ROLE_LABELS, LEVELS, TRAINER_PAGES, JOURNAL_LIMIT,
     READINESS_COMPONENTS, READINESS_TARGETS
   };

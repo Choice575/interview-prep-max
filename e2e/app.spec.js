@@ -104,16 +104,21 @@ test('stores and removes a skill-journal note', async ({ page }) => {
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_coach_journal')).length)).toBe(0);
 });
 
-test('gets an AI review through the backend without sending question text', async ({ page }) => {
+test('sends bounded diagnostic evidence, stores history and starts a trusted retest', async ({ page }) => {
+  let reviewRequest = null;
+  page.on('request', request => {
+    if (request.method() === 'POST' && request.url().endsWith('/api/ai/review')) reviewRequest = request;
+  });
   await setProgress(page, {
     ipmax_onboarding: profile,
     ipmax_onboarding_complete: true,
+    ipmax_sync_token: 'e2e-sync-token-at-least-24-characters',
     ipmax_coach_control: {
       id: 'control-e2e', startedAt: Date.now() - 60000, completedAt: null,
-      questionIds: ['1', '2', '3'], topics: ['Linux', 'Terraform'],
+      questionIds: ['1', '2', '3'], topics: ['Terraform'],
       attempts: [
-        { questionId: '1', topic: 'Linux', score: 0, responseSeconds: 35, at: Date.now() - 30000 },
-        { questionId: '2', topic: 'Terraform', score: 1, responseSeconds: 20, at: Date.now() - 20000 }
+        { questionId: '1', topic: 'Terraform', score: 0, selectedAnswerIndex: 1, responseSeconds: 74, at: Date.now() - 30000 },
+        { questionId: '2', topic: 'Terraform', score: 1, selectedAnswerIndex: 1, responseSeconds: 20, at: Date.now() - 20000 }
       ]
     }
   });
@@ -122,9 +127,223 @@ test('gets an AI review through the backend without sending question text', asyn
   await expect(page.locator('#coach-ai-modal')).toHaveClass(/open/);
   await expect(page.locator('.coach-ai-badge')).toHaveText('Внешний AI');
   await expect(page.locator('.coach-ai-summary')).toContainText('AI-разбор готов');
-  await expect(page.locator('#coach-ai-content')).toContainText('Linux');
-  await page.getByRole('button', { name: 'Обновить разбор' }).click();
-  await expect(page.locator('#coach-ai-close')).toBeFocused();
+  await expect(page.locator('.coach-ai-diagnosis')).toContainText('Terraform');
+  await expect(page.locator('.coach-ai-weekly')).toContainText('Динамика за 7 дней');
+  await expect(page.locator('.coach-ai-history-item')).toHaveCount(1);
+
+  expect(reviewRequest).not.toBeNull();
+  expect(reviewRequest.headers().authorization).toMatch(/^Bearer .{24,}$/);
+  const payload = reviewRequest.postDataJSON();
+  expect(payload.schemaVersion).toBe(2);
+  expect(payload.control.questionDetails).toHaveLength(1);
+  expect(payload.control.questionDetails[0].selectedAnswer).toBe('Система управления конфигурацией операционных систем');
+  expect(payload.control.questionDetails[0].correctAnswer).toBe('Декларативный инструмент Infrastructure as Code');
+
+  const history = await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_ai_review_history')));
+  expect(history).toHaveLength(1);
+  expect(JSON.stringify(history)).not.toContain('questionDetails');
+
+  await page.getByRole('button', { name: 'Запустить повторную контрольную' }).click();
+  await expect(page.locator('#page-exam')).toHaveClass(/active/);
+  const cards = page.locator('#questions-container .q-card');
+  const ids = await cards.evaluateAll(items => items.map(item => item.id));
+  expect(ids.length).toBeGreaterThan(0);
+  expect(ids.length).toBeLessThanOrEqual(20);
+  expect(new Set(ids).size).toBe(ids.length);
+  await expect(cards.first().locator('.q-meta')).toContainText('Terraform');
+});
+
+test('evaluates a written interview answer, stores compact history and bounds one follow-up', async ({ page }) => {
+  const requests = [];
+  await page.addInitScript(() => {
+    try { delete window.SpeechRecognition; } catch (_) {}
+    try { delete window.webkitSpeechRecognition; } catch (_) {}
+  });
+  page.on('request', request => {
+    if (request.method() === 'POST' && request.url().endsWith('/api/ai/interview')) requests.push(request);
+  });
+  await setProgress(page, {
+    ipmax_onboarding: profile,
+    ipmax_onboarding_complete: true,
+    ipmax_sync_token: 'e2e-sync-token-at-least-24-characters'
+  });
+  await page.goto('/');
+  await page.locator('[data-page="interview"]').click();
+  await expect(page.locator('#page-interview')).toHaveClass(/active/);
+  await expect(page.locator('#ip-dictate-btn')).toBeDisabled();
+  await expect(page.locator('#ip-dictation-status')).toContainText('используйте печать');
+
+  const written = 'Ситуация: выпуск сломался. Действия: остановил ущерб и откатил версионный образ. Результат: восстановил сервис за 10 минут и добавил проверку.';
+  await page.locator('#ip-answer').fill(written);
+  await page.locator('#ip-ai-evaluate-btn').click();
+  await expect(page.locator('.ip-ai-evaluation')).toBeVisible();
+  await expect(page.locator('.ip-ai-source')).toHaveText('Тестовый AI');
+  await expect(page.locator('.ip-ai-dimension')).toHaveCount(4);
+  await expect(page.locator('.ip-ai-rubric-item')).toHaveCount(4);
+
+  expect(requests).toHaveLength(1);
+  expect(requests[0].headers().authorization).toMatch(/^Bearer .{24,}$/);
+  const firstPayload = requests[0].postDataJSON();
+  expect(firstPayload.answer).toBe(written);
+  expect(firstPayload.followUp).toBeUndefined();
+  expect(firstPayload.messages).toBeUndefined();
+
+  const firstHistory = await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_interview_ai_history')));
+  expect(firstHistory).toHaveLength(1);
+  const compact = JSON.stringify(firstHistory);
+  expect(compact).not.toContain(written);
+  expect(compact).not.toContain('evidence');
+  expect(compact).not.toContain('improvedAnswer');
+
+  await page.getByRole('button', { name: 'Ответить на уточнение' }).first().click();
+  await expect(page.locator('#ip-follow-up-form')).toBeVisible();
+  await expect(page.locator('#ip-follow-up-turn')).toContainText('1 из 3');
+  await page.locator('#ip-follow-up-answer').fill('Результат измерил по времени восстановления и числу повторных сбоев.');
+  await page.getByRole('button', { name: 'Отправить уточнение' }).click();
+  await expect.poll(() => requests.length).toBe(2);
+  const followPayload = requests[1].postDataJSON();
+  expect(followPayload.followUpTurn).toBe(1);
+  expect(followPayload.followUp.question.length).toBeGreaterThan(0);
+  expect(followPayload.followUp.answer).toContain('времени восстановления');
+  expect(followPayload.messages).toBeUndefined();
+  await expect(page.locator('#ip-follow-up-form')).toBeHidden();
+});
+
+test('does not render or save an AI evaluation after switching interview tasks', async ({ page }) => {
+  let releaseResponse;
+  const responseGate = new Promise(resolve => { releaseResponse = resolve; });
+  await page.route('**/api/ai/interview', async route => {
+    await responseGate;
+    await route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ evaluation: {
+        source: 'mock', overallScore: 70, summary: 'Устаревший результат',
+        dimensions: {
+          correctness: { score: 70, feedback: '' }, completeness: { score: 70, feedback: '' },
+          structure: { score: 70, feedback: '' }, tradeoffs: { score: 70, feedback: '' }
+        },
+        rubric: [], gaps: [], improvedAnswer: '', followUps: [], caution: ''
+      } })
+    });
+  });
+  await setProgress(page, {
+    ipmax_onboarding: profile, ipmax_onboarding_complete: true,
+    ipmax_sync_token: 'e2e-sync-token-at-least-24-characters'
+  });
+  await page.goto('/');
+  await page.locator('[data-page="interview"]').click();
+  await page.locator('#ip-answer').fill('Ответ на первое задание');
+  await page.locator('#ip-ai-evaluate-btn').click();
+  await expect(page.locator('#ip-ai-result')).toContainText('оценивает ответ');
+  await page.locator('#ip-list [data-ip-id]').nth(1).click();
+  releaseResponse();
+
+  await expect(page.locator('#ip-answer')).toHaveValue('');
+  await expect(page.locator('#ip-ai-result')).not.toContainText('Устаревший результат');
+  await expect(page.locator('#ip-ai-evaluate-btn')).toBeEnabled();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_interview_ai_history') || '[]'))).toHaveLength(0);
+});
+
+test('does not save a delayed interview evaluation after leaving the page', async ({ page }) => {
+  let releaseResponse;
+  const responseGate = new Promise(resolve => { releaseResponse = resolve; });
+  await page.route('**/api/ai/interview', async route => {
+    await responseGate;
+    await route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ evaluation: {
+        source: 'mock', overallScore: 70, summary: 'Результат покинутой страницы',
+        dimensions: {
+          correctness: { score: 70, feedback: '' }, completeness: { score: 70, feedback: '' },
+          structure: { score: 70, feedback: '' }, tradeoffs: { score: 70, feedback: '' }
+        }, rubric: [], gaps: [], improvedAnswer: '', followUps: [], caution: ''
+      } })
+    });
+  });
+  await setProgress(page, {
+    ipmax_onboarding: profile, ipmax_onboarding_complete: true,
+    ipmax_sync_token: 'e2e-sync-token-at-least-24-characters'
+  });
+  await page.goto('/');
+  await page.locator('[data-page="interview"]').click();
+  await page.locator('#ip-answer').fill('Ответ перед уходом со страницы');
+  await page.locator('#ip-ai-evaluate-btn').click();
+  await expect(page.locator('#ip-ai-result')).toContainText('оценивает ответ');
+  await page.locator('[data-page="home"]').click();
+  releaseResponse();
+
+  await expect(page.locator('#page-home')).toHaveClass(/active/);
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_interview_ai_history') || '[]').length)).toBe(0);
+});
+
+test('dictation is opt-in, appends recognised text and stops when the task changes', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__recognitionStarts = 0;
+    window.__recognitionStops = 0;
+    class FakeRecognition {
+      start() {
+        window.__recognitionStarts++;
+        if (this.onstart) this.onstart();
+        setTimeout(() => {
+          if (this.onresult) this.onresult({ results: [[{ transcript: 'распознанный фрагмент' }]] });
+        }, 20);
+      }
+      stop() {
+        window.__recognitionStops++;
+        if (this.onend) this.onend();
+      }
+    }
+    window.SpeechRecognition = FakeRecognition;
+  });
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+  await page.locator('[data-page="interview"]').click();
+  expect(await page.evaluate(() => window.__recognitionStarts)).toBe(0);
+  await expect(page.locator('#ip-dictate-btn')).toBeEnabled();
+  await page.locator('#ip-dictate-btn').click();
+  await expect(page.locator('#ip-answer')).toHaveValue(/распознанный фрагмент/);
+  expect(await page.evaluate(() => window.__recognitionStarts)).toBe(1);
+
+  await page.locator('#ip-list [data-ip-id]').nth(1).click();
+  expect(await page.evaluate(() => window.__recognitionStops)).toBe(1);
+  await expect(page.locator('#ip-answer')).toHaveValue('');
+});
+
+test('ignores a late dictation result after switching interview tasks', async ({ page }) => {
+  await page.addInitScript(() => {
+    class LateRecognition {
+      start() {
+        if (this.onstart) this.onstart();
+        setTimeout(() => {
+          if (this.onresult) this.onresult({ results: [[{ transcript: 'ПОЗДНИЙ ФРАГМЕНТ' }]] });
+          if (this.onend) this.onend();
+        }, 120);
+      }
+      stop() { /* Браузер вправе ещё доставить финальный result после stop(). */ }
+    }
+    window.SpeechRecognition = LateRecognition;
+  });
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+  await page.locator('[data-page="interview"]').click();
+  await page.locator('#ip-dictate-btn').click();
+  await page.locator('#ip-list [data-ip-id]').nth(1).click();
+
+  await page.waitForTimeout(180);
+  await expect(page.locator('#ip-answer')).toHaveValue('');
+  await expect(page.locator('#ip-dictate-btn')).toContainText('Начать диктовку');
+  await expect(page.locator('#ip-dictation-status')).not.toContainText('Слушаю');
+});
+
+test('keeps written interview practice usable on a compact viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+  await page.locator('#menu-toggle').click();
+  await page.locator('[data-page="interview"]').click();
+  await expect(page.locator('#ip-answer')).toBeVisible();
+  await expect(page.locator('#ip-ai-evaluate-btn')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
 });
 
 test('records a Mock Interview rating in the skill-event journal', async ({ page }) => {

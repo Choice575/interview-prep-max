@@ -10,7 +10,9 @@ const { createAiService } = require('./server/ai-service.js');
 
 const ADMIN = 'admin-token-long-enough-for-tests';
 const AUTH = { Authorization: 'Bearer ' + ADMIN };
-const SECRET = 'sk-provider-secret-value-000042';
+const SYNC = 'sync-token-long-enough-for-tests';
+const REVIEW_AUTH = { Authorization: 'Bearer ' + SYNC };
+const SECRET = '«redacted:sk-…»';
 
 function request(server, method, target, body, headers = {}) {
   const port = server.address().port;
@@ -32,7 +34,7 @@ function request(server, method, target, body, headers = {}) {
 
 async function withServer(run, options = {}) {
   const dir = await fsp.mkdtemp(path.join(os.tmpdir(), 'ipmax-set-routes-'));
-  const env = { IPMAX_ADMIN_TOKEN: ADMIN, IPMAX_AI_SETTINGS_DIR: dir, ...(options.env || {}) };
+  const env = { IPMAX_ADMIN_TOKEN: ADMIN, IPMAX_SYNC_TOKEN: SYNC, IPMAX_AI_SETTINGS_DIR: dir, ...(options.env || {}) };
   const aiSettings = createAiSettingsStore(env);
   const server = createAppServer({
     env,
@@ -120,7 +122,7 @@ test('the mock review does not claim to be a local one', async () => {
     const result = await request(server, 'POST', '/api/ai/review', {
       profile: { role: 'DevOps', level: 'Junior' },
       control: { attempted: 1, total: 1, accuracy: 100, averageSeconds: 10, topics: [{ topic: 'Linux', attempted: 1, accuracy: 100, averageSeconds: 10 }] }
-    });
+    }, REVIEW_AUTH);
     assert.equal(result.status, 200);
     const review = JSON.parse(result.body).review || JSON.parse(result.body);
     assert.equal(review.source, 'mock');
@@ -143,7 +145,7 @@ test('settings saved through the API take effect without a restart', async () =>
     const review = await request(server, 'POST', '/api/ai/review', {
       profile: { role: 'DevOps', level: 'Junior' },
       control: { attempted: 2, total: 3, accuracy: 50, averageSeconds: 20, topics: [{ topic: 'Linux', attempted: 2, accuracy: 50, averageSeconds: 20 }] }
-    });
+    }, REVIEW_AUTH);
     assert.equal(review.status, 200, 'разбор должен заработать сразу после сохранения настроек');
   });
 });
@@ -155,7 +157,7 @@ test('temperature and max_tokens from settings reach the provider request', asyn
     const review = await request(server, 'POST', '/api/ai/review', {
       profile: { role: 'DevOps', level: 'Junior' },
       control: { attempted: 1, total: 1, accuracy: 100, averageSeconds: 10, topics: [{ topic: 'Linux', attempted: 1, accuracy: 100, averageSeconds: 10 }] }
-    });
+    }, REVIEW_AUTH);
     assert.equal(review.status, 200);
     assert.equal(seen.length, 1);
     assert.equal(seen[0].body.temperature, 0.7, 'ранее temperature была зашита как 0.2');
