@@ -54,6 +54,73 @@ test('wires written and optional dictated interview answers into bounded AI hist
   assert.match(styles, /@media\(max-width:560px\).*\.ip-ai-dimensions/s);
 });
 
+test('registers AI Tutor modules across the complete no-bundler PWA fan-out', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  const serverSource = fs.readFileSync(path.join(root, 'server.js'), 'utf8');
+  const dockerfile = fs.readFileSync(path.join(root, 'Dockerfile'), 'utf8');
+  const eslint = fs.readFileSync(path.join(root, 'eslint.config.mjs'), 'utf8');
+  const verifier = fs.readFileSync(path.join(root, 'verify-release.js'), 'utf8');
+  const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+
+  assert.ok(html.indexOf('./ai-tutor.js') > html.indexOf('./chapter-ui.js'));
+  assert.ok(html.indexOf('./ai-tutor-ui.js') > html.indexOf('./ai-tutor.js'));
+  assert.ok(html.indexOf('./ai-tutor-ui.js') < html.indexOf('./app.js'));
+  ['./ai-tutor.js', './ai-tutor-ui.js'].forEach(asset => {
+    assert.match(sw, new RegExp(asset.replace(/[./-]/g, '\\$&')));
+    assert.match(app, new RegExp(asset.replace(/[./-]/g, '\\$&')));
+    assert.match(verifier, new RegExp(asset.replace(/[./-]/g, '\\$&')));
+  });
+  assert.match(serverSource, /'ai-tutor\.js'/);
+  assert.match(serverSource, /'ai-tutor-ui\.js'/);
+  assert.match(dockerfile, /ai-tutor\.js/);
+  assert.match(dockerfile, /ai-tutor-ui\.js/);
+  assert.match(eslint, /'ai-tutor\.js'/);
+  assert.match(eslint, /'ai-tutor-ui\.js'/);
+  assert.match(eslint, /IPMaxAITutor/);
+  assert.match(eslint, /IPMaxAITutorUI/);
+  assert.match(pkg.scripts.test, /ai-tutor\.test\.js/);
+  assert.match(pkg.scripts.test, /ai-tutor-ui\.test\.js/);
+});
+
+test('wires context-aware AI Tutor buttons into the course chapter and current study day', () => {
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  const chapterUi = fs.readFileSync(path.join(root, 'chapter-ui.js'), 'utf8');
+  const studyUi = fs.readFileSync(path.join(root, 'study-ui.js'), 'utf8');
+
+  assert.match(app, /function openAITutor\(/);
+  assert.match(app, /async function submitAITutor\(/);
+  assert.match(app, /function resetAITutorSession\(/);
+  assert.match(app, /function setAITutorStyle\(style\)[\s\S]*resetAITutorSession\(false\)/);
+  assert.match(app, /AbortController/);
+  assert.match(app, /aiTutorRequestId/);
+  assert.match(app, /aiTutorContextKey/);
+  assert.match(app, /const tutor=requireAITutor\(\)[\s\S]*tutor\.buildTutorPayload/);
+  assert.match(app, /requireAITutorUI\(\)\.renderTutorModal/);
+  assert.match(app, /data-tutor-open/);
+  assert.match(app, /data-tutor-copy-index/);
+  assert.match(app, /KeyboardEvent|Escape/);
+  assert.match(app, /leavingInterview[\s\S]*resetInterviewAIState/);
+  assert.match(chapterUi, /data-tutor-open/);
+  assert.match(studyUi, /data-tutor-open/);
+  assert.match(app, /renderChapterPage[\s\S]*resolved[\s\S]*openAITutor|openAITutor[\s\S]*chapter/);
+  assert.match(app, /renderStudyToday[\s\S]*day[\s\S]*openAITutor|openAITutor[\s\S]*study/);
+});
+
+test('styles AI Tutor for accessible touch targets, long output and compact viewports', () => {
+  const styles = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
+  assert.match(styles, /\.tutor-open-btn[^{]*\{[^}]*min-height:44px/s);
+  assert.match(styles, /\.tutor-modal-head \.btn-icon[^{]*\{[^}]*min-width:44px[^}]*min-height:44px/s);
+  assert.match(styles, /\.tutor-modal[^{]*\{[^}]*max-width:[^;}]+[^}]*max-height:[^;}]+[^}]*overflow-y:auto/s);
+  assert.match(styles, /#ai-tutor-practice-wrap\[hidden\]\{display:none/);
+  assert.match(styles, /\.tutor-modal textarea[^{]*\{[^}]*width:100%[^}]*min-width:0/s);
+  assert.match(styles, /\.tutor-code pre[^{]*\{[^}]*overflow-x:auto[^}]*max-width:100%/s);
+  assert.match(styles, /\.tutor-(?:summary|section|block)[^{]*\{[^}]*overflow-wrap:anywhere/s);
+  assert.match(styles, /@media\(max-width:560px\)[\s\S]*\.tutor-modal[^{]*\{[^}]*width:100%[^}]*max-height:100/s);
+  assert.match(styles, /@media\(max-width:560px\)[\s\S]*\.tutor-mode-tabs[^{]*\{[^}]*flex-wrap:wrap/s);
+});
+
 test('serves the complete app shell and personal-coach modules', async () => {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const port = server.address().port;

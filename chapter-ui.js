@@ -337,6 +337,7 @@
       + '<div class="chapter-actions">'
       + '<button type="button" class="btn btn-primary" data-chapter-start="' + escapeHtml(chapter.id) + '">'
       + (complete ? 'Повторить' : 'Перейти к прохождению') + '</button>'
+      + '<button type="button" class="btn btn-outline tutor-open-btn" data-tutor-open="course">Спросить AI-учителя</button>'
       + '</div>'
       + renderNav(position);
   }

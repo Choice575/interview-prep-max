@@ -95,6 +95,15 @@ const RELEASE_VERSION = (() => {
   return match[1];
 })();
 
+test('publishes AI Tutor 1.0 from release 14.5.0 onward with a fresh offline cache', () => {
+  const [major, minor] = RELEASE_VERSION.split('.').map(Number);
+  assert.ok(major > 14 || (major === 14 && minor >= 5));
+  const context = { self: {} };
+  vm.createContext(context);
+  vm.runInContext(read('version.js'), context, { filename: 'version.js' });
+  assert.equal(context.self.IPMAX_CACHE_NAME, 'ipmax-v' + RELEASE_VERSION);
+});
+
 test('publishes the current version with a complete offline shell', async () => {
   const worker = loadServiceWorker();
 
@@ -102,6 +111,8 @@ test('publishes the current version with a complete offline shell', async () => 
   assert.equal(worker.context.self.IPMAX_CACHE_NAME, 'ipmax-v' + RELEASE_VERSION);
   await dispatchExtendable(worker.handlers.get('install'));
   assert.ok(worker.precached().includes('./study-ui.js'));
+  assert.ok(worker.precached().includes('./ai-tutor.js'));
+  assert.ok(worker.precached().includes('./ai-tutor-ui.js'));
   assert.ok(worker.added().includes('./tasks/study_map.json'));
   assert.ok(worker.added().includes('./tasks/study_tests.json'));
   assert.ok(worker.added().includes('./tasks/senior_cases.json'));

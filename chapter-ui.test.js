@@ -178,6 +178,21 @@ test('renderChapter: пройденная глава помечена и пре�
   assert.match(html, />Повторить</);
 });
 
+test('renderChapter: разрешённая глава предлагает контекстного AI-учителя без данных в HTML', () => {
+  const course = courseBySlug('git');
+  const chapter = course.chapters[0];
+  const html = ui.renderChapter(course, chapter, ui.resolveChapter(chapter, datasets),
+    ui.neighbours(course, chapter.id), false);
+
+  assert.match(html, /data-tutor-open="course"/);
+  assert.match(html, /Спросить AI-учителя/);
+  assert.doesNotMatch(html, /expectedResult|productionLayer|practiceInput/);
+
+  const missing = ui.renderChapter(course, chapter, { ok: false, body: null, missing: 'study_map.json' },
+    ui.neighbours(course, chapter.id), false);
+  assert.doesNotMatch(missing, /data-tutor-open/);
+});
+
 test('renderChapter: навигация вперёд-назад по краям курса', () => {
   const course = courseBySlug('git');
   const first = course.chapters[0];

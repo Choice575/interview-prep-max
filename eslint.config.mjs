@@ -11,6 +11,7 @@ const browserGlobals = {
   location: 'readonly',
   navigator: 'readonly',
   fetch: 'readonly',
+  atob: 'readonly',
   caches: 'readonly',
   crypto: 'readonly',
   console: 'readonly',
@@ -81,6 +82,8 @@ const appGlobals = {
   IPMaxBestPracticesUI: 'readonly',
   IPMaxCatalogUI: 'readonly',
   IPMaxChapterUI: 'readonly',
+  IPMaxAITutor: 'readonly',
+  IPMaxAITutorUI: 'readonly',
   IPMaxRouter: 'readonly',
   IPMaxGamification: 'readonly',
   IPMaxGamificationUI: 'readonly',
@@ -173,7 +176,7 @@ export default [
     files: [
       'coach.js', 'coach-ui.js', 'ai-coach.js', 'storage.js', 'progress.js', 'progress-io.js',
       'date.js', 'home-ui.js', 'exam-ui.js', 'study-ui.js', 'analytics-ui.js', 'offline-ui.js',
-      'sources-ui.js', 'best-practices-ui.js', 'catalog-ui.js', 'chapter-ui.js', 'router.js', 'question-bank-ui.js', 'external-tasks-ui.js', 'interview-practice-ui.js', 'study-curriculum-rules.js', 'question-quality.js',
+      'sources-ui.js', 'best-practices-ui.js', 'catalog-ui.js', 'chapter-ui.js', 'ai-tutor.js', 'ai-tutor-ui.js', 'router.js', 'question-bank-ui.js', 'external-tasks-ui.js', 'interview-practice-ui.js', 'study-curriculum-rules.js', 'question-quality.js',
       'gamification.js', 'gamification-ui.js', 'daily.js', 'daily-ui.js', 'trainers-ui.js',
       'sync-merge.js', 'sync-client.js', 'sync-ui.js',
       'ai-settings-client.js', 'ai-settings-ui.js'

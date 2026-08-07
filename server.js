@@ -24,7 +24,7 @@ const publicFiles = new Set([
   // Модули синхронизации нужны браузеру, поэтому они публичные. Серверная
   // часть (server/sync-service.js) сюда НЕ попадает и остаётся закрытой.
   'sync-merge.js', 'sync-client.js', 'sync-ui.js', 'ai-settings-client.js', 'ai-settings-ui.js',
-  'offline-ui.js', 'sources-ui.js', 'best-practices-ui.js', 'catalog-ui.js', 'chapter-ui.js', 'router.js',
+  'offline-ui.js', 'sources-ui.js', 'best-practices-ui.js', 'catalog-ui.js', 'chapter-ui.js', 'ai-tutor.js', 'ai-tutor-ui.js', 'router.js',
   // Новый модуль, не добавленный сюда, отдаётся как 403: страница молча теряет
   // скрипт, а sw.js не устанавливается вовсе — SHELL_ASSETS кешируется
   // атомарным addAll, и один недоступный файл роняет всю установку.
@@ -193,6 +193,22 @@ function createAppServer(options = {}) {
       } catch (error) {
         const status = Number.isInteger(error && error.status) ? error.status : 500;
         return sendJson(response, status, { error: status >= 500 ? 'AI interview is temporarily unavailable' : error.message, code: error && error.code || undefined });
+      }
+    }
+    if (url.pathname === '/api/ai/tutor') {
+      if (request.method !== 'POST') return sendJson(response, 405, { error: 'Method not allowed' });
+      try {
+        syncService.authorise(request.headers.authorization);
+        if (!allowRequest(clientAddress(request, trustProxy))) return sendJson(response, 429, { error: 'Too many AI tutor requests' });
+        const payload = await readJson(request, MAX_AI_BODY_BYTES);
+        const tutor = await aiService.tutor(payload);
+        return sendJson(response, 200, { tutor });
+      } catch (error) {
+        const status = Number.isInteger(error && error.status) ? error.status : 500;
+        return sendJson(response, status, {
+          error: status >= 500 ? 'AI tutor is temporarily unavailable' : error.message,
+          code: error && error.code || undefined
+        });
       }
     }
     if (url.pathname === '/api/ai/settings') {

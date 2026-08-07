@@ -818,6 +818,153 @@ test('keeps study progress and recommendations accessible on a compact viewport'
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
 });
 
+test('opens the AI Tutor from a course chapter, sends bounded context and ignores a late response after Escape', async ({ page }) => {
+  const requests = [];
+  let requestNumber = 0;
+  let releaseLateResponse;
+  const lateResponseGate = new Promise(resolve => { releaseLateResponse = resolve; });
+  await setProgress(page, {
+    ipmax_onboarding: profile,
+    ipmax_onboarding_complete: true,
+    ipmax_sync_token: 'e2e-sync-token-at-least-24-characters',
+    ipmax_chapter_position: { slug: 'git', chapterId: 'ch_git_w4d1' },
+  });
+  await page.route('**/api/ai/tutor', async route => {
+    requestNumber += 1;
+    requests.push(route.request());
+    if (requestNumber === 2) await lateResponseGate;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ tutor: {
+        source: 'mock', mode: 'explain', title: requestNumber === 1 ? 'Git: рабочая директория и индекс' : 'ПОЗДНИЙ ОТВЕТ',
+        summary: 'Git хранит изменения по этапам, поэтому status, diff и индекс нужно различать.',
+        sections: [{ title: 'Основная идея', text: 'Рабочая директория содержит текущие файлы, индекс — следующий снимок.' }],
+        example: { description: 'Проверка состояния', code: 'git status' },
+        checkQuestion: { question: 'Что попадёт в следующий commit?' },
+        nextActions: [{ action: 'Выполнить git status', successCriterion: 'Понятно состояние каждого файла' }],
+        caution: 'Проверяйте diff перед commit.'
+      } })
+    });
+  });
+
+  await page.goto('/#/chapter/git/ch_git_w4d1');
+  await expect(page.locator('#page-chapter')).toHaveClass(/active/);
+  const trigger = page.locator('#chapter-host [data-tutor-open="course"]');
+  await expect(trigger).toBeVisible();
+  await trigger.focus();
+  await trigger.click();
+  await expect(page.locator('#ai-tutor-modal')).toHaveClass(/open/);
+  await expect(page.locator('#ai-tutor-context-label')).toContainText('Git basics');
+  await page.locator('#ai-tutor-question').fill('Объясни разницу между рабочей директорией и индексом');
+  await page.locator('#ai-tutor-modal [data-tutor-action="submit"]').click();
+  await expect(page.locator('#ai-tutor-result')).toContainText('Git: рабочая директория и индекс');
+
+  expect(requests).toHaveLength(1);
+  expect(requests[0].headers().authorization).toBe('Bearer e2e-sync-token-at-least-24-characters');
+  const body = requests[0].postDataJSON();
+  expect(body.source).toBe('course');
+  expect(body.context.key).toBe('course:git:ch_git_w4d1');
+  expect(body.context.chapterId).toBe('ch_git_w4d1');
+  expect(body.context.courseTitle).toContain('Git');
+  expect(body.context.practice.length).toBeLessThanOrEqual(10);
+  expect(JSON.stringify(body)).not.toContain('sync-token');
+  expect(JSON.stringify(body)).not.toContain('localStorage');
+
+  await page.locator('#ai-tutor-question').fill('Дай второй ответ');
+  await page.locator('#ai-tutor-modal [data-tutor-action="submit"]').click();
+  await expect.poll(() => requests.length).toBe(2);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#ai-tutor-modal')).not.toHaveClass(/open/);
+  releaseLateResponse();
+  await page.waitForTimeout(100);
+  await expect(page.locator('#ai-tutor-result')).not.toContainText('ПОЗДНИЙ ОТВЕТ');
+  await expect(trigger).toBeFocused();
+
+  await page.locator('[data-chapter-open="ch_git_w4d1_test"]').click();
+  await expect(page.locator('#chapter-host')).toContainText('Проверка: Git basics');
+  await page.locator('#chapter-host [data-tutor-open="course"]').click();
+  await page.locator('#ai-tutor-modal [data-tutor-action="submit"]').click();
+  await expect.poll(() => requests.length).toBe(3);
+  const miniBody = requests[2].postDataJSON();
+  expect(miniBody.context.key).toBe('course:git:ch_git_w4d1_test');
+  expect(miniBody.context.kind).toBe('mini');
+  expect(miniBody.context.materials).toContain('Что показывает git status?');
+  expect(miniBody.context.materials).toContain('Что попадает в commit после git add?');
+  expect(JSON.stringify(miniBody.context)).not.toMatch(/"expected"\s*:|"answer"\s*:/);
+});
+
+test('uses explain, Socratic and practice Tutor modes for the current study day on mobile', async ({ page }) => {
+  const requests = [];
+  await page.setViewportSize({ width: 390, height: 844 });
+  page.on('request', request => {
+    if (request.method() === 'POST' && request.url().endsWith('/api/ai/tutor')) requests.push(request);
+  });
+  await setProgress(page, {
+    ipmax_onboarding: profile,
+    ipmax_onboarding_complete: true,
+    ipmax_sync_token: 'e2e-sync-token-at-least-24-characters',
+    ipmax_study_position: { week: 1, day: 2 },
+  });
+
+  await page.goto('/');
+  await page.locator('#menu-toggle').click();
+  await page.locator('[data-page="study"]').click();
+  await expect(page.locator('#page-study')).toHaveClass(/active/);
+  const trigger = page.locator('#study-today [data-tutor-open="study"]');
+  await expect(trigger).toBeVisible();
+  const triggerBox = await trigger.boundingBox();
+  expect(triggerBox.height).toBeGreaterThanOrEqual(44);
+  await trigger.click();
+
+  const modal = page.locator('#ai-tutor-modal');
+  await expect(modal).toHaveClass(/open/);
+  await expect(page.locator('#ai-tutor-context-label')).toContainText('Файлы, директории, копирование');
+  const modalBox = await page.locator('.tutor-modal').boundingBox();
+  expect(modalBox.x).toBeGreaterThanOrEqual(0);
+  expect(modalBox.width).toBeLessThanOrEqual(390);
+  expect(modalBox.height).toBeLessThanOrEqual(844);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+
+  await page.locator('#ai-tutor-question').fill('Объясни текущую тему простыми словами');
+  await page.locator('[data-tutor-style="technical"]').click();
+  await page.locator('#ai-tutor-modal [data-tutor-action="submit"]').click();
+  await expect(page.locator('#ai-tutor-result')).toContainText('Тестовый AI-учитель');
+  await expect(page.locator('#ai-tutor-result')).toContainText('Локальный разбор');
+
+  await page.locator('[data-tutor-mode="socratic"]').click();
+  await page.locator('#ai-tutor-modal [data-tutor-action="submit"]').click();
+  await expect(page.locator('.tutor-next-question')).toBeVisible();
+  await page.locator('[data-tutor-socratic-answer]').fill('Сначала проверю текущее состояние и ожидаемый результат.');
+  await page.locator('[data-tutor-action="submit-socratic"]').click();
+  await expect(page.locator('.tutor-turn')).toContainText('Ход 2 из 5');
+
+  await page.locator('[data-tutor-mode="practice"]').click();
+  await expect(page.locator('#ai-tutor-practice-wrap')).toBeVisible();
+  await page.locator('#ai-tutor-practice-input').fill('Ошибка: команда вернула exit code 1; TOKEN=abcdefghijklmnopqrstuvwxyz');
+  await page.locator('#ai-tutor-modal [data-tutor-action="submit"]').click();
+  await expect(page.locator('#ai-tutor-result')).toContainText('Локальная помощь с практикой');
+  await expect(page.locator('#ai-tutor-result [data-tutor-copy-index]').first()).toBeVisible();
+
+  expect(requests).toHaveLength(4);
+  const payloads = requests.map(request => request.postDataJSON());
+  for (const payload of payloads) {
+    expect(payload.source).toBe('study');
+    expect(payload.context.key).toBe('study:devops:1:2');
+    expect(payload.context.programId).toBe('devops');
+    expect(payload.context.practice.length).toBeLessThanOrEqual(10);
+    expect(JSON.stringify(payload)).not.toContain('localStorage');
+  }
+  expect(payloads[1].mode).toBe('socratic');
+  expect(payloads[1].turn).toBe(0);
+  expect(payloads[2].turn).toBe(1);
+  expect(payloads[2].exchanges).toHaveLength(1);
+  expect(payloads[2].exchanges[0]).not.toHaveProperty('role');
+  expect(payloads[3].mode).toBe('practice');
+  expect(payloads[3].practiceInput.length).toBeLessThanOrEqual(8000);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+});
+
 const curriculumSmokeScenarios = [
   { week: 9, day: 3, name: 'container registries', terms: ['Harbor/Nexus', 'Дан вывод'] },
   { week: 12, day: 1, name: 'Yandex Cloud', terms: ['Yandex Cloud', 'Yandex VPC'] },

@@ -2,6 +2,15 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const StudyUI = require('./study-ui');
 
+test('renderTutorButton: учебный день получает доступную кнопку без контекста в DOM', () => {
+  const html = StudyUI.renderTutorButton('study');
+  assert.match(html, /type="button"/);
+  assert.match(html, /data-tutor-open="study"/);
+  assert.match(html, /Спросить AI-учителя/);
+  assert.match(html, /aria-label=/);
+  assert.doesNotMatch(html, /objective|expectedResult|practiceInput/);
+});
+
 test('renders populated technology lifecycle groups and metadata', () => {
   const markup = StudyUI.renderTechnologyStatus({
     preferred: ['Gateway API'],

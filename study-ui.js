@@ -431,5 +431,11 @@
     '</section>';
   }
 
-  return { STATUS_GROUPS, formatReviewDate, renderExpectedResult, renderWeekNavigator, renderWeekContext, renderWeekOutcome, renderAITrack, renderTechnologyStatus, renderProgramSwitch, isPlannedWeek, renderPlannedWeekNotice, clampWeeklyScore, evaluateWeeklyAttempt, buildStudyOverview, renderStudyOverview };
+  function renderTutorButton(source) {
+    const safeSource = source === 'course' ? 'course' : 'study';
+    return '<button type="button" class="btn btn-outline tutor-open-btn" data-tutor-open="' + safeSource +
+      '" aria-label="Спросить AI-учителя по текущей теме">Спросить AI-учителя</button>';
+  }
+
+  return { STATUS_GROUPS, formatReviewDate, renderExpectedResult, renderWeekNavigator, renderWeekContext, renderWeekOutcome, renderAITrack, renderTechnologyStatus, renderProgramSwitch, isPlannedWeek, renderPlannedWeekNotice, clampWeeklyScore, evaluateWeeklyAttempt, buildStudyOverview, renderStudyOverview, renderTutorButton };
 });

@@ -341,6 +341,8 @@ const PAGE_TITLES={home:'Сегодня',interview:'Ответы вслух',cat
   git:'Git-тренажёр',regex:'Regex-тренажёр',tips:'Советы',incidents:'Разбор инцидентов'};
 function nav(page){
   stopActiveSessions();
+  const tutorModal=document.getElementById('ai-tutor-modal');
+  if(tutorModal?.classList.contains('open')) closeAccessibleModal('ai-tutor-modal',false);
   const leavingInterview=page!=='interview'&&document.getElementById('page-interview')?.classList.contains('active');
   if(leavingInterview) resetInterviewAIState();
   if(page!=='exam') coachQuestionIds=null;
@@ -443,6 +445,7 @@ function openAccessibleModal(id,initialFocusSelector){
 function closeAccessibleModal(id,restoreFocus=true){
   const overlay=document.getElementById(id);if(!overlay) return;
   overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');
+  if(id==='ai-tutor-modal') resetAITutorSession();
   if(activeModalOverlay!==overlay) return;
   const returnFocus=modalReturnFocus;
   activeModalOverlay=null;modalReturnFocus=null;document.body.classList.remove('modal-open');
@@ -466,6 +469,166 @@ document.addEventListener('keydown',function(e){
   if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
 });
+
+// ═══ AI TUTOR ═══
+let aiTutorContext=null,aiTutorContextKey='',aiTutorMode='explain',aiTutorStyle='simple';
+let aiTutorExchanges=[],aiTutorLastResult=null,aiTutorCopyCommands=[];
+let aiTutorRequestId=0,aiTutorAbortController=null,aiTutorConfigured=false;
+function requireAITutor(){if(typeof IPMaxAITutor==='undefined') throw new Error('Модуль AI Tutor не загружен.');return IPMaxAITutor;}
+function requireAITutorUI(){if(typeof IPMaxAITutorUI==='undefined') throw new Error('UI AI Tutor не загружен.');return IPMaxAITutorUI;}
+function invalidateAITutorRequest(){
+  aiTutorRequestId++;
+  const controller=aiTutorAbortController;aiTutorAbortController=null;
+  if(controller&&!controller.signal.aborted) controller.abort();
+}
+function resetAITutorSession(clearContext=true){
+  invalidateAITutorRequest();
+  aiTutorExchanges=[];aiTutorLastResult=null;aiTutorCopyCommands=[];
+  if(clearContext){aiTutorContext=null;aiTutorContextKey='';aiTutorMode='explain';aiTutorStyle='simple';}
+  const status=document.getElementById('ai-tutor-status');if(status)status.textContent='';
+  const result=document.getElementById('ai-tutor-result');if(result)result.innerHTML='';
+  const submit=document.querySelector('#ai-tutor-modal [data-tutor-action="submit"]');if(submit)submit.disabled=false;
+  const follow=document.querySelector('#ai-tutor-modal [data-tutor-action="submit-socratic"]');if(follow)follow.disabled=false;
+  if(clearContext){
+    const question=document.getElementById('ai-tutor-question');if(question)question.value='';
+    const practice=document.getElementById('ai-tutor-practice-input');if(practice)practice.value='';
+  }
+}
+function buildCurrentCourseTutorContext(){
+  const ui=requireChapterUI();const position=getChapterPosition();
+  const course=position?ui.findCourse(COURSES,position.slug):null;
+  const chapter=course?ui.findChapter(course,position.chapterId):null;
+  if(!course||!chapter)return null;
+  const resolved=ui.resolveChapter(chapter,chapterDatasets());
+  if(!resolved?.ok)return null;
+  return {source:'course',label:course.title+' · '+chapter.title,
+    context:requireAITutor().buildCourseTutorContext(course,chapter,resolved.body)};
+}
+function buildStudyTutorContext(){
+  const program=activeProgram();const map=programMap(program);const pos=getStudyPosition();
+  const week=getStudyWeek(pos.week);const day=getStudyDay(pos.week,pos.day);
+  if(!program||!week||!day)return null;
+  return {source:'study',label:(map?.shortTitle||program.title)+' · '+week.title+' · '+day.title,context:{
+    key:'study:'+program.id+':'+week.week+':'+day.day,programId:program.id,
+    programTitle:map?.shortTitle||program.title,week:week.week,weekTitle:week.title,day:day.day,dayTitle:day.title,
+    level:day.level||week.targetLevel||'',mainTopics:Array.isArray(week.mainTopics)?week.mainTopics:[],
+    objective:day.objective||'',expectedResult:day.expectedResult||'',
+    practice:Array.isArray(day.practice)?day.practice:[],pitfalls:Array.isArray(day.pitfalls)?day.pitfalls:[],
+    productionLayer:week.productionLayer||'',artifact:week.artifact||''
+  }};
+}
+function setAITutorMode(mode){
+  if(!['explain','socratic','practice'].includes(mode))return;
+  resetAITutorSession(false);aiTutorMode=mode;
+  document.querySelectorAll('#ai-tutor-modal [data-tutor-mode]').forEach(button=>{
+    const active=button.dataset.tutorMode===mode;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));
+  });
+  const practice=document.getElementById('ai-tutor-practice-wrap');if(practice)practice.hidden=mode!=='practice';
+  const submit=document.querySelector('#ai-tutor-modal [data-tutor-action="submit"]');
+  if(submit)submit.textContent=mode==='socratic'?'Начать опрос':mode==='practice'?'Разобрать практику':'Спросить учителя';
+}
+function setAITutorStyle(style){
+  if(!['simple','technical','production','interview'].includes(style))return;
+  if(style!==aiTutorStyle)resetAITutorSession(false);
+  aiTutorStyle=style;
+  document.querySelectorAll('#ai-tutor-modal [data-tutor-style]').forEach(button=>{
+    const active=button.dataset.tutorStyle===style;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));
+  });
+}
+function mountAITutor(){
+  if(document.getElementById('ai-tutor-modal'))return;
+  document.body.insertAdjacentHTML('beforeend',requireAITutorUI().renderTutorModal());
+  const modal=document.getElementById('ai-tutor-modal');
+  modal.addEventListener('click',handleAITutorModalClick);
+  setAITutorMode('explain');setAITutorStyle('simple');
+}
+function openAITutor(source){
+  mountAITutor();resetAITutorSession();
+  aiTutorContext=source==='study'?buildStudyTutorContext():buildCurrentCourseTutorContext();
+  if(!aiTutorContext)return;
+  aiTutorContextKey=aiTutorContext.context.key;
+  const label=document.getElementById('ai-tutor-context-label');if(label)label.textContent=aiTutorContext.label;
+  setAITutorMode('explain');setAITutorStyle('simple');
+  openAccessibleModal('ai-tutor-modal','#ai-tutor-question');
+}
+function closeAITutor(){closeAccessibleModal('ai-tutor-modal');}
+function tutorDefaultQuestion(){
+  if(aiTutorMode==='socratic')return 'Проведи сократический опрос по текущей теме.';
+  if(aiTutorMode==='practice')return 'Помоги безопасно разобраться с практическим заданием.';
+  return 'Объясни текущую тему и предложи проверяемый следующий шаг.';
+}
+function tutorCommands(result){
+  if(result?.mode==='explain')return result.example?.code?[result.example.code]:[];
+  if(result?.mode==='practice')return [...(result.checks||[]).map(item=>item.command),result.nextStep?.command].filter(Boolean);
+  return [];
+}
+function renderAITutorResult(result){
+  aiTutorLastResult=result;aiTutorCopyCommands=tutorCommands(result);
+  const host=document.getElementById('ai-tutor-result');if(host)host.innerHTML=requireAITutorUI().renderTutorResponse(result);
+}
+async function submitAITutor(socraticAnswer){
+  if(!aiTutorContext||aiTutorAbortController)return;
+  const questionEl=document.getElementById('ai-tutor-question');
+  const practiceEl=document.getElementById('ai-tutor-practice-input');
+  const answer=typeof socraticAnswer==='string'?socraticAnswer.trim():'';
+  if(answer&&aiTutorMode==='socratic'&&aiTutorLastResult?.nextQuestion){
+    aiTutorExchanges.push({question:aiTutorLastResult.nextQuestion,answer,feedback:''});
+  }
+  const tutor=requireAITutor();
+  const payload=tutor.buildTutorPayload({
+    mode:aiTutorMode,style:aiTutorStyle,source:aiTutorContext.source,context:aiTutorContext.context,
+    question:questionEl?.value.trim()||tutorDefaultQuestion(),
+    practiceInput:practiceEl?.value||'',exchanges:aiTutorExchanges
+  });
+  const requestId=++aiTutorRequestId;const contextKey=aiTutorContextKey;
+  const controller=new AbortController();aiTutorAbortController=controller;
+  const status=document.getElementById('ai-tutor-status');if(status)status.textContent='AI-учитель готовит ответ…';
+  const submit=document.querySelector('#ai-tutor-modal [data-tutor-action="submit"]');if(submit)submit.disabled=true;
+  const follow=document.querySelector('#ai-tutor-modal [data-tutor-action="submit-socratic"]');if(follow)follow.disabled=true;
+  try{
+    const result=await tutor.tutor(payload,{url:'./api/ai/tutor',timeoutMs:60000,
+      token:appStorage?appStorage.get('sync_token',''):'',signal:controller.signal});
+    if(requestId!==aiTutorRequestId||contextKey!==aiTutorContextKey||controller.signal.aborted)return;
+    if(aiTutorMode==='socratic'&&answer&&aiTutorExchanges.length)aiTutorExchanges[aiTutorExchanges.length-1].feedback=result.feedback||'';
+    renderAITutorResult(result);
+    if(status)status.textContent=result.source==='local'?'Показана локальная подсказка.':'Ответ AI-учителя готов.';
+  }catch{
+    if(requestId!==aiTutorRequestId||contextKey!==aiTutorContextKey||controller.signal.aborted)return;
+    if(status)status.textContent='Не удалось получить ответ. Попробуйте ещё раз.';
+  }finally{
+    if(requestId===aiTutorRequestId&&contextKey===aiTutorContextKey){
+      aiTutorAbortController=null;if(submit)submit.disabled=false;
+      const currentFollow=document.querySelector('#ai-tutor-modal [data-tutor-action="submit-socratic"]');if(currentFollow)currentFollow.disabled=false;
+    }
+  }
+}
+async function copyAITutorCommand(index){
+  const command=aiTutorCopyCommands[Number(index)];if(!command)return;
+  const status=document.getElementById('ai-tutor-status');
+  try{await navigator.clipboard.writeText(command);if(status)status.textContent='Команда скопирована. Проверьте её перед запуском.';}
+  catch(_){if(status)status.textContent='Не удалось скопировать команду.';}
+}
+function handleAITutorModalClick(event){
+  if(event.target===event.currentTarget){closeAITutor();return;}
+  const target=event.target.closest?.('[data-tutor-action],[data-tutor-mode],[data-tutor-style],[data-tutor-copy-index]');
+  if(!target)return;
+  if(target.dataset.tutorMode){setAITutorMode(target.dataset.tutorMode);return;}
+  if(target.dataset.tutorStyle){setAITutorStyle(target.dataset.tutorStyle);return;}
+  if(target.dataset.tutorCopyIndex!==undefined){copyAITutorCommand(target.dataset.tutorCopyIndex);return;}
+  if(target.dataset.tutorAction==='close'){closeAITutor();return;}
+  if(target.dataset.tutorAction==='submit'){submitAITutor();return;}
+  if(target.dataset.tutorAction==='submit-socratic'){
+    const answer=document.querySelector('#ai-tutor-modal [data-tutor-socratic-answer]');
+    if(!answer?.value.trim()){answer?.focus();return;}submitAITutor(answer.value);
+  }
+}
+function configureAITutor(){
+  if(aiTutorConfigured)return;aiTutorConfigured=true;mountAITutor();
+  document.addEventListener('click',event=>{
+    const trigger=event.target.closest?.('[data-tutor-open]');if(!trigger)return;
+    openAITutor(trigger.dataset.tutorOpen);
+  });
+}
 
 // ═══ TAGS ═══
 function requireExamUIModule(){if(typeof IPMaxExamUI==='undefined') throw new Error('Модуль экзамена не загружен.');return IPMaxExamUI;}
@@ -942,6 +1105,7 @@ function renderStudyDays(week,activeDay){
 }
 function renderStudyToday(day){
   const expectedResult=typeof IPMaxStudyUI!=='undefined'?IPMaxStudyUI.renderExpectedResult(day.expectedResult,esc):'';
+  const tutorButton=typeof IPMaxStudyUI!=='undefined'?IPMaxStudyUI.renderTutorButton('study'):'';
   document.getElementById('study-today').innerHTML=
     '<section class="study-card"><h3>Сегодня</h3><div class="study-goal">'+esc(day.objective||'')+'</div>'+
     expectedResult+
@@ -949,7 +1113,7 @@ function renderStudyToday(day){
     '<h4>Типовые ошибки</h4><ul class="study-list">'+(day.pitfalls||[]).map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul>'+
     '<div class="study-actions"><button class="btn btn-outline btn-sm" onclick="setStudyDayStatus(getStudyPosition().week,getStudyPosition().day,\'in_progress\')">Начал</button>'+
     '<button class="btn btn-primary btn-sm" onclick="setStudyDayStatus(getStudyPosition().week,getStudyPosition().day,\'done\')">Отметить готово</button>'+
-    '<button class="btn btn-outline btn-sm" onclick="setStudyDayStatus(getStudyPosition().week,getStudyPosition().day,\'review\')">На повтор</button></div></section>';
+    '<button class="btn btn-outline btn-sm" onclick="setStudyDayStatus(getStudyPosition().week,getStudyPosition().day,\'review\')">На повтор</button>'+tutorButton+'</div></section>';
 }
 function renderStudyWeekOutcome(week){
   const el=document.getElementById('study-week-outcome');
@@ -1847,6 +2011,7 @@ async function initApp(){
   configureCoachUI();
   configureSyncUI();
   configureAiSettingsUI();
+  configureAITutor();
 
   // Обновляем счётчик вопросов динамически
   document.getElementById('sb-counter').textContent = 'DevOps Edition · '+getAllQ().length+' вопросов';
@@ -1923,7 +2088,7 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 function requireOfflineUI(){if(typeof IPMaxOfflineUI==='undefined') throw new Error('Модуль offline-отчёта не загружен.');return IPMaxOfflineUI;}
 function offlineAssetList(){
-  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./sync-merge.js','./sync-client.js','./sync-ui.js','./ai-settings-client.js','./ai-settings-ui.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./router.js','./gamification.js','./gamification-ui.js','./daily.js','./daily-ui.js','./trainers-ui.js','./question-bank-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./sync-merge.js','./sync-client.js','./sync-ui.js','./ai-settings-client.js','./ai-settings-ui.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./ai-tutor.js','./ai-tutor-ui.js','./router.js','./gamification.js','./gamification-ui.js','./daily.js','./daily-ui.js','./trainers-ui.js','./question-bank-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   return shell.concat(Object.values(DATA_FILES).map(file=>'./'+file));
 }
 async function probeOfflineAssets(assets){
