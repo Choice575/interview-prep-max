@@ -895,6 +895,37 @@ test('opens the AI Tutor from a course chapter, sends bounded context and ignore
   expect(JSON.stringify(miniBody.context)).not.toMatch(/"expected"\s*:|"answer"\s*:/);
 });
 
+test('explains local Tutor fallback and opens sync setup when this browser has no token', async ({ page }) => {
+  const tutorRequests = [];
+  page.on('request', request => {
+    if (request.method() === 'POST' && request.url().endsWith('/api/ai/tutor')) tutorRequests.push(request);
+  });
+  await setProgress(page, {
+    ipmax_onboarding: profile,
+    ipmax_onboarding_complete: true,
+  });
+
+  await page.goto('/#/course/git/chapter/ch_git_w4d1');
+  const trigger = page.locator('#chapter-host [data-tutor-open="course"]');
+  await expect(trigger).toBeVisible();
+  await trigger.click();
+  await page.locator('#ai-tutor-modal [data-tutor-action="submit"]').click();
+
+  const notice = page.locator('#ai-tutor-result .tutor-fallback-notice');
+  await expect(notice).toContainText('токен синхронизации');
+  await expect(notice).toContainText('Синхронизация');
+  expect(tutorRequests).toHaveLength(0);
+
+  await notice.getByRole('button', { name: 'Настроить синхронизацию' }).click();
+  await expect(page.locator('#ai-tutor-modal')).not.toHaveClass(/open/);
+  await expect(page.locator('#sync-modal')).toHaveClass(/open/);
+  await expect(page.locator('#sync-token-input')).toBeVisible();
+  await expect(page.locator('#sync-token-input')).toBeEditable();
+  await page.locator('#sync-close').click();
+  await expect(page.locator('#sync-modal')).not.toHaveClass(/open/);
+  await expect(trigger).toBeFocused();
+});
+
 test('uses explain, Socratic and practice Tutor modes for the current study day on mobile', async ({ page }) => {
   const requests = [];
   await page.setViewportSize({ width: 390, height: 844 });

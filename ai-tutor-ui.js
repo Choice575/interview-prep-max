@@ -38,6 +38,16 @@
       '</span><h3>' + escapeText(result.title) + '</h3></header>';
   }
 
+  function fallbackNotice(value) {
+    const notice = value && typeof value === 'object' ? value : {};
+    if (!notice.message) return '';
+    const action = notice.action === 'open-sync'
+      ? '<button type="button" class="btn btn-outline btn-sm" data-tutor-action="open-sync">Настроить синхронизацию</button>'
+      : '';
+    return '<aside class="tutor-fallback-notice"><strong>Почему показан локальный ответ</strong><p>' +
+      escapeText(notice.message) + '</p>' + action + '</aside>';
+  }
+
   function renderExplanation(result) {
     let copyIndex = 0;
     const sections = list(result.sections).map(item =>
@@ -89,11 +99,12 @@
       (result.caution ? '<p class="tutor-caution">' + escapeText(result.caution) + '</p>' : '');
   }
 
-  function renderTutorResponse(result) {
+  function renderTutorResponse(result, notice) {
     if (!result || typeof result !== 'object') return '';
-    if (result.mode === 'socratic') return renderSocratic(result);
-    if (result.mode === 'practice') return renderPractice(result);
-    return renderExplanation(result);
+    const content = result.mode === 'socratic'
+      ? renderSocratic(result)
+      : result.mode === 'practice' ? renderPractice(result) : renderExplanation(result);
+    return fallbackNotice(notice) + content;
   }
 
   function renderTutorModal() {

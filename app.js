@@ -571,7 +571,8 @@ function tutorCommands(result){
 }
 function renderAITutorResult(result){
   aiTutorLastResult=result;aiTutorCopyCommands=tutorCommands(result);
-  const host=document.getElementById('ai-tutor-result');if(host)host.innerHTML=requireAITutorUI().renderTutorResponse(result);
+  const tutor=requireAITutor();const notice=tutor.describeTutorFallback(result);
+  const host=document.getElementById('ai-tutor-result');if(host)host.innerHTML=requireAITutorUI().renderTutorResponse(result,notice);
 }
 async function submitAITutor(socraticAnswer){
   if(!aiTutorContext||aiTutorAbortController)return;
@@ -598,7 +599,10 @@ async function submitAITutor(socraticAnswer){
     if(requestId!==aiTutorRequestId||contextKey!==aiTutorContextKey||controller.signal.aborted)return;
     if(aiTutorMode==='socratic'&&answer&&aiTutorExchanges.length)aiTutorExchanges[aiTutorExchanges.length-1].feedback=result.feedback||'';
     renderAITutorResult(result);
-    if(status)status.textContent=result.source==='local'?'Показана локальная подсказка.':'Ответ AI-учителя готов.';
+    if(status){
+      const notice=tutor.describeTutorFallback(result);
+      status.textContent=notice.message|| (result.source==='local'?'Показана локальная подсказка.':'Ответ AI-учителя готов.');
+    }
   }catch{
     if(requestId!==aiTutorRequestId||contextKey!==aiTutorContextKey||controller.signal.aborted)return;
     if(status)status.textContent='Не удалось получить ответ. Попробуйте ещё раз.';
@@ -623,6 +627,15 @@ function handleAITutorModalClick(event){
   if(target.dataset.tutorStyle){setAITutorStyle(target.dataset.tutorStyle);return;}
   if(target.dataset.tutorCopyIndex!==undefined){copyAITutorCommand(target.dataset.tutorCopyIndex);return;}
   if(target.dataset.tutorAction==='close'){closeAITutor();return;}
+  if(target.dataset.tutorAction==='open-sync'){
+    const returnFocus=modalReturnFocus;
+    closeAccessibleModal('ai-tutor-modal',false);
+    if(typeof IPMaxSyncUI!=='undefined'&&typeof IPMaxSyncUI.open==='function'){
+      IPMaxSyncUI.open();
+      if(returnFocus?.isConnected)modalReturnFocus=returnFocus;
+    }
+    return;
+  }
   if(target.dataset.tutorAction==='submit'){submitAITutor();return;}
   if(target.dataset.tutorAction==='submit-socratic'){
     const answer=document.querySelector('#ai-tutor-modal [data-tutor-socratic-answer]');

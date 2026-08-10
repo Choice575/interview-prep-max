@@ -466,6 +466,18 @@
     return null;
   }
 
+  function describeTutorFallback(result) {
+    const source = result && typeof result === 'object' ? result : {};
+    if (source.source !== 'local') return { message: '', action: '' };
+    if (source.fallbackCode === 'AI_AUTH_REQUIRED') {
+      return {
+        message: 'Внешний AI не вызван: в этом браузере не указан токен синхронизации. Откройте «Синхронизация», введите токен и повторите вопрос.',
+        action: 'open-sync'
+      };
+    }
+    return { message: '', action: '' };
+  }
+
   async function requestTutor(input, options) {
     const config = options || {};
     const payload = buildTutorPayload(input);
@@ -535,6 +547,6 @@
 
   return {
     buildTutorPayload, buildCourseTutorContext, normaliseTutorResponse, buildLocalTutorResponse,
-    requestTutor, tutor, redactTutorText, redactTutorPayload, boundedText, boundedList
+    requestTutor, tutor, describeTutorFallback, redactTutorText, redactTutorPayload, boundedText, boundedList
   };
 });

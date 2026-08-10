@@ -66,6 +66,23 @@ test('renders practice checks and commands as inert escaped text', () => {
   assert.doesNotMatch(markup, /data-tutor-execute|onclick=/i);
 });
 
+test('renders an actionable sync notice when external Tutor lacks a device token', () => {
+  const markup = UI.renderTutorResponse({
+    source: 'local', mode: 'explain', title: 'Локальный разбор', summary: 'Краткий смысл.',
+    sections: [{ title: 'Цель', text: 'Изучить тему.' }],
+    example: { description: '', code: '' }, checkQuestion: { question: '' },
+    nextActions: [{ action: 'Повторить тему', successCriterion: 'Объяснить своими словами' }], caution: ''
+  }, {
+    message: 'Внешний AI не вызван: укажите токен синхронизации.',
+    action: 'open-sync'
+  });
+
+  assert.match(markup, /Внешний AI не вызван/);
+  assert.match(markup, /data-tutor-action="open-sync"/);
+  assert.match(markup, />Настроить синхронизацию</);
+  assert.doesNotMatch(markup, /Sync token is required/);
+});
+
 test('renders an accessible modal shell for all three modes', () => {
   const markup = UI.renderTutorModal();
   assert.match(markup, /id="ai-tutor-modal"/);

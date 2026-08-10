@@ -467,6 +467,20 @@ test('builds honest local practice guidance without inventing a diagnosis', () =
   assert.doesNotMatch(JSON.stringify(local), /unknown application error.*причин/i);
 });
 
+test('explains that local Tutor fallback needs the sync token before calling the backend', () => {
+  const notice = Tutor.describeTutorFallback({
+    source: 'local',
+    fallbackCode: 'AI_AUTH_REQUIRED',
+    fallbackStatus: 401,
+    fallbackReason: 'Sync token is required for external AI tutor'
+  });
+
+  assert.match(notice.message, /токен синхронизации/i);
+  assert.match(notice.message, /Синхронизац/i);
+  assert.equal(notice.action, 'open-sync');
+  assert.doesNotMatch(notice.message, /Sync token is required/i);
+});
+
 test('requests a strict tutor response with the sync token and falls back locally', async () => {
   const input = courseInput({
     context: {
