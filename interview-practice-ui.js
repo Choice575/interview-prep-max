@@ -196,8 +196,9 @@
       '<div class="ip-kicker">Поведенческий вопрос · ' + escapeText(item.topic) + '</div>' +
       '<h4 class="ip-prompt">' + escapeText(item.prompt) + '</h4>' +
       '<p class="ip-why">' + escapeText(item.why) + '</p>' +
+      '<details class="ip-support"><summary>Подсказки к сильному ответу</summary>' +
       renderBullets('Как строить ответ', item.hints, 'ip-hints') +
-      renderBullets('Типичные ошибки', item.pitfalls, 'ip-pitfalls') +
+      renderBullets('Типичные ошибки', item.pitfalls, 'ip-pitfalls') + '</details>' +
       '</div>';
   }
 

@@ -387,6 +387,13 @@ function startMode(m){resetCoachSelection();currentMode=m;document.querySelector
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebar-overlay').classList.toggle('open');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');}
 document.getElementById('sidebar-overlay').onclick=closeSidebar;
+function configureResponsiveShell(){
+  const compact=window.matchMedia('(max-width:600px)').matches;
+  const examFilters=document.querySelector('.exam-filters');
+  const homeSessions=document.querySelector('.home-sessions');
+  if(examFilters) examFilters.open=!compact;
+  if(homeSessions) homeSessions.open=!compact;
+}
 
 function stopActiveSessions(){
   if(blitzState.timer){clearInterval(blitzState.timer);blitzState.timer=null;}
@@ -2012,6 +2019,7 @@ async function initApp(){
   configureSyncUI();
   configureAiSettingsUI();
   configureAITutor();
+  configureResponsiveShell();
 
   // Обновляем счётчик вопросов динамически
   document.getElementById('sb-counter').textContent = 'DevOps Edition · '+getAllQ().length+' вопросов';

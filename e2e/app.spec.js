@@ -416,6 +416,7 @@ test('exports a versioned progress backup through the extracted module', async (
   await page.goto('/');
   page.once('dialog', dialog => dialog.dismiss());
   const downloadPromise = page.waitForEvent('download');
+  await page.locator('.sb-more > summary').click();
   await page.getByRole('button', { name: 'Копировать прогресс' }).click();
   const download = await downloadPromise;
   const stream = await download.createReadStream();
@@ -539,10 +540,10 @@ test('defers exam cards and renders the full list in batches', async ({ page }) 
   await page.goto('/');
   await expect(page.locator('#questions-container .q-card')).toHaveCount(0);
   await page.locator('[data-page="exam"]').click();
-  await expect(page.locator('#questions-container .q-card')).toHaveCount(60);
-  await expect(page.locator('#questions-load-more')).toContainText('60/818');
+  await expect(page.locator('#questions-container .q-card')).toHaveCount(12);
+  await expect(page.locator('#questions-load-more')).toContainText('12/818');
   await page.locator('#questions-load-more button').click();
-  await expect(page.locator('#questions-container .q-card')).toHaveCount(120);
+  await expect(page.locator('#questions-container .q-card')).toHaveCount(24);
 });
 
 test('routes exam answers and keyboard flashcards through the extracted UI module', async ({ page }) => {
@@ -575,7 +576,7 @@ test('offers a bound recovery action when there are no mistakes', async ({ page 
   await expect(recovery).toBeVisible();
   expect(await recovery.getAttribute('onclick')).toBeNull();
   await recovery.click();
-  await expect(page.locator('#questions-container .q-card')).toHaveCount(60);
+  await expect(page.locator('#questions-container .q-card')).toHaveCount(12);
   await expect(page.locator('#mode-chips .chip').first()).toHaveClass(/active/);
 });
 

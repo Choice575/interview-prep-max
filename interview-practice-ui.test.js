@@ -278,6 +278,9 @@ test('renders a STAR card without leaking the rubric', () => {
   assert.match(markup, /Расскажите про свою ошибку/);
   assert.match(markup, /Проверяется зрелость/);
   assert.match(markup, /Ситуация/);
+  assert.match(markup, /<details class="ip-support"><summary>Подсказки к сильному ответу<\/summary>/);
+  assert.match(markup, /Как строить ответ/);
+  assert.match(markup, /Типичные ошибки/);
   assert.match(markup, /Чужая ошибка/);
   assert.doesNotMatch(markup, /Ответственность признана/, 'rubric must stay hidden until requested');
 });

@@ -190,7 +190,9 @@
     const source = services || {};
     const env = environment || {};
     const doc = env.document || (typeof document !== 'undefined' ? document : null);
-    const batchSize = Number.isInteger(env.batchSize) && env.batchSize > 0 ? env.batchSize : 60;
+    // Keep the first screen focused. The complete filtered set remains
+    // available through "Показать ещё"; only the render batch is compact.
+    const batchSize = Number.isInteger(env.batchSize) && env.batchSize > 0 ? env.batchSize : 12;
     const boundActions = new WeakSet();
     let renderLimit = batchSize;
     const run = (name, ...args) => typeof source[name] === 'function' ? source[name](...args) : undefined;
