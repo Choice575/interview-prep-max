@@ -55,6 +55,31 @@ test('renders the extracted home UI and routes its actions', async ({ page }) =>
   await expect(page.locator('#questions-container .q-card')).toHaveCount(10);
 });
 
+test('keeps curriculum and video flashcards as separate visible decks', async ({ page }) => {
+  await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
+  await page.goto('/');
+  await page.locator('[data-page="flashcards"]').click();
+
+  await expect(page.locator('#page-flashcards')).toHaveClass(/active/);
+  await expect(page.locator('#sb-flashcards-count')).toHaveText('3331');
+  const studyDeck = page.locator('[data-flashcards-action="deck"][data-deck="study"]');
+  const videoDeck = page.locator('[data-flashcards-action="deck"][data-deck="video"]');
+  await expect(studyDeck).toContainText('Учебная программа');
+  await expect(studyDeck.locator('strong')).toHaveText('3045');
+  await expect(videoDeck).toContainText('Собеседования из видео');
+  await expect(videoDeck.locator('strong')).toHaveText('286');
+  await expect(page.locator('.study-card').first()).toHaveAttribute('data-card-id', '1000001');
+
+  await videoDeck.click();
+  await expect(videoDeck).toHaveClass(/active/);
+  await expect(page.locator('.study-card').first()).toHaveAttribute('data-card-id', '2000001');
+  await expect(page.locator('.study-card-source a')).toHaveAttribute('href', /vkvideo\.ru/);
+  await expect(page.locator('.flashcards-stats')).toContainText('286 всего');
+
+  await studyDeck.click();
+  await expect(page.locator('.study-card').first()).toHaveAttribute('data-card-id', '1000001');
+});
+
 test('opens only due repetitions from the coach plan', async ({ page }) => {
   await setProgress(page, {
     ipmax_onboarding: profile,

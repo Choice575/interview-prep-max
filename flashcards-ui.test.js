@@ -8,6 +8,49 @@ const cards = [
   { id: 1000003, collection: 'MLOps — Serving', question: 'Что такое online serving?', answer: 'Синхронная выдача предсказаний.' }
 ];
 
+const decks = [
+  { id: 'study', label: 'Учебная программа', description: 'Карточки из учебной программы.', cards },
+  { id: 'video', label: 'Собеседования из видео', description: 'Реальные вопросы из видео.', cards: [
+    { id: 2000001, collection: 'Linux', question: 'Что такое inode?', answer: 'Метаданные файла.' }
+  ] }
+];
+
+test('renders separate study and video deck choices with their own counts', () => {
+  const markup = FlashcardsUI.renderPage({
+    decks, deck: 'video', progress: {}, collection: 'all', mode: 'all', now: 100
+  });
+
+  assert.match(markup, /data-flashcards-action="deck" data-deck="study"/);
+  assert.match(markup, /Учебная программа<\/span><strong>3<\/strong>/);
+  assert.match(markup, /data-flashcards-action="deck" data-deck="video"/);
+  assert.match(markup, /Собеседования из видео<\/span><strong>1<\/strong>/);
+  assert.match(markup, /Реальные вопросы из видео/);
+  assert.match(markup, /<strong>1<\/strong> всего/);
+  assert.match(markup, /Что такое inode\?/);
+  assert.doesNotMatch(markup, /Что делает pwd\?/);
+});
+
+test('controller switches decks without mixing cards or progress', () => {
+  const host = { innerHTML: '', querySelectorAll: () => [] };
+  const doc = { getElementById: id => id === 'flashcards-host' ? host : null };
+  const attempts = [];
+  const controller = FlashcardsUI.create({
+    getDecks: () => decks,
+    getProgress: () => ({ 1000001: { lastSeen: 10, repetitions: 2 } }),
+    recordAttempt: (card, outcome, deck) => attempts.push([card.id, outcome, deck.id]),
+    now: () => 100
+  }, { document: doc });
+
+  controller.render();
+  assert.match(host.innerHTML, /Что делает pwd\?/);
+  assert.doesNotMatch(host.innerHTML, /Что такое inode\?/);
+  controller.setDeck('video');
+  assert.match(host.innerHTML, /Что такое inode\?/);
+  assert.match(host.innerHTML, /<strong>1<\/strong> новых/);
+  controller.rate('pass');
+  assert.deepEqual(attempts, [[2000001, 'pass', 'video']]);
+});
+
 test('filters cards by collection, text and review mode without mutating input', () => {
   const original = structuredClone(cards);
   const progress = {

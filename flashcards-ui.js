@@ -65,9 +65,36 @@
     return value === expected ? ' active' : '';
   }
 
+  function normalizeDecks(input) {
+    const state = input || {};
+    const supplied = Array.isArray(state.decks) ? state.decks : [];
+    const decks = supplied.filter(deck => deck && deck.id && Array.isArray(deck.cards)).map(deck => ({
+      id: String(deck.id),
+      label: String(deck.label || deck.id),
+      description: String(deck.description || ''),
+      cards: deck.cards
+    }));
+    if (decks.length) return decks;
+    return [{
+      id: 'study', label: 'Учебная программа', description: 'Карточки из учебной программы.',
+      cards: Array.isArray(state.cards) ? state.cards : []
+    }];
+  }
+
+  function selectedDeck(decks, id) {
+    return decks.find(deck => deck.id === id) || decks[0];
+  }
+
+  function safeHttpUrl(value) {
+    const url = String(value || '').trim();
+    return /^https?:\/\//i.test(url) ? url : '';
+  }
+
   function renderPage(input) {
     const state = input || {};
-    const cards = Array.isArray(state.cards) ? state.cards : [];
+    const decks = normalizeDecks(state);
+    const deck = selectedDeck(decks, String(state.deck || decks[0].id));
+    const cards = deck.cards;
     const progress = state.progress && typeof state.progress === 'object' ? state.progress : {};
     const now = Number.isFinite(Number(state.now)) ? Number(state.now) : Date.now();
     const collection = String(state.collection || 'all');
@@ -78,6 +105,11 @@
     const card = filtered[index];
     const summary = summarizeCards(cards, progress, now);
     const collections = [...new Set(cards.map(item => item && item.collection).filter(Boolean))].sort();
+
+    const deckSwitch = '<div class="flashcards-decks" role="tablist" aria-label="Источник карточек">' +
+      decks.map(item => '<button type="button" role="tab" aria-selected="' + (item.id === deck.id) + '" class="flashcards-deck' + active(deck.id, item.id) + '" data-flashcards-action="deck" data-deck="' + escapeText(item.id) + '">' +
+        '<span>' + escapeText(item.label) + '</span><strong>' + item.cards.length + '</strong></button>').join('') +
+      '</div><p class="flashcards-deck-description">' + escapeText(deck.description) + '</p>';
 
     const controls = '<div class="flashcards-controls">' +
       '<label>Коллекция<select class="form-input" data-flashcards-filter="collection">' +
@@ -98,8 +130,15 @@
       '<span><strong>' + summary.due + '</strong> к повторению</span></div>';
 
     if (!card) {
-      return stats + controls + '<div class="empty-state"><div class="icon">✅</div><p>Для выбранных фильтров карточек нет.</p></div>';
+      return deckSwitch + stats + controls + '<div class="empty-state"><div class="icon">✅</div><p>Для выбранных фильтров карточек нет.</p></div>';
     }
+
+    const sourceUrl = safeHttpUrl(card.sourceUrl);
+    const source = card.sourceTitle
+      ? '<div class="study-card-source">Источник: ' + (sourceUrl
+        ? '<a href="' + escapeText(sourceUrl) + '" target="_blank" rel="noopener noreferrer">' + escapeText(card.sourceTitle) + '</a>'
+        : escapeText(card.sourceTitle)) + '</div>'
+      : '';
 
     const answer = state.revealed
       ? '<div class="study-card-answer"><div class="study-card-answer-label">Ответ</div><p>' + escapeText(card.answer) + '</p></div>' +
@@ -109,9 +148,9 @@
         '<button type="button" class="btn btn-primary" data-flashcards-action="rate" data-outcome="pass">Знаю</button></div>'
       : '<button type="button" class="btn btn-primary" data-flashcards-action="reveal">Показать ответ</button>';
 
-    return stats + controls + '<article class="study-card" data-card-id="' + escapeText(card.id) + '">' +
+    return deckSwitch + stats + controls + '<article class="study-card" data-card-id="' + escapeText(card.id) + '">' +
       '<div class="study-card-meta"><span>' + escapeText(card.collection) + '</span><span>' + (index + 1) + ' / ' + filtered.length + '</span></div>' +
-      '<h2>' + escapeText(card.question) + '</h2>' + answer +
+      '<h2>' + escapeText(card.question) + '</h2>' + source + answer +
       '<div class="study-card-nav"><button type="button" class="btn btn-quiet" data-flashcards-action="prev"' + (index === 0 ? ' disabled' : '') + '>← Предыдущая</button>' +
       '<button type="button" class="btn btn-quiet" data-flashcards-action="next"' + (index >= filtered.length - 1 ? ' disabled' : '') + '>Следующая →</button></div></article>';
   }
@@ -120,11 +159,19 @@
     const source = services || {};
     const env = environment || {};
     const doc = env.document || (typeof document !== 'undefined' ? document : null);
-    const state = { collection: 'all', mode: 'all', search: '', revealed: false, index: 0 };
+    const state = { deck: 'study', collection: 'all', mode: 'all', search: '', revealed: false, index: 0 };
     const run = (name, ...args) => typeof source[name] === 'function' ? source[name](...args) : undefined;
 
+    function currentDecks() {
+      return normalizeDecks({ decks: run('getDecks'), cards: run('getCards') || [] });
+    }
+
+    function currentDeck() {
+      return selectedDeck(currentDecks(), state.deck);
+    }
+
     function currentCards() {
-      return filterCards(run('getCards') || [], {
+      return filterCards(currentDeck().cards, {
         collection: state.collection, mode: state.mode, search: state.search,
         progress: run('getProgress') || {}, now: run('now')
       });
@@ -136,7 +183,7 @@
       const filtered = currentCards();
       if (state.index >= filtered.length) state.index = Math.max(0, filtered.length - 1);
       host.innerHTML = renderPage({
-        cards: run('getCards') || [], progress: run('getProgress') || {}, now: run('now'),
+        decks: currentDecks(), deck: currentDeck().id, progress: run('getProgress') || {}, now: run('now'),
         collection: state.collection, mode: state.mode, search: state.search,
         revealed: state.revealed, index: state.index
       });
@@ -156,7 +203,7 @@
       if (!['pass', 'partial', 'fail'].includes(outcome)) return false;
       const card = currentCards()[state.index];
       if (!card) return false;
-      run('recordAttempt', card, outcome);
+      run('recordAttempt', card, outcome, currentDeck());
       const remaining = currentCards();
       const cardStillVisible = remaining.some(item => String(item.id) === String(card.id));
       if (cardStillVisible) state.index++;
@@ -173,6 +220,17 @@
       state.revealed = false;
       render();
     }
+    function setDeck(value) {
+      const next = currentDecks().find(deck => deck.id === String(value || ''));
+      if (!next) return false;
+      state.deck = next.id;
+      state.collection = 'all';
+      state.search = '';
+      state.index = 0;
+      state.revealed = false;
+      render();
+      return true;
+    }
     function bind(host) {
       host.querySelectorAll('[data-flashcards-action]').forEach(element => {
         element.addEventListener('click', () => {
@@ -182,6 +240,7 @@
           else if (action === 'prev') move(-1);
           else if (action === 'next') move(1);
           else if (action === 'mode') setFilter('mode', element.getAttribute('data-mode'));
+          else if (action === 'deck') setDeck(element.getAttribute('data-deck'));
         });
       });
       host.querySelectorAll('[data-flashcards-filter]').forEach(element => {
@@ -191,8 +250,8 @@
       });
     }
 
-    return { render, reveal, rate, next: () => move(1), prev: () => move(-1), setFilter, getState: () => ({ ...state }) };
+    return { render, reveal, rate, next: () => move(1), prev: () => move(-1), setFilter, setDeck, getState: () => ({ ...state }) };
   }
 
-  return { cardState, isDue, filterCards, summarizeCards, renderPage, create };
+  return { cardState, isDue, filterCards, summarizeCards, normalizeDecks, renderPage, create };
 });

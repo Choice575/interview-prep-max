@@ -22,15 +22,27 @@ test('registers flashcards across data loading, navigation and the browser shell
   assert.match(app, /FLASHCARDS_DATA/);
   assert.match(app, /flashcards:\s*'tasks\/flashcards\.json'/);
   assert.match(app, /flashcards:\s*'FLASHCARDS_DATA'/);
+  assert.match(app, /video_flashcards:\s*'tasks\/video_flashcards\.json'/);
+  assert.match(app, /video_flashcards:\s*'VIDEO_FLASHCARDS_DATA'/);
   assert.match(app, /if\(page==='flashcards'\)\s*renderFlashcards\(\)/);
-  assert.match(app, /recordQuestionResult\(\{id:card\.id,topic:card\.collection\},\{outcome,source:'flashcards'/);
+  assert.match(app, /recordQuestionResult\(\{id:card\.id,topic:card\.collection\},\{outcome,source:deck\?\.id==='video'\?'video_flashcards':'flashcards'/);
   assert.match(sw, /'\.\/flashcards-ui\.js'/);
   assert.match(sw, /'\.\/tasks\/flashcards\.json'/);
+  assert.match(sw, /'\.\/tasks\/video_flashcards\.json'/);
   assert.match(server, /'flashcards-ui\.js'/);
   assert.match(server, /'tasks\/flashcards\.json'/);
+  assert.match(server, /'tasks\/video_flashcards\.json'/);
   assert.match(docker, /flashcards-ui\.js/);
   assert.match(eslint, /IPMaxFlashcardsUI:\s*'readonly'/);
   assert.match(eslint, /'flashcards-ui\.js'/);
+});
+
+test('labels the flashcard page as two distinguishable sources', () => {
+  const html = read('index.html');
+  assert.match(html, />Карточки<span class="sb-count" id="sb-flashcards-count">/);
+  assert.match(html, /<h2>Карточки<\/h2>/);
+  assert.match(html, /Учебная программа/);
+  assert.match(html, /Собеседования из видео/);
 });
 
 test('runs flashcard tests through the declared project command', () => {

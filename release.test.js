@@ -104,6 +104,28 @@ test('publishes AI Tutor 1.0 from release 14.5.0 onward with a fresh offline cac
   assert.equal(context.self.IPMAX_CACHE_NAME, 'ipmax-v' + RELEASE_VERSION);
 });
 
+test('publishes separate video flashcards from release 15.2.0 onward', async () => {
+  const [major, minor] = RELEASE_VERSION.split('.').map(Number);
+  assert.ok(major > 15 || (major === 15 && minor >= 2), 'video flashcards require release >= 15.2.0');
+  const video = JSON.parse(read('tasks/video_flashcards.json'));
+  assert.equal(video.cards.length, 286);
+  assert.equal(video.cards[0].id, 2000001);
+  assert.equal(video.cards.at(-1).id, 2000286);
+
+  const worker = loadServiceWorker();
+  await dispatchExtendable(worker.handlers.get('install'));
+  assert.ok(worker.added().includes('./tasks/video_flashcards.json'));
+
+  const server = createAppServer();
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  try {
+    const response = await request(server, '/tasks/video_flashcards.json');
+    assert.equal(response.status, 200);
+  } finally {
+    await new Promise(resolve => server.close(resolve));
+  }
+});
+
 test('publishes the current version with a complete offline shell', async () => {
   const worker = loadServiceWorker();
 

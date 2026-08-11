@@ -11,7 +11,7 @@ var BASE_QUESTIONS = [], SUBNET_PROBLEMS = [], TS_SCENARIOS = [], CMD_TASKS = []
     INCIDENTS = [],
     STUDY_MAP = null, STUDY_TESTS = null, MLOPS_MAP = null, MLOPS_TESTS = null, SENIOR_CASES = [], BEST_PRACTICES = null,
     QUESTION_SOURCES = null, INTERVIEW_PRACTICE = null, EXTERNAL_TASKS = null, COURSES = null,
-    QUESTION_BANK = null, FLASHCARDS_DATA = null;
+    QUESTION_BANK = null, FLASHCARDS_DATA = null, VIDEO_FLASHCARDS_DATA = null;
 
 const DATA_FILES = {
   base_questions: 'tasks/base_questions.json',
@@ -39,7 +39,8 @@ const DATA_FILES = {
 interview_practice: 'tasks/interview_practice.json',
 courses: 'tasks/courses.json',
 question_bank: 'tasks/question_bank.json',
-flashcards: 'tasks/flashcards.json'
+flashcards: 'tasks/flashcards.json',
+video_flashcards: 'tasks/video_flashcards.json'
 };
 
 const DATA_VARS = {
@@ -47,7 +48,7 @@ const DATA_VARS = {
   cmd: 'CMD_TASKS', code: 'CODE_TASKS', git: 'GIT_TASKS', regex: 'REGEX_TASKS',
   ansible_pb: 'ANSIBLE_PB_TASKS', dockerfile: 'DOCKERFILE_TASKS', k8s: 'K8S_TASKS',
   ports: 'PORTS_TASKS', labs: 'LABS_TASKS', tips: 'TIPS', incidents: 'INCIDENTS', study_map: 'STUDY_MAP',
-  study_tests: 'STUDY_TESTS', mlops_map: 'MLOPS_MAP', mlops_tests: 'MLOPS_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES', question_sources: 'QUESTION_SOURCES', interview_practice: 'INTERVIEW_PRACTICE', external_tasks: 'EXTERNAL_TASKS', courses: 'COURSES', question_bank: 'QUESTION_BANK', flashcards: 'FLASHCARDS_DATA'
+  study_tests: 'STUDY_TESTS', mlops_map: 'MLOPS_MAP', mlops_tests: 'MLOPS_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES', question_sources: 'QUESTION_SOURCES', interview_practice: 'INTERVIEW_PRACTICE', external_tasks: 'EXTERNAL_TASKS', courses: 'COURSES', question_bank: 'QUESTION_BANK', flashcards: 'FLASHCARDS_DATA', video_flashcards: 'VIDEO_FLASHCARDS_DATA'
 };
 
 function dataSize(data){
@@ -335,7 +336,7 @@ let currentPracticeTopic='';
 let dailyBlitzActive=false;
 
 // ═══ NAV ═══
-const PAGE_TITLES={home:'Сегодня',interview:'Ответы вслух',catalog:'Курсы',chapter:'Глава',study:'Учебный план',flashcards:'Учебные карточки',practices:'Best Practices',qbank:'Банк вопросов',exam:'Вопросы с вариантами',analytics:'Аналитика',
+const PAGE_TITLES={home:'Сегодня',interview:'Ответы вслух',catalog:'Курсы',chapter:'Глава',study:'Учебный план',flashcards:'Карточки',practices:'Best Practices',qbank:'Банк вопросов',exam:'Вопросы с вариантами',analytics:'Аналитика',
   trainers:'Тренажёры',achievements:'Достижения',external:'Задания на практику',
   subnet:'Тренажёр подсетей',ts:'Troubleshooting-симулятор',
   cmd:'Command Builder',code:'Code Reviewer',
@@ -714,8 +715,12 @@ function renderQCard(q,sMode){return requireExamUI().renderQuestionCard(q,sMode)
 function requireFlashcardsUIModule(){if(typeof IPMaxFlashcardsUI==='undefined') throw new Error('Модуль учебных карточек не загружен.');return IPMaxFlashcardsUI;}
 const flashcardsUI=requireFlashcardsUIModule().create({
   getCards:()=>Array.isArray(FLASHCARDS_DATA?.cards)?FLASHCARDS_DATA.cards:[],
+  getDecks:()=>[
+    {id:'study',label:'Учебная программа',description:'3 045 карточек из учебного корпуса DevOps и MLOps.',cards:Array.isArray(FLASHCARDS_DATA?.cards)?FLASHCARDS_DATA.cards:[]},
+    {id:'video',label:'Собеседования из видео',description:'286 реальных вопросов из 9 видео с техническими собеседованиями.',cards:Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards:[]}
+  ],
   getProgress:getQProg,now:()=>Date.now(),
-  recordAttempt:(card,outcome)=>recordQuestionResult({id:card.id,topic:card.collection},{outcome,source:'flashcards',syncMistakes:false,history:true})
+  recordAttempt:(card,outcome,deck)=>recordQuestionResult({id:card.id,topic:card.collection},{outcome,source:deck?.id==='video'?'video_flashcards':'flashcards',syncMistakes:false,history:true})
 });
 function renderFlashcards(){return flashcardsUI.render();}
 
@@ -2048,7 +2053,7 @@ async function initApp(){
   // Обновляем счётчик вопросов динамически
   document.getElementById('sb-counter').textContent = 'DevOps Edition · '+getAllQ().length+' вопросов';
   const flashcardsCount=document.getElementById('sb-flashcards-count');
-  if(flashcardsCount) flashcardsCount.textContent=Array.isArray(FLASHCARDS_DATA?.cards)?FLASHCARDS_DATA.cards.length:'';
+  if(flashcardsCount) flashcardsCount.textContent=(Array.isArray(FLASHCARDS_DATA?.cards)?FLASHCARDS_DATA.cards.length:0)+(Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards.length:0);
 
   // Строим UI с динамическими темами
   buildTopicFilters();
