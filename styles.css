@@ -1260,3 +1260,26 @@ button:disabled,[aria-disabled="true"]{cursor:not-allowed}
   .ip-hero{display:block}.ip-hero p{display:none}.ip-kicker{font-size:9px}.ip-prompt{font-size:15px}.ip-block li{font-size:12px}.ip-answer-panel{order:1}
   .practices-hero,.qbank-hero{padding:15px}.practice-panel,.qbank-panel{padding:13px}.modal{width:calc(100% - 20px);padding:16px}
 }
+
+/* FLASHCARDS — учебные карточки со свободным ответом и интервальным повторением */
+.flashcards-hero{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px}
+.flashcards-hero h2{font-size:20px;font-weight:800;margin:4px 0 6px}
+.flashcards-hero p{font-size:13px;color:var(--text2);line-height:1.6;max-width:70ch}
+.flashcards-stats{display:flex;flex-wrap:wrap;gap:8px 18px;margin-bottom:14px;font-size:12px;color:var(--text2)}
+.flashcards-stats strong{color:var(--text);font-size:15px;margin-right:3px}
+.flashcards-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-bottom:16px}
+.flashcards-controls label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:600;color:var(--text3)}
+.flashcards-modes{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:6px}
+.study-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+.study-card-meta{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--text3);margin-bottom:10px}
+.study-card h2{font-size:17px;font-weight:700;line-height:1.5;margin:0 0 14px}
+.study-card-answer{background:var(--primary-dim);border:1px solid var(--primary);border-radius:9px;padding:14px 16px;margin-bottom:14px}
+.study-card-answer-label{font-size:11px;font-weight:700;color:var(--primary-h);margin-bottom:6px}
+.study-card-answer p{font-size:14px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.study-card-rates{display:flex;flex-wrap:wrap;gap:10px}
+.study-card-rates .btn{flex:1 1 30%;min-height:44px}
+.study-card-nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+@media(max-width:600px){
+  .flashcards-controls{grid-template-columns:1fr}
+  .study-card{padding:15px}.study-card h2{font-size:15px}.study-card-rates .btn{flex:1 1 100%}
+}

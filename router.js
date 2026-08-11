@@ -8,7 +8,7 @@
   // Страницы приложения: значения data-page в боковом меню плюс catalog и chapter.
   // Список закрытый: неизвестный хеш уводит на главную, а не в пустую страницу.
   const PAGES = [
-    'home', 'study', 'catalog', 'chapter', 'practices', 'external', 'qbank', 'exam', 'analytics',
+    'home', 'study', 'catalog', 'chapter', 'flashcards', 'practices', 'external', 'qbank', 'exam', 'analytics',
     'trainers', 'achievements',
     // The individual trainers keep their own routes: the hub is a way in, not a
     // replacement, and old deep links must not start resolving to the home page.

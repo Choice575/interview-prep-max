@@ -1,0 +1,198 @@
+(function(root, factory) {
+  const api = factory();
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  root.IPMaxFlashcardsUI = api;
+})(typeof self !== 'undefined' ? self : globalThis, function() {
+  'use strict';
+
+  const hasOwn = (object, key) => !!object && Object.prototype.hasOwnProperty.call(object, key);
+
+  function cardState(card, progress, now) {
+    const record = hasOwn(progress, card && card.id) && progress[card.id] && typeof progress[card.id] === 'object'
+      ? progress[card.id] : null;
+    if (!record || !Number(record.lastSeen)) return 'new';
+    return Number(record.repetitions) >= 2 ? 'known' : 'learning';
+  }
+
+  function isDue(card, progress, now) {
+    const record = hasOwn(progress, card && card.id) ? progress[card.id] : null;
+    return !!record && Number(record.nextReviewAt) > 0 && Number(record.nextReviewAt) <= now;
+  }
+
+  function filterCards(cards, options) {
+    const settings = options || {};
+    const progress = settings.progress && typeof settings.progress === 'object' ? settings.progress : {};
+    const now = Number.isFinite(Number(settings.now)) ? Number(settings.now) : Date.now();
+    const collection = String(settings.collection || 'all');
+    const search = String(settings.search || '').trim().toLowerCase();
+    const mode = String(settings.mode || 'all');
+    let result = Array.isArray(cards) ? cards.slice() : [];
+
+    if (collection !== 'all') result = result.filter(card => card && card.collection === collection);
+    if (search) {
+      result = result.filter(card => [card && card.question, card && card.answer, card && card.collection]
+        .some(value => String(value || '').toLowerCase().includes(search)));
+    }
+    if (mode === 'due') result = result.filter(card => isDue(card, progress, now));
+    else if (['new', 'learning', 'known'].includes(mode)) {
+      result = result.filter(card => cardState(card, progress, now) === mode);
+    }
+    return result;
+  }
+
+  function summarizeCards(cards, progress, now) {
+    const list = Array.isArray(cards) ? cards : [];
+    const records = progress && typeof progress === 'object' ? progress : {};
+    const at = Number.isFinite(Number(now)) ? Number(now) : Date.now();
+    const summary = { total: list.length, new: 0, learning: 0, known: 0, due: 0 };
+    list.forEach(card => {
+      summary[cardState(card, records, at)]++;
+      if (isDue(card, records, at)) summary.due++;
+    });
+    return summary;
+  }
+
+  function escapeText(value) {
+    return String(value === undefined || value === null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function selected(value, expected) {
+    return value === expected ? ' selected' : '';
+  }
+
+  function active(value, expected) {
+    return value === expected ? ' active' : '';
+  }
+
+  function renderPage(input) {
+    const state = input || {};
+    const cards = Array.isArray(state.cards) ? state.cards : [];
+    const progress = state.progress && typeof state.progress === 'object' ? state.progress : {};
+    const now = Number.isFinite(Number(state.now)) ? Number(state.now) : Date.now();
+    const collection = String(state.collection || 'all');
+    const mode = String(state.mode || 'all');
+    const search = String(state.search || '');
+    const filtered = filterCards(cards, { collection, mode, search, progress, now });
+    const index = filtered.length ? Math.max(0, Math.min(filtered.length - 1, Math.floor(Number(state.index) || 0))) : 0;
+    const card = filtered[index];
+    const summary = summarizeCards(cards, progress, now);
+    const collections = [...new Set(cards.map(item => item && item.collection).filter(Boolean))].sort();
+
+    const controls = '<div class="flashcards-controls">' +
+      '<label>Коллекция<select class="form-input" data-flashcards-filter="collection">' +
+      '<option value="all"' + selected(collection, 'all') + '>Все коллекции</option>' +
+      collections.map(name => '<option value="' + escapeText(name) + '"' + selected(collection, name) + '>' + escapeText(name) + '</option>').join('') +
+      '</select></label>' +
+      '<label>Поиск<input class="form-input" type="search" value="' + escapeText(search) + '" placeholder="Вопрос, ответ или тема" data-flashcards-filter="search"></label>' +
+      '<div class="flashcards-modes" role="group" aria-label="Режим повторения">' +
+      [['all', 'Все'], ['new', 'Новые'], ['learning', 'Изучаю'], ['known', 'Знаю'], ['due', 'К повторению']]
+        .map(item => '<button type="button" class="chip' + active(mode, item[0]) + '" data-flashcards-action="mode" data-mode="' + item[0] + '">' + item[1] + '</button>').join('') +
+      '</div></div>';
+
+    const stats = '<div class="flashcards-stats" aria-label="Прогресс по карточкам">' +
+      '<span><strong>' + summary.total + '</strong> всего</span>' +
+      '<span><strong>' + summary.new + '</strong> новых</span>' +
+      '<span><strong>' + summary.learning + '</strong> изучаю</span>' +
+      '<span><strong>' + summary.known + '</strong> знаю</span>' +
+      '<span><strong>' + summary.due + '</strong> к повторению</span></div>';
+
+    if (!card) {
+      return stats + controls + '<div class="empty-state"><div class="icon">✅</div><p>Для выбранных фильтров карточек нет.</p></div>';
+    }
+
+    const answer = state.revealed
+      ? '<div class="study-card-answer"><div class="study-card-answer-label">Ответ</div><p>' + escapeText(card.answer) + '</p></div>' +
+        '<div class="study-card-rates" aria-label="Оценить ответ">' +
+        '<button type="button" class="btn btn-outline" data-flashcards-action="rate" data-outcome="fail">Не знаю</button>' +
+        '<button type="button" class="btn btn-outline" data-flashcards-action="rate" data-outcome="partial">Повторить</button>' +
+        '<button type="button" class="btn btn-primary" data-flashcards-action="rate" data-outcome="pass">Знаю</button></div>'
+      : '<button type="button" class="btn btn-primary" data-flashcards-action="reveal">Показать ответ</button>';
+
+    return stats + controls + '<article class="study-card" data-card-id="' + escapeText(card.id) + '">' +
+      '<div class="study-card-meta"><span>' + escapeText(card.collection) + '</span><span>' + (index + 1) + ' / ' + filtered.length + '</span></div>' +
+      '<h2>' + escapeText(card.question) + '</h2>' + answer +
+      '<div class="study-card-nav"><button type="button" class="btn btn-quiet" data-flashcards-action="prev"' + (index === 0 ? ' disabled' : '') + '>← Предыдущая</button>' +
+      '<button type="button" class="btn btn-quiet" data-flashcards-action="next"' + (index >= filtered.length - 1 ? ' disabled' : '') + '>Следующая →</button></div></article>';
+  }
+
+  function create(services, environment) {
+    const source = services || {};
+    const env = environment || {};
+    const doc = env.document || (typeof document !== 'undefined' ? document : null);
+    const state = { collection: 'all', mode: 'all', search: '', revealed: false, index: 0 };
+    const run = (name, ...args) => typeof source[name] === 'function' ? source[name](...args) : undefined;
+
+    function currentCards() {
+      return filterCards(run('getCards') || [], {
+        collection: state.collection, mode: state.mode, search: state.search,
+        progress: run('getProgress') || {}, now: run('now')
+      });
+    }
+
+    function render() {
+      const host = doc && doc.getElementById('flashcards-host');
+      if (!host) return [];
+      const filtered = currentCards();
+      if (state.index >= filtered.length) state.index = Math.max(0, filtered.length - 1);
+      host.innerHTML = renderPage({
+        cards: run('getCards') || [], progress: run('getProgress') || {}, now: run('now'),
+        collection: state.collection, mode: state.mode, search: state.search,
+        revealed: state.revealed, index: state.index
+      });
+      bind(host);
+      return filtered;
+    }
+
+    function reveal() { state.revealed = true; render(); }
+    function move(delta) {
+      const cards = currentCards();
+      if (!cards.length) return;
+      state.index = Math.max(0, Math.min(cards.length - 1, state.index + delta));
+      state.revealed = false;
+      render();
+    }
+    function rate(outcome) {
+      if (!['pass', 'partial', 'fail'].includes(outcome)) return false;
+      const card = currentCards()[state.index];
+      if (!card) return false;
+      run('recordAttempt', card, outcome);
+      const remaining = currentCards();
+      const cardStillVisible = remaining.some(item => String(item.id) === String(card.id));
+      if (cardStillVisible) state.index++;
+      else state.index = Math.min(state.index, Math.max(0, remaining.length - 1));
+      state.revealed = false;
+      render();
+      return true;
+    }
+    function setFilter(name, value) {
+      if (name === 'collection') state.collection = String(value || 'all');
+      if (name === 'mode') state.mode = String(value || 'all');
+      if (name === 'search') state.search = String(value || '');
+      state.index = 0;
+      state.revealed = false;
+      render();
+    }
+    function bind(host) {
+      host.querySelectorAll('[data-flashcards-action]').forEach(element => {
+        element.addEventListener('click', () => {
+          const action = element.getAttribute('data-flashcards-action');
+          if (action === 'reveal') reveal();
+          else if (action === 'rate') rate(element.getAttribute('data-outcome'));
+          else if (action === 'prev') move(-1);
+          else if (action === 'next') move(1);
+          else if (action === 'mode') setFilter('mode', element.getAttribute('data-mode'));
+        });
+      });
+      host.querySelectorAll('[data-flashcards-filter]').forEach(element => {
+        const name = element.getAttribute('data-flashcards-filter');
+        const eventName = name === 'search' ? 'input' : 'change';
+        element.addEventListener(eventName, () => setFilter(name, element.value));
+      });
+    }
+
+    return { render, reveal, rate, next: () => move(1), prev: () => move(-1), setFilter, getState: () => ({ ...state }) };
+  }
+
+  return { cardState, isDue, filterCards, summarizeCards, renderPage, create };
+});

@@ -12,7 +12,7 @@ const SHELL_ASSETS = [
   './offline-ui.js', './sources-ui.js', './best-practices-ui.js', './catalog-ui.js', './chapter-ui.js', './ai-tutor.js', './ai-tutor-ui.js', './router.js',
   './gamification.js', './gamification-ui.js', './daily.js', './daily-ui.js', './trainers-ui.js',
   './question-bank-ui.js', './external-tasks-ui.js', './interview-practice-ui.js', './analytics-ui.js', './home-ui.js',
-  './exam-ui.js', './study-ui.js', './coach-ui.js',
+  './exam-ui.js', './flashcards-ui.js', './study-ui.js', './coach-ui.js',
   './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png',
   './assets/icon-512.png'
 ];
@@ -24,7 +24,7 @@ const DATA_ASSETS = [
   './tasks/regex.json', './tasks/ansible_pb.json', './tasks/dockerfile.json',
   './tasks/k8s.json', './tasks/ports.json', './tasks/labs.json',
   './tasks/tips.json', './tasks/incidents.json', './tasks/study_map.json',
-  './tasks/study_tests.json', './tasks/mlops_map.json', './tasks/mlops_tests.json', './tasks/senior_cases.json', './tasks/best_practices.json', './tasks/external_tasks.json', './tasks/question_sources.json', './tasks/interview_practice.json', './tasks/courses.json', './tasks/question_bank.json'
+  './tasks/study_tests.json', './tasks/mlops_map.json', './tasks/mlops_tests.json', './tasks/senior_cases.json', './tasks/best_practices.json', './tasks/external_tasks.json', './tasks/question_sources.json', './tasks/interview_practice.json', './tasks/courses.json', './tasks/question_bank.json', './tasks/flashcards.json'
 ];
 
 // Full asset list. Not read by precache() (shell and datasets are cached

@@ -28,6 +28,7 @@
     <div class="sb-section">Учёба</div>
     <button type="button" class="sb-item" onclick="nav('study')" data-page="study"><span class="icon">🎓</span>Учебный план</button>
     <button type="button" class="sb-item" onclick="nav('catalog')" data-page="catalog"><span class="icon">📚</span>Курсы</button>
+    <button type="button" class="sb-item" onclick="nav('flashcards')" data-page="flashcards"><span class="icon">🧠</span>Учебные карточки<span class="sb-count" id="sb-flashcards-count"></span></button>
 
     <div class="sb-section">Практика</div>
     <button type="button" class="sb-item" onclick="nav('exam')" data-page="exam"><span class="icon">📝</span>Вопросы с вариантами</button>
@@ -238,6 +239,18 @@
       <div id="qbank-sr-status" class="sr-only" role="status" aria-live="polite"></div>
       <div class="qbank-panel" id="qbank-panel" role="tabpanel" tabindex="0"></div>
     </section>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div class="page" id="page-flashcards">
+    <section class="flashcards-hero">
+      <div>
+        <div class="practice-kicker">Интервальное повторение DevOps и MLOps</div>
+        <h2>Учебные карточки</h2>
+        <p>Сначала сформулируйте ответ самостоятельно, затем откройте эталон и честно оцените воспроизведение.</p>
+      </div>
+    </section>
+    <div id="flashcards-host"></div>
   </div>
 
   <!-- EXAM -->
@@ -587,6 +600,7 @@
 <script src="./analytics-ui.js"></script>
 <script src="./home-ui.js"></script>
 <script src="./exam-ui.js"></script>
+<script src="./flashcards-ui.js"></script>
 <script src="./study-ui.js"></script>
 <script src="./coach-ui.js"></script>
 <script src="./app.js"></script>
