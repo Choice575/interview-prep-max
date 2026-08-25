@@ -150,7 +150,7 @@ function createPolygonGateway(options = {}) {
       try { terminal = service.openTerminal(id, token); }
       catch (_) { client.close(1011, 'Terminal unavailable'); return; }
       const forward = (chunk) => {
-        if (client.readyState === 1) client.send(Buffer.isBuffer(chunk) ? chunk : String(chunk));
+        if (client.readyState === 1) client.send(Buffer.isBuffer(chunk) ? chunk.toString('utf8') : String(chunk));
       };
       terminal.stdout?.on('data', forward);
       terminal.stderr?.on('data', forward);

@@ -1,6 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const http = require('node:http');
+const { EventEmitter } = require('node:events');
 const { WebSocket } = require('ws');
 const { createPolygonGateway } = require('./gateway.js');
 
@@ -155,6 +156,36 @@ test('rejects a WebSocket with a wrong or missing terminal token', async () => {
       socket.once('error', () => {});
     });
     assert.equal(result, 401);
+  } finally {
+    await new Promise(resolve => server.close(resolve));
+  }
+});
+
+test('forwards terminal buffers as WebSocket text frames for browser terminals', async () => {
+  const service = fakeService();
+  let stdout;
+  service.openTerminal = () => {
+    stdout = new EventEmitter();
+    return { stdin: { write() {}, end() {} }, stdout, stderr: new EventEmitter(), on() {}, kill() {} };
+  };
+  const gateway = createPolygonGateway({ service });
+  const server = await listen(gateway);
+  try {
+    const socket = new WebSocket(
+      `ws://127.0.0.1:${server.address().port}/api/polygon/sessions/session-1/terminal`,
+      ['ipmax-polygon', 'terminal-1']
+    );
+    await new Promise((resolve, reject) => { socket.once('open', resolve); socket.once('error', reject); });
+    const received = new Promise((resolve, reject) => {
+      socket.once('message', (data, isBinary) => resolve({ data: data.toString(), isBinary }));
+      socket.once('error', reject);
+    });
+    stdout.emit('data', Buffer.from('hello from shell\n', 'utf8'));
+    const message = await received;
+    assert.deepEqual(message, { data: 'hello from shell\n', isBinary: false });
+    const closed = new Promise(resolve => socket.once('close', resolve));
+    socket.close();
+    await closed;
   } finally {
     await new Promise(resolve => server.close(resolve));
   }

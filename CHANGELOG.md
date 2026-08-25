@@ -1,5 +1,10 @@
 # Changelog
 
+## v15.3.1 (2026-08-25)
+
+- Terminal output from the polygon runner is now sent as WebSocket text frames, so the browser renders shell output instead of `[object Blob]`.
+- Added a regression test that asserts binary Docker stdout is converted to a text frame before it reaches the browser.
+
 ## v15.3.0 (2026-08-24)
 
 Добавлен технический spike «DevOps-полигон»: первая живая Linux-лаборатория с браузерным терминалом, временным Docker-контейнером и автоматической проверкой.
