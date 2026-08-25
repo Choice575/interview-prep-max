@@ -38,7 +38,8 @@
     sync_token: 'ipmax_sync_token', sync_meta: 'ipmax_sync_meta',
     // Токен доступа к настройкам сервера. Как и sync_token, принадлежит
     // устройству и не входит в снимок синхронизации.
-    admin_token: 'ipmax_admin_token'
+    admin_token: 'ipmax_admin_token',
+    polygon_progress: 'ipmax_polygon_progress'
   };
 
   // `options` carries the timer host for debounced writes ({ setTimeout,

@@ -331,13 +331,14 @@ let updateReloadPending=false;
 let coachSessionLimit=0;
 let coachQuestionIds=null;
 let currentPracticeTopic='';
+let polygonTasks=[],polygonSession=null,polygonSocket=null,polygonExpiryTimer=null;
 // Ежедневный блиц использует движок обычного блица, но без таймера и с
 // закрытием дня в конце. Флаг различает два режима в общих обработчиках.
 let dailyBlitzActive=false;
 
 // ═══ NAV ═══
 const PAGE_TITLES={home:'Сегодня',interview:'Ответы вслух',catalog:'Курсы',chapter:'Глава',study:'Учебный план',flashcards:'Карточки',practices:'Best Practices',qbank:'Банк вопросов',exam:'Вопросы с вариантами',analytics:'Аналитика',
-  trainers:'Тренажёры',achievements:'Достижения',external:'Задания на практику',
+  trainers:'Тренажёры',achievements:'Достижения',external:'DevOps-полигон',
   subnet:'Тренажёр подсетей',ts:'Troubleshooting-симулятор',
   cmd:'Command Builder',code:'Code Reviewer',
   ansible:'Ansible Playbook',dockerfile:'Dockerfile',k8s:'K8s YAML',ports:'Порты TCP',labs:'Debugging',
@@ -400,6 +401,7 @@ function configureResponsiveShell(){
 }
 
 function stopActiveSessions(){
+  closePolygonSocket();
   if(blitzState.timer){clearInterval(blitzState.timer);blitzState.timer=null;}
   blitzState.active=false;blitzState.deadline=0;
   // Без сброса флага следующий обычный блиц дописал бы ответы в счёт
@@ -2127,7 +2129,7 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 function requireOfflineUI(){if(typeof IPMaxOfflineUI==='undefined') throw new Error('Модуль offline-отчёта не загружен.');return IPMaxOfflineUI;}
 function offlineAssetList(){
-  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./sync-merge.js','./sync-client.js','./sync-ui.js','./ai-settings-client.js','./ai-settings-ui.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./ai-tutor.js','./ai-tutor-ui.js','./router.js','./gamification.js','./gamification-ui.js','./daily.js','./daily-ui.js','./trainers-ui.js','./question-bank-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./sync-merge.js','./sync-client.js','./sync-ui.js','./ai-settings-client.js','./ai-settings-ui.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./ai-tutor.js','./ai-tutor-ui.js','./router.js','./gamification.js','./gamification-ui.js','./daily.js','./daily-ui.js','./trainers-ui.js','./question-bank-ui.js','./external-tasks-ui.js','./polygon-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./flashcards-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   return shell.concat(Object.values(DATA_FILES).map(file=>'./'+file));
 }
 async function probeOfflineAssets(assets){
@@ -2481,9 +2483,83 @@ function endIncidentSim(){
     '<button class="btn btn-outline" onclick="nav(\'incidents\')">← К списку</button>'+
     '<button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
 }
+function requirePolygonUI(){if(typeof IPMaxPolygonUI==='undefined') throw new Error('Модуль полигона не загружен.');return IPMaxPolygonUI;}
+function getPolygonClient(){return requirePolygonUI().createClient({token:()=>appStorage?appStorage.get('sync_token',''):''});}
+function closePolygonSocket(){
+  if(polygonSocket){try{polygonSocket.close();}catch(_){}polygonSocket=null;}
+  if(polygonExpiryTimer){clearInterval(polygonExpiryTimer);polygonExpiryTimer=null;}
+}
+function polygonStatus(message){const host=document.getElementById('polygon-session-status');if(host)host.textContent=message||'';}
+function polygonTask(id){return polygonTasks.find(task=>task.id===id)||null;}
+function appendPolygonTerminal(text){
+  const output=document.getElementById('polygon-terminal-output');if(!output)return;
+  output.textContent=(output.textContent+String(text||'')).slice(-30000);output.scrollTop=output.scrollHeight;
+}
+function connectPolygonTerminal(){
+  closePolygonSocket();if(!polygonSession)return;
+  const target=requirePolygonUI().terminalTarget(polygonSession,location);
+  const socket=new WebSocket(target.url,target.protocols);polygonSocket=socket;
+  socket.addEventListener('open',()=>{appendPolygonTerminal('Терминал подключён.\n');polygonStatus('Сессия активна.');});
+  socket.addEventListener('message',event=>appendPolygonTerminal(event.data));
+  socket.addEventListener('close',()=>{if(polygonSocket===socket){polygonSocket=null;polygonStatus('Терминал отключён. Контейнер будет удалён по TTL или кнопкой «Остановить».');}});
+  socket.addEventListener('error',()=>polygonStatus('Не удалось подключить терминал.'));
+  polygonExpiryTimer=setInterval(()=>{
+    const remaining=Math.max(0,polygonSession.expiresAt-Date.now());
+    const label=document.querySelector('[data-polygon-expires]');if(label)label.textContent='Осталось '+Math.ceil(remaining/60000)+' мин';
+    if(!remaining){closePolygonSocket();polygonStatus('Время сессии истекло.');}
+  },1000);
+}
+function bindPolygonSession(){
+  document.getElementById('polygon-terminal-form')?.addEventListener('submit',event=>{
+    event.preventDefault();const input=document.getElementById('polygon-terminal-input');const command=input?.value||'';
+    if(!command.trim()||!polygonSocket||polygonSocket.readyState!==WebSocket.OPEN)return;
+    polygonSocket.send(command+'\n');appendPolygonTerminal('root@lab:# '+command+'\n');input.value='';
+  });
+  document.querySelector('[data-polygon-action="check"]')?.addEventListener('click',checkPolygonSession);
+  document.querySelector('[data-polygon-action="stop"]')?.addEventListener('click',stopPolygonSession);
+}
+async function startPolygonSession(taskId){
+  const host=document.getElementById('polygon-live-host');if(!host)return;
+  host.innerHTML='<p class="polygon-loading">Создаём изолированный контейнер…</p>';
+  try{
+    polygonSession=await getPolygonClient().createSession(taskId);
+    host.innerHTML=requirePolygonUI().renderSession(polygonTask(taskId),polygonSession,[]);
+    bindPolygonSession();connectPolygonTerminal();
+  }catch(error){
+    polygonSession=null;host.innerHTML='<div class="polygon-error">'+esc(error.message||'Не удалось запустить лабораторию.')+
+      (error.code==='POLYGON_AUTH_REQUIRED'?'<button type="button" class="btn btn-outline btn-sm" data-polygon-auth>Настроить синхронизацию</button>':'')+'</div>';
+    host.querySelector('[data-polygon-auth]')?.addEventListener('click',()=>{if(typeof IPMaxSyncUI!=='undefined')IPMaxSyncUI.open();});
+  }
+}
+async function checkPolygonSession(){
+  if(!polygonSession)return;polygonStatus('Проверяем состояние контейнера…');
+  try{
+    const result=await getPolygonClient().checkSession(polygonSession.id);
+    const checks=document.querySelector('.polygon-checks');if(checks)checks.outerHTML=requirePolygonUI().renderChecks(result.checks);
+    if(result.complete){
+      const progress=lsGet('polygon_progress',{});progress[result.taskId]={status:'done',score:100,completedAt:result.completedAt};lsSet('polygon_progress',progress);
+      polygonStatus('Готово: все четыре критерия выполнены. Результат сохранён.');
+    }else polygonStatus('Пока выполнены не все критерии. Исправьте окружение и проверьте снова.');
+  }catch(error){polygonStatus(error.message||'Проверка недоступна.');}
+}
+async function stopPolygonSession(){
+  if(!polygonSession)return;const id=polygonSession.id;closePolygonSocket();polygonStatus('Удаляем контейнер…');
+  try{await getPolygonClient().deleteSession(id);}catch(_){}
+  polygonSession=null;renderExternalTasks();
+}
+async function renderPolygonCatalog(){
+  const host=document.getElementById('polygon-live-host');if(!host)return;
+  if(polygonSession){host.innerHTML=requirePolygonUI().renderSession(polygonTask(polygonSession.taskId),polygonSession,[]);bindPolygonSession();connectPolygonTerminal();return;}
+  try{
+    polygonTasks=await getPolygonClient().listTasks();
+    host.innerHTML=requirePolygonUI().renderCatalog(polygonTasks,lsGet('polygon_progress',{}));
+    host.querySelectorAll('[data-polygon-action="start"]').forEach(button=>button.addEventListener('click',()=>startPolygonSession(button.dataset.taskId)));
+  }catch(error){host.innerHTML='<div class="polygon-error">Живые лаборатории сейчас недоступны. '+esc(error.message||'')+'</div>';}
+}
 function renderExternalTasks(){
   const container=document.getElementById('external-tasks-container');
   if(!container) return;
+  renderPolygonCatalog();
   const et=typeof IPMaxExternalTasksUI!=='undefined'?IPMaxExternalTasksUI:null;
   if(!et){container.innerHTML='<p>Модуль не загружен.</p>';return;}
   const completed=JSON.parse(localStorage.getItem('external_tasks_completed')||'{}');

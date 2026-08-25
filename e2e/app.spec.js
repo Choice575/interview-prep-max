@@ -55,6 +55,75 @@ test('renders the extracted home UI and routes its actions', async ({ page }) =>
   await expect(page.locator('#questions-container .q-card')).toHaveCount(10);
 });
 
+test('runs one live polygon lab, checks it automatically and stores only durable progress', async ({ page }) => {
+  const requests = [];
+  await setProgress(page, {
+    ipmax_onboarding: profile,
+    ipmax_onboarding_complete: true,
+    ipmax_sync_token: 'e2e-sync-token-at-least-24-characters'
+  });
+  await page.route('**/api/polygon/tasks', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ tasks: [{
+    id: 'linux-permissions-lockout', title: 'Права после выкатки', technology: 'Linux', difficulty: 'Легко',
+    durationMinutes: 20, xp: 100, description: 'Исправьте права', criteria: [
+      { id: 'directory', title: 'Каталог' }, { id: 'config', title: 'Конфиг' },
+      { id: 'secret', title: 'Секрет' }, { id: 'service', title: 'Сервис' }
+    ]
+  }] }) }));
+  await page.route('**/api/polygon/sessions', async route => {
+    requests.push(route.request());
+    await route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify({ session: {
+      id: 'session-1', taskId: 'linux-permissions-lockout', expiresAt: Date.now() + 1200000,
+      terminalPath: '/api/polygon/sessions/session-1/terminal', terminalProtocol: 'secret-terminal-protocol'
+    } }) });
+  });
+  await page.route('**/api/polygon/sessions/session-1/check', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+    sessionId: 'session-1', taskId: 'linux-permissions-lockout', complete: true, completedAt: Date.now(),
+    checks: ['directory', 'config', 'secret', 'service'].map(id => ({ id, title: id, passed: true }))
+  }) }));
+  await page.route('**/api/polygon/sessions/session-1', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"removed":true}' }));
+  await page.addInitScript(() => {
+    class FakeWebSocket {
+      static OPEN = 1;
+      constructor(url, protocols) {
+        this.url = url; this.protocols = protocols; this.readyState = 0; this.listeners = {};
+        window.__polygonSocket = this;
+        setTimeout(() => { this.readyState = 1; this.emit('open'); this.emit('message', { data: 'root@lab:# ' }); }, 0);
+      }
+      addEventListener(type, handler) { (this.listeners[type] ||= []).push(handler); }
+      send(data) { (window.__polygonSent ||= []).push(String(data)); }
+      close() { this.readyState = 3; this.emit('close'); }
+      emit(type, event = {}) { for (const handler of this.listeners[type] || []) handler(event); }
+    }
+    window.WebSocket = FakeWebSocket;
+  });
+
+  await page.goto('/');
+  await page.locator('[data-page="external"]').click();
+  await expect(page.locator('#page-external')).toHaveClass(/active/);
+  await expect(page.locator('.polygon-card')).toContainText('Права после выкатки');
+  await expect(page.locator('.external-task-card')).toHaveCount(5);
+  await page.locator('[data-polygon-action="start"]').click();
+  await expect(page.locator('#polygon-terminal-output')).toContainText('root@lab:#');
+
+  const socket = await page.evaluate(() => ({ url: window.__polygonSocket.url, protocols: window.__polygonSocket.protocols }));
+  expect(socket.url).not.toContain('secret-terminal-protocol');
+  expect(socket.url).not.toContain('token=');
+  expect(socket.protocols).toEqual(['ipmax-polygon', 'secret-terminal-protocol']);
+  await expect(page.locator('#page-external')).not.toContainText('secret-terminal-protocol');
+  expect(requests[0].headers().authorization).toBe('Bearer e2e-sync-token-at-least-24-characters');
+  expect(requests[0].postData()).not.toContain('e2e-sync-token');
+
+  await page.locator('#polygon-terminal-input').fill('chmod 750 /etc/anketa');
+  await page.locator('#polygon-terminal-form').press('Enter');
+  expect(await page.evaluate(() => window.__polygonSent)).toContain('chmod 750 /etc/anketa\n');
+  await page.locator('[data-polygon-action="check"]').click();
+  await expect(page.locator('.polygon-check-pass')).toHaveCount(4);
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_polygon_progress')));
+  expect(saved['linux-permissions-lockout']).toMatchObject({ status: 'done', score: 100 });
+  expect(JSON.stringify(saved)).not.toContain('session-1');
+  expect(JSON.stringify(saved)).not.toContain('secret-terminal-protocol');
+});
+
 test('keeps curriculum and video flashcards as separate visible decks', async ({ page }) => {
   await setProgress(page, { ipmax_onboarding: profile, ipmax_onboarding_complete: true });
   await page.goto('/');

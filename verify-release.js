@@ -40,6 +40,7 @@ const aiTutorScriptIndex = html.indexOf('<script src="./ai-tutor.js"></script>')
 const aiTutorUiScriptIndex = html.indexOf('<script src="./ai-tutor-ui.js"></script>');
 const routerScriptIndex = html.indexOf('<script src="./router.js"></script>');
 const questionBankUiScriptIndex = html.indexOf('<script src="./question-bank-ui.js"></script>');
+const polygonUiScriptIndex = html.indexOf('<script src="./polygon-ui.js"></script>');
 const analyticsUiScriptIndex = html.indexOf('<script src="./analytics-ui.js"></script>');
 const homeUiScriptIndex = html.indexOf('<script src="./home-ui.js"></script>');
 const examUiScriptIndex = html.indexOf('<script src="./exam-ui.js"></script>');
@@ -47,7 +48,7 @@ const flashcardsUiScriptIndex = html.indexOf('<script src="./flashcards-ui.js"><
 const studyUiScriptIndex = html.indexOf('<script src="./study-ui.js"></script>');
 const coachUiScriptIndex = html.indexOf('<script src="./coach-ui.js"></script>');
 const appScriptIndex = html.indexOf('<script src="./app.js"></script>');
-expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && aiCoachScriptIndex > coachScriptIndex && progressIoScriptIndex > aiCoachScriptIndex && offlineUiScriptIndex > progressIoScriptIndex && sourcesUiScriptIndex > offlineUiScriptIndex && catalogUiScriptIndex > sourcesUiScriptIndex && chapterUiScriptIndex > catalogUiScriptIndex && aiTutorScriptIndex > chapterUiScriptIndex && aiTutorUiScriptIndex > aiTutorScriptIndex && routerScriptIndex > aiTutorUiScriptIndex && questionBankUiScriptIndex > routerScriptIndex && analyticsUiScriptIndex > questionBankUiScriptIndex && homeUiScriptIndex > analyticsUiScriptIndex && examUiScriptIndex > homeUiScriptIndex && flashcardsUiScriptIndex > examUiScriptIndex && studyUiScriptIndex > flashcardsUiScriptIndex && coachUiScriptIndex > studyUiScriptIndex && appScriptIndex > coachUiScriptIndex, 'index.html должен загружать browser-модули до app.js в установленном порядке');
+expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && aiCoachScriptIndex > coachScriptIndex && progressIoScriptIndex > aiCoachScriptIndex && offlineUiScriptIndex > progressIoScriptIndex && sourcesUiScriptIndex > offlineUiScriptIndex && catalogUiScriptIndex > sourcesUiScriptIndex && chapterUiScriptIndex > catalogUiScriptIndex && aiTutorScriptIndex > chapterUiScriptIndex && aiTutorUiScriptIndex > aiTutorScriptIndex && routerScriptIndex > aiTutorUiScriptIndex && questionBankUiScriptIndex > routerScriptIndex && polygonUiScriptIndex > questionBankUiScriptIndex && analyticsUiScriptIndex > polygonUiScriptIndex && homeUiScriptIndex > analyticsUiScriptIndex && examUiScriptIndex > homeUiScriptIndex && flashcardsUiScriptIndex > examUiScriptIndex && studyUiScriptIndex > flashcardsUiScriptIndex && coachUiScriptIndex > studyUiScriptIndex && appScriptIndex > coachUiScriptIndex, 'index.html должен загружать browser-модули до app.js в установленном порядке');
 expect(manifest.start_url === './' && manifest.scope === './', 'manifest должен использовать относительные start_url и scope');
 
 const requiredIcons = [
@@ -84,7 +85,7 @@ expect(/cache\.add\(asset\)\.then\(\(\) => null\)\.catch\(\(\) => asset\)/.test(
 const shellAssets = shellBlock ? [...shellBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
 const dataAssets = dataBlock ? [...dataBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
 const assets = shellAssets.concat(dataAssets);
-['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './sync-merge.js', './sync-client.js', './sync-ui.js', './ai-settings-client.js', './ai-settings-ui.js', './offline-ui.js', './sources-ui.js', './best-practices-ui.js', './ai-tutor.js', './ai-tutor-ui.js', './external-tasks-ui.js', './interview-practice-ui.js', './analytics-ui.js', './home-ui.js', './exam-ui.js', './flashcards-ui.js', './study-ui.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
+['./index.html', './styles.css', './version.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './sync-merge.js', './sync-client.js', './sync-ui.js', './ai-settings-client.js', './ai-settings-ui.js', './offline-ui.js', './sources-ui.js', './best-practices-ui.js', './ai-tutor.js', './ai-tutor-ui.js', './external-tasks-ui.js', './polygon-ui.js', './interview-practice-ui.js', './analytics-ui.js', './home-ui.js', './exam-ui.js', './flashcards-ui.js', './study-ui.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
   expect(assets.includes(file), `offline-кеш не содержит ${file}`);
 });
 dataFiles.forEach(file => expect(assets.includes('./' + file), `offline-кеш не содержит ./${file}`));

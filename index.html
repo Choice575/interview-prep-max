@@ -35,7 +35,7 @@
     <button type="button" class="sb-item" onclick="nav('qbank')" data-page="qbank"><span class="icon">🗂️</span>Банк вопросов</button>
     <button type="button" class="sb-item" onclick="nav('trainers')" data-page="trainers"><span class="icon">🎯</span>Тренажёры<span class="sb-count" id="sb-trainers-count"></span></button>
     <button type="button" class="sb-item" onclick="nav('interview')" data-page="interview"><span class="icon">🎤</span>Ответы вслух</button>
-    <button type="button" class="sb-item" onclick="nav('external')" data-page="external"><span class="icon">🚀</span>Задания на практику</button>
+    <button type="button" class="sb-item" onclick="nav('external')" data-page="external"><span class="icon">🧪</span>DevOps-полигон</button>
 
     <div class="sb-section">Прогресс</div>
     <button type="button" class="sb-item" onclick="nav('analytics')" data-page="analytics"><span class="icon">📊</span>Аналитика</button>
@@ -255,9 +255,14 @@
 
   <!-- EXAM -->
   <div class="page" id="page-external">
-    <h1>Практические задания</h1>
-    <p class="page-subtitle">Выполните задания вне приложения и приложите доказательство</p>
+    <section class="polygon-hero">
+      <div><span class="practice-kicker">Живая практика</span><h1>DevOps-полигон</h1>
+      <p class="page-subtitle">Временная Linux-среда с терминалом и автоматической проверкой. Одна сессия, до 20 минут.</p></div>
+    </section>
+    <div id="polygon-live-host" aria-live="polite"><p class="polygon-loading">Загружаем живые лаборатории…</p></div>
+    <details class="external-more" open><summary>Задания вне приложения</summary>
     <div id="external-tasks-container"></div>
+    </details>
   </div>
 
   <div class="page" id="page-exam">
@@ -596,6 +601,7 @@
 <script src="./trainers-ui.js"></script>
 <script src="./question-bank-ui.js"></script>
 <script src="./external-tasks-ui.js"></script>
+<script src="./polygon-ui.js"></script>
 <script src="./interview-practice-ui.js"></script>
 <script src="./analytics-ui.js"></script>
 <script src="./home-ui.js"></script>

@@ -46,6 +46,7 @@
     study_progress: 'doneMap',
     mlops_progress: 'doneMap',
     inc_prog: 'maxScoreMap',
+    polygon_progress: 'polygonProgress',
     senior_case_prog: 'doneStatusMap',
     study_answers: 'newerByCompletedAt',
     study_weekly_results: 'weeklyResults',
@@ -148,6 +149,24 @@
       const two = isRecord(b[key]) ? b[key] : null;
       if (!one || !two) { const only = one || two; if (only) out[key] = only; return; }
       out[key] = num(one.score, 0) >= num(two.score, 0) ? one : two;
+    });
+    return out;
+  }
+
+  function polygonProgress(left, right) {
+    const [a, b] = pickRecords(left, right);
+    const out = {};
+    keysOf(a, b).forEach(key => {
+      const one = isRecord(a[key]) ? a[key] : null;
+      const two = isRecord(b[key]) ? b[key] : null;
+      if (!one || !two) { const only = one || two; if (only) out[key] = only; return; }
+      if (one.status === 'done' && two.status !== 'done') { out[key] = one; return; }
+      if (two.status === 'done' && one.status !== 'done') { out[key] = two; return; }
+      const byCompleted = num(one.completedAt, 0) - num(two.completedAt, 0);
+      if (byCompleted !== 0) { out[key] = byCompleted > 0 ? one : two; return; }
+      const byScore = num(one.score, 0) - num(two.score, 0);
+      if (byScore !== 0) { out[key] = byScore > 0 ? one : two; return; }
+      out[key] = JSON.stringify(one) <= JSON.stringify(two) ? one : two;
     });
     return out;
   }
@@ -342,7 +361,7 @@
   }
 
   const HANDLERS = {
-    maxNumberMap, firstWriteMap, truthyMap, doneMap, doneStatusMap, maxScoreMap,
+    maxNumberMap, firstWriteMap, truthyMap, doneMap, doneStatusMap, maxScoreMap, polygonProgress,
     statsSum, questionProg, appendLog, journalLog, reviewHistory, customQuestions, gamification,
     dailyBlitz, weeklyResults, newerByCompletedAt, controlSession,
     maxNumber: (left, right) => Math.max(num(left, 0), num(right, 0))
@@ -402,7 +421,7 @@
   return {
     SNAPSHOT_VERSION, MERGE_RULES, HISTORY_LIMIT, EVENT_LIMIT, JOURNAL_LIMIT, REVIEW_HISTORY_LIMIT,
     normaliseSnapshot, mergeSnapshots,
-    maxNumberMap, firstWriteMap, truthyMap, doneMap, doneStatusMap, maxScoreMap,
+    maxNumberMap, firstWriteMap, truthyMap, doneMap, doneStatusMap, maxScoreMap, polygonProgress,
     statsSum, questionProg, appendLog, journalLog, reviewHistory, customQuestions, gamification,
     dailyBlitz, weeklyResults, newerByCompletedAt, controlSession
   };

@@ -19,8 +19,41 @@ test('every storage key has an explicit merge rule', () => {
   assert.deepEqual(transported.filter(key => !Merge.MERGE_RULES[key]), []);
 });
 
+test('polygon results are registered, merge completed state, and travel through export/import', () => {
+  assert.equal(Storage.DEFAULT_KEYS.polygon_progress, 'ipmax_polygon_progress');
+  assert.equal(Merge.MERGE_RULES.polygon_progress, 'polygonProgress');
+  const left = snapshot({ polygon_progress: { 'linux-permissions-lockout': { status: 'started', score: 0 } } }, 100, 'phone');
+  const right = snapshot({ polygon_progress: { 'linux-permissions-lockout': { status: 'done', score: 100, completedAt: 200 } } }, 200, 'laptop');
+  const merged = Merge.mergeSnapshots(left, right).state.polygon_progress['linux-permissions-lockout'];
+  assert.equal(merged.status, 'done');
+  assert.equal(merged.score, 100);
+
+  const values = { polygon_progress: { 'linux-permissions-lockout': merged, terminalProtocol: 'must-not-export' } };
+  const exported = ProgressIO.createExportData({
+    version: '15.1.0', get: (key, fallback) => key in values ? values[key] : fallback,
+    getOnboardingProfile: () => null, getSkillEvents: () => [], getCoachJournal: () => [], getCoachControlSession: () => null
+  });
+  assert.deepEqual(exported.polygon_progress, { 'linux-permissions-lockout': merged });
+  assert.equal('terminalProtocol' in exported, false);
+  const prepared = ProgressIO.prepareImport({ version: '15.1.0', polygon_progress: exported.polygon_progress }, {});
+  assert.deepEqual(prepared.entries.polygon_progress, exported.polygon_progress);
+});
+
+test('polygon completion merge is commutative and keeps the newer score', () => {
+  const phone = snapshot({ polygon_progress: {
+    'linux-permissions-lockout': { status: 'done', score: 80, completedAt: 100 }
+  } }, 100, 'phone');
+  const laptop = snapshot({ polygon_progress: {
+    'linux-permissions-lockout': { status: 'done', score: 100, completedAt: 200 }
+  } }, 200, 'laptop');
+  const one = Merge.mergeSnapshots(phone, laptop).state.polygon_progress;
+  const two = Merge.mergeSnapshots(laptop, phone).state.polygon_progress;
+  assert.deepEqual(one, two);
+  assert.deepEqual(one['linux-permissions-lockout'], { status: 'done', score: 100, completedAt: 200 });
+});
+
 test('answers from two devices both survive the merge', () => {
-  // Телефон ответил на вопрос 1, ноутбук на вопрос 2. Наивная перезапись
+  // Телефон ответил на вопрос 1, ноутбук ответил на вопрос 2. Наивная перезапись
   // снимка потеряла бы одну из сессий целиком.
   const phone = snapshot({ qprog: { 1: { correct: 1, wrong: 0, lastSeen: 100 } } }, 100, 'phone');
   const laptop = snapshot({ qprog: { 2: { correct: 1, wrong: 0, lastSeen: 200 } } }, 200, 'laptop');

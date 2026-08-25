@@ -16,7 +16,7 @@
 		Referrer-Policy "no-referrer"
 		# Приложение не встраивает сторонний код; connect-src 'self' не даёт
 		# утечь прогрессу на чужой домен, если в разметку попадёт инъекция.
-		Content-Security-Policy "default-src 'self'; script-src 'self'; script-src-elem 'self'; script-src-attr 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; script-src-elem 'self'; script-src-attr 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' wss://{$IPMAX_DOMAIN}; base-uri 'none'; form-action 'none'; object-src 'none'"
 		-Server
 	}
 
@@ -24,15 +24,26 @@
 	@api path /api/*
 	header @api Cache-Control "no-store"
 
-	reverse_proxy app:4173 {
-		# X-Forwarded-For проставляет Caddy; приложение доверяет заголовку
-		# только при IPMAX_TRUST_PROXY=true, поэтому подделать его снаружи
-		# нельзя — прокси перезаписывает значение клиента.
-		header_up X-Forwarded-For {remote_host}
+	route {
+		# Runner изолирован от app: только этот путь получает WebSocket/HTTP
+		# лабораторий, остальные API и PWA по-прежнему идут в app.
+		reverse_proxy /api/polygon/* polygon-runner:4180
+		reverse_proxy app:4173 {
+			# X-Forwarded-For проставляет Caddy; приложение доверяет заголовку
+			# только при IPMAX_TRUST_PROXY=true, поэтому подделать его снаружи
+			# нельзя — прокси перезаписывает значение клиента.
+			header_up X-Forwarded-For {remote_host}
+		}
 	}
 
 	log {
 		output stdout
-		format console
+		# Terminal token передаётся как WebSocket subprotocol. Caddy по умолчанию
+		# редактирует Authorization, но не этот заголовок — удаляем его явно.
+		format filter {
+			request>headers>Sec-WebSocket-Protocol delete
+			request>headers>Sec-Websocket-Protocol delete
+			wrap console
+		}
 	}
 }

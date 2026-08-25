@@ -216,17 +216,18 @@ test('npm start reads .env without requiring the file to exist', () => {
   const missing = spawnSync(process.execPath, ['--env-file-if-exists=.env.missing-probe', '-e', 'process.exit(0)'], { cwd: root, encoding: 'utf8' });
   assert.equal(missing.status, 0, 'отсутствующий .env не должен ронять запуск: ' + missing.stderr);
 
-  const probe = path.join(root, '.env.release-probe');
+  const probeName = '.env.release-probe-' + process.pid;
+  const probe = path.join(root, probeName);
   fs.writeFileSync(probe, 'IPMAX_ENV_PROBE=loaded-from-file\n', 'utf8');
   try {
-    const loaded = spawnSync(process.execPath, ['--env-file-if-exists=.env.release-probe', '-e', 'process.stdout.write(String(process.env.IPMAX_ENV_PROBE))'], { cwd: root, encoding: 'utf8' });
+    const loaded = spawnSync(process.execPath, ['--env-file-if-exists=' + probeName, '-e', 'process.stdout.write(String(process.env.IPMAX_ENV_PROBE))'], { cwd: root, encoding: 'utf8' });
     assert.equal(loaded.stdout, 'loaded-from-file', 'переменные из .env должны попадать в process.env');
   } finally {
     fs.rmSync(probe, { force: true });
   }
 });
 
-test('Caddy CSP permits legacy event handlers without allowing external scripts', () => {
+test('Caddy CSP permits legacy event handlers and the same-origin polygon WebSocket only', () => {
   // Интерфейс пока использует onclick="..." в HTML и динамической разметке.
   // Разрешаем только атрибутные обработчики; загружаемые <script> по-прежнему
   // должны приходить исключительно с нашего origin.
@@ -241,6 +242,36 @@ test('Caddy CSP permits legacy event handlers without allowing external scripts'
   assert.deepEqual(directives['script-src'], ["'self'"]);
   assert.deepEqual(directives['script-src-elem'], ["'self'"]);
   assert.deepEqual(directives['script-src-attr'], ["'unsafe-inline'"]);
+  assert.deepEqual(directives['connect-src'], ["'self'", 'wss://{$IPMAX_DOMAIN}']);
+  assert.match(caddy, /reverse_proxy \/api\/polygon\/\* polygon-runner:4180/);
+  assert.match(caddy, /request>headers>Sec-WebSocket-Protocol delete/);
+  assert.match(caddy, /request>headers>Sec-Websocket-Protocol delete/);
+  assert.doesNotMatch(caddy, /reverse_proxy \/api\/\* polygon-runner/);
+});
+
+test('polygon runner is bounded and is the only service receiving the Docker socket', () => {
+  const compose = read('docker-compose.yml');
+  const runner = compose.match(/  polygon-runner:\n([\s\S]*?)\n  polygon-task-linux-permissions:/);
+  const task = compose.match(/  polygon-task-linux-permissions:\n([\s\S]*?)\n  caddy:/);
+  const app = compose.match(/  app:\n([\s\S]*?)\n  polygon-runner:/);
+  assert.ok(runner && task && app, 'compose должен разделять app, runner и task image');
+  assert.match(runner[1], /\/var\/run\/docker\.sock:\/var\/run\/docker\.sock/);
+  assert.match(runner[1], /read_only: true/);
+  assert.match(runner[1], /mem_limit: 160m/);
+  assert.match(runner[1], /cpus: 0\.35/);
+  assert.match(runner[1], /pids_limit: 96/);
+  assert.match(runner[1], /no-new-privileges:true/);
+  assert.doesNotMatch(app[1], /docker\.sock|privileged:/);
+  assert.doesNotMatch(task[1], /docker\.sock|privileged:|ports:/);
+  assert.match(task[1], /profiles:\n\s+- polygon-images/, 'task image не должен стартовать как постоянный сервис');
+
+  const adapter = read('polygon-runner/docker-adapter.js');
+  assert.match(adapter, /'--network', 'none'/);
+  assert.match(adapter, /'--memory-swap', String\(spec\.memorySwapBytes\)/);
+  assert.match(adapter, /'--cap-drop', 'ALL'/);
+  assert.match(adapter, /'--security-opt', 'no-new-privileges:true'/);
+  assert.match(adapter, /e0403fdd8ef7770dcf60fc143e51dc328998e85fa78b0f0989ce0a625236b236/);
+  assert.doesNotMatch(adapter, /--privileged|docker\.sock/);
 });
 
 test('secrets are kept out of git and the image', () => {

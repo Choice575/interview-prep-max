@@ -88,11 +88,29 @@ git check-ignore -v .env    # должен показать правило .giti
 
 ## 4. Запуск
 
+Полигон использует заранее собранный образ задачи. Сервис задачи находится в
+Compose-профиле `polygon-images`: профиль не запускают постоянно, но его image
+нужно собрать до старта runner.
+
 ```bash
-docker compose up -d --build
-docker compose ps           # оба контейнера healthy/running
+# Образ временной Linux-лаборатории. --network=host нужен на небольшом VPS,
+# где обычная build-сеть периодически зависает на apk/pip.
+DOCKER_BUILDKIT=0 docker build --network=host \
+  -t ipmax-polygon-linux-permissions:v1 \
+  ./polygon-runner/task-linux-permissions
+
+# Основное приложение и отдельный доверенный runner.
+DOCKER_BUILDKIT=0 docker compose build --network=host app polygon-runner
+docker compose up -d --no-build
+docker compose ps           # app healthy, polygon-runner healthy, caddy running
 docker compose logs -f caddy
 ```
+
+Runner — доверенный компонент с доступом к `/var/run/docker.sock`, поэтому его
+код и зависимости проходят review. Пользовательский lab-контейнер socket не
+получает: он запускается без сети и mounts, без `--privileged`, с 256 MiB RAM,
+0.5 CPU и 64 PID. Для hostile multi-tenant эту схему нельзя считать достаточной —
+там нужна отдельная VM/gVisor/Kata; текущий полигон рассчитан на одного владельца.
 
 В логах Caddy дождитесь строки о полученном сертификате. Первый выпуск занимает
 до минуты.
@@ -102,6 +120,9 @@ docker compose logs -f caddy
 ```bash
 curl https://ipmax-mikhail.duckdns.org/api/sync/status
 # {"enabled":true,"hasSnapshot":false,"revision":0,"maxBytes":1048576}
+
+curl https://ipmax-mikhail.duckdns.org/api/polygon/tasks
+# {"tasks":[{"id":"linux-permissions-lockout",...}]}
 ```
 
 `enabled: true` означает, что токен принят. Если `false` — токен короче 24
@@ -141,12 +162,23 @@ crontab -e
 
 ```bash
 cd ~/interview-prep-max
-git pull
-docker compose up -d --build
+git pull --ff-only
+
+# Сначала task image — старые app/caddy продолжают обслуживать сайт.
+DOCKER_BUILDKIT=0 docker build --network=host \
+  -t ipmax-polygon-linux-permissions:v1 \
+  ./polygon-runner/task-linux-permissions
+DOCKER_BUILDKIT=0 docker compose build --network=host app polygon-runner
+
+# Переключение только после успешной сборки обоих образов.
+docker compose up -d --no-build
+docker compose ps
 ```
 
 Прогресс не теряется: он на именованном томе, а не в образе. Браузер покажет
-баннер обновления, Service Worker подхватит новую версию.
+баннер обновления, Service Worker подхватит новую версию. При обновлении runner
+его `shutdown()` удаляет активную временную лабораторию; пользователь запускает
+её заново, durable результат остаётся в `polygon_progress`.
 
 ## Диагностика
 

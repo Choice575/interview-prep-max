@@ -13,7 +13,7 @@
     // Daily blitz and achievement state must travel with the progress file:
     // without them an import resets the streak and re-fires "new badge" dots.
     'daily_blitz', 'gamification', 'qbank_revealed',
-    'inc_prog',
+    'inc_prog', 'polygon_progress',
     // Прогресс MLOps-программы хранится отдельно от study_progress, поэтому в
     // перенос он должен попасть своим ключом: иначе переезд на другое
     // устройство молча обнуляет вторую учебную программу.
@@ -88,6 +88,22 @@
       typeof item.topic === 'string' && item.topic.length <= 80 && typeof item.correct === 'boolean');
   }
 
+  function normalisePolygonProgress(value) {
+    if (!isRecord(value)) return {};
+    const out = {};
+    Object.entries(value).forEach(([taskId, entry]) => {
+      if (!/^[a-z0-9][a-z0-9-]{1,79}$/.test(taskId) || !isRecord(entry)) return;
+      if (!['started', 'done'].includes(entry.status)) return;
+      const score = Number(entry.score);
+      if (!Number.isFinite(score) || score < 0 || score > 100) return;
+      const completedAt = Number(entry.completedAt);
+      if (entry.status === 'done' && (!Number.isFinite(completedAt) || completedAt <= 0)) return;
+      out[taskId] = { status: entry.status, score,
+        ...(entry.status === 'done' ? { completedAt } : {}) };
+    });
+    return out;
+  }
+
   function validationOptions(options) {
     const source = options || {};
     const baseQuestions = typeof source.getBaseQuestions === 'function' ? source.getBaseQuestions() : source.baseQuestions;
@@ -109,6 +125,8 @@
       (Number.isFinite(data.stats.total) && Number.isFinite(data.stats.correct) && data.stats.correct > data.stats.total)
     )) invalid.push('stats');
     if ('qprog' in data && isRecord(data.qprog) && !validateQuestionProgress(data.qprog)) invalid.push('qprog');
+    if ('polygon_progress' in data && isRecord(data.polygon_progress) &&
+        Object.keys(normalisePolygonProgress(data.polygon_progress)).length !== Object.keys(data.polygon_progress).length) invalid.push('polygon_progress');
     if ('history' in data && Array.isArray(data.history) && !validateHistory(data.history)) invalid.push('history');
     if ('study_position' in data && (!isRecord(data.study_position) || !Number.isInteger(data.study_position.week) ||
       !Number.isInteger(data.study_position.day) || data.study_position.week < 1 || data.study_position.week > 100 ||
@@ -136,6 +154,7 @@
     const data = validateProgressImport(rawData, deps);
     const entries = {};
     IMPORT_RECORD_KEYS.forEach(key => { if (key in data) entries[key] = data[key]; });
+    if ('polygon_progress' in data) entries.polygon_progress = normalisePolygonProgress(data.polygon_progress);
     if ('coach_control' in data) entries.coach_control = deps.normaliseControlSession(data.coach_control);
     IMPORT_ARRAY_KEYS.forEach(key => {
       if (!(key in data)) return;
@@ -179,6 +198,7 @@
       study_program: get('study_program', 'devops'),
       mlops_progress: get('mlops_progress', {}), mlops_position: get('mlops_position', { week: 1, day: 1 }),
       senior_case_prog: get('senior_case_prog', {}),
+      polygon_progress: normalisePolygonProgress(get('polygon_progress', {})),
       skill_events: typeof source.getSkillEvents === 'function' ? source.getSkillEvents() : [],
       coach_journal: typeof source.getCoachJournal === 'function' ? source.getCoachJournal() : [],
       ai_review_history: get('ai_review_history', []), interview_ai_history: get('interview_ai_history', []),
@@ -290,7 +310,7 @@
 
   return {
     IMPORT_MAX_BYTES, IMPORT_MAX_DEPTH, IMPORT_MAX_NODES, IMPORT_RECORD_KEYS, IMPORT_ARRAY_KEYS,
-    isRecord, validateBoundedImportValue, validateCustomQuestions, validateQuestionProgress, validateHistory,
+    isRecord, validateBoundedImportValue, validateCustomQuestions, validateQuestionProgress, validateHistory, normalisePolygonProgress,
     validateProgressImport, prepareImport, createExportData, create
   };
 });

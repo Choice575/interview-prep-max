@@ -767,6 +767,18 @@ button.study-recommendation{cursor:pointer}.study-recommendation:hover{border-co
 .task-instructions{background:var(--bg3);padding:12px;border-left:3px solid var(--primary);margin-bottom:20px;color:var(--text2);line-height:1.6}
 .form-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:20px}
 
+/* ═══ DEVOPS POLYGON ═══ */
+.polygon-hero{margin-bottom:12px;padding:18px;border:1px solid var(--border);border-radius:10px;background:linear-gradient(135deg,var(--bg2),var(--primary-dim))}
+.polygon-hero h1{margin:4px 0 6px}.polygon-loading,.polygon-error{padding:18px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text2)}
+.polygon-error{display:flex;align-items:center;justify-content:space-between;gap:12px;border-color:color-mix(in srgb,var(--red) 45%,var(--border))}
+.polygon-catalog{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-bottom:18px}.polygon-card{padding:18px;border:1px solid var(--border);border-radius:10px;background:var(--bg2)}
+.polygon-card-done{border-color:var(--green);background:color-mix(in srgb,var(--green) 6%,var(--bg2))}.polygon-card-head,.polygon-session-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.polygon-card h2,.polygon-session h2{margin:4px 0 8px}
+.polygon-limits{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.polygon-limits span{padding:4px 8px;border:1px solid var(--border);border-radius:999px;color:var(--text2);font-size:12px}.polygon-criteria-preview{margin:12px 0 16px;padding-left:20px;color:var(--text2);font-size:13px;line-height:1.7}
+.polygon-session{padding:18px;border:1px solid var(--primary);border-radius:10px;background:var(--bg2);margin-bottom:18px}.polygon-expiry{white-space:nowrap;color:var(--primary-h);font-size:12px;font-weight:700}.polygon-warning{margin:10px 0;padding:10px 12px;border-left:3px solid var(--yellow);background:var(--bg3);color:var(--text2);font-size:12px;line-height:1.5}
+.polygon-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:12px 0}.polygon-check{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:12px}.polygon-check-pass{border-color:var(--green);color:var(--green);background:var(--green-dim)}
+.polygon-terminal{overflow:hidden;border:1px solid var(--border2);border-radius:8px;background:#090d16}.polygon-terminal pre{height:300px;margin:0;padding:12px;overflow:auto;color:#d6e3ff;background:#090d16;font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}.polygon-terminal-line{display:flex;align-items:center;gap:8px;padding:8px 10px;border-top:1px solid #25314a;color:#7dd3fc;font:12px ui-monospace,SFMono-Regular,Consolas,monospace}.polygon-terminal-line input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:#fff;font:inherit}.polygon-session-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.polygon-status{min-height:20px;margin-top:8px;color:var(--text2);font-size:12px}.external-more{margin-top:18px}.external-more>summary{cursor:pointer;font-weight:700;color:var(--text2)}
+@media(max-width:560px){.polygon-card-head,.polygon-session-head{flex-direction:column}.polygon-checks{grid-template-columns:1fr}.polygon-terminal pre{height:240px}.polygon-terminal-line{flex-wrap:wrap}.polygon-terminal-line input{flex-basis:calc(100% - 90px)}.polygon-session-actions .btn{width:100%;justify-content:center}}
+
 /* ═══ CATALOG ═══ */
 .catalog-hero{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
 .catalog-hero-copy{flex:1 1 320px}

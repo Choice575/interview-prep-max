@@ -30,6 +30,7 @@ const browserGlobals = {
   Blob: 'readonly',
   FileReader: 'readonly',
   AbortController: 'readonly',
+  WebSocket: 'readonly',
   Response: 'readonly',
   Request: 'readonly',
   Headers: 'readonly',
@@ -93,6 +94,7 @@ const appGlobals = {
   IPMaxTrainersUI: 'readonly',
   IPMaxQuestionBankUI: 'readonly',
   IPMaxExternalTasksUI: 'readonly',
+  IPMaxPolygonUI: 'readonly',
   IPMaxInterviewPracticeUI: 'readonly',
   IPMaxAICoach: 'readonly',
   IPMaxSyncMerge: 'readonly',
@@ -177,7 +179,7 @@ export default [
     files: [
       'coach.js', 'coach-ui.js', 'ai-coach.js', 'storage.js', 'progress.js', 'progress-io.js',
       'date.js', 'home-ui.js', 'exam-ui.js', 'flashcards-ui.js', 'study-ui.js', 'analytics-ui.js', 'offline-ui.js',
-      'sources-ui.js', 'best-practices-ui.js', 'catalog-ui.js', 'chapter-ui.js', 'ai-tutor.js', 'ai-tutor-ui.js', 'router.js', 'question-bank-ui.js', 'external-tasks-ui.js', 'interview-practice-ui.js', 'study-curriculum-rules.js', 'question-quality.js',
+      'sources-ui.js', 'best-practices-ui.js', 'catalog-ui.js', 'chapter-ui.js', 'ai-tutor.js', 'ai-tutor-ui.js', 'router.js', 'question-bank-ui.js', 'external-tasks-ui.js', 'polygon-ui.js', 'interview-practice-ui.js', 'study-curriculum-rules.js', 'question-quality.js',
       'gamification.js', 'gamification-ui.js', 'daily.js', 'daily-ui.js', 'trainers-ui.js',
       'sync-merge.js', 'sync-client.js', 'sync-ui.js',
       'ai-settings-client.js', 'ai-settings-ui.js'
@@ -199,7 +201,7 @@ export default [
       // server/**/*.js попадал в ту же ловушку, что и scripts/**: ни один блок
       // его не матчил, поэтому серверные модули (ai-service, sync-service)
       // проверялись с нулём правил и no-undef в них молча проходил.
-      'server/**/*.js',
+      'server/**/*.js', 'polygon-runner/**/*.js',
       'playwright.config.js', '*.test.js', 'e2e/**/*.js', 'scripts/**/*.js'
     ],
     languageOptions: {

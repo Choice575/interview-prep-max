@@ -11,7 +11,7 @@ const SHELL_ASSETS = [
   './ai-settings-client.js', './ai-settings-ui.js',
   './offline-ui.js', './sources-ui.js', './best-practices-ui.js', './catalog-ui.js', './chapter-ui.js', './ai-tutor.js', './ai-tutor-ui.js', './router.js',
   './gamification.js', './gamification-ui.js', './daily.js', './daily-ui.js', './trainers-ui.js',
-  './question-bank-ui.js', './external-tasks-ui.js', './interview-practice-ui.js', './analytics-ui.js', './home-ui.js',
+  './question-bank-ui.js', './external-tasks-ui.js', './polygon-ui.js', './interview-practice-ui.js', './analytics-ui.js', './home-ui.js',
   './exam-ui.js', './flashcards-ui.js', './study-ui.js', './coach-ui.js',
   './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png',
   './assets/icon-512.png'

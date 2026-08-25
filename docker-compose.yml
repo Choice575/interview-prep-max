@@ -38,6 +38,43 @@ services:
     networks:
       - ipmax
 
+  polygon-runner:
+    build:
+      context: .
+      dockerfile: polygon-runner/Dockerfile
+    image: interview-prep-max-polygon-runner:latest
+    restart: unless-stopped
+    expose:
+      - "4180"
+    environment:
+      IPMAX_SYNC_TOKEN: ${IPMAX_SYNC_TOKEN:?IPMAX_SYNC_TOKEN обязателен}
+      POLYGON_HOST: 0.0.0.0
+      POLYGON_PORT: 4180
+      POLYGON_MAX_SESSIONS: 1
+      POLYGON_TTL_MS: 1200000
+    volumes:
+      # Только доверенный runner управляет заранее ограниченными lab-контейнерами.
+      # Само пользовательское окружение Docker socket не получает.
+      - /var/run/docker.sock:/var/run/docker.sock
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    mem_limit: 160m
+    cpus: 0.35
+    pids_limit: 96
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - ipmax
+
+  polygon-task-linux-permissions:
+    image: ipmax-polygon-linux-permissions:v1
+    build:
+      context: ./polygon-runner/task-linux-permissions
+    profiles:
+      - polygon-images
+    command: ["/bin/true"]
+
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -57,6 +94,7 @@ services:
       - caddy-config:/config
     depends_on:
       - app
+      - polygon-runner
     networks:
       - ipmax
 
