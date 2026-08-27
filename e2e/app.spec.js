@@ -130,20 +130,20 @@ test('keeps curriculum and video flashcards as separate visible decks', async ({
   await page.locator('[data-page="flashcards"]').click();
 
   await expect(page.locator('#page-flashcards')).toHaveClass(/active/);
-  await expect(page.locator('#sb-flashcards-count')).toHaveText('3331');
+  await expect(page.locator('#sb-flashcards-count')).toHaveText('3374');
   const studyDeck = page.locator('[data-flashcards-action="deck"][data-deck="study"]');
   const videoDeck = page.locator('[data-flashcards-action="deck"][data-deck="video"]');
   await expect(studyDeck).toContainText('Учебная программа');
   await expect(studyDeck.locator('strong')).toHaveText('3045');
   await expect(videoDeck).toContainText('Собеседования из видео');
-  await expect(videoDeck.locator('strong')).toHaveText('286');
+  await expect(videoDeck.locator('strong')).toHaveText('329');
   await expect(page.locator('.study-card').first()).toHaveAttribute('data-card-id', '1000001');
 
   await videoDeck.click();
   await expect(videoDeck).toHaveClass(/active/);
   await expect(page.locator('.study-card').first()).toHaveAttribute('data-card-id', '2000001');
   await expect(page.locator('.study-card-source a')).toHaveAttribute('href', /vkvideo\.ru/);
-  await expect(page.locator('.flashcards-stats')).toContainText('286 всего');
+  await expect(page.locator('.flashcards-stats')).toContainText('329 всего');
 
   await studyDeck.click();
   await expect(page.locator('.study-card').first()).toHaveAttribute('data-card-id', '1000001');
@@ -635,7 +635,7 @@ test('defers exam cards and renders the full list in batches', async ({ page }) 
   await expect(page.locator('#questions-container .q-card')).toHaveCount(0);
   await page.locator('[data-page="exam"]').click();
   await expect(page.locator('#questions-container .q-card')).toHaveCount(12);
-  await expect(page.locator('#questions-load-more')).toContainText('12/818');
+  await expect(page.locator('#questions-load-more')).toContainText('12/861');
   await page.locator('#questions-load-more button').click();
   await expect(page.locator('#questions-container .q-card')).toHaveCount(24);
 });

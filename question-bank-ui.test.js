@@ -215,7 +215,7 @@ test('question_bank.json: структура и уникальность иде�
   const ids = new Set();
   const slugs = new Set();
   const KNOWN_TOPICS = ['Terraform', 'Linux', 'Сети', 'Ansible', 'Docker', 'Kubernetes',
-    'CI/CD', 'Git', 'Regex', 'Monitoring', 'Cloud', 'Security', 'System Design'];
+    'CI/CD', 'Git', 'Regex', 'Monitoring', 'Cloud', 'Security', 'System Design', 'DevOps'];
   const KNOWN_LEVELS = ['Junior', 'Middle', 'Senior'];
 
   categories.forEach(category => {

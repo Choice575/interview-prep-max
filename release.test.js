@@ -108,9 +108,9 @@ test('publishes separate video flashcards from release 15.2.0 onward', async () 
   const [major, minor] = RELEASE_VERSION.split('.').map(Number);
   assert.ok(major > 15 || (major === 15 && minor >= 2), 'video flashcards require release >= 15.2.0');
   const video = JSON.parse(read('tasks/video_flashcards.json'));
-  assert.equal(video.cards.length, 286);
+  assert.equal(video.cards.length, 329);
   assert.equal(video.cards[0].id, 2000001);
-  assert.equal(video.cards.at(-1).id, 2000286);
+  assert.equal(video.cards.at(-1).id, 2000329);
 
   const worker = loadServiceWorker();
   await dispatchExtendable(worker.handlers.get('install'));

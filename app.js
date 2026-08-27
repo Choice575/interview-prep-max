@@ -719,7 +719,7 @@ const flashcardsUI=requireFlashcardsUIModule().create({
   getCards:()=>Array.isArray(FLASHCARDS_DATA?.cards)?FLASHCARDS_DATA.cards:[],
   getDecks:()=>[
     {id:'study',label:'Учебная программа',description:'3 045 карточек из учебного корпуса DevOps и MLOps.',cards:Array.isArray(FLASHCARDS_DATA?.cards)?FLASHCARDS_DATA.cards:[]},
-    {id:'video',label:'Собеседования из видео',description:'286 реальных вопросов из 9 видео с техническими собеседованиями.',cards:Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards:[]}
+    {id:'video',label:'Собеседования из видео',description:(Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards.length:0)+' реальных вопросов из '+(Array.isArray(VIDEO_FLASHCARDS_DATA?.sources)?VIDEO_FLASHCARDS_DATA.sources.length:0)+' видео с техническими собеседованиями.',cards:Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards:[]}
   ],
   getProgress:getQProg,now:()=>Date.now(),
   recordAttempt:(card,outcome,deck)=>recordQuestionResult({id:card.id,topic:card.collection},{outcome,source:deck?.id==='video'?'video_flashcards':'flashcards',syncMistakes:false,history:true})

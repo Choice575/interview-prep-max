@@ -39,10 +39,14 @@ test('registers flashcards across data loading, navigation and the browser shell
 
 test('labels the flashcard page as two distinguishable sources', () => {
   const html = read('index.html');
+  const app = read('app.js');
   assert.match(html, />Карточки<span class="sb-count" id="sb-flashcards-count">/);
   assert.match(html, /<h2>Карточки<\/h2>/);
   assert.match(html, /Учебная программа/);
   assert.match(html, /Собеседования из видео/);
+  assert.doesNotMatch(app, /286 реальных вопросов из 9 видео/);
+  assert.match(app, /VIDEO_FLASHCARDS_DATA\?\.cards/);
+  assert.match(app, /VIDEO_FLASHCARDS_DATA\?\.sources/);
 });
 
 test('runs flashcard tests through the declared project command', () => {

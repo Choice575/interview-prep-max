@@ -1,5 +1,13 @@
 # Changelog
 
+## v15.4.0 (2026-08-27)
+
+- Добавлены 43 содержательных вопроса из открытого DevOps-собеседования с Head of DevOps в KTS.
+- Вопросы синхронно добавлены в видеокарточки, банк вопросов и раздел вопросов с вариантами.
+- Покрыты Docker, Kubernetes/etcd, Linux, Monitoring/PostgreSQL, System Design, очереди, WebSocket и технический Q&A по сетям и AI.
+- Для каждой записи сохранены источник, таймкод и ссылка на соответствующий момент видео.
+- Варианты ответов сбалансированы по позициям и проверяются quality-gate без подсказок по длине и абсолютным формулировкам.
+
 ## v15.3.1 (2026-08-25)
 
 - Terminal output from the polygon runner is now sent as WebSocket text frames, so the browser renders shell output instead of `[object Blob]`.
