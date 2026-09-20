@@ -1305,3 +1305,7 @@ button:disabled,[aria-disabled="true"]{cursor:not-allowed}
   .flashcards-controls{grid-template-columns:1fr}
   .study-card{padding:15px}.study-card h2{font-size:15px}.study-card-rates .btn{flex:1 1 100%}
 }
+
+/* Keep section controls inert until their data is available. */
+.page-data-pending > :not(.page-data-status){display:none!important}
+.page-data-status{max-width:640px;margin:24px auto}

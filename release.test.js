@@ -114,7 +114,7 @@ test('publishes separate video flashcards from release 15.2.0 onward', async () 
 
   const worker = loadServiceWorker();
   await dispatchExtendable(worker.handlers.get('install'));
-  assert.ok(worker.added().includes('./tasks/video_flashcards.json'));
+  assert.ok(!worker.added().includes('./tasks/video_flashcards.json'), 'video deck is cached when opened');
 
   const server = createAppServer();
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
@@ -135,21 +135,19 @@ test('publishes the current version with a complete offline shell', async () => 
   assert.ok(worker.precached().includes('./study-ui.js'));
   assert.ok(worker.precached().includes('./ai-tutor.js'));
   assert.ok(worker.precached().includes('./ai-tutor-ui.js'));
-  assert.ok(worker.added().includes('./tasks/study_map.json'));
-  assert.ok(worker.added().includes('./tasks/study_tests.json'));
-  assert.ok(worker.added().includes('./tasks/senior_cases.json'));
+  assert.deepEqual(worker.added(), ['./tasks/base_questions.json', './tasks/best_practices.json']);
 });
 
 test('installs the offline shell even when one dataset is unavailable', async () => {
-  const worker = loadServiceWorker([], { unavailable: ['./tasks/labs.json'] });
+  const worker = loadServiceWorker([], { unavailable: ['./tasks/best_practices.json'] });
 
   await dispatchExtendable(worker.handlers.get('install'));
 
   assert.ok(worker.precached().includes('./index.html'), 'shell must stay atomic');
   assert.ok(worker.precached().includes('./app.js'));
   assert.ok(!worker.precached().some(asset => asset.startsWith('./tasks/')), 'datasets cache separately');
-  assert.ok(worker.added().includes('./tasks/study_map.json'), 'healthy datasets still cached');
-  assert.ok(!worker.added().includes('./tasks/labs.json'), 'broken dataset is skipped');
+  assert.ok(worker.added().includes('./tasks/base_questions.json'), 'healthy core data still cached');
+  assert.ok(!worker.added().includes('./tasks/best_practices.json'), 'broken dataset is skipped');
 });
 
 test('fails the install when the offline shell itself is unavailable', async () => {
@@ -250,7 +248,7 @@ test('Caddy CSP permits legacy event handlers and the same-origin polygon WebSoc
 });
 
 test('polygon runner is bounded and is the only service receiving the Docker socket', () => {
-  const compose = read('docker-compose.yml');
+  const compose = read('docker-compose.yml').replace(/\r\n/g, '\n');
   const runner = compose.match(/  polygon-runner:\n([\s\S]*?)\n  polygon-task-linux-permissions:/);
   const task = compose.match(/  polygon-task-linux-permissions:\n([\s\S]*?)\n  caddy:/);
   const app = compose.match(/  app:\n([\s\S]*?)\n  polygon-runner:/);

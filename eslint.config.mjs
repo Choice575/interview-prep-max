@@ -74,6 +74,7 @@ const nodeGlobals = {
 // index.html, plus module globals that load via script tags. ESLint cannot see
 // those call sites, so they must not be reported as unused.
 const appGlobals = {
+  IPMaxDataLoader: 'readonly',
   IPMaxStudyUI: 'readonly',
   IPMaxExamUI: 'readonly',
   IPMaxFlashcardsUI: 'readonly',
@@ -177,7 +178,7 @@ export default [
   {
     // UMD modules: work in both the browser and Node.
     files: [
-      'coach.js', 'coach-ui.js', 'ai-coach.js', 'storage.js', 'progress.js', 'progress-io.js',
+      'coach.js', 'coach-ui.js', 'ai-coach.js', 'storage.js', 'data-loader.js', 'progress.js', 'progress-io.js',
       'date.js', 'home-ui.js', 'exam-ui.js', 'flashcards-ui.js', 'study-ui.js', 'analytics-ui.js', 'offline-ui.js',
       'sources-ui.js', 'best-practices-ui.js', 'catalog-ui.js', 'chapter-ui.js', 'ai-tutor.js', 'ai-tutor-ui.js', 'router.js', 'question-bank-ui.js', 'external-tasks-ui.js', 'polygon-ui.js', 'interview-practice-ui.js', 'study-curriculum-rules.js', 'question-quality.js',
       'gamification.js', 'gamification-ui.js', 'daily.js', 'daily-ui.js', 'trainers-ui.js',

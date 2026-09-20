@@ -20,7 +20,7 @@ const contentTypes = {
   '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json', '.png': 'image/png'
 };
 const publicFiles = new Set([
-  'index.html', 'styles.css', 'version.js', 'date.js', 'storage.js', 'progress.js', 'coach.js', 'ai-coach.js', 'progress-io.js',
+  'index.html', 'styles.css', 'version.js', 'data-loader.js', 'date.js', 'storage.js', 'progress.js', 'coach.js', 'ai-coach.js', 'progress-io.js',
   // Модули синхронизации нужны браузеру, поэтому они публичные. Серверная
   // часть (server/sync-service.js) сюда НЕ попадает и остаётся закрытой.
   'sync-merge.js', 'sync-client.js', 'sync-ui.js', 'ai-settings-client.js', 'ai-settings-ui.js',

@@ -13,7 +13,7 @@ WORKDIR /app
 RUN mkdir -p /data && chown -R node:node /data
 
 COPY --chown=node:node package.json ./
-COPY --chown=node:node version.js date.js storage.js progress.js coach.js ai-coach.js progress-io.js ./
+COPY --chown=node:node version.js data-loader.js date.js storage.js progress.js coach.js ai-coach.js progress-io.js ./
 COPY --chown=node:node sync-merge.js sync-client.js sync-ui.js ./
 COPY --chown=node:node ai-settings-client.js ai-settings-ui.js ./
 COPY --chown=node:node offline-ui.js sources-ui.js best-practices-ui.js catalog-ui.js chapter-ui.js ai-tutor.js ai-tutor-ui.js router.js ./

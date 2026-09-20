@@ -51,69 +51,58 @@ const DATA_VARS = {
   study_tests: 'STUDY_TESTS', mlops_map: 'MLOPS_MAP', mlops_tests: 'MLOPS_TESTS', senior_cases: 'SENIOR_CASES', best_practices: 'BEST_PRACTICES', question_sources: 'QUESTION_SOURCES', interview_practice: 'INTERVIEW_PRACTICE', external_tasks: 'EXTERNAL_TASKS', courses: 'COURSES', question_bank: 'QUESTION_BANK', flashcards: 'FLASHCARDS_DATA', video_flashcards: 'VIDEO_FLASHCARDS_DATA'
 };
 
-function dataSize(data){
-  if(Array.isArray(data)) return data.length;
-  if(data&&Array.isArray(data.weeks)) return data.weeks.length+' недель';
-  if(data&&Array.isArray(data.miniTests)) return data.miniTests.length+' мини-тестов';
-  if(data&&Array.isArray(data.cases)) return data.cases.length+' кейсов';
-  if(data&&Array.isArray(data.topics)) return data.topics.length+' тем';
-  if(data&&Array.isArray(data.cards)) return data.cards.length+' карточек';
-  return 'object';
-}
-
-function renderLoadFailure(errors, loadedCount, totalCount) {
-  const box = document.getElementById('app-loading');
-  const pct = totalCount ? Math.round(loadedCount / totalCount * 100) : 0;
-  box.innerHTML =
-    '<div style="font-size:48px;margin-bottom:16px">⚠️</div>'+
-    '<div style="font-size:18px;font-weight:700;margin-bottom:8px;color:var(--red)">Не удалось загрузить данные</div>'+
-    '<div style="font-size:12px;color:var(--text2);max-width:520px;margin:0 auto;line-height:1.7">'+
-    '<div>APP_VERSION: <b>'+APP_VERSION+'</b> · пакеты: <b>'+loadedCount+'/'+totalCount+'</b> · '+pct+'%</div>'+
-    '<div style="margin-top:8px;text-align:left;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px">'+
-    errors.map(e => '<div>• '+esc(e)+'</div>').join('')+
-    '</div>'+
-    '<div style="margin-top:8px">Если проблема повторяется, очистите кэш сайта или проверьте доступность JSON-файлов.</div>'+
-    '</div>'+
-    '<div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'+
-    '<button class="btn btn-primary" onclick="location.reload()">🔄 Повторить загрузку</button>'+
-    '<button class="btn btn-outline" onclick="checkOfflineReady()">📶 Проверить оффлайн</button>'+
-    '</div>';
-}
-
-async function loadAllData() {
-  const status = document.getElementById('load-status');
-  const totalCount = Object.keys(DATA_FILES).length;
-  const errors = [];
-  let loadedCount = 0;
-  let lastProgressAt = Date.now();
-  const watchdog = setInterval(() => {
-    const elapsed = Math.round((Date.now() - lastProgressAt) / 1000);
-    if (elapsed >= 8 && status) {
-      status.textContent = `Загрузка данных... ${loadedCount}/${totalCount}. Нет ответа ${elapsed}с. APP_VERSION ${APP_VERSION}`;
+const TRAINER_DATA=['ts','labs','code','subnet','ports','cmd','git','regex','dockerfile','k8s','ansible_pb','incidents'];
+const STUDY_DATA=['study_map','study_tests','mlops_map','mlops_tests','senior_cases'];
+const PAGE_DATA={
+  home:['base_questions'],exam:['base_questions'],analytics:['base_questions'],
+  study:STUDY_DATA,catalog:['courses'],
+  chapter:['courses','study_map','study_tests','senior_cases','labs','external_tasks','ts'],
+  flashcards:['flashcards','video_flashcards'],practices:['best_practices'],
+  qbank:['question_bank'],external:['external_tasks'],interview:['interview_practice'],
+  trainers:TRAINER_DATA,subnet:['subnet'],ts:['ts'],cmd:['cmd'],labs:['labs'],code:['code'],
+  ansible:['ansible_pb'],dockerfile:['dockerfile'],k8s:['k8s'],ports:['ports'],git:['git'],
+  regex:['regex'],tips:['tips'],incidents:['incidents']
+};
+const dataLoader=IPMaxDataLoader.create({files:DATA_FILES,fetch:(url,options)=>fetch(url,options),
+  onLoad:(key,data)=>{
+    window[DATA_VARS[key]]=data;
+    if(key==='base_questions'){
+      document.getElementById('sb-counter').textContent='DevOps Edition · '+getAllQ().length+' вопросов';
+      buildTopicFilters();
     }
-  }, 1000);
-  const promises = Object.entries(DATA_FILES).map(async ([key, url]) => {
-    try {
-      const resp = await fetch(url, {cache:'no-cache'});
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      const data = await resp.json();
-      window[DATA_VARS[key]] = data;
-      loadedCount++;
-      lastProgressAt = Date.now();
-      status.textContent = `Загружено: ${key} (${dataSize(data)}) · ${loadedCount}/${totalCount}`;
-    } catch (e) {
-      console.error(`Failed to load ${url}:`, e);
-      errors.push(`${key}: ${url} — ${e.message}`);
-      status.textContent = `Ошибка загрузки ${key} · ${loadedCount}/${totalCount}`;
+    if(key==='flashcards'||key==='video_flashcards'){
+      const count=document.getElementById('sb-flashcards-count');
+      if(count)count.textContent=(FLASHCARDS_DATA?.cards?.length||0)+(VIDEO_FLASHCARDS_DATA?.cards?.length||0);
     }
-  });
-  await Promise.all(promises);
-  clearInterval(watchdog);
-  if (errors.length > 0) {
-    renderLoadFailure(errors, loadedCount, totalCount);
-    throw new Error('Data loading failed: '+errors.join(', '));
   }
-  status.textContent = `Инициализация... APP_VERSION ${APP_VERSION}`;
+});
+let navigationRequest=0;
+function showPageDataStatus(page,error){
+  const host=document.getElementById('page-'+page);
+  if(!host)return;
+  host.classList.add('page-data-pending');
+  host.setAttribute('aria-busy',error?'false':'true');
+  let panel=host.querySelector('.page-data-status');
+  if(!panel){panel=document.createElement('div');panel.className='page-data-status card';host.prepend(panel);}
+  panel.setAttribute('role','status');panel.setAttribute('aria-live','polite');
+  panel.replaceChildren();
+  const text=document.createElement('p');
+  text.textContent=error?'Не удалось загрузить этот раздел. Остальные разделы доступны.':'Загружаем раздел…';
+  panel.appendChild(text);
+  if(error){
+    const retry=document.createElement('button');retry.type='button';retry.className='btn btn-primary';
+    retry.textContent='Повторить загрузку';retry.onclick=()=>nav(page);panel.appendChild(retry);
+  }
+}
+function clearPageDataStatus(page){
+  const host=document.getElementById('page-'+page);
+  if(!host)return;
+  host.classList.remove('page-data-pending');host.removeAttribute('aria-busy');
+  host.querySelector('.page-data-status')?.remove();
+}
+async function loadAllData(){
+  // Only the question engine is needed at startup; a failure must not lock navigation.
+  try{await dataLoader.load(['base_questions']);}catch(error){console.warn('Startup questions unavailable:',error);}
 }
 
 // ═══ STORAGE ═══
@@ -344,6 +333,7 @@ const PAGE_TITLES={home:'Сегодня',interview:'Ответы вслух',cat
   ansible:'Ansible Playbook',dockerfile:'Dockerfile',k8s:'K8s YAML',ports:'Порты TCP',labs:'Debugging',
   git:'Git-тренажёр',regex:'Regex-тренажёр',tips:'Советы',incidents:'Разбор инцидентов'};
 function nav(page){
+  const request=++navigationRequest;
   stopActiveSessions();
   const tutorModal=document.getElementById('ai-tutor-modal');
   if(tutorModal?.classList.contains('open')) closeAccessibleModal('ai-tutor-modal',false);
@@ -359,7 +349,28 @@ function nav(page){
   if(sb){sb.classList.add('active');sb.setAttribute('aria-current','page');}
   document.getElementById('page-title').textContent=PAGE_TITLES[page]||page;
   closeSidebar();
-  if(page==='home') renderHome();
+  syncHashWithPage(page);
+  const required=PAGE_DATA[page]||[];
+  if(!dataLoader.hasAll(required)){
+    showPageDataStatus(page,false);
+    return dataLoader.load(required).then(()=>{
+      if(request!==navigationRequest)return false;
+      clearPageDataStatus(page);renderPageContent(page);return true;
+    }).catch(error=>{
+      console.warn('Section data unavailable:',page,error);
+      if(request===navigationRequest)showPageDataStatus(page,true);
+      return false;
+    });
+  }
+  clearPageDataStatus(page);renderPageContent(page);return true;
+}
+function renderPageContent(page){
+  if(page==='home'){
+    renderHome();
+    dataLoader.load(['best_practices']).then(()=>{
+      if(pageActive('home')&&dailyUI)dailyUI.render();
+    }).catch(()=>{});
+  }
   if(page==='study'){cameFromStudy=false;interviewMode=false;renderStudy();}
   if(page==='catalog') renderCatalog();
   if(page==='chapter') renderChapterPage();
@@ -385,7 +396,7 @@ function nav(page){
   if(page==='interview') renderInterviewPractice();
   if(page==='git') renderGit();
   if(page==='regex') renderRegex();
-  syncHashWithPage(page);
+  if(page==='trainers')updateTrainersCount();
 }
 function resetCoachSelection(){coachSessionLimit=0;coachQuestionIds=null;}
 function startMode(m){resetCoachSelection();currentMode=m;document.querySelectorAll('#mode-chips .chip').forEach(c=>c.classList.remove('active'));nav('exam');}
@@ -1541,7 +1552,7 @@ function updateTrainersCount(){
   const label=document.getElementById('sb-trainers-count');
   if(!label||!trainersUI||typeof IPMaxTrainersUI==='undefined') return;
   const summary=IPMaxTrainersUI.summarise(trainersUI.statuses());
-  label.textContent=summary.total?summary.done+'/'+summary.total:'';
+  label.textContent=dataLoader.hasAll(TRAINER_DATA)&&summary.total?summary.done+'/'+summary.total:'';
 }
 
 // ═══ ANALYTICS ═══
@@ -2055,7 +2066,7 @@ async function initApp(){
   // Обновляем счётчик вопросов динамически
   document.getElementById('sb-counter').textContent = 'DevOps Edition · '+getAllQ().length+' вопросов';
   const flashcardsCount=document.getElementById('sb-flashcards-count');
-  if(flashcardsCount) flashcardsCount.textContent=(Array.isArray(FLASHCARDS_DATA?.cards)?FLASHCARDS_DATA.cards.length:0)+(Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards.length:0);
+  if(flashcardsCount) flashcardsCount.textContent='';
 
   // Строим UI с динамическими темами
   buildTopicFilters();
@@ -2091,7 +2102,7 @@ async function initApp(){
   }
 
   // Рендерим: маршрут из адресной строки имеет приоритет над главной.
-  if(!startRouting()) renderHome();
+  if(!startRouting()) nav('home');
 
   // Онбординг
   if(!getOnboardingProfile()){
@@ -2129,7 +2140,7 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 function requireOfflineUI(){if(typeof IPMaxOfflineUI==='undefined') throw new Error('Модуль offline-отчёта не загружен.');return IPMaxOfflineUI;}
 function offlineAssetList(){
-  const shell=['./','./index.html','./styles.css','./version.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./sync-merge.js','./sync-client.js','./sync-ui.js','./ai-settings-client.js','./ai-settings-ui.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./ai-tutor.js','./ai-tutor-ui.js','./router.js','./gamification.js','./gamification-ui.js','./daily.js','./daily-ui.js','./trainers-ui.js','./question-bank-ui.js','./external-tasks-ui.js','./polygon-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./flashcards-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const shell=['./','./index.html','./styles.css','./version.js', './data-loader.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./sync-merge.js','./sync-client.js','./sync-ui.js','./ai-settings-client.js','./ai-settings-ui.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./ai-tutor.js','./ai-tutor-ui.js','./router.js','./gamification.js','./gamification-ui.js','./daily.js','./daily-ui.js','./trainers-ui.js','./question-bank-ui.js','./external-tasks-ui.js','./polygon-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./flashcards-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   return shell.concat(Object.values(DATA_FILES).map(file=>'./'+file));
 }
 async function probeOfflineAssets(assets){
@@ -2327,10 +2338,13 @@ function toggleInterviewDictation(){
   recognition.start();
 }
 function requireSourcesUI(){if(typeof IPMaxSourcesUI==='undefined') throw new Error('Модуль источников не загружен.');return IPMaxSourcesUI;}
-function showSourcesReport(){
+async function showSourcesReport(){
   const body=document.getElementById('sources-report-body');
   openAccessibleModal('sources-modal','#sources-modal-close');
-  if(body) body.innerHTML=requireSourcesUI().renderPanel(QUESTION_SOURCES,Date.now());
+  if(!body)return;
+  body.textContent='Загружаем источники…';
+  try{await dataLoader.load(['question_sources']);body.innerHTML=requireSourcesUI().renderPanel(QUESTION_SOURCES,Date.now());}
+  catch(_error){body.textContent='Источники сейчас недоступны. Закройте окно и попробуйте снова.';}
 }
 function closeSourcesReport(){closeAccessibleModal('sources-modal');}
 function closeOfflineReport(){closeAccessibleModal('offline-modal');}
@@ -2391,7 +2405,9 @@ function startIncidentById(id){
   if(!found) return;
   startIncidentSim(found);
 }
-function startIncidentSim(preset){
+async function startIncidentSim(preset){
+  if(!dataLoader.has('incidents')){if(!await nav('incidents'))return;}
+  if(!dataLoader.has('base_questions')){if(!await nav('exam'))return;}
   if(!INCIDENTS.length){alert("Нет сценариев инцидентов");return;}
   // Без аргумента — случайный сценарий (кнопка «Другой инцидент» и быстрый
   // старт с главной), с аргументом — выбранный в списке.
@@ -2743,7 +2759,9 @@ function renderChapterPage(){
   const ui=requireChapterUI();
   const position=getChapterPosition();
   const course=position?ui.findCourse(COURSES,position.slug):null;
-  const chapter=course?ui.findChapter(course,position.chapterId):null;
+  const chapter=course?(ui.findChapter(course,position.chapterId)||course.chapters[0]):null;
+  if(chapter)lsSet('chapter_position',{slug:course.slug,chapterId:chapter.id});
+  if(!course&&position?.slug){nav('catalog');return;}
   if(!course||!chapter){
     host.innerHTML='<div class="empty-state"><p>Глава не выбрана. Откройте курс в разделе «Курсы».</p>'+
       '<button type="button" class="btn btn-primary" data-chapter-catalog="1">К списку курсов</button></div>';
@@ -2768,14 +2786,14 @@ function handleChapterClick(event){
   if(target.dataset.chapterStart&&position) startChapter(position.slug,target.dataset.chapterStart);
 }
 // Прохождение живёт в существующих разделах: своей механики у главы нет.
-function startChapter(courseSlug,chapterId){
+async function startChapter(courseSlug,chapterId){
   const ui=requireChapterUI();
   const course=ui.findCourse(COURSES,courseSlug);
   const chapter=course?ui.findChapter(course,chapterId):null;
   if(!chapter) return;
   const page=ui.targetPage(chapter);
   const source=chapter.source||{};
-  nav(page);
+  if(!await nav(page))return;
   if(page==='study'&&source.week) setStudyPosition(source.week,source.day||1);
 }
 
@@ -2818,12 +2836,7 @@ function applyRoute(route){
   applyingRoute=true;
   try{
     if(route.page==='chapter'&&route.courseSlug){
-      const course=typeof IPMaxChapterUI!=='undefined'?IPMaxChapterUI.findCourse(COURSES,route.courseSlug):null;
-      if(!course){nav('catalog');return;}
-      const chapter=route.chapterId?IPMaxChapterUI.findChapter(course,route.chapterId):null;
-      const targetId=(chapter||course.chapters[0]||{}).id;
-      if(!targetId){nav('catalog');return;}
-      lsSet('chapter_position',{slug:course.slug,chapterId:targetId});
+      lsSet('chapter_position',{slug:route.courseSlug,chapterId:route.chapterId});
       nav('chapter');
       return;
     }

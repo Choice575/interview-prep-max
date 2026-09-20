@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -24,6 +25,10 @@ jobs:
           for file in $(git ls-files '*.js'); do
             node --check "$file" || exit 1
           done
+      - name: Deployment safety tests
+        run: |
+          bash -n scripts/deploy-production.sh scripts/deploy-from-ci.sh
+          python3 -m unittest discover -s scripts -p 'test_deploy.py' -v
       - name: Lint
         run: npm run lint:strict
       - name: Unit and integration tests
@@ -48,3 +53,74 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Browser E2E
         run: npm run test:e2e
+      - name: Save browser failure traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-failure-traces
+          path: test-results/
+          retention-days: 7
+
+  deploy:
+    needs: [validate, e2e]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 15
+    concurrency:
+      group: production
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+      DEPLOY_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Prepare version and release notes
+        run: |
+          set -euo pipefail
+          node scripts/release-info.js >> "$GITHUB_ENV"
+          tag=$(node scripts/release-info.js --tag)
+          # Refuse to move an existing tag to different code, before deploying.
+          existing=$(git ls-remote origin "refs/tags/$tag" | cut -f1)
+          if [ -n "$existing" ] && [ "$existing" != "$DEPLOY_SHA" ]; then
+            echo "Version $tag already belongs to another commit; bump version.js and CHANGELOG.md."
+            exit 1
+          fi
+      - name: Install restricted deployment credential
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          test -n "$DEPLOY_SSH_KEY" && test -n "$DEPLOY_KNOWN_HOSTS"
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/ipmax_deploy
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/ipmax_deploy ~/.ssh/known_hosts
+      - name: Deploy with backup and automatic rollback
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/ipmax_deploy -o BatchMode=yes -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes -o ConnectTimeout=15 \
+            -o ServerAliveInterval=15 -o ServerAliveCountMax=4 \
+            "$DEPLOY_USER@$DEPLOY_HOST" "deploy $DEPLOY_SHA"
+      - name: Publish release only after successful deployment
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" --latest --notes-file release-notes.md
+          else
+            gh release create "$RELEASE_TAG" --target "$DEPLOY_SHA" \
+              --title "$RELEASE_TAG" --notes-file release-notes.md --latest
+          fi
+      - name: Remove ephemeral credential
+        if: always()
+        run: rm -f ~/.ssh/ipmax_deploy

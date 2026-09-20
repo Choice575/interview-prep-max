@@ -5,7 +5,7 @@ const CACHE_PREFIX = self.IPMAX_CACHE_PREFIX;
 // The shell installs atomically: without it the app cannot start offline at all.
 const SHELL_ASSETS = [
   './', './index.html', './styles.css',
-  './version.js', './date.js', './storage.js',
+  './version.js', './data-loader.js', './date.js', './storage.js',
   './progress.js', './coach.js', './ai-coach.js',
   './progress-io.js', './sync-merge.js', './sync-client.js', './sync-ui.js',
   './ai-settings-client.js', './ai-settings-ui.js',
@@ -32,11 +32,12 @@ const DATA_ASSETS = [
 // place where the complete cache manifest is visible.
 // eslint-disable-next-line no-unused-vars
 const ASSETS = SHELL_ASSETS.concat(DATA_ASSETS);
+const CORE_DATA_ASSETS = ['./tasks/base_questions.json', './tasks/best_practices.json'];
 
 async function precache() {
   const cache = await caches.open(CACHE_NAME);
   await cache.addAll(SHELL_ASSETS);
-  const failed = await Promise.all(DATA_ASSETS.map(asset =>
+  const failed = await Promise.all(CORE_DATA_ASSETS.map(asset =>
     cache.add(asset).then(() => null).catch(() => asset)
   ));
   const missing = failed.filter(Boolean);
