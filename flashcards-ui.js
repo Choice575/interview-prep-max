@@ -6,6 +6,12 @@
   'use strict';
 
   const hasOwn = (object, key) => !!object && Object.prototype.hasOwnProperty.call(object, key);
+  const CATEGORY_ORDER = [
+    'Linux и Bash', 'Сети и протоколы', 'Docker и реестры образов', 'Kubernetes',
+    'Git и CI/CD', 'Ansible', 'Terraform и облака', 'Мониторинг и диагностика',
+    'Базы данных и очереди', 'Безопасность', 'Архитектура и надёжность',
+    'Карьера и собеседования', 'MLOps'
+  ];
 
   function cardState(card, progress, now) {
     const record = hasOwn(progress, card && card.id) && progress[card.id] && typeof progress[card.id] === 'object'
@@ -57,10 +63,6 @@
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  function selected(value, expected) {
-    return value === expected ? ' selected' : '';
-  }
-
   function active(value, expected) {
     return value === expected ? ' active' : '';
   }
@@ -104,18 +106,25 @@
     const index = filtered.length ? Math.max(0, Math.min(filtered.length - 1, Math.floor(Number(state.index) || 0))) : 0;
     const card = filtered[index];
     const summary = summarizeCards(cards, progress, now);
-    const collections = [...new Set(cards.map(item => item && item.collection).filter(Boolean))].sort();
+    const counts = new Map();
+    cards.forEach(item => {
+      if (item && item.collection) counts.set(item.collection, (counts.get(item.collection) || 0) + 1);
+    });
+    const collections = CATEGORY_ORDER.filter(name => counts.has(name))
+      .concat([...counts.keys()].filter(name => !CATEGORY_ORDER.includes(name)).sort());
 
     const deckSwitch = '<div class="flashcards-decks" role="tablist" aria-label="Источник карточек">' +
       decks.map(item => '<button type="button" role="tab" aria-selected="' + (item.id === deck.id) + '" class="flashcards-deck' + active(deck.id, item.id) + '" data-flashcards-action="deck" data-deck="' + escapeText(item.id) + '">' +
         '<span>' + escapeText(item.label) + '</span><strong>' + item.cards.length + '</strong></button>').join('') +
       '</div><p class="flashcards-deck-description">' + escapeText(deck.description) + '</p>';
 
-    const controls = '<div class="flashcards-controls">' +
-      '<label>Коллекция<select class="form-input" data-flashcards-filter="collection">' +
-      '<option value="all"' + selected(collection, 'all') + '>Все коллекции</option>' +
-      collections.map(name => '<option value="' + escapeText(name) + '"' + selected(collection, name) + '>' + escapeText(name) + '</option>').join('') +
-      '</select></label>' +
+    const categories = '<div class="flashcards-categories" role="group" aria-label="Категории карточек">' +
+      [['all', 'Все категории', cards.length], ...collections.map(name => [name, name, counts.get(name)])]
+        .map(([value, label, count]) => '<button type="button" class="flashcards-category' + active(collection, value) +
+          '" aria-pressed="' + (collection === value) + '" data-flashcards-action="category" data-collection="' + escapeText(value) +
+          '"><span>' + escapeText(label) + '</span><strong>' + count + '</strong></button>').join('') + '</div>';
+
+    const controls = categories + '<div class="flashcards-controls">' +
       '<label>Поиск<input class="form-input" type="search" value="' + escapeText(search) + '" placeholder="Вопрос, ответ или тема" data-flashcards-filter="search"></label>' +
       '<div class="flashcards-modes" role="group" aria-label="Режим повторения">' +
       [['all', 'Все'], ['new', 'Новые'], ['learning', 'Изучаю'], ['known', 'Знаю'], ['due', 'К повторению']]
@@ -180,6 +189,12 @@
     function render() {
       const host = doc && doc.getElementById('flashcards-host');
       if (!host) return [];
+      const focused = doc.activeElement;
+      const restoreFocus = focused && host.contains && host.contains(focused);
+      const focusAttributes = restoreFocus ? ['data-flashcards-action', 'data-collection', 'data-mode', 'data-deck', 'data-flashcards-filter']
+        .map(name => [name, focused.getAttribute(name)]).filter(([, value]) => value !== null) : [];
+      const selection = restoreFocus && focused.getAttribute('data-flashcards-filter') === 'search'
+        ? [focused.selectionStart, focused.selectionEnd] : null;
       const filtered = currentCards();
       if (state.index >= filtered.length) state.index = Math.max(0, filtered.length - 1);
       host.innerHTML = renderPage({
@@ -188,6 +203,14 @@
         revealed: state.revealed, index: state.index
       });
       bind(host);
+      if (focusAttributes.length) {
+        const replacement = [...host.querySelectorAll('[data-flashcards-action], [data-flashcards-filter]')]
+          .find(element => focusAttributes.every(([name, value]) => element.getAttribute(name) === value));
+        if (replacement) {
+          replacement.focus({ preventScroll: true });
+          if (selection) replacement.setSelectionRange(...selection);
+        }
+      }
       return filtered;
     }
 
@@ -241,6 +264,7 @@
           else if (action === 'next') move(1);
           else if (action === 'mode') setFilter('mode', element.getAttribute('data-mode'));
           else if (action === 'deck') setDeck(element.getAttribute('data-deck'));
+          else if (action === 'category') setFilter('collection', element.getAttribute('data-collection'));
         });
       });
       host.querySelectorAll('[data-flashcards-filter]').forEach(element => {

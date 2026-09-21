@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const { createHash } = require('node:crypto');
 
 const file = path.join(__dirname, 'tasks', 'flashcards.json');
 const data = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -15,7 +16,7 @@ test('ships the complete themed flashcard corpus with stable ids', () => {
   assert.equal(data.source, 'Interview Prep Max study corpus');
   assert.equal(data.sourceCsvSha256, '113241009bb68c8df5d16a3f944a747dd40243e3111bbae20581eb00f0e1fcc9');
   assert.equal(data.cards.length, 3045);
-  assert.equal(new Set(data.cards.map(card => card.collection)).size, 27);
+  assert.equal(new Set(data.cards.map(card => card.collection)).size, 13);
   assert.deepEqual(data.cards.map(card => card.id), Array.from({ length: 3045 }, (_, index) => 1000001 + index));
 });
 
@@ -104,4 +105,27 @@ test('keeps KTS command snippets executable in a shell', () => {
   assert.match(byId.qb_kts_021.commands[0], /awk '\$3 ~ \/Z\/'/);
   assert.match(byId.qb_kts_041.commands[0], /vtysh -c 'show ip ospf neighbor'/);
   assert.match(byId.qb_kts_041.commands[1], /vtysh -c 'show ip bgp summary'/);
+});
+
+// These hashes exclude only category names: IDs, content and source links predate regrouping.
+test('regrouping preserves every existing card and source field', () => {
+  const video = JSON.parse(fs.readFileSync(videoFile, 'utf8'));
+  for (const [corpus, expected] of [
+    [data, 'bb2e9a91b9c0d1575d8d05b2b0fbaf462819312932f61083a0bd07b0f2c1f038'],
+    [video, '5847315cd0b79a1fe944843c2f511c097922e200a804c8127a27e0a2984b6e9f']
+  ]) {
+    const content = corpus.cards.map(card => Object.fromEntries(Object.entries(card).filter(([key]) => key !== 'collection')));
+    assert.equal(createHash('sha256').update(JSON.stringify(content)).digest('hex'), expected);
+  }
+});
+
+test('both decks use the same flat categories, with MLOps only in study', () => {
+  const categories = [
+    'Linux и Bash', 'Сети и протоколы', 'Docker и реестры образов', 'Kubernetes',
+    'Git и CI/CD', 'Ansible', 'Terraform и облака', 'Мониторинг и диагностика',
+    'Базы данных и очереди', 'Безопасность', 'Архитектура и надёжность', 'Карьера и собеседования'
+  ];
+  const video = JSON.parse(fs.readFileSync(videoFile, 'utf8'));
+  assert.deepEqual(Object.keys(video.collections), categories);
+  assert.deepEqual(Object.keys(data.collections), [...categories, 'MLOps']);
 });

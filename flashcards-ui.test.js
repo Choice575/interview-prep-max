@@ -3,15 +3,15 @@ const assert = require('node:assert/strict');
 const FlashcardsUI = require('./flashcards-ui.js');
 
 const cards = [
-  { id: 1000001, collection: 'DevOps — Linux и Bash', question: 'Что делает pwd?', answer: 'Печатает текущий каталог.' },
-  { id: 1000002, collection: 'DevOps — Docker', question: 'Что делает docker build?', answer: 'Собирает образ из Dockerfile.' },
-  { id: 1000003, collection: 'MLOps — Serving', question: 'Что такое online serving?', answer: 'Синхронная выдача предсказаний.' }
+  { id: 1000001, collection: 'Linux и Bash', question: 'Что делает pwd?', answer: 'Печатает текущий каталог.' },
+  { id: 1000002, collection: 'Docker и реестры образов', question: 'Что делает docker build?', answer: 'Собирает образ из Dockerfile.' },
+  { id: 1000003, collection: 'MLOps', question: 'Что такое online serving?', answer: 'Синхронная выдача предсказаний.' }
 ];
 
 const decks = [
   { id: 'study', label: 'Учебная программа', description: 'Карточки из учебной программы.', cards },
   { id: 'video', label: 'Собеседования из видео', description: 'Реальные вопросы из видео.', cards: [
-    { id: 2000001, collection: 'Linux', question: 'Что такое inode?', answer: 'Метаданные файла.' }
+    { id: 2000001, collection: 'Linux и Bash', question: 'Что такое inode?', answer: 'Метаданные файла.' }
   ] }
 ];
 
@@ -59,7 +59,7 @@ test('filters cards by collection, text and review mode without mutating input',
   };
 
   assert.deepEqual(FlashcardsUI.filterCards(cards, {
-    collection: 'DevOps — Linux и Bash', search: 'текущий', mode: 'due', progress, now: 100
+    collection: 'Linux и Bash', search: 'текущий', mode: 'due', progress, now: 100
   }).map(card => card.id), [1000001]);
   assert.deepEqual(FlashcardsUI.filterCards(cards, { mode: 'new', progress, now: 100 }).map(card => card.id), [1000003]);
   assert.deepEqual(FlashcardsUI.filterCards(cards, { mode: 'learning', progress, now: 100 }).map(card => card.id), [1000001, 1000002]);
@@ -130,4 +130,30 @@ test('rating a card that leaves the current mode does not skip the next card', (
   controller.rate('pass');
   assert.match(host.innerHTML, /Что делает docker build\?/);
   assert.doesNotMatch(host.innerHTML, /Что такое online serving\?/);
+});
+
+test('category buttons show stable deck totals and selection even when search has no matches', () => {
+  const markup = FlashcardsUI.renderPage({ cards, collection: 'Linux и Bash', search: 'no matching question' });
+  assert.match(markup, /role="group" aria-label="Категории карточек"/);
+  assert.match(markup, /aria-pressed="true" data-flashcards-action="category" data-collection="Linux и Bash"><span>Linux и Bash<\/span><strong>1<\/strong>/);
+  assert.match(markup, /<span>Все категории<\/span><strong>3<\/strong>/);
+  assert.match(markup, /Для выбранных фильтров карточек нет/);
+  assert.doesNotMatch(markup, /<select|<option/);
+});
+
+test('changing category resets position and answer while preserving progress by ID', () => {
+  const host = { innerHTML: '', querySelectorAll: () => [] };
+  const progress = { 1000002: { lastSeen: 10, repetitions: 2 } };
+  const controller = FlashcardsUI.create({ getCards: () => cards, getProgress: () => progress }, {
+    document: { getElementById: () => host }
+  });
+  controller.next();
+  controller.reveal();
+  controller.setFilter('collection', 'Docker и реестры образов');
+  controller.setFilter('mode', 'known');
+  assert.equal(controller.getState().index, 0);
+  assert.equal(controller.getState().revealed, false);
+  assert.match(host.innerHTML, /Что делает docker build/);
+  assert.doesNotMatch(host.innerHTML, /Собирает образ из Dockerfile/);
+  assert.deepEqual(progress, { 1000002: { lastSeen: 10, repetitions: 2 } });
 });

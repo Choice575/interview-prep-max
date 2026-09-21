@@ -1120,3 +1120,43 @@ for (const scenario of curriculumSmokeScenarios) {
     }
   });
 }
+
+
+test('flat flashcard categories preserve progress, filter independently and keep keyboard focus', async ({ page }) => {
+  await setProgress(page, {
+    ipmax_onboarding: profile, ipmax_onboarding_complete: true,
+    ipmax_qprog: { 1000984: { lastSeen: 10, repetitions: 2, nextReviewAt: Date.now() - 1 } }
+  });
+  await page.goto('/');
+  await page.locator('[data-page="flashcards"]').click();
+  const categories = page.getByRole('group', { name: 'Категории карточек' });
+  await expect(categories.getByRole('button')).toHaveCount(14);
+  const linux = categories.getByRole('button', { name: 'Linux и Bash 429', exact: true });
+  await linux.click();
+  await expect(linux).toHaveAttribute('aria-pressed', 'true');
+  await expect(linux).toBeFocused();
+  await page.locator('[data-flashcards-action="mode"][data-mode="known"]').click();
+  await expect(page.locator('.study-card')).toHaveAttribute('data-card-id', '1000984');
+  await expect(page.locator('.study-card-meta')).toContainText('1 / 1');
+  const search = page.locator('[data-flashcards-filter="search"]');
+  await search.pressSequentially('несуществующий вопрос');
+  await expect(search).toHaveValue('несуществующий вопрос');
+  await expect(search).toBeFocused();
+  await expect(page.locator('#flashcards-host .empty-state')).toBeVisible();
+  await expect(linux.locator('strong')).toHaveText('429');
+  await search.fill('');
+  await page.locator('[data-flashcards-action="mode"][data-mode="all"]').click();
+  await categories.getByRole('button', { name: 'Docker и реестры образов 194', exact: true }).click();
+  await expect(page.locator('.study-card-meta')).toContainText('Docker и реестры образов');
+  await expect(page.locator('.study-card-meta')).toContainText('1 / 194');
+  await page.locator('[data-flashcards-action="deck"][data-deck="video"]').click();
+  await expect(categories.getByRole('button')).toHaveCount(13);
+  await expect(categories.getByRole('button', { name: 'Все категории 329', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.study-card')).toHaveAttribute('data-card-id', '2000001');
+  expect((await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_qprog'))))['1000984'].repetitions).toBe(2);
+
+  await page.setViewportSize({ width: 375, height: 812 });
+  await categories.getByRole('button', { name: 'Docker и реестры образов 22', exact: true }).click();
+  await expect(page.locator('.study-card-meta')).toContainText('1 / 22');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});

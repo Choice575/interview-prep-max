@@ -1286,7 +1286,14 @@ button:disabled,[aria-disabled="true"]{cursor:not-allowed}
 .flashcards-deck-description{min-height:20px;margin:0 0 14px;color:var(--text2);font-size:12px;line-height:1.5}
 .flashcards-stats{display:flex;flex-wrap:wrap;gap:8px 18px;margin-bottom:14px;font-size:12px;color:var(--text2)}
 .flashcards-stats strong{color:var(--text);font-size:15px;margin-right:3px}
-.flashcards-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-bottom:16px}
+.flashcards-categories{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:8px;margin-bottom:16px}
+.flashcards-category{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;padding:10px 12px;border:1px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--text2);font:inherit;font-size:12px;font-weight:600;text-align:left;cursor:pointer}
+.flashcards-category strong{flex-shrink:0;color:var(--text3);font-size:11px;font-variant-numeric:tabular-nums}
+.flashcards-category:hover{border-color:var(--primary);color:var(--text)}
+.flashcards-category.active{border-color:var(--primary);background:var(--primary-dim);color:var(--primary-h)}
+.flashcards-category.active strong{color:var(--primary-h)}
+.flashcards-category:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.flashcards-controls{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:16px}
 .flashcards-controls label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:600;color:var(--text3)}
 .flashcards-modes{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:6px}
 .study-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
@@ -1302,6 +1309,7 @@ button:disabled,[aria-disabled="true"]{cursor:not-allowed}
 .study-card-nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
 @media(max-width:600px){
   .flashcards-decks{grid-template-columns:1fr}
+  .flashcards-categories{grid-template-columns:repeat(2,minmax(0,1fr))}
   .flashcards-controls{grid-template-columns:1fr}
   .study-card{padding:15px}.study-card h2{font-size:15px}.study-card-rates .btn{flex:1 1 100%}
 }
