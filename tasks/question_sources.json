@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updated": "2026-07-28",
+  "updated": "2026-09-21",
   "scope": "per-topic",
   "disclaimer": "Ссылки ведут на официальную документацию по теме, а не на отдельный вопрос. Дата lastReviewed означает, когда тема сверялась с документацией целиком.",
   "topics": [
     {
       "topic": "Ansible",
-      "questionCount": 126,
+      "questionCount": 130,
       "source": "https://docs.ansible.com/ansible/latest/index.html",
       "additionalSources": [],
       "lastReviewed": "2026-07-28",
@@ -16,7 +16,7 @@
     },
     {
       "topic": "CI/CD",
-      "questionCount": 58,
+      "questionCount": 64,
       "source": "https://docs.gitlab.com/ee/ci/",
       "additionalSources": [
         "https://argo-cd.readthedocs.io/en/stable/"
@@ -28,7 +28,7 @@
     },
     {
       "topic": "Cloud",
-      "questionCount": 23,
+      "questionCount": 30,
       "source": "https://yandex.cloud/ru/docs/",
       "additionalSources": [],
       "lastReviewed": "2026-07-28",
@@ -38,7 +38,7 @@
     },
     {
       "topic": "Docker",
-      "questionCount": 51,
+      "questionCount": 63,
       "source": "https://docs.docker.com/reference/",
       "additionalSources": [
         "https://docs.docker.com/reference/dockerfile/"
@@ -50,7 +50,7 @@
     },
     {
       "topic": "Kubernetes",
-      "questionCount": 56,
+      "questionCount": 80,
       "source": "https://kubernetes.io/docs/home/",
       "additionalSources": [
         "https://gateway-api.sigs.k8s.io/"
@@ -62,7 +62,7 @@
     },
     {
       "topic": "Linux",
-      "questionCount": 134,
+      "questionCount": 160,
       "source": "https://www.kernel.org/doc/html/latest/",
       "additionalSources": [
         "https://man7.org/linux/man-pages/"
@@ -74,7 +74,7 @@
     },
     {
       "topic": "Monitoring",
-      "questionCount": 24,
+      "questionCount": 32,
       "source": "https://prometheus.io/docs/introduction/overview/",
       "additionalSources": [
         "https://opentelemetry.io/docs/",
@@ -87,7 +87,7 @@
     },
     {
       "topic": "Security",
-      "questionCount": 22,
+      "questionCount": 30,
       "source": "https://docs.sigstore.dev/",
       "additionalSources": [
         "https://github.com/anchore/syft",
@@ -100,7 +100,7 @@
     },
     {
       "topic": "Terraform",
-      "questionCount": 128,
+      "questionCount": 132,
       "source": "https://developer.hashicorp.com/terraform/docs",
       "additionalSources": [
         "https://opentofu.org/docs/"
@@ -112,7 +112,7 @@
     },
     {
       "topic": "Сети",
-      "questionCount": 124,
+      "questionCount": 138,
       "source": "https://datatracker.ietf.org/doc/html/rfc9293",
       "additionalSources": [
         "https://datatracker.ietf.org/doc/html/rfc1034",

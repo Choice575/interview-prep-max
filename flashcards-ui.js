@@ -36,7 +36,7 @@
 
     if (collection !== 'all') result = result.filter(card => card && card.collection === collection);
     if (search) {
-      result = result.filter(card => [card && card.question, card && card.answer, card && card.collection]
+      result = result.filter(card => [card && card.question, card && card.answer, card && card.collection, card && card.sourceTitle]
         .some(value => String(value || '').toLowerCase().includes(search)));
     }
     if (mode === 'due') result = result.filter(card => isDue(card, progress, now));
@@ -125,7 +125,7 @@
           '"><span>' + escapeText(label) + '</span><strong>' + count + '</strong></button>').join('') + '</div>';
 
     const controls = categories + '<div class="flashcards-controls">' +
-      '<label>Поиск<input class="form-input" type="search" value="' + escapeText(search) + '" placeholder="Вопрос, ответ или тема" data-flashcards-filter="search"></label>' +
+      '<label>Поиск<input class="form-input" type="search" value="' + escapeText(search) + '" placeholder="Вопрос, ответ, тема или источник" data-flashcards-filter="search"></label>' +
       '<div class="flashcards-modes" role="group" aria-label="Режим повторения">' +
       [['all', 'Все'], ['new', 'Новые'], ['learning', 'Изучаю'], ['known', 'Знаю'], ['due', 'К повторению']]
         .map(item => '<button type="button" class="chip' + active(mode, item[0]) + '" data-flashcards-action="mode" data-mode="' + item[0] + '">' + item[1] + '</button>').join('') +

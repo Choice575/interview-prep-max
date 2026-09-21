@@ -15,9 +15,9 @@ test('ships the complete themed flashcard corpus with stable ids', () => {
   assert.equal(data.version, '1.0.0');
   assert.equal(data.source, 'Interview Prep Max study corpus');
   assert.equal(data.sourceCsvSha256, '113241009bb68c8df5d16a3f944a747dd40243e3111bbae20581eb00f0e1fcc9');
-  assert.equal(data.cards.length, 3045);
+  assert.equal(data.cards.length, 3105);
   assert.equal(new Set(data.cards.map(card => card.collection)).size, 13);
-  assert.deepEqual(data.cards.map(card => card.id), Array.from({ length: 3045 }, (_, index) => 1000001 + index));
+  assert.deepEqual(data.cards.map(card => card.id), Array.from({ length: 3105 }, (_, index) => 1000001 + index));
 });
 
 test('keeps every flashcard answerable and free of exact duplicates', () => {
@@ -114,7 +114,7 @@ test('regrouping preserves every existing card and source field', () => {
     [data, 'bb2e9a91b9c0d1575d8d05b2b0fbaf462819312932f61083a0bd07b0f2c1f038'],
     [video, '5847315cd0b79a1fe944843c2f511c097922e200a804c8127a27e0a2984b6e9f']
   ]) {
-    const content = corpus.cards.map(card => Object.fromEntries(Object.entries(card).filter(([key]) => key !== 'collection')));
+    const content = corpus.cards.filter(card => !card.sourceRepository).map(card => Object.fromEntries(Object.entries(card).filter(([key]) => key !== 'collection')));
     assert.equal(createHash('sha256').update(JSON.stringify(content)).digest('hex'), expected);
   }
 });

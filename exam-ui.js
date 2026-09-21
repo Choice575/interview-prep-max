@@ -67,7 +67,8 @@
       result = result.filter(question => {
         const prompt = String(question && question.q || '').toLowerCase();
         const answers = Array.isArray(question && question.options) ? question.options : [];
-        return prompt.includes(search) || answers.some(answer => String(answer || '').toLowerCase().includes(search));
+        return prompt.includes(search) || String(question && question.sourceTitle || '').toLowerCase().includes(search)
+          || answers.some(answer => String(answer || '').toLowerCase().includes(search));
       });
     }
 
@@ -168,6 +169,9 @@
       ).join('') + '</div>' +
       (q.explanation && state.studyMode ? '<div class="q-explanation">💡 ' + escapeText(q.explanation) + buildWhyWrong(q, answers) + '</div>' : '') +
       '<div id="qexpl-' + safeId + '" style="display:none" class="q-explanation"></div>' +
+      (/^https?:\/\//i.test(String(q.sourceUrl || ''))
+        ? '<p class="question-source">Источник темы: <a href="' + escapeAttribute(q.sourceUrl) + '" target="_blank" rel="noopener noreferrer">'
+          + escapeText(q.sourceTitle || 'Материал') + '</a></p>' : '') +
       (state.interviewMode ? '<div class="q-interview-note">🎤 Режим собеседования — отвечайте развёрнуто, без подсказок</div>' : '') +
       '</div>';
   }

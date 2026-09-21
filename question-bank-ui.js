@@ -55,7 +55,7 @@
     return questionsOf(category).filter(function(q) {
       if (wantLevel && q.level !== wantLevel) return false;
       if (!needle) return true;
-      const haystack = [q.q, q.answer, (q.keyPoints || []).join(' ')].join(' ').toLowerCase();
+      const haystack = [q.q, q.answer, (q.keyPoints || []).join(' '), q.sourceTitle].join(' ').toLowerCase();
       return haystack.indexOf(needle) !== -1;
     });
   }
@@ -124,7 +124,10 @@
       + (q.pitfall
         ? '<div class="qbank-pitfall"><strong>Подводный камень</strong><p>'
           + escapeHtml(q.pitfall) + '</p></div>'
-        : '');
+        : '')
+      + (/^https?:\/\//i.test(String(q.sourceUrl || ''))
+        ? '<p class="question-source">Источник темы: <a href="' + escapeHtml(q.sourceUrl) + '" target="_blank" rel="noopener noreferrer">'
+          + escapeHtml(q.sourceTitle || 'Материал') + '</a></p>' : '');
   }
 
   function renderPanel(category, questions, expandedId) {

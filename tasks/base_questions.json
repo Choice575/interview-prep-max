@@ -12999,5 +12999,1205 @@
     "id": 14169,
     "sourceVideoId": "M1tXCebcOBE",
     "sourceTime": "66:25"
+  },
+  {
+    "id": 15001,
+    "topic": "Linux",
+    "level": "Middle",
+    "category": "definition",
+    "q": "Чем политики планирования SCHED_FIFO и SCHED_RR отличаются от SCHED_OTHER?",
+    "options": [
+      "Это алгоритмы выбора блока для дисковой очереди.",
+      "Это политики реального времени с фиксированным приоритетом.",
+      "Это политики вытеснения страниц из оперативной памяти.",
+      "Это режимы распределения квоты процессорного времени Docker."
+    ],
+    "answer": 1,
+    "explanation": "SCHED_OTHER обслуживает обычные задачи, а SCHED_FIFO и SCHED_RR используют приоритеты реального времени. FIFO выполняет готовую задачу до блокировки, уступки процессора или вытеснения более приоритетной задачей; RR дополнительно делит время между задачами одинакового приоритета квантами. Неосторожная настройка может лишить обычные процессы процессорного времени.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_001",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L1550"
+  },
+  {
+    "id": 15002,
+    "topic": "Linux",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Где посмотреть аргументы запуска и открытые дескрипторы процесса Linux с известным PID?",
+    "options": [
+      "В каталогах модулей ядра внутри /lib/modules.",
+      "В файлах passwd и shadow каталога /etc.",
+      "В cmdline и fd внутри каталога /proc/PID.",
+      "В очереди печати и журнале входов пользователей."
+    ],
+    "answer": 2,
+    "explanation": "Каталог /proc/PID предоставляет сведения о конкретном процессе: cmdline содержит аргументы, разделённые нулевыми байтами, а fd — ссылки на открытые дескрипторы. status и maps помогают исследовать состояние и память. Доступ зависит от прав и параметров монтирования procfs; процесс может завершиться между двумя чтениями.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_002",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L1453"
+  },
+  {
+    "id": 15003,
+    "topic": "Linux",
+    "level": "Junior",
+    "category": "definition",
+    "q": "Как процессы обмениваются данными, если их виртуальные адресные пространства изолированы?",
+    "options": [
+      "Меняют виртуальный адрес процесса через запись в DNS.",
+      "Передают указатель на стек напрямую соседнему процессу.",
+      "Записывают данные в обычную локальную переменную родителя.",
+      "Используют IPC: каналы, сокеты или разделяемую память."
+    ],
+    "answer": 3,
+    "explanation": "Для обмена нужны механизмы IPC: pipe, Unix-сокеты, очереди сообщений или явно созданная разделяемая память. Обычный указатель одного процесса не даёт другому доступа к тем же данным. Разделяемая память сокращает копирование, но согласованность доступа приходится обеспечивать блокировками, семафорами или другим протоколом синхронизации.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_003",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L2038"
+  },
+  {
+    "id": 15004,
+    "topic": "Linux",
+    "level": "Middle",
+    "category": "tradeoff",
+    "q": "Что меняет taskset при закреплении процесса за набором CPU?",
+    "options": [
+      "Ограничивает набор процессоров, на которых задача может исполняться.",
+      "Резервирует указанные процессоры для одного процесса целиком.",
+      "Повышает аппаратную частоту перечисленных процессоров.",
+      "Запрещает процессу создавать новые потоки исполнения."
+    ],
+    "answer": 0,
+    "explanation": "CPU affinity задаёт допустимый набор логических процессоров для выполнения задачи. Это не выделение эксклюзивных ядер: на тех же CPU могут работать другие процессы, а ограничения cpuset могут дополнительно сузить выбор. Для многопоточного приложения проверяют привязку потоков и измеряют влияние NUMA и миграций на задержки.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_004",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L1542"
+  },
+  {
+    "id": 15005,
+    "topic": "Docker",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Попадут ли данные подключённого volume в образ, созданный docker commit?",
+    "options": [
+      "Да, содержимое каждого тома становится слоем нового образа.",
+      "Нет, снимок изменений контейнера не включает подключённые тома.",
+      "Да, если том был подключён с правом записи в контейнер.",
+      "Нет, команда сохраняет конфигурацию без изменений файлов."
+    ],
+    "answer": 1,
+    "explanation": "docker commit сохраняет изменения файловой системы контейнера в новом образе, но не содержимое подключённых томов. Поэтому такой снимок не заменяет резервную копию данных приложения. Для воспроизводимой сборки изменения лучше описать в Dockerfile, а данные томов копировать отдельно с учётом согласованности базы или сервиса.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_005",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L3173"
+  },
+  {
+    "id": 15006,
+    "topic": "Docker",
+    "level": "Middle",
+    "category": "tradeoff",
+    "q": "Как объединение слоёв образа влияет на повторное использование кеша и общих слоёв?",
+    "options": [
+      "Заменяет изоляцию контейнера отдельным гостевым ядром.",
+      "Увеличивает количество независимо кешируемых промежуточных слоёв.",
+      "Может уменьшить размер, но ухудшить совместное использование слоёв.",
+      "Автоматически переносит данные volume в реестр образов."
+    ],
+    "answer": 2,
+    "explanation": "Объединение слоёв может убрать из результата файлы, добавленные и затем удалённые на промежуточных шагах. Однако изменение большого объединённого слоя требует передавать его заново и уменьшает выгоду от общих слоёв. Доступность squash зависит от сборщика; multi-stage часто позволяет получить небольшой конечный образ без переноса инструментов сборки.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_006",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L3498"
+  },
+  {
+    "id": 15007,
+    "topic": "Docker",
+    "level": "Middle",
+    "category": "tradeoff",
+    "q": "Как Kata Containers усиливает изоляцию по сравнению с обычным контейнером Linux?",
+    "options": [
+      "Упаковывает файлы приложения в более плотный слой образа.",
+      "Запускает нагрузку с root-доступом к ядру основного хоста.",
+      "Заменяет сетевые пространства имён общей сетью для всех подов.",
+      "Запускает нагрузку в лёгкой виртуальной машине с отдельным ядром."
+    ],
+    "answer": 3,
+    "explanation": "Kata использует виртуализацию для запуска контейнерной нагрузки в лёгкой виртуальной машине. Граница отдельного гостевого ядра усиливает изоляцию по сравнению с разделением ядра хоста. За это платят дополнительным потреблением ресурсов и требованиями к виртуализации; совместимость и производительность проверяют на конкретной нагрузке.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_007",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L3673"
+  },
+  {
+    "id": 15008,
+    "topic": "Сети",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Хост отправляет IPv4-пакет в другую подсеть. Чей MAC-адрес он обычно ищет через ARP?",
+    "options": [
+      "MAC-адрес следующего шлюза в локальном сегменте.",
+      "MAC-адрес конечного сервера в удалённом сегменте.",
+      "MAC-адрес авторитативного DNS-сервера доменной зоны.",
+      "MAC-адрес коммутатора на каждом участке маршрута."
+    ],
+    "answer": 0,
+    "explanation": "Сначала таблица маршрутизации выбирает следующий узел. Если назначение находится за маршрутизатором, Ethernet-кадр отправляется локальному шлюзу, и ARP нужен для его адреса. IP-адрес назначения в пакете остаётся адресом удалённого хоста; маршрутизаторы на следующих участках формируют новые канальные заголовки.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_008",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L3728"
+  },
+  {
+    "id": 15009,
+    "topic": "Сети",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Как HTTPS-сервер выбирает сертификат, когда несколько доменов используют один IP-адрес?",
+    "options": [
+      "Читает HTTP Host до начала установления TLS-соединения.",
+      "Получает имя сервера в расширении SNI сообщения ClientHello.",
+      "Запрашивает обратную DNS-запись для адреса каждого клиента.",
+      "Выбирает сертификат по длине загружаемой страницы сайта."
+    ],
+    "answer": 1,
+    "explanation": "SNI передаёт имя сервера на этапе TLS ClientHello, чтобы сервер мог выбрать сертификат и параметры виртуального хоста до обработки HTTP. Это отличается от заголовка Host, который передаётся уже внутри защищённого соединения. В обычном TLS SNI виден наблюдателю; ECH позволяет защищать внутренний ClientHello при поддержке обеими сторонами.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_009",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L3960"
+  },
+  {
+    "id": 15010,
+    "topic": "Сети",
+    "level": "Junior",
+    "category": "scenario",
+    "q": "Зачем в DNS-имени server.example.org. указывать завершающую точку?",
+    "options": [
+      "Чтобы отключить кеширование ответа локальным резолвером.",
+      "Чтобы заставить резолвер отправлять запросы по TCP.",
+      "Чтобы явно обозначить абсолютное имя от корня DNS.",
+      "Чтобы запросить IPv6-адрес вместо IPv4-адреса узла."
+    ],
+    "answer": 2,
+    "explanation": "Завершающая точка обозначает корень DNS и делает имя явно абсолютным. При использовании короткого имени или настроек search резолвер может пробовать дополнять имя локальными суффиксами. FQDN задаёт полный путь в DNS-иерархии; это помогает отличать намеренное полное имя от относительного имени в конфигурации.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_010",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L4449"
+  },
+  {
+    "id": 15011,
+    "topic": "Сети",
+    "level": "Middle",
+    "category": "definition",
+    "q": "Чем авторитативный DNS-сервер отличается от рекурсивного резолвера?",
+    "options": [
+      "Первый обслуживает IPv4-запросы, второй обслуживает IPv6-запросы.",
+      "Первый раздаёт IP-адреса по DHCP, второй хранит маршруты.",
+      "Первый устанавливает TLS-соединение, второй проверяет сертификат.",
+      "Первый отвечает данными своей зоны, второй ищет ответ для клиента."
+    ],
+    "answer": 3,
+    "explanation": "Авторитативный сервер публикует данные зоны, за которую отвечает, и не обязан искать ответы в других зонах. Рекурсивный резолвер выполняет поиск от имени клиента, обращается к другим серверам и кеширует результат согласно TTL. Эти функции могут совмещаться в программе, но их роли и требования к доступу различаются.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_011",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L4140"
+  },
+  {
+    "id": 15012,
+    "topic": "Сети",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Что делает резолвер после получения referral при итеративном поиске DNS?",
+    "options": [
+      "Обращается к указанным серверам следующего уровня делегации.",
+      "Считает запрос окончательно завершённым ошибкой NXDOMAIN.",
+      "Передаёт клиенту сертификат сервера следующего уровня.",
+      "Повторяет тот же запрос без изменения сервера до истечения TTL."
+    ],
+    "answer": 0,
+    "explanation": "Referral указывает, какие серверы обслуживают следующую часть DNS-иерархии. Резолвер продолжает поиск у них, пока не получит нужную запись или достоверный отрицательный ответ. Клиент при рекурсивном запросе ожидает готовый результат, а последовательность итеративных обращений выполняет резолвер.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_012",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L4173"
+  },
+  {
+    "id": 15013,
+    "topic": "Security",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Защищает ли Base64 в HTTP Basic Authentication пароль от перехвата?",
+    "options": [
+      "Да, это шифрование с ключом, полученным от HTTP-сервера.",
+      "Нет, это обратимое кодирование; конфиденциальность обеспечивает TLS.",
+      "Да, пароль заменяется необратимым криптографическим хешем.",
+      "Нет, поскольку Basic передаёт пароль через отдельный DNS-запрос."
+    ],
+    "answer": 1,
+    "explanation": "Basic Authentication кодирует сочетание имени и пароля в Base64 и передаёт его в заголовке Authorization. Base64 легко декодируется и не скрывает секрет от читающего трафик. Поэтому канал защищают HTTPS и проверяют сертификат сервера; заголовок также нельзя записывать в общедоступные логи.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_013",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L4195"
+  },
+  {
+    "id": 15014,
+    "topic": "Сети",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Как выбирается маршрут, если адрес назначения подходит под /16 и /24?",
+    "options": [
+      "Предпочитается маршрут, добавленный раньше второго.",
+      "Предпочитается более широкий маршрут /16.",
+      "Предпочитается более специфичный маршрут /24.",
+      "Оба маршрута используются попеременно для каждого пакета."
+    ],
+    "answer": 2,
+    "explanation": "В пределах выбранной таблицы маршрутизации действует правило наиболее длинного совпавшего префикса. Поэтому /24 специфичнее /16 и выигрывает независимо от того, какой маршрут был добавлен первым. Метрики и другие критерии разрешают выбор между подходящими маршрутами одинаковой специфичности; policy routing может влиять на выбор самой таблицы.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_014",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L4338"
+  },
+  {
+    "id": 15015,
+    "topic": "Сети",
+    "level": "Middle",
+    "category": "tradeoff",
+    "q": "Что означает stateless-взаимодействие в REST API?",
+    "options": [
+      "Сервер запрещает кеширование результатов обработки запросов.",
+      "Сервер не использует постоянную базу данных для ресурсов.",
+      "Клиент устанавливает новое TCP-соединение для каждого запроса.",
+      "Каждый запрос содержит контекст, необходимый для его обработки."
+    ],
+    "answer": 3,
+    "explanation": "Stateless означает, что обработка запроса не должна зависеть от сохранённого на сервере контекста предыдущих шагов клиентской сессии. Нужные сведения, например идентификатор ресурса и токен доступа, приходят в запросе. Это не запрещает хранить ресурсы в базе, использовать кеш или повторно применять транспортное соединение.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_015",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L4348"
+  },
+  {
+    "id": 15016,
+    "topic": "Linux",
+    "level": "Junior",
+    "category": "tradeoff",
+    "q": "Почему не стоит использовать изменяемый list как ключ словаря Python?",
+    "options": [
+      "Ключу нужны стабильный хеш и согласованная проверка равенства.",
+      "Словарь поддерживает числовые ключи, но не составные значения.",
+      "Списки сравниваются по адресу и не поддерживают равенство.",
+      "Хеш-таблица предварительно сортирует ключи по возрастанию."
+    ],
+    "answer": 0,
+    "explanation": "Для поиска dict вычисляет хеш ключа и проверяет равенство подходящих кандидатов; коллизии хеша допустимы. Изменяемый list не является хешируемым, поскольку изменение содержимого нарушило бы устойчивость такого поиска. Tuple может быть ключом, если все его элементы хешируемы; одного неизменяемого внешнего контейнера недостаточно.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_016",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L4970"
+  },
+  {
+    "id": 15017,
+    "topic": "Linux",
+    "level": "Junior",
+    "category": "tradeoff",
+    "q": "Чем генератор Python удобен при последовательной обработке большого файла?",
+    "options": [
+      "Автоматически загружает весь файл в непрерывный массив памяти.",
+      "Выдаёт элементы по мере запроса, сохраняя состояние выполнения.",
+      "Создаёт отдельный системный поток на каждую строку файла.",
+      "Повторно запускает функцию с первой строки при каждом next."
+    ],
+    "answer": 1,
+    "explanation": "Генератор является итератором, который при yield приостанавливается и сохраняет локальное состояние. Следующий запрос продолжает выполнение, поэтому данные можно обрабатывать постепенно без списка всех результатов. После исчерпания генератор не перематывается сам; для нового прохода создают новый экземпляр или отдельно сохраняют результаты.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_017",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L4986"
+  },
+  {
+    "id": 15018,
+    "topic": "Linux",
+    "level": "Junior",
+    "category": "tradeoff",
+    "q": "Можно ли изменить список, который хранится внутри кортежа Python?",
+    "options": [
+      "Да, но такое изменение автоматически преобразует кортеж в список.",
+      "Нет, кортеж рекурсивно блокирует изменения всех вложенных объектов.",
+      "Да, неизменяемость кортежа не делает его вложенные объекты неизменяемыми.",
+      "Нет, кортеж разрешает хранить числовые и строковые значения."
+    ],
+    "answer": 2,
+    "explanation": "Tuple фиксирует набор ссылок на элементы: заменить элемент кортежа присваиванием нельзя. Но если элемент ссылается на изменяемый список, его содержимое можно изменить обычными методами списка. Поэтому неизменяемость контейнера не равна глубокой неизменяемости объекта, а кортеж со списком нельзя использовать как ключ dict.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_018",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L5007"
+  },
+  {
+    "id": 15019,
+    "topic": "Linux",
+    "level": "Junior",
+    "category": "tradeoff",
+    "q": "Что происходит при применении декоратора @decorate к функции Python?",
+    "options": [
+      "Интерпретатор выполняет тело функции при каждой строке импорта.",
+      "Тело функции копируется в новый отдельный процесс операционной системы.",
+      "Функция превращается в генератор независимо от наличия yield.",
+      "Имя функции связывается с результатом decorate исходной функции."
+    ],
+    "answer": 3,
+    "explanation": "Декоратор получает объект функции и возвращает объект, с которым затем связывается её имя. Часто это обёртка, добавляющая логирование, измерения или проверку доступа при вызове. functools.wraps сохраняет полезные метаданные исходной функции; сама запись с @ не гарантирует сохранение имени, документации или сигнатуры.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_019",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L5052"
+  },
+  {
+    "id": 15020,
+    "topic": "Cloud",
+    "level": "Middle",
+    "category": "tradeoff",
+    "q": "Что обычно происходит с EBS-томом при stop EC2 и от чего зависит его удаление при terminate?",
+    "options": [
+      "Stop сохраняет том; при terminate важен флаг DeleteOnTermination.",
+      "Stop удаляет том; terminate создаёт его автоматическую архивную копию.",
+      "Обе операции сохраняют том независимо от параметров подключения.",
+      "Обе операции перемещают содержимое тома в instance store."
+    ],
+    "answer": 0,
+    "explanation": "Остановка EBS-backed инстанса сохраняет его EBS-тома, тогда как данные instance store при остановке теряются. При завершении инстанса судьба каждого EBS-тома определяется DeleteOnTermination. Нельзя считать остановку, завершение и удаление диска одной операцией; резервные копии и флаги проверяют до изменения жизненного цикла.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_020",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L6810"
+  },
+  {
+    "id": 15021,
+    "topic": "Cloud",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Почему переключение DNS-записи в Route 53 не переводит всех клиентов на новый адрес мгновенно?",
+    "options": [
+      "Route 53 ожидает перезагрузки операционной системы каждого клиента.",
+      "Резолверы и клиенты могут ещё использовать ответ до истечения TTL.",
+      "TLS-сертификат навсегда закрепляет прежний IP-адрес у клиента.",
+      "Смена записи требует пересоздать сетевые интерфейсы всех клиентов."
+    ],
+    "answer": 1,
+    "explanation": "Route 53 публикует новые DNS-данные, но ранее полученные ответы остаются в кешах резолверов и приложений. Время обновления зависит от TTL и поведения конкретного клиента; уже открытые соединения также могут продолжить работать. При миграции заранее уменьшают TTL и оставляют старую сторону доступной на переходный период.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_021",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L6950"
+  },
+  {
+    "id": 15022,
+    "topic": "Cloud",
+    "level": "Middle",
+    "category": "tradeoff",
+    "q": "Чем EKS Anywhere отличается от управляемого Amazon EKS в AWS?",
+    "options": [
+      "Предоставляет EKS-кластер без узлов, сети и плоскости управления.",
+      "Переносит прикладную базу данных из Kubernetes в сервис DynamoDB.",
+      "Позволяет эксплуатировать Kubernetes на собственной инфраструктуре.",
+      "Является названием сетевого плагина для подов Amazon EKS."
+    ],
+    "answer": 2,
+    "explanation": "Amazon EKS предоставляет управляемую плоскость управления Kubernetes в AWS. EKS Anywhere ориентирован на развёртывание и жизненный цикл кластеров на собственной инфраструктуре, где обязанности эксплуатации значительно шире. Выбор зависит от размещения оборудования, сетевых ограничений и ответственности команды; это не просто другой тариф того же управляемого кластера.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_022",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L6959"
+  },
+  {
+    "id": 15023,
+    "topic": "Cloud",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Как приложению на EC2 получать доступ к AWS API без статического ключа в конфигурации?",
+    "options": [
+      "Передавать пароль AWS Console в HTTP-заголовке каждого запроса.",
+      "Включить публичный доступ к API для IP-адреса инстанса.",
+      "Сохранить постоянный ключ администратора в образе машины.",
+      "Использовать IAM role инстанса и цепочку получения учётных данных SDK."
+    ],
+    "answer": 3,
+    "explanation": "К EC2 прикрепляют IAM role через instance profile, а SDK получает временные учётные данные через стандартную цепочку провайдеров. Права роли ограничивают необходимыми действиями и ресурсами. Это устраняет необходимость распространять постоянные access keys; доступ к metadata service и защиту от SSRF при этом также настраивают.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_023",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L6988"
+  },
+  {
+    "id": 15024,
+    "topic": "Kubernetes",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Какая цепочка приводит новый Pod от запроса к API до запуска контейнеров на узле?",
+    "options": [
+      "API сохраняет объект, scheduler назначает узел, kubelet запускает нагрузку.",
+      "Scheduler принимает HTTP-запрос и напрямую запускает контейнеры на узле.",
+      "Kubelet выбирает узел кластера и сохраняет Pod напрямую в etcd.",
+      "CoreDNS создаёт контейнеры после регистрации имени Service."
+    ],
+    "answer": 0,
+    "explanation": "API server проверяет запрос и сохраняет объект Pod в хранилище. Scheduler наблюдает неназначенные Pod и выбирает узел с учётом ресурсов и ограничений; kubelet этого узла организует тома, сеть и запуск через runtime. При создании Deployment сначала контроллеры создают ReplicaSet и Pod, поэтому путь включает дополнительные шаги согласования.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_024",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L5403"
+  },
+  {
+    "id": 15025,
+    "topic": "Kubernetes",
+    "level": "Junior",
+    "category": "scenario",
+    "q": "Могут ли контейнеры одного Pod одновременно работать на двух разных узлах?",
+    "options": [
+      "Да, scheduler распределяет контейнеры Pod независимо друг от друга.",
+      "Нет, Pod назначается одному узлу; для распределения нужны отдельные Pod.",
+      "Да, достаточно указать две реплики у объекта Service.",
+      "Нет, поскольку Kubernetes запрещает запуск многоконтейнерных Pod."
+    ],
+    "answer": 1,
+    "explanation": "Pod является единицей размещения и назначается одному узлу. Его контейнеры разделяют сетевую среду Pod и могут совместно использовать тома, поэтому не распределяются scheduler по разным машинам. Отказоустойчивость достигают несколькими Pod и правилами размещения; после потери узла контроллер обычно создаёт замену с новым UID.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_025",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L5448"
+  },
+  {
+    "id": 15026,
+    "topic": "Kubernetes",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Что происходит после изменения шаблона StatefulSet со стратегией OnDelete?",
+    "options": [
+      "Изменение шаблона немедленно удаляет все связанные PVC.",
+      "Контроллер последовательно заменяет Pod без дополнительного действия.",
+      "Работающие Pod сохраняются; замена создаётся после их удаления.",
+      "API server отклоняет изменение образа до остановки StatefulSet."
+    ],
+    "answer": 2,
+    "explanation": "При OnDelete контроллер не обновляет существующие Pod автоматически после изменения шаблона. Новый шаблон используется при создании замены, поэтому оператор управляет порядком удаления и восстановления Pod. Для системы с состоянием перед каждым шагом проверяют кворум, готовность, репликацию и возможность восстановления.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_026",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L6192"
+  },
+  {
+    "id": 15027,
+    "topic": "System Design",
+    "level": "Senior",
+    "category": "tradeoff",
+    "q": "Зачем при переключении active-standby системы нужен fencing прежнего активного узла?",
+    "options": [
+      "Чтобы увеличить количество DNS-ответов в локальном кеше.",
+      "Чтобы ускорить сжатие журналов на резервном узле системы.",
+      "Чтобы отключить проверку готовности перед сменой активного узла.",
+      "Чтобы исключить одновременную запись двух узлов после сетевого разделения."
+    ],
+    "answer": 3,
+    "explanation": "Потеря связи с активным узлом не доказывает, что он перестал обслуживать запросы или писать данные. Если резервный узел начнёт запись одновременно с ним, возможен split-brain. Fencing надёжно лишает прежний узел доступа к записи или выполнению, а протокол выбора лидера и репликация определяют безопасные условия переключения.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_027",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L6255"
+  },
+  {
+    "id": 15028,
+    "topic": "Kubernetes",
+    "level": "Middle",
+    "category": "tradeoff",
+    "q": "Гарантирует ли режим тома ReadWriteOnce, что к нему подключён ровно один Pod?",
+    "options": [
+      "Нет, он ограничивает запись одним узлом; на нём возможны несколько Pod.",
+      "Да, API запрещает двум Pod ссылаться на один PVC в этом режиме.",
+      "Да, режим автоматически создаёт эксклюзивную блокировку приложения.",
+      "Нет, режим предназначен для одновременной записи с нескольких узлов."
+    ],
+    "answer": 0,
+    "explanation": "ReadWriteOnce означает возможность монтирования тома для записи с одного узла, а не обязательную эксклюзивность одного Pod. Если нужна привязка к одному Pod, проверяют поддержку ReadWriteOncePod у CSI-драйвера и версии кластера. Режим доступа сам по себе не заменяет протокол согласованной записи приложения.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_028",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L5749"
+  },
+  {
+    "id": 15029,
+    "topic": "System Design",
+    "level": "Junior",
+    "category": "definition",
+    "q": "Чем роль PostgreSQL с LOGIN отличается от роли без LOGIN?",
+    "options": [
+      "Первая владеет базой автоматически, вторая хранит резервные копии.",
+      "Первая может начинать сеанс, вторая удобна для объединения прав.",
+      "Первая обходит проверку привилегий, вторая отвечает за репликацию.",
+      "Первая является схемой базы, вторая представляет табличное пространство."
+    ],
+    "answer": 1,
+    "explanation": "В PostgreSQL одна сущность role используется и для учётных записей, и для группировки привилегий. Атрибут LOGIN разрешает использовать роль для подключения; права на объекты и членство в других ролях назначают отдельно. LOGIN не делает роль суперпользователем и не даёт доступа ко всем таблицам.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_029",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L4887"
+  },
+  {
+    "id": 15030,
+    "topic": "CI/CD",
+    "level": "Junior",
+    "category": "tradeoff",
+    "q": "Как fork-based workflow позволяет внести изменения без права записи в основной Git-репозиторий?",
+    "options": [
+      "Основной репозиторий добавляют как submodule и заменяют его историю.",
+      "Изменения записывают в upstream без аутентификации через git fetch.",
+      "Изменения отправляют в свой fork и предлагают через pull request.",
+      "Создают локальный tag, после чего сервер сам переносит коммиты."
+    ],
+    "answer": 2,
+    "explanation": "Fork создаёт отдельный репозиторий, в который автор может отправлять свои ветки. Связь с исходным проектом поддерживают отдельным remote, получают его обновления и предлагают изменения через pull request. Внешний код в CI рассматривают как недоверенный: секреты и привилегии не должны автоматически становиться доступны сборке из fork.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_030",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/interview.md#L7141"
+  },
+  {
+    "id": 15031,
+    "topic": "System Design",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Какую задачу решает KRaft в Apache Kafka?",
+    "options": [
+      "Перераспределяет сообщения между группами по HTTP-заголовкам.",
+      "Заменяет хранение записей топика файловой системой PostgreSQL.",
+      "Шифрует полезную нагрузку каждого сообщения ключом потребителя.",
+      "Управляет метаданными кластера через кворум контроллеров на Raft."
+    ],
+    "answer": 3,
+    "explanation": "KRaft переносит управление метаданными Kafka в кворум контроллеров с протоколом Raft, устраняя зависимость этой функции от ZooKeeper. Журналы сообщений по-прежнему обслуживаются брокерами и партициями. При проектировании учитывают отказоустойчивость кворума контроллеров отдельно от репликации пользовательских топиков.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_031",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/baraholka.md"
+  },
+  {
+    "id": 15032,
+    "topic": "Сети",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Почему успешный запрос через curl не доказывает, что запрос браузера пройдёт проверку CORS?",
+    "options": [
+      "Ограничения CORS проверяет браузер при доступе скрипта к другому origin.",
+      "Curl автоматически добавляет разрешение сервера к браузерному origin.",
+      "Браузер использует для HTTP другой диапазон транспортных портов.",
+      "Curl проверяет CORS по DNS, а браузер проверяет его по сертификату."
+    ],
+    "answer": 0,
+    "explanation": "CORS регулирует, может ли браузерный скрипт читать ответ другого origin. Для части запросов браузер сначала выполняет preflight OPTIONS и проверяет разрешённые origin, методы и заголовки. Curl не применяет браузерную политику, поэтому успешный сетевой запрос подтверждает доступность сервера, но не корректность CORS; механизм не заменяет аутентификацию.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_032",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/baraholka.md"
+  },
+  {
+    "id": 15033,
+    "topic": "Kubernetes",
+    "level": "Senior",
+    "category": "scenario",
+    "q": "Helm сообщает another operation is in progress после сбоя CI. С чего начать восстановление?",
+    "options": [
+      "Удалить namespace приложения вместе с его томами и секретами.",
+      "Проверить историю релиза и наличие активной операции перед откатом.",
+      "Запустить несколько параллельных upgrade для снятия блокировки.",
+      "Изменить имя релиза без проверки состояния существующей нагрузки."
+    ],
+    "answer": 1,
+    "explanation": "Сначала проверяют helm status, helm history и процессы CI, чтобы не вмешаться в реально выполняющееся обновление. Зависший pending-релиз восстанавливают управляемым откатом к рабочей ревизии, если это соответствует состоянию ресурсов и данным. Ручное удаление метаданных Helm опасно рассогласованием истории; после восстановления проверяют приложение и ограничивают параллельные деплои.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_033",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/books.md"
+  },
+  {
+    "id": 15034,
+    "topic": "Kubernetes",
+    "level": "Senior",
+    "category": "scenario",
+    "q": "Истекли сертификаты control plane kubeadm-кластера. Что проверить перед восстановлением?",
+    "options": [
+      "Размер clusterIP-диапазона и число публичных DNS-записей.",
+      "Количество образов Docker и наличие локального кеша сборки.",
+      "Сроки, способ управления сертификатами, время узлов и резервные копии.",
+      "Срок сертификата внешнего Ingress вместо сертификатов control plane."
+    ],
+    "answer": 2,
+    "explanation": "Проверяют время узлов и kubeadm certs check-expiration, определяют, какие сертификаты управляются kubeadm, а какие внешней CA. После резервного копирования выполняют предусмотренное для этой схемы обновление и перезапускают компоненты, чтобы они прочитали новые файлы. Также обновляют нужные kubeconfig и проверяют API; удаление PKI-каталога не является процедурой восстановления.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_034",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/books.md"
+  },
+  {
+    "id": 15035,
+    "topic": "Security",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Trivy падает при загрузке базы уязвимостей. Как сохранить надёжность проверки в CI?",
+    "options": [
+      "Удалить сведения о зависимостях из образа перед запуском сканера.",
+      "Заменить сканирование проверкой названия тега собираемого образа.",
+      "Считать сбой загрузки успешным результатом без замечаний.",
+      "Проверить доступ к реестру БД, настроить кеш и контролировать свежесть базы."
+    ],
+    "answer": 3,
+    "explanation": "Ошибка загрузки базы не означает, что уязвимостей нет. Проверяют DNS, прокси, сертификаты, лимиты реестра и таймауты; для повторяемых запусков используют кеш или разрешённое зеркало с контролем актуальности. Если полная проверка недоступна, pipeline явно сообщает о неполном результате и следует принятой политике выпуска.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_035",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/books.md"
+  },
+  {
+    "id": 15036,
+    "topic": "Monitoring",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Как сохранить метрики за год, если локальный Prometheus хранит их три месяца?",
+    "options": [
+      "Заранее настроить внешнее долговременное хранилище метрик.",
+      "Увеличить временной диапазон запроса после удаления старых блоков.",
+      "Включить подробные access-логи у интерфейса Grafana.",
+      "Уменьшить интервал обновления панели для старых дат."
+    ],
+    "answer": 0,
+    "explanation": "Для годовой истории заранее предусматривают долговременное хранилище, например систему с remote write или объектным хранением блоков. Планируют retention, стоимость, кардинальность и доступность запросов. Удалённые три месяца назад данные не появятся от изменения настройки retention сегодня; восстановить их можно из существующего архива.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_036",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/books.md"
+  },
+  {
+    "id": 15037,
+    "topic": "System Design",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Как организовать выдачу очень больших объектов без чтения файла целиком в память API-сервера?",
+    "options": [
+      "Сохранять файл в HTTP-cookie и возвращать его при каждом запросе.",
+      "Использовать объектное хранилище, потоковую передачу и диапазонные запросы.",
+      "Преобразовывать весь файл в Base64 перед первым байтом ответа.",
+      "Передавать файл через DNS TXT-записи с коротким TTL."
+    ],
+    "answer": 1,
+    "explanation": "API хранит метаданные и проверяет доступ, а сами объекты выдаются потоково из подходящего хранилища, при необходимости через подписанные URL. Range-запросы позволяют получать части объекта, а multipart помогает загружать большие файлы с повтором отдельных частей. Учитывают лимиты сервиса, контроль целостности и ограничения CDN на размер кешируемого объекта.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_037",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/books.md"
+  },
+  {
+    "id": 15038,
+    "topic": "Kubernetes",
+    "level": "Senior",
+    "category": "scenario",
+    "q": "Как спланировать переход kubeadm-кластера через две minor-версии Kubernetes?",
+    "options": [
+      "Заменить версию kubectl и считать кластер обновлённым.",
+      "Обновить kubelet на всех узлах раньше API server через две версии.",
+      "Обновлять последовательно по minor-версии с проверкой совместимости и нагрузки.",
+      "Сразу пересоздать все узлы без проверки PDB и доступной ёмкости."
+    ],
+    "answer": 2,
+    "explanation": "Для kubeadm переход выполняют по поддерживаемой последовательности minor-версий, проверяя version skew, удалённые API и совместимость дополнений. Сохраняют резервную копию etcd и план восстановления, затем поочерёдно обновляют control plane и рабочие узлы с проверкой готовности. Отсутствие простоя требует реплик, запаса ёмкости и корректных ограничений disruption.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_038",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/books.md"
+  },
+  {
+    "id": 15039,
+    "topic": "Kubernetes",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Что даёт размещение служебного контейнера рядом с приложением в одном Pod?",
+    "options": [
+      "Отдельный IP-адрес Service для каждого процесса контейнера.",
+      "Независимое масштабирование контейнера на другой узел кластера.",
+      "Автоматическую репликацию базы приложения между всеми узлами.",
+      "Общий жизненный контекст Pod, сеть и возможность совместных томов."
+    ],
+    "answer": 3,
+    "explanation": "Sidecar сопровождает основное приложение, например проксирует трафик или доставляет служебные данные. Контейнеры одного Pod разделяют сеть и могут использовать общие тома, но расходуют ресурсы и планируются вместе. Требования к порядку запуска и завершения задают явно; наличие sidecar не делает основное приложение автоматически готовым.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_039",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/bank.md"
+  },
+  {
+    "id": 15040,
+    "topic": "Security",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "В каких цепочках фильтруют трафик самого Linux-хоста и транзитный трафик?",
+    "options": [
+      "INPUT и OUTPUT обслуживают хост, FORWARD — проходящие через него пакеты.",
+      "PREROUTING обслуживает процессы хоста, INPUT — маршрутизируемые пакеты.",
+      "POSTROUTING обслуживает входящие сокеты, OUTPUT — чужие подсети.",
+      "FORWARD обслуживает локальные сокеты, INPUT выполняет трансляцию адресов."
+    ],
+    "answer": 0,
+    "explanation": "В модели netfilter входящие локальному хосту пакеты проходят INPUT, локально созданные — OUTPUT, а маршрутизируемые через хост — FORWARD. NAT и изменение пакетов используют другие таблицы и точки обработки; конкретные правила могут создаваться iptables или nftables. Поэтому правило INPUT не обязательно ограничит трафик к контейнеру за маршрутизацией.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_040",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/bank.md"
+  },
+  {
+    "id": 15041,
+    "topic": "Ansible",
+    "level": "Junior",
+    "category": "scenario",
+    "q": "Чем magic variables Ansible отличаются от обычных переменных пользователя?",
+    "options": [
+      "Их значения обязательно зашифрованы отдельным ключом Vault.",
+      "Их формирует Ansible для описания текущего контекста выполнения.",
+      "Их разрешено использовать в inventory, но запрещено в playbook.",
+      "Они автоматически загружаются из переменных окружения каждой машины."
+    ],
+    "answer": 1,
+    "explanation": "Magic variables, например inventory_hostname, hostvars и groups, описывают inventory и контекст выполнения Ansible. Их значения поддерживает движок, поэтому переопределять их как обычные переменные не следует. Факты об ОС и оборудовании относятся к другой группе данных и обычно собираются модулем setup или его аналогами.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_041",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/bank.md"
+  },
+  {
+    "id": 15042,
+    "topic": "System Design",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Как связаны индекс, primary shard и replica shard в Elasticsearch?",
+    "options": [
+      "Primary shard хранит схему, replica shard хранит документы без схемы.",
+      "Каждый индекс хранится одним файлом на всех узлах одновременно.",
+      "Индекс разделён на primary shards, реплики копируют их данные.",
+      "Реплики разделяют документы primary shard на непересекающиеся части."
+    ],
+    "answer": 2,
+    "explanation": "Индекс — логическое пространство документов, разбитое на первичные шарды. Реплика содержит копию шарда для доступности и части операций чтения; она не является новой независимой частью данных. Число шардов и реплик влияет на память, размещение и восстановление, поэтому избыток маленьких шардов тоже может стать проблемой.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_042",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/bank.md"
+  },
+  {
+    "id": 15043,
+    "topic": "CI/CD",
+    "level": "Junior",
+    "category": "tradeoff",
+    "q": "Что происходит при fast-forward слиянии, если целевая ветка не имеет собственных новых коммитов?",
+    "options": [
+      "Git удаляет промежуточные коммиты и заменяет их одним squash.",
+      "Каждый входящий коммит получает новый хеш и нового автора.",
+      "Создаётся новая корневая история без общего предка веток.",
+      "Указатель ветки перемещается вперёд без отдельного merge-коммита."
+    ],
+    "answer": 3,
+    "explanation": "Fast-forward возможен, когда текущая вершина ветки является предком присоединяемой вершины. Git перемещает указатель и не создаёт новый merge-коммит, поскольку развилки истории нет. Параметр --no-ff позволяет сохранить отдельный коммит слияния даже в такой ситуации, если команде важна видимая граница работы.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_043",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/bank.md"
+  },
+  {
+    "id": 15044,
+    "topic": "CI/CD",
+    "level": "Junior",
+    "category": "scenario",
+    "q": "Для чего в GitLab CI используют job с именем, начинающимся с точки?",
+    "options": [
+      "Как скрытую конфигурацию для повторного использования другими job.",
+      "Как задание, запускаемое раньше всех остальных стадий pipeline.",
+      "Как задание с автоматическим доступом к production-секретам.",
+      "Как правило удаления артефактов после окончания pipeline."
+    ],
+    "answer": 0,
+    "explanation": "Скрытая job не выполняется самостоятельно и служит шаблоном настроек. Другие задания могут использовать её через extends, чтобы не дублировать image, script или общие правила. Итоговую объединённую конфигурацию проверяют отдельно: наследование и порядок переопределения полей могут изменить ожидаемое поведение.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_044",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/furniture_shop.md"
+  },
+  {
+    "id": 15045,
+    "topic": "Сети",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Почему отсутствие ответа на UDP-пробу не доказывает, что удалённый порт закрыт?",
+    "options": [
+      "UDP подтверждает каждый пакет, поэтому отсутствие ответа означает успех.",
+      "Сервис может молчать, а фильтр может отбрасывать пакеты без ответа.",
+      "Открытый UDP-порт обязан возвращать TCP SYN-ACK на пробу.",
+      "UDP-пробы проверяют DNS-кеш, а не доступность сетевого сервиса."
+    ],
+    "answer": 1,
+    "explanation": "У UDP нет обязательного установления соединения и подтверждения каждого пакета. Молчание может означать фильтрацию, потерю пакета или отсутствие реакции приложения на неподходящий запрос. Используют корректную пробу прикладного протокола, анализ ICMP-ошибок и захват трафика на обеих сторонах, чтобы отделить сеть от поведения сервиса.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_045",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/furniture_shop.md"
+  },
+  {
+    "id": 15046,
+    "topic": "Terraform",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Как один Terraform-модуль может создавать AWS-ресурсы в двух регионах?",
+    "options": [
+      "Через увеличение parallelism без изменения конфигурации provider.",
+      "Через два вызова terraform plan с разными именами лог-файлов.",
+      "Через несколько конфигураций provider с alias и явное назначение ресурсов.",
+      "Через смену DNS-сервера машины, запускающей terraform apply."
+    ],
+    "answer": 2,
+    "explanation": "Для разных регионов объявляют отдельные конфигурации AWS provider с alias. Ресурсы выбирают нужную конфигурацию через provider, а дочерним модулям её передают явно с учётом configuration_aliases. Alias выбирает контекст API, но сам по себе не изолирует state, права или окружения приложения.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_046",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/moonmait.md"
+  },
+  {
+    "id": 15047,
+    "topic": "Cloud",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Как EC2 в приватной подсети обращаться к S3 своего региона без маршрута через NAT gateway?",
+    "options": [
+      "Отключить проверку IAM-политик для приватной подсети.",
+      "Добавить публичный IP в каждую запись объекта S3.",
+      "Разрешить входящий SSH на security group инстанса.",
+      "Добавить S3 gateway endpoint в нужные таблицы маршрутизации."
+    ],
+    "answer": 3,
+    "explanation": "S3 gateway endpoint добавляет в выбранные таблицы маршрутизации путь к сервису внутри инфраструктуры AWS, без NAT gateway для этого трафика. Доступ по-прежнему определяется IAM, политикой endpoint и bucket policy; также проверяют регион и маршрут. Endpoint не делает бакет общедоступным и не отменяет проверку полномочий.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_047",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/moonmait.md"
+  },
+  {
+    "id": 15048,
+    "topic": "Security",
+    "level": "Senior",
+    "category": "tradeoff",
+    "q": "Что ограничивает permissions boundary у IAM-роли?",
+    "options": [
+      "Максимум прав, которые могут дать её identity-based политики.",
+      "Список подсетей, в которых разрешено размещать EC2-инстансы.",
+      "Количество временных паролей для входа в AWS Console.",
+      "Срок хранения сетевых журналов для ресурсов этой роли."
+    ],
+    "answer": 0,
+    "explanation": "Permissions boundary задаёт верхнюю границу разрешений, выдаваемых identity-based политиками роли, и сама права не предоставляет. Эффективный доступ зависит также от других применимых политик и явных запретов. Resource-based политики и предоставление прав сессиям имеют отдельные правила, поэтому boundary нельзя считать универсальной заменой анализа всей модели доступа.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_048",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/moonmait.md"
+  },
+  {
+    "id": 15049,
+    "topic": "Cloud",
+    "level": "Senior",
+    "category": "scenario",
+    "q": "Обновлён user data в Launch Template. Изменится ли конфигурация уже работающих EC2 в Auto Scaling Group?",
+    "options": [
+      "Да, Auto Scaling немедленно повторно выполняет скрипт на каждом инстансе.",
+      "Нет автоматически; для новых настроек планируют замену или управляемое изменение.",
+      "Да, EC2 переписывает корневую файловую систему из Launch Template.",
+      "Нет, поскольку user data поддерживается вне Auto Scaling Group."
+    ],
+    "answer": 1,
+    "explanation": "Новая версия Launch Template определяет параметры новых инстансов, если группа настроена использовать эту версию. Работающие машины не перечитывают user data автоматически из-за её изменения. Для распространения обновления используют управляемый Instance Refresh или отдельный инструмент конфигурации, проверяя ёмкость, health checks и возможность отката.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_049",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/moonmait.md"
+  },
+  {
+    "id": 15050,
+    "topic": "Kubernetes",
+    "level": "Middle",
+    "category": "tradeoff",
+    "q": "Реплицирует ли StatefulSet данные базы между своими Pod?",
+    "options": [
+      "Да, одинаковые имена контейнеров включают синхронизацию дисков.",
+      "Да, controller копирует содержимое каждого PVC в остальные PVC.",
+      "Нет, репликацию реализует база, оператор или отдельный механизм приложения.",
+      "Нет, потому что StatefulSet запрещает подключение постоянных томов."
+    ],
+    "answer": 2,
+    "explanation": "StatefulSet предоставляет устойчивые имена и связи Pod с постоянным хранилищем, а также управляемый порядок действий. Он не знает формат данных базы и не копирует её транзакции между репликами. Репликацию, выбор лидера, восстановление и резервное копирование организует сама система хранения или специализированный оператор.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_050",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/galera.tech.md"
+  },
+  {
+    "id": 15051,
+    "topic": "Security",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Как Kyverno помогает применять правила к Kubernetes-ресурсам?",
+    "options": [
+      "Транслирует все сетевые пакеты между Service и внешними клиентами.",
+      "Заменяет etcd распределённым файловым хранилищем объектов.",
+      "Выполняет роль контейнерного runtime на каждом рабочем узле.",
+      "Проверяет, изменяет или генерирует ресурсы согласно политикам."
+    ],
+    "answer": 3,
+    "explanation": "Kyverno — движок политик, который может валидировать, изменять и генерировать ресурсы, а также проверять образы. Например, политика требует метки или ограничивает разрешённые реестры. Перед включением блокирующего режима проверяют влияние на существующие процессы и доступность admission; политика не заменяет RBAC и сетевые ограничения.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_051",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/galera.tech.md"
+  },
+  {
+    "id": 15052,
+    "topic": "Kubernetes",
+    "level": "Middle",
+    "category": "tradeoff",
+    "q": "Чем Kubespray отличается от kubeadm при развёртывании кластера?",
+    "options": [
+      "Автоматизирует больше шагов подготовки и настройки через Ansible.",
+      "Предоставляет управляемую облачную плоскость управления вместо узлов.",
+      "Используется как интерфейс контейнерного runtime на рабочем узле.",
+      "Заменяет Kubernetes API собственным несовместимым форматом манифестов."
+    ],
+    "answer": 0,
+    "explanation": "Kubeadm предоставляет инструменты начальной настройки и жизненного цикла компонентов Kubernetes, но не решает все задачи подготовки инфраструктуры. Kubespray добавляет автоматизацию на Ansible для настройки узлов, компонентов и дополнений в поддерживаемых конфигурациях. Для обоих вариантов команда остаётся ответственной за обновления, резервные копии и эксплуатацию.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_052",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/operator.md"
+  },
+  {
+    "id": 15053,
+    "topic": "Docker",
+    "level": "Junior",
+    "category": "scenario",
+    "q": "Сохранятся ли файлы writable layer после docker stop и docker start того же контейнера?",
+    "options": [
+      "Нет, stop откатывает слой к исходному состоянию образа.",
+      "Да, слой сохраняется до удаления контейнера.",
+      "Да, но файлы автоматически перемещаются в новый volume.",
+      "Нет, start пересоздаёт контейнер и выдаёт ему новый идентификатор."
+    ],
+    "answer": 1,
+    "explanation": "Остановка завершает процессы контейнера, но не удаляет его writable layer. При запуске того же контейнера записанные файлы остаются; после удаления контейнера этот слой исчезает. Поэтому для долговечных данных используют тома и резервные копии, а команды stop/start отличают от пересоздания контейнера из образа.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_053",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/moonmait.md"
+  },
+  {
+    "id": 15054,
+    "topic": "Linux",
+    "level": "Junior",
+    "category": "scenario",
+    "q": "Чем /sys отличается от /proc при исследовании работающей Linux-системы?",
+    "options": [
+      "/sys используется загрузчиком, а /proc существует до загрузки ядра.",
+      "/sys хранит обычные пользовательские файлы, /proc — резервные копии ядра.",
+      "/sys показывает модель устройств ядра, /proc — процессы и системные сведения.",
+      "/sys отражает DNS-кеш, а /proc хранит историю команд оболочки."
+    ],
+    "answer": 2,
+    "explanation": "Оба каталога обычно являются точками монтирования виртуальных файловых систем. Procfs предоставляет информацию о процессах и ряд системных интерфейсов, а sysfs отражает устройства, драйверы и другие объекты ядра. Часть файлов допускает запись с изменением поведения системы, поэтому чтение состояния отличают от настройки параметров.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_054",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/baraholka.md"
+  },
+  {
+    "id": 15055,
+    "topic": "Linux",
+    "level": "Junior",
+    "category": "scenario",
+    "q": "Как вывести поток программы на экран и одновременно сохранить его в файл?",
+    "options": [
+      "Запустить программу дважды, считая оба вывода одним потоком.",
+      "Перенаправить stdout в /dev/null и затем скопировать файл журнала.",
+      "Использовать chmod для добавления файлового дескриптора процессу.",
+      "Передать поток утилите tee; stderr при необходимости объединить заранее."
+    ],
+    "answer": 3,
+    "explanation": "Tee читает стандартный ввод, записывает его в указанные файлы и одновременно передаёт в стандартный вывод. Обычный конвейер получает stdout, поэтому stderr объединяют с ним отдельно, если нужен общий журнал. В Bash статус конвейера по умолчанию определяется последней командой; pipefail помогает заметить сбой исходной программы.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_055",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/baraholka.md"
+  },
+  {
+    "id": 15056,
+    "topic": "CI/CD",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "Почему manual job в GitLab CI иногда блокирует pipeline, а иногда считается необязательной?",
+    "options": [
+      "Поведение зависит от allow_failure и от способа задания when: manual.",
+      "Поведение определяется количеством runner в том же проекте.",
+      "Поведение меняется при выборе другого цвета окружения в интерфейсе.",
+      "Поведение зависит от расширения файла, указанного в artifacts."
+    ],
+    "answer": 0,
+    "explanation": "Manual job ожидает ручного запуска, но обязательность выполнения задаётся allow_failure. Значения по умолчанию различаются для when: manual вне rules и внутри rules, поэтому для критичного деплоя параметр лучше указывать явно. Защита окружения и права запуска задаются отдельно от того, блокирует ли job дальнейшие стадии.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_056",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/baraholka.md"
+  },
+  {
+    "id": 15057,
+    "topic": "Ansible",
+    "level": "Junior",
+    "category": "tradeoff",
+    "q": "Где разместить переопределяемые настройки роли Ansible: defaults/main.yml или vars/main.yml?",
+    "options": [
+      "В vars/main.yml: эти значения имеют низкий приоритет.",
+      "В defaults/main.yml: эти значения имеют низкий приоритет.",
+      "В handlers/main.yml: значения вычисляются до каждой задачи.",
+      "В meta/main.yml: значения заменяют extra vars при запуске."
+    ],
+    "answer": 1,
+    "explanation": "Role defaults предназначены для исходных значений с низким приоритетом. Переменные роли из vars имеют более высокий приоритет и могут неожиданно перекрыть inventory, поэтому там не стоит размещать все пользовательские настройки. При отладке учитывают полный порядок приоритетов; extra vars обычно имеют высший приоритет среди переменных.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_057",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/moonmait.md"
+  },
+  {
+    "id": 15058,
+    "topic": "Kubernetes",
+    "level": "Middle",
+    "category": "tradeoff",
+    "q": "Может ли один PersistentVolumeClaim одновременно быть связан с двумя PersistentVolume?",
+    "options": [
+      "Да, если в Pod включена политика перезапуска Always.",
+      "Да, если оба PV используют одинаковое имя StorageClass.",
+      "Нет, привязка PVC к PV является взаимно однозначной.",
+      "Нет, поскольку PVC описывает сетевой адрес, а не хранилище."
+    ],
+    "answer": 2,
+    "explanation": "PVC запрашивает хранилище и связывается с одним PV, удовлетворяющим требованиям. Такая привязка не складывает ёмкость двух PV в один том. Несколько томов подключают к Pod через отдельные claims, а возможность совместного использования одного claim несколькими Pod зависит от режима доступа и возможностей драйвера.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_058",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/moonmait.md"
+  },
+  {
+    "id": 15059,
+    "topic": "Kubernetes",
+    "level": "Middle",
+    "category": "tradeoff",
+    "q": "Может ли обычный Ingress напрямую сослаться на backend Service из другого namespace?",
+    "options": [
+      "Нет, поскольку Ingress передаёт запросы непосредственно на PVC.",
+      "Да, namespace Service определяется по его clusterIP автоматически.",
+      "Да, достаточно добавить имя namespace в поле HTTP path.",
+      "Нет, стандартный backend ссылается на Service своего namespace."
+    ],
+    "answer": 3,
+    "explanation": "Стандартный Ingress задаёт backend Service в своём namespace. Для доступа к приложениям разных пространств используют отдельные Ingress или поддерживаемую контроллером архитектуру, не подменяя поле имени произвольным межпространственным адресом. Gateway API предоставляет явные механизмы ссылок и разрешений, например ReferenceGrant, с учётом реализации.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_059",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/moonmait.md"
+  },
+  {
+    "id": 15060,
+    "topic": "Security",
+    "level": "Senior",
+    "category": "tradeoff",
+    "q": "Чем mutating admission webhook отличается от validating webhook?",
+    "options": [
+      "Может вернуть изменения объекта до его сохранения, а не просто решение о допуске.",
+      "Запускает контейнеры на узле вместо штатного kubelet.",
+      "Хранит резервные копии etcd при каждом обновлении Deployment.",
+      "Преобразует сетевые пакеты между узлами в HTTP-запросы."
+    ],
+    "answer": 0,
+    "explanation": "Mutating webhook участвует в обработке запроса API и может вернуть patch, меняющий объект, например добавляющий служебный контейнер. Validating webhook проверяет допустимость объекта без его изменения. Оба механизма требуют продуманной доступности, таймаутов и failurePolicy, иначе отказ внешней проверки способен блокировать операции в кластере.",
+    "sourceRepository": "Swfuse/devops-interview",
+    "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
+    "sourceQuestionId": "swfuse_060",
+    "sourceTitle": "Swfuse/devops-interview",
+    "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/broker.com.md"
   }
 ]
