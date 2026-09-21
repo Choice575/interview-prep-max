@@ -36,3 +36,36 @@ test('finds Swfuse additions in all three modes, reveals answers and preserves e
   expect(progress['1000001'].repetitions).toBe(2);
   expect(progress['15007'].correct).toBe(1);
 });
+
+test('search finds all 60 Swfuse cards after a category was selected and can clear review restrictions', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('ipmax_onboarding_complete', 'true');
+    localStorage.setItem('ipmax_onboarding', JSON.stringify({ role: 'SRE', level: 'Middle', completedAt: '2026-09-21T00:00:00Z' }));
+  });
+  await page.goto('/#/flashcards');
+  const network = page.locator('[data-flashcards-action="category"][data-collection="Сети и протоколы"]');
+  const search = page.locator('[data-flashcards-filter="search"]');
+  const results = page.locator('.flashcards-results');
+  await network.click();
+  await search.pressSequentially('Swfuse');
+  await expect(search).toBeFocused();
+  await expect(page.locator('[data-collection="all"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(results).toContainText('Найдено: 60 из 3105');
+  await expect(page.locator('.study-card-meta')).toContainText('1 / 60');
+  // Narrowing after search is intentional and its scope is visible.
+  await network.click();
+  await expect(results).toContainText('Найдено: 8 из 3105');
+  await expect(results).toContainText('Сети и протоколы');
+  await page.locator('[data-flashcards-action="mode"][data-mode="known"]').click();
+  await expect(results).toContainText('Найдено: 0 из 3105');
+  await expect(results).toContainText('Знаю');
+  await page.getByRole('button', { name: 'Все категории и режимы', exact: true }).click();
+  await expect(search).toHaveValue('Swfuse');
+  await expect(search).toBeFocused();
+  await expect(results).toContainText('Найдено: 60 из 3105');
+  await page.setViewportSize({ width: 375, height: 812 });
+  await network.click();
+  await page.getByRole('button', { name: 'Все категории и режимы', exact: true }).click();
+  await expect(results).toContainText('Найдено: 60 из 3105');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});

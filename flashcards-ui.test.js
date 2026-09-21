@@ -157,3 +157,35 @@ test('changing category resets position and answer while preserving progress by 
   assert.doesNotMatch(host.innerHTML, /Собирает образ из Dockerfile/);
   assert.deepEqual(progress, { 1000002: { lastSeen: 10, repetitions: 2 } });
 });
+
+test('editing a search starts across categories and preserves the explicit review mode', () => {
+  const host = { innerHTML: '', querySelectorAll: () => [] };
+  const controller = FlashcardsUI.create({ getCards: () => cards }, { document: { getElementById: () => host } });
+  controller.setFilter('collection', 'Linux и Bash');
+  controller.setFilter('mode', 'new');
+  controller.setFilter('search', 'docker');
+  assert.equal(controller.getState().collection, 'all');
+  assert.equal(controller.getState().mode, 'new');
+  assert.match(host.innerHTML, /Что делает docker build/);
+  assert.match(host.innerHTML, /Найдено: <strong>1<\/strong>/);
+  controller.setFilter('collection', 'Linux и Bash');
+  assert.match(host.innerHTML, /Найдено: <strong>0<\/strong>/);
+  assert.match(host.innerHTML, /Все категории и режимы/);
+  controller.setFilter('search', 'docker build');
+  assert.equal(controller.getState().collection, 'all');
+  assert.match(host.innerHTML, /Что делает docker build/);
+});
+
+test('resetting search restrictions keeps the query and selected deck', () => {
+  const host = { innerHTML: '', querySelectorAll: () => [] };
+  const controller = FlashcardsUI.create({ getDecks: () => decks }, { document: { getElementById: () => host } });
+  controller.setDeck('video');
+  controller.setFilter('search', 'inode');
+  controller.setFilter('mode', 'known');
+  controller.setFilter('collection', 'Linux и Bash');
+  assert.match(host.innerHTML, /Найдено: <strong>0<\/strong>/);
+  controller.resetFilters();
+  assert.deepEqual(controller.getState(), { deck: 'video', collection: 'all', mode: 'all', search: 'inode', revealed: false, index: 0 });
+  assert.match(host.innerHTML, /Что такое inode/);
+  assert.doesNotMatch(host.innerHTML, /Все категории и режимы/);
+});

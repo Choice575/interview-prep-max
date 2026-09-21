@@ -12,6 +12,7 @@
     'Базы данных и очереди', 'Безопасность', 'Архитектура и надёжность',
     'Карьера и собеседования', 'MLOps'
   ];
+  const REVIEW_MODES = [['all', 'Все'], ['new', 'Новые'], ['learning', 'Изучаю'], ['known', 'Знаю'], ['due', 'К повторению']];
 
   function cardState(card, progress, now) {
     const record = hasOwn(progress, card && card.id) && progress[card.id] && typeof progress[card.id] === 'object'
@@ -125,10 +126,17 @@
           '"><span>' + escapeText(label) + '</span><strong>' + count + '</strong></button>').join('') + '</div>';
 
     const controls = categories + '<div class="flashcards-controls">' +
-      '<label>Поиск<input class="form-input" type="search" value="' + escapeText(search) + '" placeholder="Вопрос, ответ, тема или источник" data-flashcards-filter="search"></label>' +
+      '<label>Поиск<input class="form-input" type="search" value="' + escapeText(search) + '" placeholder="Вопрос, ответ, тема или источник" aria-describedby="flashcards-search-hint" data-flashcards-filter="search"></label>' +
+      '<p id="flashcards-search-hint" class="flashcards-search-hint">Поиск начинается во всех категориях выбранного набора. Затем можно выбрать категорию для уточнения.</p>' +
       '<div class="flashcards-modes" role="group" aria-label="Режим повторения">' +
-      [['all', 'Все'], ['new', 'Новые'], ['learning', 'Изучаю'], ['known', 'Знаю'], ['due', 'К повторению']]
+      REVIEW_MODES
         .map(item => '<button type="button" class="chip' + active(mode, item[0]) + '" data-flashcards-action="mode" data-mode="' + item[0] + '">' + item[1] + '</button>').join('') +
+      '</div><div class="flashcards-results">' +
+      '<p role="status" aria-live="polite">Найдено: <strong>' + filtered.length + '</strong> из ' + cards.length +
+      ' · ' + escapeText(collection === 'all' ? 'Все категории' : collection) +
+      ' · ' + escapeText((REVIEW_MODES.find(item => item[0] === mode) || REVIEW_MODES[0])[1]) + '</p>' +
+      (collection !== 'all' || mode !== 'all'
+        ? '<button type="button" class="btn btn-quiet" data-flashcards-action="reset-filters">Все категории и режимы</button>' : '') +
       '</div></div>';
 
     const stats = '<div class="flashcards-stats" aria-label="Прогресс по карточкам">' +
@@ -238,7 +246,17 @@
     function setFilter(name, value) {
       if (name === 'collection') state.collection = String(value || 'all');
       if (name === 'mode') state.mode = String(value || 'all');
-      if (name === 'search') state.search = String(value || '');
+      if (name === 'search') {
+        state.search = String(value || '');
+        if (state.search.trim()) state.collection = 'all';
+      }
+      state.index = 0;
+      state.revealed = false;
+      render();
+    }
+    function resetFilters() {
+      state.collection = 'all';
+      state.mode = 'all';
       state.index = 0;
       state.revealed = false;
       render();
@@ -265,6 +283,10 @@
           else if (action === 'mode') setFilter('mode', element.getAttribute('data-mode'));
           else if (action === 'deck') setDeck(element.getAttribute('data-deck'));
           else if (action === 'category') setFilter('collection', element.getAttribute('data-collection'));
+          else if (action === 'reset-filters') {
+            resetFilters();
+            host.querySelector('[data-flashcards-filter="search"]').focus();
+          }
         });
       });
       host.querySelectorAll('[data-flashcards-filter]').forEach(element => {
@@ -274,7 +296,7 @@
       });
     }
 
-    return { render, reveal, rate, next: () => move(1), prev: () => move(-1), setFilter, setDeck, getState: () => ({ ...state }) };
+    return { render, reveal, rate, next: () => move(1), prev: () => move(-1), setFilter, resetFilters, setDeck, getState: () => ({ ...state }) };
   }
 
   return { cardState, isDue, filterCards, summarizeCards, normalizeDecks, renderPage, create };
