@@ -5,7 +5,7 @@
     "category": "definition",
     "q": "Что такое Terraform?",
     "options": [
-      "Декларативный инструмент Infrastructure as Code",
+      "Инструмент «инфраструктура как код» (Infrastructure as Code)",
       "Система управления конфигурацией операционных систем",
       "Платформа оркестрации контейнерных приложений",
       "Сервис мониторинга состояния инфраструктуры"
@@ -296,7 +296,7 @@
       "Они разделяют state, но используют общий root module и связанные backend-настройки"
     ],
     "answer": 3,
-    "explanation": "CLI workspaces разделяют экземпляры state, но конфигурация и многие параметры жизненного цикла остаются общими. Для окружений с разными правами, владельцами и blast radius часто яснее отдельные root modules и backend.",
+    "explanation": "CLI workspaces разделяют экземпляры state, но конфигурация и многие параметры жизненного цикла остаются общими. Для окружений с разными правами, владельцами и область воздействия сбоя (blast radius) часто яснее отдельные root modules и backend.",
     "id": 20
   },
   {
@@ -606,7 +606,7 @@
     "q": "Что происходит с orphan process после завершения его родителя?",
     "options": [
       "Его принимает подходящий subreaper или PID 1, который позднее собирает статус завершения",
-      "Ядро немедленно завершает его тем же exit code, который вернул исходный родитель",
+      "Ядро немедленно завершает его тем же код завершения (exit code), который вернул исходный родитель",
       "Он становится kernel thread и продолжает работу вне таблицы пользовательских процессов",
       "Он теряет открытые дескрипторы и перезапускается init-системой как новая служба"
     ],
@@ -2285,13 +2285,13 @@
     "category": "scenario",
     "q": "Как организовать state для multi-account инфраструктуры?",
     "options": [
-      "Разделить state по границам доступа и blast radius",
+      "Разделить state по границам доступа и область воздействия сбоя (blast radius)",
       "Объединить аккаунты в state для общего механизма locking",
       "Менять credentials у одного workspace перед каждым apply",
       "Копировать локальный state между аккаунтами вручную"
     ],
     "answer": 0,
-    "explanation": "Границы state выбирают по правам доступа, жизненному циклу и blast radius. Для каждого state отдельно настраивают backend, блокировку и минимально необходимые права.",
+    "explanation": "Границы state выбирают по правам доступа, жизненному циклу и область воздействия сбоя (blast radius). Для каждого state отдельно настраивают backend, блокировку и минимально необходимые права.",
     "id": 153
   },
   {
@@ -3356,7 +3356,7 @@
       "Конфиденциальность, целостность и аутентификацию"
     ],
     "answer": 3,
-    "explanation": "ESP может обеспечивать конфиденциальность, целостность и аутентификацию, а AH — целостность и аутентификацию без шифрования полезной нагрузки. IKE согласует Security Associations и ключи. IPsec поддерживает transport и tunnel mode.",
+    "explanation": "ESP может обеспечивать конфиденциальность, целостность и аутентификацию, а AH — целостность и аутентификацию без шифрования полезной нагрузки. IKE согласует Безопасность Associations и ключи. IPsec поддерживает transport и tunnel mode.",
     "id": 224
   },
   {
@@ -3923,7 +3923,7 @@
       "Точный результат последующего обычного запуска",
       "Симуляцию для tasks с поддержкой check mode",
       "Проверку YAML без соединения с managed nodes",
-      "Автоматический rollback после применения changes"
+      "Автоматический откат (rollback) после применения changes"
     ],
     "answer": 1,
     "explanation": "В check mode modules с соответствующей поддержкой прогнозируют changes, не применяя их. Неподдерживающие modules ничего не делают и могут не дать результата; зависимости от registered variables также ограничивают точность. Keyword check_mode: true или false принудительно меняет режим конкретной task.",
@@ -4309,7 +4309,7 @@
     "topic": "Linux",
     "level": "Middle",
     "category": "scenario",
-    "q": "Filesystem с /var/log заполнен на 95%; du нашёл активный app.log. Как срочно освободить место без restart?",
+    "q": "Файловая система с /var/log заполнена на 95%; du нашёл активный app.log. Как срочно освободить место без перезапуска?",
     "options": [
       "Удалить открытый log: filesystem вернёт место сразу после unlink",
       "Переместить log: открытый descriptor переключится на новый path",
@@ -4414,7 +4414,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "scenario",
-    "q": "BGP сессия с upstream провайдером установлена (Established), но маршрутов от него не приходит. Что проверить?",
+    "q": "Сессия BGP с вышестоящим провайдером (upstream) установлена — Established, но маршруты не приходят. Что проверить?",
     "options": [
       "Перезапустить BGP daemon, не сохраняя counters и состояние neighbor",
       "Изменить interface MTU: Established не подтверждает получение UPDATE",
@@ -4549,7 +4549,7 @@
     "topic": "Ansible",
     "level": "Middle",
     "category": "tradeoff",
-    "q": "Ansible Roles vs Collections. В чём ключевое различие и когда что использовать?",
+    "q": "Чем роли (roles) Ansible отличаются от коллекций (collections) и когда использовать каждый вариант?",
     "options": [
       "Collection — переименованная role с тем же layout и installation scope",
       "Collection пакует modules, а role не может содержать tasks и templates",
@@ -4564,7 +4564,7 @@
     "topic": "Сети",
     "level": "Middle",
     "category": "tradeoff",
-    "q": "TCP vs UDP: когда выбирать UDP несмотря на отсутствие гарантий доставки?",
+    "q": "Когда выбирать UDP вместо TCP, несмотря на отсутствие гарантий доставки?",
     "options": [
       "UDP выбирают, когда важны latency/message boundaries, а app управляет loss/reliability",
       "UDP подходит для ordered transfer, где каждый byte должен прибыть один раз",
@@ -4594,7 +4594,7 @@
     "topic": "Linux",
     "level": "Middle",
     "category": "tradeoff",
-    "q": "Hard link vs Symbolic link (symlink). Когда использовать каждый?",
+    "q": "Чем жёсткая ссылка (hard link) отличается от символической (symbolic link, symlink) и когда использовать каждую?",
     "options": [
       "Symlink разделяет inode с target и сохраняется после удаления target path",
       "Hard link пересекает filesystems и обычно ссылается на directories",
@@ -4684,7 +4684,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "BGP ECMP vs LACP (LAG) для балансировки трафика. В чём разница применения?",
+    "q": "Чем различается применение BGP ECMP и LACP (LAG) для распределения трафика?",
     "options": [
       "LACP bundles links между logical peers; BGP ECMP использует несколько routed next hops",
       "LACP балансирует arbitrary routed paths, ECMP объединяет ports в interface",
@@ -4763,7 +4763,7 @@
     "options": [
       "nginx достиг active state, а systemd подтвердил успешную restart policy",
       "Restarts достигли systemd start-rate limit; нужны прежние logs и exit status",
-      "Увеличение StartLimitBurst устраняет root cause до следующего start",
+      "Увеличение StartLimitBurst устраняет первопричина (root cause) до следующего start",
       "Сообщение означает normal daemon reload и не требует unit diagnostics"
     ],
     "answer": 1,
@@ -4864,7 +4864,7 @@
     "topic": "Ansible",
     "level": "Senior",
     "category": "output",
-    "q": "Ansible fact показывает: ansible_memory_mb.real.free: 128 на хосте с 16GB RAM. Что это означает?",
+    "q": "Собранные Ansible сведения о системе (facts) содержат ansible_memory_mb.real.free: 128 на узле с 16 ГБ оперативной памяти. Что это означает?",
     "options": [
       "free — unused RAM, не MemAvailable; проверить ansible_memavailable_mb, swap и pressure",
       "128 MB доказывает immediate OOM независимо от cache и workload",
@@ -5224,7 +5224,7 @@
     "topic": "Docker",
     "level": "Middle",
     "category": "scenario",
-    "q": "Compose должен стартовать app после готовности database. Какая настройка подходит?",
+    "q": "Compose должен запускать сервис app после готовности database. Какая настройка подходит?",
     "options": [
       "healthcheck у db и depends_on с condition: service_healthy у app",
       "links: [db], поскольку DNS connectivity означает готовность database",
@@ -5262,7 +5262,7 @@
       "Файл переносится в named volume, а lowerdir помечается writable"
     ],
     "answer": 2,
-    "explanation": "Lower layers образа остаются read-only. При первой записи overlay2 делает copy_up всего файла из lowerdir в container upperdir и изменяет уже верхнюю копию; последующие writes идут туда же. Для большого файла даже небольшое первое изменение может добавить latency, потому что copy_up работает на уровне целого файла."
+    "explanation": "Lower layers образа остаются без изменения состояния (read-only). При первой записи overlay2 делает copy_up всего файла из lowerdir в container upperdir и изменяет уже верхнюю копию; последующие writes идут туда же. Для большого файла даже небольшое первое изменение может добавить latency, потому что copy_up работает на уровне целого файла."
   },
   {
     "id": 352,
@@ -5277,7 +5277,7 @@
       "--user 1001 --read-only --cap-drop=ALL --security-opt no-new-privileges"
     ],
     "answer": 3,
-    "explanation": "Defense in depth начинает с non-root user, read-only root filesystem, удаления capabilities и запрета получения новых privileges. Нужные write paths дают через tmpfs/volumes, а отдельные capabilities возвращают точечно. Правильный Docker flag — --security-opt no-new-privileges[=true]; default или более строгий seccomp profile оставляют включённым."
+    "explanation": "Defense in depth начинает с non-root user, без изменения состояния (read-only) root filesystem, удаления capabilities и запрета получения новых privileges. Нужные write paths дают через tmpfs/volumes, а отдельные capabilities возвращают точечно. Правильный Docker flag — --security-opt no-new-privileges[=true]; default или более строгий seccomp profile оставляют включённым."
   },
   {
     "id": 353,
@@ -5409,7 +5409,7 @@
       "Поток событий Docker objects с фильтрами по type, action и времени",
       "Историю изменений Dockerfile и diff инструкций между builds",
       "Per-process CPU и memory samples для running containers",
-      "Версии daemon configuration с возможностью rollback"
+      "Версии daemon configuration с возможностью откат (rollback)"
     ],
     "answer": 0,
     "explanation": "docker events получает real-time events от daemon для containers, images, networks, volumes и других object types. --filter, --since и --until ограничивают поток. Это не долговечный audit log: при запросе истории daemon возвращает не более последних 256 событий, поэтому для аудита consumer должен сохранять их во внешней системе."
@@ -5577,7 +5577,7 @@
       "Deployment управляет ReplicaSets, rollout strategy и revisions"
     ],
     "answer": 3,
-    "explanation": "ReplicaSet поддерживает заданное число Pod replicas. Deployment управляет ReplicaSets: при изменении Pod template создаёт новый ReplicaSet, контролируемо масштабирует новый и старый наборы и сохраняет revisions для rollback. Управлять его ReplicaSets вручную не следует."
+    "explanation": "ReplicaSet поддерживает заданное число Pod replicas. Deployment управляет ReplicaSets: при изменении Pod template создаёт новый ReplicaSet, контролируемо масштабирует новый и старый наборы и сохраняет revisions для отката (rollback). Управлять его ReplicaSets вручную не следует."
   },
   {
     "id": 373,
@@ -5707,12 +5707,12 @@
     "q": "Какая команда откатывает Deployment на предыдущую revision?",
     "options": [
       "kubectl rollout undo deployment/myapp",
-      "kubectl rollout rollback deployment/myapp",
+      "kubectl rollout откат (rollback) deployment/myapp",
       "kubectl deploy undo myapp --previous",
       "kubectl apply revision deployment/myapp"
     ],
     "answer": 0,
-    "explanation": "kubectl rollout undo deployment/myapp возвращает Pod template к предыдущей revision; --to-revision=N выбирает конкретную. kubectl rollout history показывает доступную history. Возможность rollback зависит от сохранённых ReplicaSets, число которых ограничивает spec.revisionHistoryLimit."
+    "explanation": "kubectl rollout undo deployment/myapp возвращает Pod template к предыдущей revision; --to-revision=N выбирает конкретную. kubectl rollout history показывает доступную history. Возможность откат (rollback) зависит от сохранённых ReplicaSets, число которых ограничивает spec.revisionHistoryLimit."
   },
   {
     "id": 382,
@@ -5772,7 +5772,7 @@
       "API server переключается на SQL store до восстановления snapshot"
     ],
     "answer": 0,
-    "explanation": "etcd commit-ит consensus updates после подтверждения majority: floor(n/2)+1 members. При потере quorum он не делает progress, а Kubernetes API operations, которым нужны согласованные reads или writes, сбоят; API server не становится простым read-only store. Уже запущенные workloads могут продолжить на nodes, но управление desired state деградирует."
+    "explanation": "etcd commit-ит consensus updates после подтверждения majority: floor(n/2)+1 members. При потере quorum он не делает progress, а Kubernetes API operations, которым нужны согласованные reads или writes, сбоят; API server не становится простым без изменения состояния (read-only) store. Уже запущенные workloads могут продолжить на nodes, но управление desired state деградирует."
   },
   {
     "id": 386,
@@ -5813,11 +5813,11 @@
     "options": [
       "Перенести Pod на node с большей RAM, оставив прежний cgroup limit",
       "Включить swap и считать memory profile несущественным для анализа",
-      "Сбросить restart count и повторять Pod до другого exit code",
+      "Сбросить restart count и повторять Pod до другого код завершения (exit code)",
       "Сверить lastState, limit, metrics и app profile для leak или peak"
     ],
     "answer": 3,
-    "explanation": "Сначала подтверждают reason OOMKilled и exit code в lastState, затем сравнивают container limit с историческими metrics и memory working set. kubectl top показывает текущее, а не прошедший spike. Heap/native profiles, logs и нагрузочный сценарий помогают отличить leak, unbounded cache и допустимый peak; requests/limits меняют после полученных данных."
+    "explanation": "Сначала подтверждают reason OOMKilled и код завершения (exit code) в lastState, затем сравнивают container limit с историческими metrics и memory working set. kubectl top показывает текущее, а не прошедший spike. Heap/native profiles, logs и нагрузочный сценарий помогают отличить leak, unbounded cache и допустимый peak; requests/limits меняют после полученных данных."
   },
   {
     "id": 389,
@@ -5843,11 +5843,11 @@
     "options": [
       "Helm patch-ит live objects, Kustomize хранит release history",
       "Helm пакует templated charts/releases; Kustomize меняет YAML overlays",
-      "Kustomize даёт lifecycle hooks, chart registry и rollback revisions",
+      "Kustomize даёт lifecycle hooks, chart registry и откат (rollback) revisions",
       "Оба render-ят manifests из одного template language и values files"
     ],
     "answer": 1,
-    "explanation": "Helm отвечает за package/release lifecycle: Go templates, values, chart dependencies, hooks, history и rollback. Kustomize декларативно transforms и patch-ит YAML bases через overlays без отдельного template language и release state. Их можно сочетать, но сложность generated manifests и ownership нужно контролировать."
+    "explanation": "Helm отвечает за package/release lifecycle: Go templates, values, chart dependencies, hooks, history и откат (rollback). Kustomize декларативно transforms и patch-ит YAML bases через overlays без отдельного template language и release state. Их можно сочетать, но сложность generated manifests и ownership нужно контролировать."
   },
   {
     "id": 391,
@@ -6147,7 +6147,7 @@
       "Drain node и считать успешные evictions доказательством причины"
     ],
     "answer": 1,
-    "explanation": "kubectl describe node и NodeLease показывают, когда control plane перестал получать heartbeats и какие Conditions/Events были перед этим. На host проверяют kubelet logs/status, container runtime, disk/inodes, memory/PIDs, network path к API server, time и certificates. Cordon/drain может быть безопасной mitigation, но не заменяет root-cause diagnosis."
+    "explanation": "kubectl describe node и NodeLease показывают, когда control plane перестал получать heartbeats и какие Conditions/Events были перед этим. На host проверяют kubelet logs/status, container runtime, disk/inodes, memory/PIDs, network path к API server, time и certificates. Cordon/drain может быть безопасной мерой сдерживания последствий (mitigation), но не заменяет выявление первопричины (root cause)."
   },
   {
     "id": 411,
@@ -6267,7 +6267,7 @@
       "Стратегии имеют одну traffic model и различаются YAML syntax"
     ],
     "answer": 1,
-    "explanation": "Blue-Green держит old/new environments и переключает router, поэтому rollback быстрый, но parallel capacity и state synchronization могут стоить дорого. Canary постепенно увеличивает exposure новой version, требуя измеримых success criteria, traffic segmentation и automation. Обе стратегии нуждаются в backward-compatible data/schema change для безопасного rollback."
+    "explanation": "Blue-Green держит old/new environments и переключает router, поэтому откат (rollback) быстрый, но parallel capacity и state synchronization могут стоить дорого. Canary постепенно увеличивает exposure новой version, требуя измеримых success criteria, traffic segmentation и automation. Обе стратегии нуждаются в backward-compatible data/schema change для безопасного откат."
   },
   {
     "id": 419,
@@ -6291,7 +6291,7 @@
     "category": "definition",
     "q": "Каков security trade-off traditional DinD в CI?",
     "options": [
-      "Использует host daemon с read-only доступом к Docker socket",
+      "Использует host daemon с без изменения состояния (read-only) доступом к Docker socket",
       "Запускает containers в VM, изолированной от runner kernel",
       "Подписывает images во вложенном registry без privileges",
       "Nested daemon обычно требует privileged container, ослабляя isolation"
@@ -6349,15 +6349,15 @@
     "topic": "CI/CD",
     "level": "Middle",
     "category": "scenario",
-    "q": "GitLab pipeline выполняется 45 минут. С чего начать оптимизацию?",
+    "q": "Конвейер (pipeline) GitLab выполняется 45 минут. С чего начать оптимизацию?",
     "options": [
       "Добавить runners без измерений и оставить прежний DAG, порядок jobs, загрузку зависимостей и состав тестов",
       "Объединить jobs в один последовательный script, чтобы убрать передачу artifacts и ожидание свободных runners",
       "Убрать интеграционные тесты из merge request pipeline и запускать полный набор после production deployment",
-      "Измерить critical path, настроить needs, cache и artifacts, затем шардировать долгие тесты и сборки по runners"
+      "Измерить критический путь выполнения (critical path), настроить needs, cache и artifacts, затем шардировать долгие тесты и сборки по runners"
     ],
     "answer": 3,
-    "explanation": "Сначала находят critical path и потери времени. Затем применяют DAG через needs, корректный cache/artifacts, параллелизацию независимых jobs и осмысленный test sharding; дополнительные runners помогают лишь при дефиците ёмкости."
+    "explanation": "Сначала находят критический путь выполнения (critical path) и потери времени. Затем применяют DAG через needs, корректный cache/artifacts, параллелизацию независимых jobs и осмысленный test sharding; дополнительные runners помогают лишь при дефиците ёмкости."
   },
   {
     "id": 425,
@@ -6387,7 +6387,7 @@
       "Повторять deployment того же артефакта до успешного smoke test, не меняя версию и состояние зависимостей"
     ],
     "answer": 1,
-    "explanation": "Rollback должен быть заранее проверяемой операцией: Helm rollback, kubectl rollout undo или возврат желаемого состояния в Git. При Argo CD с automated sync выполняют Git revert и синхронизацию; команда rollback при auto-sync недоступна."
+    "explanation": "Rollback должен быть заранее проверяемой операцией: Helm откат (rollback), kubectl rollout undo или возврат желаемого состояния в Git. При Argo CD с automated sync выполняют Git revert и синхронизацию; команда откат при auto-sync недоступна."
   },
   {
     "id": 427,
@@ -6432,7 +6432,7 @@
       "Они скрывают неуспешные health checks от deployment controller и переводят rollout в состояние successful"
     ],
     "answer": 0,
-    "explanation": "Feature flag позволяет доставить код выключенным и включать его по аудитории или проценту трафика. Выключение снижает impact, но не откатывает несовместимые схемы или побочные эффекты; устаревшие флаги нужно удалять."
+    "explanation": "Feature flag позволяет доставить код выключенным и включать его по аудитории или проценту трафика. Выключение снижает влияние на пользователей и систему (impact), но не откатывает несовместимые схемы или побочные эффекты; устаревшие флаги нужно удалять."
   },
   {
     "id": 430,
@@ -6636,7 +6636,7 @@
     "category": "scenario",
     "q": "Как распараллелить большой test suite в GitLab CI?",
     "options": [
-      "Запустить процессы в background внутри одного job, сохранив общий workspace, timeout и один итоговый exit code",
+      "Запустить процессы в background внутри одного job, сохранив общий workspace, timeout и один итоговый код завершения (exit code)",
       "Скопировать job несколько раз с одинаковым набором тестов и объединить повторяющиеся JUnit reports как artifacts",
       "Использовать parallel с CI_NODE_INDEX/TOTAL для sharding или parallel:matrix для параметров и обеспечить runners",
       "Добавить needs к test job; GitLab сам обнаружит test files и создаст по job для каждого найденного модуля"
@@ -6687,7 +6687,7 @@
       "Pipeline-as-code помещает credentials рядом со steps, чтобы checkout другой ветки восстанавливал их версию"
     ],
     "answer": 1,
-    "explanation": "Pipeline-as-code даёт историю, review, rollback конфигурации и повторяемость окружений. Секреты, environment approvals и часть административных policy остаются во внешней защищённой конфигурации, а не попадают в repository."
+    "explanation": "Pipeline-as-code даёт историю, review, откат (rollback) конфигурации и повторяемость окружений. Секреты, environment approvals и часть административных policy остаются во внешней защищённой конфигурации, а не попадают в repository."
   },
   {
     "id": 447,
@@ -6709,7 +6709,7 @@
     "topic": "CI/CD",
     "level": "Senior",
     "category": "definition",
-    "q": "Какие controls укрепляют software supply chain в CI/CD?",
+    "q": "Какие controls укрепляют цепочка поставки программного обеспечения (software supply chain) в CI/CD?",
     "options": [
       "Сканирование CVE финального image без фиксации build inputs, identity builder и источника зависимостей",
       "TLS между runner и registry без проверки third-party actions, package signatures и provenance artifacts",
@@ -6728,7 +6728,7 @@
     "options": [
       "Версионировать Flyway/Liquibase migrations, применять expand-contract один раз и координировать с совместимым приложением",
       "Запускать migration в init container каждой replica: параллельные executions обеспечат атомарность с rollout controller",
-      "Считать reverse SQL гарантированным rollback данных и запускать его при каждом неуспешном readiness probe",
+      "Считать reverse SQL гарантированным откат (rollback) данных и запускать его при каждом неуспешном readiness probe",
       "Менять schema после переключения всех replicas, не сохраняя совместимость старого и нового application code"
     ],
     "answer": 0,
@@ -7146,13 +7146,13 @@
     "category": "tradeoff",
     "q": "Как выбрать границы Terraform state?",
     "options": [
-      "Делить по lifecycle, ownership, permissions и blast radius; monolith проще, split добавляет interfaces и coordination",
+      "Делить по lifecycle, ownership, permissions и область воздействия сбоя (blast radius); monolith проще, split добавляет interfaces и coordination",
       "Хранить production в одном state независимо от размера, поскольку backend lock устраняет team contention и risk",
       "Создать state на каждый resource, чтобы provider API failures не влияли на соседние objects и plans",
       "Разделить по provider regions: remote_state автоматически синхронизирует dependencies и применяет changes по DAG"
     ],
     "answer": 0,
-    "explanation": "Универсального размера state нет. Monolith упрощает references и atomic plan, но увеличивает contention и blast radius; split даёт независимые permissions и releases, но требует явных contracts и coordination между states."
+    "explanation": "Универсального размера state нет. Monolith упрощает references и atomic plan, но увеличивает contention и область воздействия сбоя (blast radius); split даёт независимые permissions и releases, но требует явных contracts и coordination между states."
   },
   {
     "id": 478,
@@ -7212,7 +7212,7 @@
       "Назначить регион каждому CLI workspace: Terraform автоматически переключит provider и изолирует зависимости"
     ],
     "answer": 0,
-    "explanation": "Конфигурации провайдеров связываются статически: aliases объявляют в root module и явно передают через providers. Один module block с for_each не умеет динамически выбирать alias для каждого элемента, поэтому часто используют явные вызовы или отдельные root configurations; state разделяют по blast radius и операционным границам."
+    "explanation": "Конфигурации провайдеров связываются статически: aliases объявляют в root module и явно передают через providers. Один module block с for_each не умеет динамически выбирать alias для каждого элемента, поэтому часто используют явные вызовы или отдельные root configurations; state разделяют по область воздействия сбоя (blast radius) и операционным границам."
   },
   {
     "id": 482,
@@ -7429,7 +7429,7 @@
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Когда CPU pinning оправдан в production?",
+    "q": "Когда CPU pinning оправдан в рабочей среде (production)?",
     "options": [
       "При высокой CPU utilization: taskset увеличивает число доступных cores сверх лимита physical host",
       "Для multithreaded service: affinity балансирует IRQ, memory и threads по NUMA nodes",
@@ -7452,7 +7452,7 @@
       "Режим выбирает block device при mount, и приложение не увидит различий после power loss"
     ],
     "answer": 0,
-    "explanation": "data=ordered — типичный default: metadata журналируются, а связанные data blocks уходят до их commit. data=journal журналирует и данные, но отключает delayed allocation и O_DIRECT. data=writeback не сохраняет такое упорядочение и после crash может показать stale data. В production выбор подтверждают durability-требованиями и тестами; barriers без доказанной защиты cache не отключают."
+    "explanation": "data=ordered — типичный default: metadata журналируются, а связанные data blocks уходят до их commit. data=journal журналирует и данные, но отключает delayed allocation и O_DIRECT. data=writeback не сохраняет такое упорядочение и после crash может показать stale data. В рабочей среде (production) выбор подтверждают durability-требованиями и тестами; barriers без доказанной защиты cache не отключают."
   },
   {
     "id": 498,
@@ -7542,7 +7542,7 @@
       "Увеличить swap до размера RAM: OOM killer перестанет выбирать процессы с anonymous memory"
     ],
     "answer": 2,
-    "explanation": "Сначала различают global и memcg OOM по journalctl -k или dmesg и cgroup memory.events, затем смотрят memory.current/peak, limits, PSI, RSS/anonymous/file usage и логи runtime. Исправление может быть leak fix, корректный limit/request, снижение concurrency или capacity. oom_score_adj меняет выбор жертвы, а overcommit и swap имеют trade-offs и не заменяют диагностику."
+    "explanation": "Сначала различают global и memcg OOM по journalctl -k или dmesg и cgroup memory.events, затем смотрят memory.current/peak, limits, PSI, RSS/anonymous/file usage и логи runtime. Исправление может быть leak исправление (fix), корректный limit/request, снижение concurrency или capacity. oom_score_adj меняет выбор жертвы, а overcommit и swap имеют trade-offs и не заменяют диагностику."
   },
   {
     "id": 504,
@@ -7602,7 +7602,7 @@
       "Выключить SYN cookies и увеличить keepalive time: accept queue освободится без влияния на failure detection"
     ],
     "answer": 2,
-    "explanation": "Универсального sysctl-рецепта нет. Сначала смотрят ss -s, nstat, softnet, listen queue, retransmits, drops, CPU и memory. Затем согласуют application listen backlog с somaxconn, при необходимости SYN backlog, buffer ceilings или local port range. Изменения версионируют в /etc/sysctl.d, применяют поэтапно и проверяют нагрузочным тестом и rollback."
+    "explanation": "Универсального sysctl-рецепта нет. Сначала смотрят ss -s, nstat, softnet, listen queue, retransmits, drops, CPU и memory. Затем согласуют application listen backlog с somaxconn, при необходимости SYN backlog, buffer ceilings или local port range. Изменения версионируют в /etc/sysctl.d, применяют поэтапно и проверяют нагрузочным тестом и откат (rollback)."
   },
   {
     "id": 508,
@@ -7767,7 +7767,7 @@
       "LVM thin snapshot требует заранее фиксированный COW volume, тогда как legacy LVM snapshot растёт динамически"
     ],
     "answer": 1,
-    "explanation": "btrfs snapshot — writable или read-only CoW view конкретного subvolume; вложенные subvolumes не включаются рекурсивно. send/receive удобно передаёт полные и incremental snapshots. Legacy LVM snapshots требуют COW space, но LVM thin snapshots тоже выделяют blocks динамически, поэтому простое сравнение некорректно. Crash-consistent snapshot не гарантирует согласованность приложения без flush/quiesce."
+    "explanation": "btrfs snapshot — writable или без изменения состояния (read-only) CoW view конкретного subvolume; вложенные subvolumes не включаются рекурсивно. send/receive удобно передаёт полные и incremental snapshots. Legacy LVM snapshots требуют COW space, но LVM thin snapshots тоже выделяют blocks динамически, поэтому простое сравнение некорректно. Crash-consistent snapshot не гарантирует согласованность приложения без flush/quiesce."
   },
   {
     "id": 519,
@@ -7797,7 +7797,7 @@
       "Сначала ограничить cgroups и capacity, затем точечно настроить OOMScoreAdjust; memory.oom.group завершает workload целиком"
     ],
     "answer": 3,
-    "explanation": "OOMScoreAdjust лишь смещает вероятность выбора и не создаёт память; -1000 почти исключает task и потому оправдан только для действительно системно-критичных процессов. Cgroup boundaries ограничивают blast radius, а memory.oom.group помогает не оставлять полуработающий multi-process workload. Global OOM и memcg OOM различаются; systemd-oomd также имеет отдельную PSI-based policy."
+    "explanation": "OOMScoreAdjust лишь смещает вероятность выбора и не создаёт память; -1000 почти исключает task и потому оправдан только для действительно системно-критичных процессов. Cgroup boundaries ограничивают область воздействия сбоя (blast radius), а memory.oom.group помогает не оставлять полуработающий multi-process workload. Global OOM и memcg OOM различаются; systemd-oomd также имеет отдельную PSI-based policy."
   },
   {
     "id": 521,
@@ -7939,7 +7939,7 @@
     "topic": "Linux",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Какие компромиссы учитывать при использовании swap в production?",
+    "q": "Какие компромиссы учитывать при использовании swap в рабочей среде (production)?",
     "options": [
       "Swap отключают: его наличие заставляет kernel выгрузить anonymous pages до использования page cache",
       "Swap может пережить transient pressure, но ухудшить tail latency; решение учитывает workload, cgroups, encryption и metrics",
@@ -7977,7 +7977,7 @@
       "Route, полученный по iBGP, обычно не анонсируется другому iBGP peer; mesh, RR или confederation решают scaling"
     ],
     "answer": 3,
-    "explanation": "Все BGP sessions используют TCP/179. Чтобы предотвратить loops внутри AS, обычный iBGP speaker не пересылает iBGP-learned route другому iBGP peer, поэтому без дополнительного механизма нужен N(N-1)/2 mesh. Route reflector меняет propagation model с cluster-list/originator-id loop prevention; confederations дают другой компромисс. Next-hop reachability обычно обеспечивает IGP."
+    "explanation": "Все BGP sessions используют TCP/179. Чтобы предотвратить loops внутри AS, обычный iBGP speaker не пересылает iBGP-learned route другому iBGP peer, поэтому без дополнительного механизма нужен N(N-1)/2 mesh. Route reflector меняет propagation model с cluster-list/originator-id loop меры предотвращения повторного сбоя (prevention); confederations дают другой компромисс. Next-hop reachability обычно обеспечивает IGP."
   },
   {
     "id": 533,
@@ -8014,7 +8014,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Как выбирать между WireGuard и IPsec/IKEv2 для production VPN?",
+    "q": "Как выбирать между WireGuard и IPsec/IKEv2 для рабочей среды (production) VPN?",
     "options": [
       "WireGuard выбирать по умолчанию: fixed algorithms гарантируют совместимость с legacy appliance и enterprise PKI",
       "IPsec быстрее: IKE negotiation переносит data plane encryption в NIC независимо от hardware offload",
@@ -8617,7 +8617,7 @@
     "q": "Что должен проверять полноценный Molecule scenario для Ansible role?",
     "options": [
       "Scenario сравнивает YAML с JSON Schema, а состояние instance после converge не участвует в результате теста",
-      "Scenario запускает роль на inventory из production и откатывает каждый changed task через автоматически созданный handler",
+      "Scenario запускает роль на inventory из рабочей среды (production) и откатывает каждый changed task через автоматически созданный handler",
       "Scenario создаёт instances, выполняет converge, проверяет idempotence и assertions, затем очищает ресурсы",
       "Scenario измеряет длительность tasks, а роль считается корректной, если второй запуск быстрее первого на заданный процент"
     ],
@@ -8817,7 +8817,7 @@
       "Rescue идёт после failed task в block, always — после block/rescue; failed task/result доступны для обработки"
     ],
     "answer": 3,
-    "explanation": "Block группирует tasks и общие directives. Когда task возвращает failed, Ansible переходит в rescue; там доступны ansible_failed_task и ansible_failed_result, но rollback нужно описать явно. always выполняется после основной или rescue-ветки. Unreachable и ошибки разбора не обрабатываются rescue как обычный failed result."
+    "explanation": "Block группирует tasks и общие directives. Когда task возвращает failed, Ansible переходит в rescue; там доступны ansible_failed_task и ansible_failed_result, но откат (rollback) нужно описать явно. always выполняется после основной или rescue-ветки. Unreachable и ошибки разбора не обрабатываются rescue как обычный failed result."
   },
   {
     "id": 589,
@@ -8856,7 +8856,7 @@
     "category": "definition",
     "q": "Что проверяют Molecule idempotence и ansible-lint, а чего они не доказывают?",
     "options": [
-      "Idempotence проверяет YAML formatting, lint повторно запускает role и доказывает отсутствие изменений в production",
+      "Idempotence проверяет YAML formatting, lint повторно запускает role и доказывает отсутствие изменений в рабочей среде (production)",
       "Idempotence сравнивает package versions, lint выполняет integration tests на matrix поддерживаемых distributions",
       "Idempotence ищет changed при повторном converge, lint применяет static rules; итоговое состояние проверяет verify",
       "Idempotence откатывает role после failure, lint исправляет risky tasks и гарантирует совместимость collections"
@@ -9246,7 +9246,7 @@
     "q": "Что даёт Docker named volume?",
     "options": [
       "Управляемое Docker storage, которое монтируется в container и живёт независимо от его удаления до удаления volume",
-      "Копию read-only image layer, которую daemon переносит в registry при каждом изменении файла приложением",
+      "Копию без изменения состояния (read-only) image layer, которую daemon переносит в registry при каждом изменении файла приложением",
       "Memory limit cgroup, измеренный в байтах и разделяемый между containers одного Compose service",
       "Overlay network segment с собственным DNS, где volume name используется как alias container endpoint"
     ],
@@ -9296,7 +9296,7 @@
       "Filesystem changes build steps образуют immutable content layers; container добавляет свой writable layer сверху"
     ],
     "answer": 3,
-    "explanation": "Image manifest ссылается на content-addressed filesystem layers, которые могут кэшироваться и разделяться. Build instructions, меняющие filesystem, формируют соответствующие diffs; metadata instructions не обязаны добавлять filesystem layer, хотя остаются в config/history. Container использует read-only image layers и отдельный writable layer.",
+    "explanation": "Image manifest ссылается на content-addressed filesystem layers, которые могут кэшироваться и разделяться. Build instructions, меняющие filesystem, формируют соответствующие diffs; metadata instructions не обязаны добавлять filesystem layer, хотя остаются в config/history. Container использует без изменения состояния (read-only) image layers и отдельный writable layer.",
     "id": 10010
   },
   {
@@ -9353,10 +9353,10 @@
       "Назначает один Pod каждому Node напрямую и обновляет его image без ReplicaSet, сохраняя UID между revisions",
       "Создаёт Service и EndpointSlice для Pod template, а число endpoints определяет желаемое количество replicas",
       "Запускает imperative kubectl commands из spec и хранит stdout каждой revision в status.conditions",
-      "Декларативно управляет ReplicaSets по Pod template и replicas, поддерживая rollout, rollback и scaling"
+      "Декларативно управляет ReplicaSets по Pod template и replicas, поддерживая rollout, откат (rollback) и scaling"
     ],
     "answer": 3,
-    "explanation": "Deployment controller создаёт и масштабирует ReplicaSets, которые поддерживают число Pods по selector и template. Изменение Pod template создаёт новую revision и обычно rolling rollout согласно strategy; rollback меняет активную revision. Stateful identity и storage semantics решает StatefulSet, one-per-node — DaemonSet.",
+    "explanation": "Deployment controller создаёт и масштабирует ReplicaSets, которые поддерживают число Pods по selector и template. Изменение Pod template создаёт новую revision и обычно rolling rollout согласно strategy; откат (rollback) меняет активную revision. Stateful identity и storage semantics решает StatefulSet, one-per-node — DaemonSet.",
     "id": 10014
   },
   {
@@ -9382,7 +9382,7 @@
     "options": [
       "Редкие объединения feature branches перед release с ручной сборкой, чтобы CI не выполнялся на промежуточных commits",
       "Частое объединение небольших изменений с автоматическими build/checks, быстро выявляющими integration defects",
-      "Автоматический rollout каждого успешного commit в production без approval, feature flags и progressive delivery",
+      "Автоматический rollout каждого успешного commit в рабочей среде (production) без approval, feature flags и progressive delivery",
       "Хранение release artifacts в registry и восстановление production из backup при падении post-deploy checks"
     ],
     "answer": 1,
@@ -9397,7 +9397,7 @@
     "options": [
       "Сохранение исходников в Git перед запуском CI pipeline",
       "Запуск unit tests после изменения application code",
-      "Решение о выпуске прошедшего pipeline изменения в production",
+      "Решение о выпуске прошедшего pipeline изменения в рабочей среде (production)",
       "Создание build artifact в воспроизводимом environment"
     ],
     "answer": 2,
@@ -9562,7 +9562,7 @@
     "options": [
       "Заканчиваются сетевые сокеты, поэтому новые TCP-соединения отклоняются при свободных disk blocks",
       "Нельзя создать новые файловые объекты, хотя блоки данных ещё свободны, поскольку нет inode для metadata",
-      "Каталог переходит в read-only из-за переполнения journal, но новые файлы появляются после remount",
+      "Каталог переходит в без изменения состояния (read-only) из-за переполнения journal, но новые файлы появляются после remount",
       "Ядро удаляет старые directory entries, чтобы освободить inode без изменения занятых блоков данных"
     ],
     "answer": 1,
@@ -9668,10 +9668,10 @@
       "Changed task уведомляет handler, он ставится в очередь и обычно выполняется в контрольной точке один раз по имени",
       "Каждая task запускает все handlers своей роли до проверки changed status и вычисления условия `when`",
       "Handler выполняется на controller при чтении inventory и изменяет variables для последующих plays",
-      "Failed task автоматически вызывает handler как rollback, даже если задача не содержит директиву `notify`"
+      "Failed task автоматически вызывает handler как откату (rollback), даже если задача не содержит директиву `notify`"
     ],
     "answer": 0,
-    "explanation": "Handler уведомляется через `notify`, обычно когда task имеет статус changed. Уведомления дедуплицируются по handler, а выполнение происходит после соответствующей секции tasks; `meta: flush_handlers` запускает очередь раньше. Handler не является автоматическим rollback и при аварийном завершении host может не выполниться.",
+    "explanation": "Handler уведомляется через `notify`, обычно когда task имеет статус changed. Уведомления дедуплицируются по handler, а выполнение происходит после соответствующей секции tasks; `meta: flush_handlers` запускает очередь раньше. Handler не является автоматическим откат (rollback) и при аварийном завершении host может не выполниться.",
     "id": 10035
   },
   {
@@ -9727,11 +9727,11 @@
     "options": [
       "Access binding назначает роль identity на ресурсе, а иерархия и состав роли определяют разрешённые действия",
       "Каждый сервис читает локальный файл паролей VM и переносит Unix groups на облачные API permissions",
-      "Security group назначает пользователю сетевой порт, который затем становится permission для всех API",
+      "Безопасность group назначает пользователю сетевой порт, который затем становится permission для всех API",
       "SSH public key превращается в облачную роль и наследуется дочерними folders после первого входа на VM"
     ],
     "answer": 0,
-    "explanation": "IAM связывает identities — пользователей, service accounts и участников федераций — с ролями на ресурсах. Назначение на организации, облаке или folder может наследоваться дочерними ресурсами, поэтому область привязки важна. Принцип least privilege требует узких ролей, контролируемых credentials и регулярного аудита bindings.",
+    "explanation": "IAM связывает identities — пользователей, service accounts и участников федераций — с ролями на ресурсах. Назначение на организации, облаке или folder может наследоваться дочерними ресурсами, поэтому область привязки важна. Принцип минимальных привилегий (least privilege) требует узких ролей, контролируемых credentials и регулярного аудита bindings.",
     "id": 10039
   },
   {
@@ -9830,7 +9830,7 @@
     "category": "definition",
     "q": "Какую практику описывает Continuous Integration?",
     "options": [
-      "Release собирают на рабочей станции перед квартальным окном и проверяют отдельным ручным checklist",
+      "Release собирают на рабочей станции перед квартальным окном и проверяют отдельным ручным контрольный список (checklist)",
       "Source code архивируют после каждой версии, а integration выполняют при подготовке production migration",
       "Images публикуют в registry по расписанию, даже если source и automated checks не изменялись",
       "Небольшие изменения часто объединяют в общей ветке и быстро проверяют автоматической сборкой и tests"
@@ -10145,13 +10145,13 @@
     "category": "definition",
     "q": "Какую задачу решает Helm в Kubernetes?",
     "options": [
-      "Упаковывает templated manifests в charts и управляет release values, upgrades и rollback metadata",
+      "Упаковывает templated manifests в charts и управляет release values, upgrades и откат (rollback) metadata",
       "Собирает container logs на Nodes и пересылает chunks в object storage по labels приложения",
       "Создаёт memory dumps процессов Pod через CRI и хранит их как immutable cluster resources",
       "Выдаёт API credentials пользователям и заменяет RBAC roles, bindings и admission policies"
     ],
     "answer": 0,
-    "explanation": "Helm chart содержит metadata, templates, default values и dependencies для Kubernetes application. При install/upgrade Helm рендерит manifests и хранит release metadata, что позволяет просматривать history и выполнять rollback. Chart не гарантирует корректность generated resources, поэтому полезны lint, diff и policy checks.",
+    "explanation": "Helm chart содержит metadata, templates, default values и dependencies для Kubernetes application. При install/upgrade Helm рендерит manifests и хранит release metadata, что позволяет просматривать history и выполнять откат (rollback). Chart не гарантирует корректность generated resources, поэтому полезны lint, diff и policy checks.",
     "id": 11010
   },
   {
@@ -10163,10 +10163,10 @@
       "Оператор вручную входит на servers по расписанию и считает отсутствие жалоб подтверждением здоровья",
       "Система собирает signals, сопоставляет их с целями и помогает обнаруживать, объяснять и оповещать о проблемах",
       "Backup service копирует data, но не измеряет availability, latency, errors или capacity текущей системы",
-      "Deployment tool применяет manifests и считает успешный exit code достаточной оценкой дальнейшей работы"
+      "Deployment tool применяет manifests и считает успешный код завершения (exit code) достаточной оценкой дальнейшей работы"
     ],
     "answer": 1,
-    "explanation": "Monitoring превращает telemetry и synthetic checks в представление о поведении системы: dashboards, alerts, trends и capacity signals. Метрики, logs и traces дают разные стороны observability. Полезный monitoring связан с пользовательскими целями и actionable response, а не сводится к сбору CPU counters.",
+    "explanation": "Мониторинг (monitoring) превращает telemetry и synthetic checks в представление о поведении системы: dashboards, alerts, trends и capacity signals. Метрики, logs и traces дают разные стороны observability. Полезный monitoring связан с пользовательскими целями и actionable response, а не сводится к сбору CPU counters.",
     "id": 12001
   },
   {
@@ -10286,7 +10286,7 @@
       "Измеряют bandwidth внешнего канала, но исключают API latency, queue depth, restarts и Node conditions"
     ],
     "answer": 1,
-    "explanation": "Monitoring должен начинаться с пользовательских SLI workloads, затем охватывать control plane, Nodes, scheduler, capacity, Pods и ключевые dependencies. Примеры сигналов: API latency/errors, etcd health где он доступен, pending Pods, Node conditions, OOM/restarts, resource pressure и saturation. Набор зависит от managed/self-managed модели.",
+    "explanation": "Мониторинг (monitoring) должен начинаться с пользовательских SLI workloads, затем охватывать control plane, Nodes, scheduler, capacity, Pods и ключевые dependencies. Примеры сигналов: API latency/errors, etcd health где он доступен, pending Pods, Node conditions, OOM/restarts, resource pressure и saturation. Набор зависит от managed/self-managed модели.",
     "id": 12009
   },
   {
@@ -10490,7 +10490,7 @@
     "category": "scenario",
     "q": "Как снизить риск при миграции приложения с AWS на другого облачного провайдера?",
     "options": [
-      "Сначала заменить адреса сервисов в production, затем выяснять различия API по ошибкам",
+      "Сначала заменить адреса сервисов в рабочей среде (production), затем выяснять различия API по ошибкам",
       "Перенести виртуальные машины, а зависимости managed-сервисов изучить во время cutover",
       "Перестроить pipeline, оставив перенос данных, IAM и наблюдаемость на период после запуска",
       "Инвентаризировать зависимости, проверить аналоги, перенести и сверить данные, отрепетировать откат"
@@ -10568,7 +10568,7 @@
       "Риски и проверки безопасности встроены в разработку и CI/CD с быстрым feedback для команды",
       "Безопасность проверяется отдельной командой перед релизом после завершения разработки",
       "Pipeline обновляет пароли по расписанию, а архитектурные риски разбираются после инцидентов",
-      "Пентест запускается для production, а зависимости и IaC исключаются из процесса проверки"
+      "Пентест запускается для рабочей среды (production), а зависимости и IaC исключаются из процесса проверки"
     ],
     "answer": 0,
     "explanation": "DevSecOps объединяет предотвращение, автоматические проверки и понятную ответственность на всём жизненном цикле. Инструменты дополняют threat modeling, review, управление исключениями и реакцию на находки.",
@@ -10626,7 +10626,7 @@
     "q": "Какую задачу решает Gatekeeper в кластере Kubernetes?",
     "options": [
       "Проверяет ресурсы по policy constraints при admission и может аудировать уже созданные объекты",
-      "Фильтрует сетевой трафик pod на уровне CNI и применяет правила маршрутизации между namespace",
+      "Фильтрует сетевой трафик pod на уровне CNI и применяет правила маршрутизации между пространствами имён (namespace)",
       "Получает секреты из внешнего хранилища и монтирует их в workload через CSI-драйвер",
       "Собирает журналы control plane, сохраняет события аудита и строит панели безопасности"
     ],
@@ -10653,7 +10653,7 @@
     "topic": "Security",
     "level": "Senior",
     "category": "definition",
-    "q": "Что повышает доверие к происхождению артефакта в software supply chain?",
+    "q": "Что повышает доверие к происхождению артефакта в цепочка поставки программного обеспечения (software supply chain)?",
     "options": [
       "Сборка на ноутбуке разработчика с загрузкой артефакта под его личной учётной записью",
       "Публикация хеша в журнале pipeline без связи с исходным кодом и параметрами сборки",
@@ -10672,7 +10672,7 @@
     "options": [
       "Проверять форматирование файлов и считать успешный lint подтверждением безопасной конфигурации",
       "Проводить ручной аудит после deployment, когда фактические права и сеть уже применены",
-      "Заменить анализ IaC сканированием контейнерных образов, потому что они попадают в production",
+      "Заменить анализ IaC сканированием контейнерных образов, потому что они попадают в рабочей среде (production)",
       "Сканировать pull request и план, применять policy-as-code и документировать исключения"
     ],
     "answer": 3,
@@ -10848,7 +10848,7 @@
     "topic": "Cloud",
     "level": "Middle",
     "category": "definition",
-    "q": "Зачем объектному хранилищу нужны разные storage classes?",
+    "q": "Зачем объектному хранилищу нужны разные классы хранения (storage classes)?",
     "options": [
       "Они выбирают формат объекта и преобразуют содержимое между JSON, CSV и бинарным представлением",
       "Они задают алгоритм шифрования и меняют ключ при переходе объекта между каталогами",
@@ -10901,7 +10901,7 @@
       "Лог с уровнем error пересылается в общий канал независимо от контекста и частоты события"
     ],
     "answer": 2,
-    "explanation": "Actionable alert сообщает о значимом симптоме, а не о каждом техническом событии. Выдержка, группировка, severity, runbook и ответственный снижают шум; пороги проверяют на истории и пересматривают после инцидентов.",
+    "explanation": "Actionable alert сообщает о значимом симптоме, а не о каждом техническом событии. Выдержка, группировка, severity, план действий (runbook) и ответственный снижают шум; пороги проверяют на истории и пересматривают после инцидентов.",
     "id": 14023
   },
   {
@@ -10953,7 +10953,7 @@
     "topic": "Monitoring",
     "level": "Middle",
     "category": "definition",
-    "q": "Чем synthetic monitoring отличается от Real User Monitoring?",
+    "q": "Чем synthetic monitoring отличается от Real User Мониторинг (monitoring)?",
     "options": [
       "Анализирует серверные логи после запросов и восстанавливает пользовательские сессии по идентификаторам",
       "Собирает телеметрию браузеров реальных посетителей и повторяет их распределение устройств и сетей",
@@ -11036,7 +11036,7 @@
       "Собирает связанные сигналы для конкретного вопроса и помогает быстро перейти к диагностике"
     ],
     "answer": 3,
-    "explanation": "Dashboard проектируют от задачи: обзор SLO, диагностика сервиса или ёмкость. Он показывает контекст, единицы, окна и изменения, но не заменяет actionable alerts, запросы к данным и runbook.",
+    "explanation": "Dashboard проектируют от задачи: обзор SLO, диагностика сервиса или ёмкость. Он показывает контекст, единицы, окна и изменения, но не заменяет actionable alerts, запросы к данным и план действий (runbook).",
     "id": 14032
   },
   {
@@ -11121,7 +11121,7 @@
     "q": "Как организовать incident response в cloud-native среде?",
     "options": [
       "Сразу перезапустить затронутые узлы, удалить журналы с чувствительными данными и затем искать причину",
-      "Заранее определить роли; при событии обнаружить, сдержать, сохранить evidence, восстановить и разобрать",
+      "Заранее определить роли; при событии обнаружить, сдержать, сохранить диагностические данные (evidence), восстановить и разобрать",
       "Передать событие провайдеру и отложить внутренние действия до получения окончательного отчёта",
       "Отключить весь кластер при первом security alert без оценки масштаба и критичных зависимостей"
     ],
@@ -11153,7 +11153,7 @@
       "Проверка запускает unit-тесты безопасности и измеряет покрытие ветвей прикладного кода",
       "Проверка перечисляет открытые порты и версии сервисов без попытки подтвердить цепочку атаки",
       "Проверка измеряет производительность защиты при росте легитимного пользовательского трафика",
-      "Специалист в согласованных границах имитирует атаки, подтверждает воздействие и фиксирует evidence"
+      "Специалист в согласованных границах имитирует атаки, подтверждает воздействие и фиксирует диагностические данные (evidence)"
     ],
     "answer": 3,
     "explanation": "Пентест проводится с письменным разрешением, scope, rules of engagement и процедурой аварийной связи. Автоматические сканеры помогают разведке, но эксперт проверяет эксплуатацию и цепочки риска, не выходя за границы.",
@@ -11167,7 +11167,7 @@
     "options": [
       "Falco сопоставляет события ядра и других источников с правилами и сообщает о подозрительном поведении",
       "Falco разбирает слои образа, строит SBOM и сопоставляет версии пакетов с базой уязвимостей",
-      "Falco фильтрует сетевые пакеты между namespace и заменяет реализацию Kubernetes NetworkPolicy",
+      "Falco фильтрует сетевые пакеты между пространствами имён (namespace) и заменяет реализацию Kubernetes NetworkPolicy",
       "Falco собирает прикладные логи контейнеров и хранит их как полнотекстовый поисковый индекс"
     ],
     "answer": 0,
@@ -11181,7 +11181,7 @@
     "q": "Как строить защиту публичного сервиса от DDoS?",
     "options": [
       "Отражать DDoS правилами в приложении после доставки всего трафика на его сетевой интерфейс",
-      "Сочетать upstream-фильтрацию, Anycast/CDN, rate limits, запас ёмкости, наблюдаемость и runbook",
+      "Сочетать upstream-фильтрацию, Anycast/CDN, rate limits, запас ёмкости, наблюдаемость и план действий (runbook)",
       "Считать автомасштабирование достаточной защитой от DDoS независимо от стоимости и узких мест",
       "Блокировать крупные адресные диапазоны после DDoS и не анализировать тип атаки и ложные блокировки"
     ],
@@ -12689,7 +12689,7 @@
       "Кэш обычно означает утечку памяти"
     ],
     "answer": 0,
-    "explanation": "Для записи изменённых буферов на устройства используют sync: он инициирует сброс dirty pages, после чего можно проверять состояние I/O. Команда echo 3 > /proc/sys/vm/drop_caches очищает page cache, dentries и inode cache, но не является обычным способом «освободить память» и не заменяет sync. В production это может вызвать резкий рост I/O и ухудшить latency. Сначала измеряют давление на память и кэш, а не очищают его профилактически.",
+    "explanation": "Для записи изменённых буферов на устройства используют sync: он инициирует сброс dirty pages, после чего можно проверять состояние I/O. Команда echo 3 > /proc/sys/vm/drop_caches очищает page cache, dentries и inode cache, но не является обычным способом «освободить память» и не заменяет sync. В рабочей среде (production) это может вызвать резкий рост I/O и ухудшить latency. Сначала измеряют давление на память и кэш, а не очищают его профилактически.",
     "id": 14151,
     "sourceVideoId": "M1tXCebcOBE",
     "sourceTime": "31:52"
@@ -12791,7 +12791,7 @@
       "Pg_stat_activity хранит полную историю за месяц"
     ],
     "answer": 2,
-    "explanation": "Для текущих запросов используют pg_stat_activity и рассчитывают now()-query_start, отдельно учитывая state и wait_event. Для накопленной статистики применяют pg_stat_statements, где видны calls, total_exec_time, mean_exec_time и строки; «самый долгий» можно искать по max времени в логах или по total impact в агрегате. Важно отличать один редкий долгий запрос от частого запроса, который суммарно съедает больше ресурсов, и связывать результат с планом и блокировками.",
+    "explanation": "Для текущих запросов используют pg_stat_activity и рассчитывают now()-query_start, отдельно учитывая state и wait_event. Для накопленной статистики применяют pg_stat_statements, где видны calls, total_exec_time, mean_exec_time и строки; «самый долгий» можно искать по max времени в логах или по total влияние на пользователей и систему (impact) в агрегате. Важно отличать один редкий долгий запрос от частого запроса, который суммарно съедает больше ресурсов, и связывать результат с планом и блокировками.",
     "id": 14157,
     "sourceVideoId": "M1tXCebcOBE",
     "sourceTime": "37:40"
@@ -12978,7 +12978,7 @@
       "Разбирать системы и проверять trade-off практикой."
     ],
     "answer": 3,
-    "explanation": "Начинать стоит не с запоминания названий книг, а с разбора реальных систем: требования, ограничения, failure domains, хранение, очереди, consistency, observability и стоимость. Полезно читать классические материалы по distributed systems и software architecture, затем проверять идеи маленькими лабораториями и postmortem. На собеседовании важно уметь уточнить нагрузку, предложить несколько вариантов и объяснить trade-off, а не воспроизвести один шаблон архитектуры.",
+    "explanation": "Начинать стоит не с запоминания названий книг, а с разбора реальных систем: требования, ограничения, failure domains, хранение, очереди, consistency, observability и стоимость. Полезно читать классические материалы по distributed systems и software architecture, затем проверять идеи маленькими лабораториями и разбор инцидента (postmortem). На собеседовании важно уметь уточнить нагрузку, предложить несколько вариантов и объяснить trade-off, а не воспроизвести один шаблон архитектуры.",
     "id": 14168,
     "sourceVideoId": "M1tXCebcOBE",
     "sourceTime": "65:25"
@@ -14165,7 +14165,7 @@
     "topic": "Kubernetes",
     "level": "Middle",
     "category": "tradeoff",
-    "q": "Может ли обычный Ingress напрямую сослаться на backend Service из другого namespace?",
+    "q": "Может ли обычный Ingress напрямую сослаться на backend Service из другого пространства имён (namespace)?",
     "options": [
       "Нет, поскольку Ingress передаёт запросы непосредственно на PVC.",
       "Да, namespace Service определяется по его clusterIP автоматически.",
@@ -14173,7 +14173,7 @@
       "Нет, стандартный backend ссылается на Service своего namespace."
     ],
     "answer": 3,
-    "explanation": "Стандартный Ingress задаёт backend Service в своём namespace. Для доступа к приложениям разных пространств используют отдельные Ingress или поддерживаемую контроллером архитектуру, не подменяя поле имени произвольным межпространственным адресом. Gateway API предоставляет явные механизмы ссылок и разрешений, например ReferenceGrant, с учётом реализации.",
+    "explanation": "Стандартный Ingress задаёт backend Service в своём пространстве имён. Для доступа к приложениям разных пространств используют отдельные Ingress или поддерживаемую контроллером архитектуру, не подменяя поле имени произвольным межпространственным адресом. Gateway API предоставляет явные механизмы ссылок и разрешений, например ReferenceGrant, с учётом реализации.",
     "sourceRepository": "Swfuse/devops-interview",
     "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
     "sourceQuestionId": "swfuse_059",

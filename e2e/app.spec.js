@@ -231,7 +231,7 @@ test('sends bounded diagnostic evidence, stores history and starts a trusted ret
   expect(payload.schemaVersion).toBe(2);
   expect(payload.control.questionDetails).toHaveLength(1);
   expect(payload.control.questionDetails[0].selectedAnswer).toBe('Система управления конфигурацией операционных систем');
-  expect(payload.control.questionDetails[0].correctAnswer).toBe('Декларативный инструмент Infrastructure as Code');
+  expect(payload.control.questionDetails[0].correctAnswer).toBe('Инструмент «инфраструктура как код» (Infrastructure as Code)');
 
   const history = await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_ai_review_history')));
   expect(history).toHaveLength(1);

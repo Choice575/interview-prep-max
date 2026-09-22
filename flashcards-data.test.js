@@ -107,12 +107,12 @@ test('keeps KTS command snippets executable in a shell', () => {
   assert.match(byId.qb_kts_041.commands[1], /vtysh -c 'show ip bgp summary'/);
 });
 
-// These hashes exclude only category names: IDs, content and source links predate regrouping.
-test('regrouping preserves every existing card and source field', () => {
+// Reviewed content fingerprints after Russian wording edits in 15.9.0; category names are excluded.
+test('reviewed wording and source fields match the approved corpus', () => {
   const video = JSON.parse(fs.readFileSync(videoFile, 'utf8'));
   for (const [corpus, expected] of [
-    [data, 'bb2e9a91b9c0d1575d8d05b2b0fbaf462819312932f61083a0bd07b0f2c1f038'],
-    [video, '5847315cd0b79a1fe944843c2f511c097922e200a804c8127a27e0a2984b6e9f']
+    [data, '59d53121b4b338591502051d32d31cfe72de519ada8c7d01c97aa985efd798c1'],
+    [video, 'e8d97ba327bf094757c6159c39bf472f8986c1ab2fb89463f2de486b330e7dde']
   ]) {
     const content = corpus.cards.filter(card => !card.sourceRepository).map(card => Object.fromEntries(Object.entries(card).filter(([key]) => key !== 'collection')));
     assert.equal(createHash('sha256').update(JSON.stringify(content)).digest('hex'), expected);
