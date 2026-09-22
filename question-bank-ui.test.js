@@ -114,7 +114,8 @@ test('renderTabs отмечает активную вкладку и убира�
   assert.match(html, /data-qbank-category="beta"/);
   assert.match(html, /aria-selected="true"[^>]*data-qbank-category="beta"/);
   assert.equal((html.match(/tabindex="0"/g) || []).length, 1);
-  assert.equal((html.match(/tabindex="-1"/g) || []).length, 1);
+  assert.equal((html.match(/tabindex="-1"/g) || []).length, 2);
+  assert.match(html, /data-qbank-category="all"/);
   assert.match(html, /class="qbank-tab-count">2</);
 });
 
@@ -210,7 +211,7 @@ test('question_bank.json: структура и уникальность иде�
   assert.equal(BANK.schemaVersion, 1);
   assert.ok(BANK.source && BANK.source.url, 'должен быть указан источник тем');
   const categories = ui.categoriesOf(BANK);
-  assert.ok(categories.length >= 10, `категорий должно быть не меньше 10, сейчас ${categories.length}`);
+  assert.equal(categories.length, 11, 'банк использует крупные категории без подтем');
 
   const ids = new Set();
   const slugs = new Set();
@@ -238,6 +239,34 @@ test('question_bank.json: структура и уникальность иде�
   });
 
   assert.equal(ids.size, ui.totalQuestions(BANK));
+  assert.equal(ids.size, 331);
+});
+
+test('сохранённые старые категории переходят в новые разделы без потери вопросов', () => {
+  const expected = {
+    'linux-boot': 'linux', 'linux-processes': 'linux', filesystems: 'linux', bash: 'linux',
+    virtualization: 'linux', 'linux-extra': 'linux', 'fs-extra': 'linux', 'storage-raid': 'linux',
+    debug: 'observability', 'docker-extra': 'docker', 'network-extra': 'network',
+    'network-transport': 'network', 'k8s-core': 'kubernetes', 'k8s-config': 'kubernetes',
+    'k8s-ops': 'kubernetes', cloud: 'terraform', git: 'cicd-git'
+  };
+  for (const [old, current] of Object.entries(expected)) {
+    assert.equal(ui.selectCategory(BANK, null, old).slug, current);
+    assert.equal(ui.selectCategory(BANK, old, 'ansible').slug, current);
+  }
+  assert.equal(ui.findQuestion(BANK, 'qb_boot_001').category.slug, 'linux');
+  assert.equal(ui.findQuestion(BANK, 'qb_swf_001').category.slug, 'linux');
+});
+
+test('все вопросы охватывают весь банк один раз и находят все 60 дополнений Swfuse', () => {
+  const all = ui.selectCategory(BANK, 'all', 'linux');
+  assert.equal(all.questions.length, 331);
+  assert.equal(new Set(all.questions.map(q => q.id)).size, 331);
+  assert.equal(ui.selectCategory(BANK, null, 'all').slug, 'all');
+  assert.equal(ui.filterQuestions(all, 'Swfuse', 'all').length, 60);
+  const senior = ui.filterQuestions(all, 'Swfuse', 'Senior');
+  assert.ok(senior.length > 0 && senior.length < 60);
+  assert.ok(senior.every(q => q.level === 'Senior'));
 });
 
 test('question_bank.json: формулировки корректны и не дублируются', () => {

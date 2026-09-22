@@ -2723,7 +2723,9 @@ function handleQuestionBankToggle(event){
   requestAnimationFrame(()=>{const button=document.querySelector('[data-qbank-toggle="'+id+'"]');if(button) button.focus();});
 }
 function handleQuestionBankSearch(event){
-  qbankQuery=event.target.value;qbankExpanded=null;renderQuestionBank();
+  qbankQuery=event.target.value;
+  if(qbankQuery.trim()) qbankCategory='all';
+  qbankExpanded=null;renderQuestionBank();
 }
 function handleQuestionBankLevel(event){
   const chip=event.target.closest&&event.target.closest('[data-qbank-level]');

@@ -228,7 +228,8 @@
       </div>
       <div class="qbank-controls">
         <label class="sr-only" for="qbank-search">Поиск по вопросам</label>
-        <input class="form-input" id="qbank-search" type="search" placeholder="Поиск по вопросам и ответам...">
+        <input class="form-input" id="qbank-search" type="search" placeholder="Поиск по вопросам и ответам..." aria-describedby="qbank-search-hint">
+        <p class="qbank-search-hint" id="qbank-search-hint">Поиск начинается во всех категориях выбранного уровня. Затем можно выбрать категорию для уточнения.</p>
         <div class="filter-row" id="qbank-level-chips" role="group" aria-label="Уровень вопросов">
           <button type="button" class="chip active" data-qbank-level="all">Все</button>
           <button type="button" class="chip" data-qbank-level="Junior">Junior</button>

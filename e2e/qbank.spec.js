@@ -9,8 +9,8 @@ const { test, expect } = require('@playwright/test');
 const profile = { role: 'SRE', level: 'Middle', date: '', completedAt: '2026-07-21T00:00:00.000Z' };
 
 // Реальные значения из tasks/question_bank.json — выдуманные дали бы ложно зелёный тест.
-const FIRST_CATEGORY = 'linux-boot';
-const SECOND_CATEGORY = 'linux-processes';
+const FIRST_CATEGORY = 'linux';
+const SECOND_CATEGORY = 'network';
 const FIRST_QUESTION_ID = 'qb_boot_001';
 
 async function seedProfile(page) {
@@ -37,11 +37,11 @@ test('открывается по прямой ссылке и показыва�
     .not.toBe('0');
   const categories = Number(await page.locator('#qbank-category-count').textContent());
   const questions = Number(await page.locator('#qbank-question-count').textContent());
-  expect(categories).toBeGreaterThanOrEqual(20);
-  expect(questions).toBeGreaterThanOrEqual(200);
+  expect(categories).toBe(11);
+  expect(questions).toBe(331);
 
-  // Число вкладок совпадает со счётчиком категорий.
-  await expect(page.locator('#qbank-tabs [role="tab"]')).toHaveCount(categories);
+  // Помимо 11 категорий есть общий список «Все вопросы».
+  await expect(page.locator('#qbank-tabs [role="tab"]')).toHaveCount(categories + 1);
 });
 
 test('ответ скрыт до клика и раскрывается по вопросу', async ({ page }) => {
@@ -109,7 +109,7 @@ test('поиск сужает список, а пустой результат �
 
   // Сброс поиска возвращает полный список.
   await page.locator('#qbank-search').fill('');
-  await expect.poll(() => page.locator('#qbank-panel .qbank-item').count()).toBe(total);
+  await expect.poll(() => page.locator('#qbank-panel .qbank-item').count()).toBe(331);
 });
 
 test('фильтр по уровню оставляет только вопросы этого уровня', async ({ page }) => {
@@ -139,7 +139,31 @@ test('вкладки категорий переключаются стрелк�
   await expect(page.locator(`#qbank-tab-${SECOND_CATEGORY}`)).toBeFocused();
 
   await page.keyboard.press('Home');
-  await expect(page.locator(`#qbank-tab-${FIRST_CATEGORY}`)).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('#qbank-tab-all')).toHaveAttribute('aria-selected', 'true');
+});
+
+test('старые категории сохраняют контекст, поиск охватывает весь банк и сетка помещается на телефоне', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('ipmax_qbank_category', JSON.stringify('k8s-ops'));
+    localStorage.setItem('ipmax_qprog', JSON.stringify({1000001: {lastSeen:10,repetitions:2}}));
+  });
+  await page.goto('/#/qbank');
+  await expect(page.locator('#qbank-tab-kubernetes')).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('#qbank-panel .qbank-item')).toHaveCount(55);
+  const search = page.locator('#qbank-search');
+  await search.pressSequentially('Swfuse');
+  await expect(search).toBeFocused();
+  await expect(page.locator('#qbank-tab-all')).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('#qbank-panel .qbank-item')).toHaveCount(60);
+  await page.locator('#qbank-tab-network').click();
+  await expect(page.locator('#qbank-panel .qbank-item')).toHaveCount(11);
+  await page.locator('#qbank-tab-all').click();
+  await expect(page.locator('#qbank-panel .qbank-item')).toHaveCount(60);
+  await page.setViewportSize({width:375,height:812});
+  await expect(page.locator('#qbank-tab-career-devops')).toBeVisible();
+  expect(await page.locator('#qbank-tabs').evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_qprog'))['1000001'].repetitions)).toBe(2);
 });
 
 test('переход по меню пишет маршрут и не роняет приложение', async ({ page }) => {

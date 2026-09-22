@@ -26,13 +26,23 @@
     }, 0);
   }
 
-  // Категория для показа: запрошенная, иначе запомненная, иначе первая.
+  function allCategory(dataset) {
+    return { slug: 'all', title: 'Все вопросы', icon: '📚',
+      summary: 'Вопросы из всех категорий. Выберите тему или уровень, чтобы уточнить список.',
+      questions: categoriesOf(dataset).flatMap(questionsOf) };
+  }
+
+  // Старые сохранённые категории переводим в их новые крупные разделы.
   function selectCategory(dataset, requested, remembered) {
     const categories = categoriesOf(dataset);
     if (!categories.length) return null;
-    return categories.find(function(c) { return c && c.slug === requested; })
-      || categories.find(function(c) { return c && c.slug === remembered; })
-      || categories[0];
+    function resolve(slug) {
+      if (slug === 'all') return allCategory(dataset);
+      return categories.find(function(c) {
+        return c && (c.slug === slug || (Array.isArray(c.aliases) && c.aliases.includes(slug)));
+      });
+    }
+    return resolve(requested) || resolve(remembered) || categories[0];
   }
 
   function findQuestion(dataset, questionId) {
@@ -68,7 +78,8 @@
   }
 
   function renderTabs(dataset, activeSlug) {
-    return categoriesOf(dataset).map(function(category) {
+    const categories = categoriesOf(dataset);
+    return (categories.length ? [allCategory(dataset)].concat(categories) : []).map(function(category) {
       const active = category.slug === activeSlug;
       const count = questionsOf(category).length;
       return '<button type="button" class="qbank-tab" role="tab"'

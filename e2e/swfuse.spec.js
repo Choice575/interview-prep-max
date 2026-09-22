@@ -8,7 +8,7 @@ test('finds Swfuse additions in all three modes, reveals answers and preserves e
   });
   const source = /github\.com\/Swfuse\/devops-interview\/blob\/6ac2d862/;
   await page.goto('/#/qbank');
-  await page.locator('[data-qbank-category="linux-extra"]').click();
+  await page.locator('[data-qbank-category="linux"]').click();
   await page.locator('#qbank-search').fill('Swfuse');
   await page.locator('[data-qbank-toggle="qb_swf_001"]').click();
   await expect(page.locator('#qbank-answer-qb_swf_001')).toContainText('SCHED_OTHER');
