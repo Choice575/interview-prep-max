@@ -2,6 +2,55 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const ET = require('./external-tasks-ui.js');
 
+const progressKey = 'external_tasks_completed';
+const recoveryKey = 'external_tasks_completed_recovery';
+function memoryStore(initial = {}, failKey) {
+  const values = new Map(Object.entries(initial));
+  return {
+    getItem: key => values.get(key) ?? null,
+    setItem: (key, value) => { if(key === failKey) throw new Error('QuotaExceededError'); values.set(key, value); }
+  };
+}
+
+test('progress reads reject malformed shapes without throwing or modifying storage', () => {
+  assert.deepEqual(ET.readProgress(memoryStore()), {ok:true,data:{}});
+  for(const raw of ['{broken', 'null', '[]', 'true', '{"1":null}', '{"1":3}']) {
+    const store = memoryStore({[progressKey]:raw});
+    assert.deepEqual(ET.readProgress(store), {ok:false,data:{},reason:'corrupt',raw});
+    assert.equal(store.getItem(progressKey),raw);
+  }
+  assert.equal(ET.readProgress({getItem() {throw new Error('blocked');}}).reason,'unavailable');
+});
+
+test('saving a new task preserves valid existing progress and evidence', () => {
+  const previous = {1:{completedAt:42,evidence:{text:'old answer'}}};
+  const entry = {completedAt:99,evidence:{text:'new answer'}};
+  const store = memoryStore({[progressKey]:JSON.stringify(previous)});
+  assert.equal(ET.saveProgress(store,2,entry).ok,true);
+  assert.deepEqual(JSON.parse(store.getItem(progressKey)),{...previous,2:entry});
+  assert.equal(store.getItem(recoveryKey),null);
+});
+
+test('corrupt progress is backed up before saving, retaining earlier recovery records', () => {
+  const raw = '{broken:original';
+  const old = [{raw:'earlier damage',savedAt:1}];
+  const store = memoryStore({[progressKey]:raw,[recoveryKey]:JSON.stringify(old)});
+  assert.deepEqual(ET.saveProgress(store,2,{completedAt:99}),{ok:true,recovered:true});
+  const backup = JSON.parse(store.getItem(recoveryKey));
+  assert.deepEqual(backup[0],old[0]);
+  assert.equal(backup[1].raw,raw);
+  assert.deepEqual(ET.readProgress(store).data,{2:{completedAt:99}});
+});
+
+test('backup failure never overwrites corrupt progress and write failure preserves valid data', () => {
+  for(const [raw,failKey] of [['{broken',recoveryKey],['{"1":{"completedAt":42}}',progressKey],['{broken',progressKey]]) {
+    const store = memoryStore({[progressKey]:raw},failKey);
+    assert.equal(ET.saveProgress(store,2,{completedAt:99}).ok,false);
+    assert.equal(store.getItem(progressKey),raw);
+  }
+  assert.equal(ET.saveProgress({getItem() {throw new Error('blocked');}},2,{}).ok,false);
+});
+
 const dataset = {
   updated: '2026-07-30',
   tasks: [

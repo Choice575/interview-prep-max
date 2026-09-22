@@ -1280,7 +1280,7 @@ button:disabled,[aria-disabled="true"]{cursor:not-allowed}
 .flashcards-hero{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px}
 .flashcards-hero h2{font-size:20px;font-weight:800;margin:4px 0 6px}
 .flashcards-hero p{font-size:13px;color:var(--text2);line-height:1.6;max-width:70ch}
-.flashcards-decks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:8px}
+.flashcards-decks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:8px}
 .flashcards-deck{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text2);font:inherit;font-size:13px;font-weight:700;text-align:left;cursor:pointer}
 .flashcards-deck strong{display:inline-flex;align-items:center;justify-content:center;min-width:38px;padding:3px 7px;border-radius:999px;background:var(--bg3);color:var(--text);font-size:12px}
 .flashcards-deck:hover{border-color:var(--primary);color:var(--text)}
@@ -1313,6 +1313,12 @@ button:disabled,[aria-disabled="true"]{cursor:not-allowed}
 .study-card-answer{background:var(--primary-dim);border:1px solid var(--primary);border-radius:9px;padding:14px 16px;margin-bottom:14px}
 .study-card-answer-label{font-size:11px;font-weight:700;color:var(--primary-h);margin-bottom:6px}
 .study-card-answer p{font-size:14px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.answer-short,.answer-full{overflow-wrap:anywhere;white-space:pre-wrap}
+.answer-details{margin-top:12px;border-top:1px solid var(--border);padding-top:4px}
+.answer-details>summary{cursor:pointer;min-height:44px;padding:12px 0;color:var(--primary-h);font-weight:600;white-space:normal}
+.answer-details>summary:focus-visible{outline:2px solid var(--primary);outline-offset:3px;border-radius:4px}
+.answer-full p+p{margin-top:12px}
+.external-progress-warning,#evidence-error{padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text);line-height:1.6}
 .study-card-rates{display:flex;flex-wrap:wrap;gap:10px}
 .study-card-rates .btn{flex:1 1 30%;min-height:44px}
 .study-card-nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}

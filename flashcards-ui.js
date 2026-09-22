@@ -1,8 +1,8 @@
 (function(root, factory) {
-  const api = factory();
+  const api = factory(typeof module !== 'undefined' && module.exports ? require('./answer-ui.js') : root.IPMaxAnswerUI);
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.IPMaxFlashcardsUI = api;
-})(typeof self !== 'undefined' ? self : globalThis, function() {
+})(typeof self !== 'undefined' ? self : globalThis, function(AnswerUI) {
   'use strict';
 
   const hasOwn = (object, key) => !!object && Object.prototype.hasOwnProperty.call(object, key);
@@ -158,7 +158,7 @@
       : '';
 
     const answer = state.revealed
-      ? '<div class="study-card-answer"><div class="study-card-answer-label">Ответ</div><p>' + escapeText(card.answer) + '</p></div>' +
+      ? '<div class="study-card-answer"><div class="study-card-answer-label">Ответ</div>' + AnswerUI.render(card.answer,card.shortAnswer) + '</div>' +
         '<div class="study-card-rates" aria-label="Оценить ответ">' +
         '<button type="button" class="btn btn-outline" data-flashcards-action="rate" data-outcome="fail">Не знаю</button>' +
         '<button type="button" class="btn btn-outline" data-flashcards-action="rate" data-outcome="partial">Повторить</button>' +

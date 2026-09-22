@@ -1,8 +1,8 @@
 (function(root, factory) {
-  const api = factory();
+  const api = factory(typeof module !== 'undefined' && module.exports ? require('./answer-ui.js') : root.IPMaxAnswerUI);
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.IPMaxQuestionBankUI = api;
-})(typeof self !== 'undefined' ? self : globalThis, function() {
+})(typeof self !== 'undefined' ? self : globalThis, function(AnswerUI) {
   'use strict';
 
   function escapeHtml(value) {
@@ -121,8 +121,7 @@
     if (!q) return '';
     const keyPoints = Array.isArray(q.keyPoints) ? q.keyPoints : [];
     const commands = Array.isArray(q.commands) ? q.commands : [];
-    return '<div class="qbank-answer-text">' + escapeHtml(q.answer) + '</div>'
-      + (keyPoints.length
+    const supporting = (keyPoints.length
         ? '<div class="qbank-block"><h4>Ключевые тезисы</h4><ul class="qbank-points">'
           + keyPoints.map(function(point) { return '<li>' + escapeHtml(point) + '</li>'; }).join('')
           + '</ul></div>'
@@ -135,7 +134,8 @@
       + (q.pitfall
         ? '<div class="qbank-pitfall"><strong>Подводный камень</strong><p>'
           + escapeHtml(q.pitfall) + '</p></div>'
-        : '')
+        : '');
+    return '<div class="qbank-answer-text">' + AnswerUI.render(q.answer,q.shortAnswer,supporting) + '</div>'
       + (/^https?:\/\//i.test(String(q.sourceUrl || ''))
         ? '<p class="question-source">Источник темы: <a href="' + escapeHtml(q.sourceUrl) + '" target="_blank" rel="noopener noreferrer">'
           + escapeHtml(q.sourceTitle || 'Материал') + '</a></p>' : '');

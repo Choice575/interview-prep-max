@@ -14,6 +14,38 @@
   const DIFFICULTY_LABELS = { junior: 'Junior', middle: 'Middle', senior: 'Senior' };
   const EVIDENCE_LABELS = { screenshot: 'Скриншот', link: 'Ссылка', text: 'Текст/вывод' };
 
+  const PROGRESS_KEY='external_tasks_completed';
+  const RECOVERY_KEY='external_tasks_completed_recovery';
+  function readProgress(store) {
+    let raw;
+    try { raw=store.getItem(PROGRESS_KEY); }
+    catch (_) { return {ok:false,data:{},reason:'unavailable'}; }
+    if(raw===null) return {ok:true,data:{}};
+    try {
+      const data=JSON.parse(raw);
+      if(!data||typeof data!=='object'||Array.isArray(data)||Object.values(data).some(value=>!value||typeof value!=='object'||Array.isArray(value))) throw new Error('Invalid progress');
+      return {ok:true,data};
+    } catch (_) { return {ok:false,data:{},reason:'corrupt',raw}; }
+  }
+  function saveProgress(store,id,entry) {
+    const previous=readProgress(store);
+    if(previous.reason==='unavailable') return {ok:false};
+    try {
+      // Backup must succeed before replacing an unreadable record. Never erase
+      // earlier recovery data: keep each distinct raw value in the same backup.
+      if(previous.reason==='corrupt') {
+        const old=store.getItem(RECOVERY_KEY);
+        let backups=[];
+        if(old!==null) { try {backups=JSON.parse(old);} catch (_) {backups=[{raw:old}];} }
+        if(!Array.isArray(backups)) backups=[{raw:old}];
+        if(!backups.some(item=>item&&item.raw===previous.raw)) backups.push({savedAt:Date.now(),raw:previous.raw});
+        store.setItem(RECOVERY_KEY,JSON.stringify(backups));
+      }
+      store.setItem(PROGRESS_KEY,JSON.stringify({...previous.data,[id]:entry}));
+      return {ok:true,recovered:previous.reason==='corrupt'};
+    } catch (_) { return {ok:false}; }
+  }
+
   // Returns the task list or empty array
   function tasksOf(dataset) {
     return dataset && Array.isArray(dataset.tasks) ? dataset.tasks : [];
@@ -60,7 +92,7 @@
     }
     return '<div class="evidence-modal-body"><h2>' + escapeHtml(task.title) + '</h2>'
       + '<p class="task-instructions">' + escapeHtml(task.description) + '</p>'
-      + '<form id="evidence-form">' + inputs
+      + '<form id="evidence-form"><p id="evidence-error" role="alert" hidden></p>' + inputs
       + '<div class="form-actions"><button type="button" class="btn btn-secondary" id="evidence-cancel">Отмена</button>'
       + '<button type="submit" class="btn btn-primary" id="evidence-submit">Отправить</button></div></form></div>';
   }
@@ -79,7 +111,7 @@
   }
 
   return { 
-    escapeHtml, tasksOf, renderTaskList, renderEvidenceModal, 
+    escapeHtml, tasksOf, renderTaskList, renderEvidenceModal, readProgress, saveProgress,
     collectEvidence, validateEvidence, DIFFICULTY_LABELS, EVIDENCE_LABELS 
   };
 });

@@ -729,8 +729,9 @@ function requireFlashcardsUIModule(){if(typeof IPMaxFlashcardsUI==='undefined') 
 const flashcardsUI=requireFlashcardsUIModule().create({
   getCards:()=>Array.isArray(FLASHCARDS_DATA?.cards)?FLASHCARDS_DATA.cards:[],
   getDecks:()=>[
-    {id:'study',label:'Учебная программа',description:(Array.isArray(FLASHCARDS_DATA?.cards)?FLASHCARDS_DATA.cards.length:0)+' карточек по DevOps и MLOps, включая вопросы из Swfuse/devops-interview.',cards:Array.isArray(FLASHCARDS_DATA?.cards)?FLASHCARDS_DATA.cards:[]},
-    {id:'video',label:'Собеседования из видео',description:(Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards.length:0)+' реальных вопросов из '+(Array.isArray(VIDEO_FLASHCARDS_DATA?.sources)?VIDEO_FLASHCARDS_DATA.sources.length:0)+' видео с техническими собеседованиями.',cards:Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards:[]}
+    {id:'study',label:'Учебная программа',description:'Вопросы по DevOps и MLOps, включая Swfuse/devops-interview. Задания на разбор вывода команд вынесены в практические сценарии.',cards:(FLASHCARDS_DATA?.cards||[]).filter(card=>!card.practice)},
+    {id:'video',label:'Собеседования из видео',description:(Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards.length:0)+' реальных вопросов из '+(Array.isArray(VIDEO_FLASHCARDS_DATA?.sources)?VIDEO_FLASHCARDS_DATA.sources.length:0)+' видео с техническими собеседованиями.',cards:Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards:[]},
+    {id:'practice',label:'Практические сценарии',description:'Разбор вывода команд: объясните результат, границы проверки и следующий шаг. Прежний прогресс этих заданий сохранён.',cards:(FLASHCARDS_DATA?.cards||[]).filter(card=>card.practice)}
   ],
   getProgress:getQProg,now:()=>Date.now(),
   recordAttempt:(card,outcome,deck)=>recordQuestionResult({id:card.id,topic:card.collection},{outcome,source:deck?.id==='video'?'video_flashcards':'flashcards',syncMistakes:false,history:true})
@@ -1422,14 +1423,7 @@ function getDailyBlitzState(){
   return IPMaxDaily.stateForDay(lsGet('daily_blitz',null),Date.now());
 }
 function readExternalTasksCompleted(){
-  try{
-    const raw=localStorage.getItem('external_tasks_completed');
-    const parsed=raw?JSON.parse(raw):null;
-    return parsed&&typeof parsed==='object'&&!Array.isArray(parsed)?parsed:{};
-  }catch(error){
-    console.warn('external tasks read error:',error);
-    return {};
-  }
+  return typeof IPMaxExternalTasksUI!=='undefined'?IPMaxExternalTasksUI.readProgress(localStorage).data:{};
 }
 function collectGamificationState(){
   const blitz=getDailyBlitzState();
@@ -2140,7 +2134,7 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 function requireOfflineUI(){if(typeof IPMaxOfflineUI==='undefined') throw new Error('Модуль offline-отчёта не загружен.');return IPMaxOfflineUI;}
 function offlineAssetList(){
-  const shell=['./','./index.html','./styles.css','./version.js', './data-loader.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./sync-merge.js','./sync-client.js','./sync-ui.js','./ai-settings-client.js','./ai-settings-ui.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./ai-tutor.js','./ai-tutor-ui.js','./router.js','./gamification.js','./gamification-ui.js','./daily.js','./daily-ui.js','./trainers-ui.js','./question-bank-ui.js','./external-tasks-ui.js','./polygon-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./flashcards-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
+  const shell=['./','./index.html','./styles.css','./version.js', './data-loader.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./sync-merge.js','./sync-client.js','./sync-ui.js','./ai-settings-client.js','./ai-settings-ui.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./ai-tutor.js','./ai-tutor-ui.js','./router.js','./gamification.js','./gamification-ui.js','./daily.js','./daily-ui.js','./trainers-ui.js','./answer-ui.js','./question-bank-ui.js','./external-tasks-ui.js','./polygon-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./flashcards-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
   return shell.concat(Object.values(DATA_FILES).map(file=>'./'+file));
 }
 async function probeOfflineAssets(assets){
@@ -2578,8 +2572,9 @@ function renderExternalTasks(){
   renderPolygonCatalog();
   const et=typeof IPMaxExternalTasksUI!=='undefined'?IPMaxExternalTasksUI:null;
   if(!et){container.innerHTML='<p>Модуль не загружен.</p>';return;}
-  const completed=JSON.parse(localStorage.getItem('external_tasks_completed')||'{}');
-  container.innerHTML=et.renderTaskList(EXTERNAL_TASKS,completed);
+  const saved=et.readProgress(localStorage);
+  const warning=saved.ok?'':'<p class="external-progress-warning" role="status">'+(saved.reason==='corrupt'?'Не удалось прочитать прогресс практики. Исходные данные сохранены. При следующем сохранении задания будет создана резервная копия.':'Хранилище браузера недоступно. Прогресс практики сейчас нельзя прочитать.')+'</p>';
+  container.innerHTML=warning+et.renderTaskList(EXTERNAL_TASKS,saved.data);
   document.querySelectorAll('.btn-submit-evidence').forEach(btn=>{
     btn.addEventListener('click',()=>openEvidenceModal(parseInt(btn.dataset.taskId)));
   });
@@ -2596,9 +2591,12 @@ function openEvidenceModal(taskId){
     e.preventDefault();
     const evidence=et.collectEvidence();
     if(!et.validateEvidence(evidence)){alert('Приложите хотя бы одно доказательство.');return;}
-    const completed=JSON.parse(localStorage.getItem('external_tasks_completed')||'{}');
-    completed[taskId]={completedAt:Date.now(),evidence};
-    localStorage.setItem('external_tasks_completed',JSON.stringify(completed));
+    const saved=et.saveProgress(localStorage,taskId,{completedAt:Date.now(),evidence});
+    if(!saved.ok){
+      const error=document.getElementById('evidence-error');
+      if(error){error.hidden=false;error.textContent='Не удалось сохранить результат. Данные не перезаписаны; ваш ответ остаётся в форме. Освободите место или разрешите хранение данных в браузере и повторите попытку.';}
+      return;
+    }
     closeAccessibleModal('evidence-modal');
     renderExternalTasks();
   });
@@ -2615,8 +2613,7 @@ function catalogCompletedChapterIds(){
   const caseProgress=lsGet('senior_case_prog',{});
   const labsProgress=lsGet('labs_prog',{});
   const tsProgress=lsGet('ts_scores',{});
-  let externalDone={};
-  try{externalDone=JSON.parse(localStorage.getItem('external_tasks_completed')||'{}');}catch{externalDone={};}
+  const externalDone=readExternalTasksCompleted();
   ((COURSES&&COURSES.courses)||[]).forEach(course=>{
     (course.chapters||[]).forEach(chapter=>{
       const source=chapter.source||{};

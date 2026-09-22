@@ -63,7 +63,8 @@ test('ответ скрыт до клика и раскрывается по в�
   await expect(item).toHaveClass(/is-open/);
   await expect(page.locator(`#qbank-answer-${FIRST_QUESTION_ID} .qbank-answer-text`))
     .not.toBeEmpty();
-  // Ключевые тезисы — обязательная часть ответа.
+  await answer.locator('summary').click();
+  // Ключевые тезисы доступны в подробном ответе.
   await expect(page.locator(`#qbank-answer-${FIRST_QUESTION_ID} .qbank-points li`).first())
     .toBeVisible();
 

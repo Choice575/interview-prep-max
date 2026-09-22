@@ -37,7 +37,7 @@ test('registers flashcards across data loading, navigation and the browser shell
   assert.match(eslint, /'flashcards-ui\.js'/);
 });
 
-test('labels the flashcard page as two distinguishable sources', () => {
+test('labels the flashcard page as distinguishable sources', () => {
   const html = read('index.html');
   const app = read('app.js');
   assert.match(html, />Карточки<span class="sb-count" id="sb-flashcards-count">/);

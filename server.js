@@ -29,7 +29,7 @@ const publicFiles = new Set([
   // скрипт, а sw.js не устанавливается вовсе — SHELL_ASSETS кешируется
   // атомарным addAll, и один недоступный файл роняет всю установку.
   'gamification.js', 'gamification-ui.js', 'daily.js', 'daily-ui.js', 'trainers-ui.js',
-  'question-bank-ui.js', 'external-tasks-ui.js', 'polygon-ui.js', 'interview-practice-ui.js', 'analytics-ui.js', 'home-ui.js', 'exam-ui.js', 'flashcards-ui.js', 'study-ui.js', 'sw.js',
+  'answer-ui.js', 'question-bank-ui.js', 'external-tasks-ui.js', 'polygon-ui.js', 'interview-practice-ui.js', 'analytics-ui.js', 'home-ui.js', 'exam-ui.js', 'flashcards-ui.js', 'study-ui.js', 'sw.js',
   'coach-ui.js', 'app.js', 'interview-prep-max.webmanifest', 'assets/icon-192.png', 'assets/icon-512.png',
   'tasks/base_questions.json', 'tasks/subnet.json', 'tasks/ts.json', 'tasks/cmd.json', 'tasks/code.json',
   'tasks/git.json', 'tasks/regex.json', 'tasks/ansible_pb.json', 'tasks/dockerfile.json', 'tasks/k8s.json',
