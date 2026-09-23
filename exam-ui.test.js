@@ -84,6 +84,19 @@ test('renders safe answer controls without inline JavaScript', () => {
   assert.deepEqual(started, [['7" onmouseover="bad', 123]]);
 });
 
+test('marks a corrected answer for review without changing recorded scores', () => {
+  const question = { id: 9, topic: 'Terraform', level: 'Middle', q: 'Что такое tfstate?', options: ['Неверно', 'Верно'], answer: 1 };
+  const oldProgress = { correct: 2, wrong: 1 };
+  const state = {
+    progress: { 9: oldProgress },
+    needsAnswerReview: (_, progress) => progress.correct + progress.wrong > 0 && progress.answerKeyReviewedVersion !== '15.10.1'
+  };
+  assert.match(ExamUI.renderQuestionCard(question, state), /q-answer-review/);
+  assert.deepEqual(oldProgress, { correct: 2, wrong: 1 });
+  state.progress[9] = { ...oldProgress, answerKeyReviewedVersion: '15.10.1' };
+  assert.doesNotMatch(ExamUI.renderQuestionCard(question, state), /q-answer-review/);
+});
+
 test('renders keyboard-ready flashcards with escaped content', () => {
   const markup = ExamUI.renderFlashcardMarkup([{
     id: 9, topic: 'Linux', level: 'Junior', q: '<em>question</em>',

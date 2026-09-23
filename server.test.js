@@ -140,6 +140,30 @@ test('protects AI review with the sync token before consuming the rate limit', a
   }, { rateLimit: 1 });
 });
 
+test('limits failed AI token guesses across routes without spending the owner quota', async () => {
+  await withServer(createAiService({ IPMAX_AI_PROVIDER: 'mock' }), async server => {
+    for (const route of ['/api/ai/review', '/api/ai/interview', '/api/ai/tutor']) {
+      const denied = await request(server, 'POST', route, {}, { Authorization: 'Bearer wrong-' + route });
+      assert.equal(denied.status, 401, route);
+    }
+    const blocked = await request(server, 'POST', '/api/ai/review', reviewPayload, { Authorization: 'Bearer another-wrong-token' });
+    assert.equal(blocked.status, 429);
+    const owner = await request(server, 'POST', '/api/ai/review', reviewPayload, AI_AUTH);
+    assert.equal(owner.status, 200);
+  }, { aiAuthFailureLimit: 3, rateLimit: 1 });
+});
+
+test('AI token failure limits use the trusted proxy client address', async () => {
+  await withServer(createAiService({ IPMAX_AI_PROVIDER: 'mock' }), async server => {
+    const from = address => ({ Authorization: 'Bearer invalid', 'X-Forwarded-For': address });
+    assert.equal((await request(server, 'POST', '/api/ai/review', reviewPayload, from('198.51.100.1'))).status, 401);
+    assert.equal((await request(server, 'POST', '/api/ai/review', reviewPayload, from('198.51.100.1'))).status, 429);
+    assert.equal((await request(server, 'POST', '/api/ai/review', reviewPayload, from('198.51.100.2'))).status, 401);
+    const owner = await request(server, 'POST', '/api/ai/review', reviewPayload, { ...AI_AUTH, 'X-Forwarded-For': '198.51.100.1' });
+    assert.equal(owner.status, 200);
+  }, { aiAuthFailureLimit: 1, rateLimit: 1, trustProxy: true });
+});
+
 test('protects interview evaluation with the sync token and returns a normalised mock result', async () => {
   await withServer(createAiService({ IPMAX_AI_PROVIDER: 'mock' }), async server => {
     const missing = await request(server, 'POST', '/api/ai/interview', interviewPayload);

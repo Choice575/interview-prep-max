@@ -119,6 +119,21 @@ test('an oversized snapshot is rejected with 413', async () => {
   }, { env: { IPMAX_SYNC_MAX_BYTES: '65536' } });
 });
 
+test('sync HTTP body limit follows the advertised configured maximum', async () => {
+  await withSyncServer(async server => {
+    const status = await request(server, 'GET', '/api/sync/status');
+    assert.equal(JSON.parse(status.body).maxBytes, 3 * 1024 * 1024);
+    const withinLimit = await request(server, 'POST', '/api/sync', { invalid: 'x'.repeat(2 * 1024 * 1024) }, AUTH);
+    assert.equal(withinLimit.status, 400, 'body above the old 2 MiB cap should reach snapshot validation');
+    const limit = 3 * 1024 * 1024;
+    const exact = '{"invalid":"' + 'x'.repeat(limit - Buffer.byteLength('{"invalid":""}')) + '"}';
+    assert.equal(Buffer.byteLength(exact), limit);
+    assert.equal((await request(server, 'POST', '/api/sync', exact, AUTH)).status, 400);
+    const overLimit = await request(server, 'POST', '/api/sync', exact + ' ', AUTH);
+    assert.equal(overLimit.status, 413);
+  }, { env: { IPMAX_SYNC_MAX_BYTES: String(3 * 1024 * 1024) } });
+});
+
 test('unknown keys and malformed bodies are rejected', async () => {
   await withSyncServer(async server => {
     const unknown = await request(server, 'POST', '/api/sync', snapshot({ evil: 1 }, 10), AUTH);

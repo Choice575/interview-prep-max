@@ -197,15 +197,15 @@
   {
     "id": 14,
     "tool": "Ansible",
-    "title": "set_fact в handler",
-    "code": "handlers:\n  - name: Restart app\n    service:\n      name: myapp\n      state: restarted\n\n  - name: Record restart time\n    set_fact:\n      last_restart: \"{{ ansible_date_time.iso8601 }}\"",
-    "bug": "set_fact в handler недоступен в задачах того же play — handlers выполняются в конце play изолированно.",
-    "fix": "Переместить set_fact в tasks или post_tasks. Handlers должны только выполнять действия (restart, reload).",
+    "title": "Второй обработчик не получает уведомление",
+    "code": "- hosts: app\n  tasks:\n    - name: Update app config\n      ansible.builtin.template:\n        src: app.conf.j2\n        dest: /etc/myapp/app.conf\n      notify: Restart app\n\n  handlers:\n    - name: Restart app\n      ansible.builtin.service:\n        name: myapp\n        state: restarted\n\n    - name: Record restart time\n      ansible.builtin.set_fact:\n        last_restart: \"{{ ansible_date_time.iso8601 }}\"",
+    "bug": "Обработчик Record restart time не получает уведомление, поэтому не выполнится. set_fact в обработчике допустим; собранный при старте play ansible_date_time не отражает момент перезапуска.",
+    "fix": "Уведомлять Record restart time из Restart app, как в приведённом коде, либо уведомлять оба обработчика из задачи. Для фактического времени использовать now(utc=true), а не ansible_date_time, собранный ранее.",
     "opts": [
-      "set_fact в handler недоступен в задачах того же play — handlers изолированы в конце play",
-      "Handlers выполняются раньше tasks, поэтому факт ansible_date_time на этот момент не собран",
-      "Два handler'а с одним notify требуют listen, иначе сработает только первый",
-      "set_fact пишет факт на весь inventory, значение перезапишется у всех хостов"
+      "Второй handler не уведомлён; set_fact допустим",
+      "Обработчики всегда запускаются по порядку объявления без notify",
+      "set_fact в обработчике меняет переменную сразу на всех хостах",
+      "ansible_date_time всегда показывает момент запуска обработчика"
     ],
     "answer": 0
   },

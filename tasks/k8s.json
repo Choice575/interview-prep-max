@@ -71,15 +71,15 @@
   },
   {
     "id": 6,
-    "title": "latest-тег и imagePullPolicy: Always пропущен",
-    "code": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: frontend\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: frontend\n  template:\n    spec:\n      containers:\n      - name: frontend\n        image: myapp:latest",
-    "bug": "latest + imagePullPolicy по умолчанию (IfNotPresent) = нода кэширует старый latest. Новый образ не подтягивается. Поды на разных нодах могут запустить РАЗНЫЕ версии.",
-    "fix": "Добавить imagePullPolicy: Always\nИли использовать версионированные теги: myapp:v1.2.3",
+    "title": "Изменяемый тег latest с imagePullPolicy: IfNotPresent",
+    "code": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: frontend\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: frontend\n  template:\n    metadata:\n      labels:\n        app: frontend\n    spec:\n      containers:\n      - name: frontend\n        image: myapp:latest\n        imagePullPolicy: IfNotPresent",
+    "bug": "Явная политика IfNotPresent позволяет использовать локально сохранённый образ с изменяемым тегом latest. Разные узлы могут запустить разные версии. Для нового образа latest без явной политики Kubernetes обычно назначает Always.",
+    "fix": "Предпочтительно закрепить версию или digest образа, например myapp:v1.2.3 или myapp@sha256:... . Если нужен изменяемый latest, явно задать imagePullPolicy: Always и учитывать, что уже созданная политика не меняется автоматически при замене тега.",
     "opts": [
-      "latest без imagePullPolicy: Always — нода кэширует старый образ",
-      "imagePullPolicy: Always требуется только образам из приватного реестра",
-      "Без revisionHistoryLimit откат на прошлую версию невозможен",
-      "Для 2 реплик rollout встанет без явного maxUnavailable"
+      "Явная IfNotPresent с изменяемым latest может повторно использовать старый образ на узле",
+      "Для тега latest Kubernetes всегда назначает IfNotPresent, даже если политика не указана",
+      "Deployment без template.metadata.labels не может выбирать поды",
+      "Политика Always требуется только для образов из частного реестра"
     ],
     "answer": 0
   },
@@ -99,15 +99,15 @@
   },
   {
     "id": 8,
-    "title": "Deployment без strategy",
-    "code": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 3\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      containers:\n      - name: api\n        image: myapp:v1",
-    "bug": "По умолчанию strategy: RollingUpdate с maxSurge: 25% и maxUnavailable: 25%. Для 3 реплик — 1 под может быть недоступен (33% трафика под риском). Для production лучше явно указать параметры.",
-    "fix": "strategy:\n  type: RollingUpdate\n  rollingUpdate:\n    maxSurge: 1\n    maxUnavailable: 0\n// Гарантирует что все 3 пода всегда доступны",
+    "title": "RollingUpdate и требование сохранить четыре доступные реплики",
+    "code": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 4\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      containers:\n      - name: api\n        image: myapp:v1",
+    "bug": "Если при обновлении должны оставаться доступными все четыре реплики, настройка по умолчанию не подходит: maxUnavailable: 25% для четырёх реплик округляется вниз до 1. Для трёх реплик она округлилась бы до 0.",
+    "fix": "Добавить в spec:\n  strategy:\n    type: RollingUpdate\n    rollingUpdate:\n      maxSurge: 1\n      maxUnavailable: 0\nЭто задаёт требование по числу доступных реплик во время обновления; готовность приложения следует проверять readinessProbe.",
     "opts": [
-      "strategy по умолчанию RollingUpdate — нужно явно задать maxUnavailable: 0 для production",
-      "maxSurge по умолчанию равен 0, поэтому новые поды поднимутся только после остановки старых",
-      "Без явной strategy Deployment обновляет поды напрямую, не создавая ReplicaSet",
-      "Для 3 реплик по умолчанию включается Recreate — все поды гасятся сразу"
+      "25% от четырёх реплик = один недоступный под",
+      "maxSurge по умолчанию равен 0 и запрещает запуск новых подов",
+      "Без явной strategy Deployment не создаёт ReplicaSet",
+      "Для четырёх реплик по умолчанию выбирается Recreate"
     ],
     "answer": 0
   },

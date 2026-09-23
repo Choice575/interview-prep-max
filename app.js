@@ -126,6 +126,13 @@ function getCustomQ(){return lsGet('custom',[]);}
 function getAllQ(){return [...BASE_QUESTIONS,...getCustomQ()];}
 function getMistakes(){return lsGet('mistakes',{});}
 function getQProg(){return lsGet('qprog',{});}
+const CORRECTED_TERRAFORM_ANSWER_IDS=new Set([9,11,14,18,26]);
+const CORRECTED_ANSWER_VERSION='15.10.1';
+function needsCorrectedAnswerReview(question,progress){
+  return CORRECTED_TERRAFORM_ANSWER_IDS.has(Number(question.id))&&
+    Number(progress.correct||0)+Number(progress.wrong||0)>0&&
+    progress.answerKeyReviewedVersion!==CORRECTED_ANSWER_VERSION;
+}
 function getSkillEvents(){
   const events=lsGet('skill_events',[]);
   return Array.isArray(events)&&typeof ProgressTracker!=='undefined'?events.filter(ProgressTracker.isSkillEvent):[];
@@ -138,6 +145,9 @@ function recordQuestionResult(question,input){
   if(!question||typeof ProgressTracker==='undefined') return null;
   const now=Number.isFinite(input?.now)?input.now:Date.now();
   const result=ProgressTracker.recordQuestionAttempt(getQProg(),question.id,{outcome:input?.outcome,source:input?.source,now,responseSeconds:input?.responseSeconds});
+  if(CORRECTED_TERRAFORM_ANSWER_IDS.has(Number(question.id))&&['exam','blitz','daily-blitz','diagnostic'].includes(input?.source)){
+    result.progress[question.id].answerKeyReviewedVersion=CORRECTED_ANSWER_VERSION;
+  }
   lsSet('qprog',result.progress);
   if(input?.syncMistakes){
     const mistakes=getMistakes();
@@ -403,6 +413,20 @@ function startMode(m){resetCoachSelection();currentMode=m;document.querySelector
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebar-overlay').classList.toggle('open');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');}
 document.getElementById('sidebar-overlay').onclick=closeSidebar;
+document.getElementById('page-study').addEventListener('click',event=>{
+  const button=event.target.closest('[data-study-action]');
+  if(!button)return;
+  const {studyAction:action,studyId:id,studyRef:ref,studyIndex:index,studyScore:score}=button.dataset;
+  if(action==='toggle-ref')toggleStudyRef(ref);
+  else if(action==='score')scoreStudyQuestion(id,Number(index),Number(score));
+  else if(action==='save-mini')saveStudyAnswers(id);
+  else if(action==='save-weekly')saveWeeklyTest(id);
+  else if(action==='mark-senior')markSeniorCaseDone(id);
+});
+document.getElementById('inc-cards').addEventListener('click',event=>{
+  const button=event.target.closest('[data-incident-id]');
+  if(button)startIncidentById(button.dataset.incidentId);
+});
 function configureResponsiveShell(){
   const compact=window.matchMedia('(max-width:600px)').matches;
   const examFilters=document.querySelector('.exam-filters');
@@ -700,6 +724,7 @@ function toggleInterviewMode(){
 
 const examUI=requireExamUIModule().create({
   getQuestions:getAllQ,getQuestionProgress:getQProg,getMistakes,
+  needsAnswerReview:needsCorrectedAnswerReview,
   getFilters:()=>({
     coachQuestionIds,topic:currentTopic,level:currentLevel,category:currentCategory,mode:currentMode,
     search:document.getElementById('exam-search')?.value||'',coachSessionLimit
@@ -1203,12 +1228,12 @@ function renderStudyMiniTest(test,weekly,showWeekly){
   const total=qScores.reduce((s,v)=>s+(v||0),0);
   el.innerHTML='<section class="study-card"><h3>Мини-тест: '+esc(test.title)+'</h3><div style="font-size:12px;color:var(--text2);margin-bottom:10px">Оценка: '+total+' / 5</div>'+
     (test.questions||[]).map((q,i)=>'<div class="study-question"><div class="study-question-text">'+(i+1)+'. '+esc(q.q)+'</div>'+
-      '<textarea class="study-answer" id="study-answer-'+test.id+'-'+i+'" placeholder="Ответ своими словами...">'+esc((saved.answers||[])[i]||'')+'</textarea>'+
-      '<div class="study-score-row"><button class="btn btn-outline btn-sm" onclick="toggleStudyRef(\''+escAttr(test.id)+'-'+i+'\')">Показать эталон</button>'+
-      '<button class="btn btn-outline btn-sm" onclick="scoreStudyQuestion(\''+escAttr(test.id)+'\','+i+',0)">0</button>'+
-      '<button class="btn btn-primary btn-sm" onclick="scoreStudyQuestion(\''+escAttr(test.id)+'\','+i+',1)">1</button><span class="study-status '+(qScores[i]?'done':'')+'">'+(qScores[i]?'1':'0')+' балл</span></div>'+
-      '<div class="study-reference" id="study-ref-'+test.id+'-'+i+'">'+esc(q.expected)+'</div></div>').join('')+
-    '<div class="study-actions"><button class="btn btn-primary btn-sm" onclick="saveStudyAnswers(\''+escAttr(test.id)+'\')">Сохранить ответы</button></div></section>'+
+      '<textarea class="study-answer" id="study-answer-'+escAttr(test.id)+'-'+i+'" placeholder="Ответ своими словами...">'+esc((saved.answers||[])[i]||'')+'</textarea>'+
+      '<div class="study-score-row"><button class="btn btn-outline btn-sm" data-study-action="toggle-ref" data-study-ref="'+escAttr(test.id)+'-'+i+'">Показать эталон</button>'+
+      '<button class="btn btn-outline btn-sm" data-study-action="score" data-study-id="'+escAttr(test.id)+'" data-study-index="'+i+'" data-study-score="0">0</button>'+
+      '<button class="btn btn-primary btn-sm" data-study-action="score" data-study-id="'+escAttr(test.id)+'" data-study-index="'+i+'" data-study-score="1">1</button><span class="study-status '+(qScores[i]?'done':'')+'">'+(qScores[i]?'1':'0')+' балл</span></div>'+
+      '<div class="study-reference" id="study-ref-'+escAttr(test.id)+'-'+i+'">'+esc(q.expected)+'</div></div>').join('')+
+    '<div class="study-actions"><button class="btn btn-primary btn-sm" data-study-action="save-mini" data-study-id="'+escAttr(test.id)+'">Сохранить ответы</button></div></section>'+
     (showWeekly&&weekly?renderWeeklyTest(weekly):'');
   el.querySelectorAll('.study-answer').forEach(field=>
     field.addEventListener('input',()=>scheduleStudyAnswerSave(test.id)));
@@ -1238,15 +1263,15 @@ function renderWeeklyTest(test){
     '<fieldset class="study-weekly-part"><legend>Теория · '+(parts.theory?.score||0)+' баллов</legend><div class="study-weekly-questions">'+theory+'</div>'+scoreInput('theory','Самооценка теории')+'</fieldset>'+
     '<fieldset class="study-weekly-part"><legend>Debug · '+(parts.debug?.score||0)+' баллов</legend><p class="study-goal">'+esc(parts.debug?.task||'')+'</p>'+
     '<label class="study-weekly-answer" for="'+prefix+'debug"><span>Диагностика, исправление и проверка</span><textarea class="study-answer" id="'+prefix+'debug" placeholder="Сначала evidence, затем безопасное действие...">'+esc(answers.debug||'')+'</textarea></label>'+
-    '<button class="btn btn-outline btn-sm" onclick="toggleStudyRef(\''+escAttr(test.id)+'-debug\')">Показать ожидаемый ответ</button>'+
-    '<div class="study-reference" id="study-ref-'+test.id+'-debug">'+esc(parts.debug?.expected||'')+'</div>'+scoreInput('debug','Самооценка debug')+'</fieldset>'+
+    '<button class="btn btn-outline btn-sm" data-study-action="toggle-ref" data-study-ref="'+escAttr(test.id)+'-debug">Показать ожидаемый ответ</button>'+
+    '<div class="study-reference" id="study-ref-'+escAttr(test.id)+'-debug">'+esc(parts.debug?.expected||'')+'</div>'+scoreInput('debug','Самооценка debug')+'</fieldset>'+
     '<fieldset class="study-weekly-part"><legend>Senior Challenge · '+(parts.seniorChallenge?.score||0)+' баллов</legend><p class="study-goal">Кейс: '+esc(parts.seniorChallenge?.caseId||'')+'. '+esc(parts.seniorChallenge?.task||'')+'</p>'+
     '<label class="study-weekly-answer" for="'+prefix+'senior"><span>Решение и компромиссы</span><textarea class="study-answer" id="'+prefix+'senior" placeholder="Защитите решение как на Senior-интервью...">'+esc(answers.seniorChallenge||'')+'</textarea></label>'+scoreInput('seniorChallenge','Самооценка Senior Challenge')+'</fieldset>'+
     '<div class="study-weekly-gates"><h4>Условия зачёта</h4>'+
     '<label><input id="'+prefix+'artifact" type="checkbox"'+(last.artifactReady?' checked':'')+'> <span>Рабочий артефакт недели готов и проверен</span></label>'+
     '<label><input id="'+prefix+'critical" type="checkbox"'+(last.criticalReviewed?' checked':'')+'> <span>Все найденные критические ошибки разобраны и исправлены</span></label>'+
     '<p>Также должны быть отмечены все критерии завершения в карточке «Результат недели».</p></div>'+
-    '<div class="study-actions"><button class="btn btn-primary" onclick="saveWeeklyTest(\''+escAttr(test.id)+'\')">Сохранить попытку и проверить</button></div></section>';
+    '<div class="study-actions"><button class="btn btn-primary" data-study-action="save-weekly" data-study-id="'+escAttr(test.id)+'">Сохранить попытку и проверить</button></div></section>';
 }
 function weeklyTestDomId(testId,field){return 'study-weekly-'+String(testId).replace(/[^a-zA-Z0-9_-]/g,'-')+'-'+field;}
 function weeklyPassScore(){return Number(programTests()?.grading?.weeklyTest?.passScore)||70;}
@@ -1343,9 +1368,9 @@ function renderStudySeniorCase(c){
   const prog=lsGet('senior_case_prog',{})[c.id]||{};
   el.innerHTML='<section class="study-card"><h3>Senior Challenge</h3><div class="study-meta"><span class="tag tag-sr">'+esc(c.level)+'</span><span class="tag tag-tr">'+esc(c.type)+'</span></div>'+
     '<h4>'+esc(c.title)+'</h4><p class="study-goal">'+esc(c.context)+'</p><h4>Evidence</h4><pre class="study-evidence">'+esc((c.evidence||[]).join('\n'))+'</pre>'+
-    '<h4>Задача</h4><p class="study-goal">'+esc(c.task)+'</p><div class="study-case-actions"><button class="btn btn-outline btn-sm" onclick="toggleStudyRef(\''+escAttr(c.id)+'-actions\')">Показать ожидаемые действия</button>'+
-    '<button class="btn btn-primary btn-sm" onclick="markSeniorCaseDone(\''+escAttr(c.id)+'\')">Отметить кейс готовым</button></div>'+
-    '<div class="study-reference" id="study-ref-'+c.id+'-actions"><b>Ожидаемые действия:</b><ul class="study-list">'+(c.expectedActions||[]).map(a=>'<li>'+esc(a)+'</li>').join('')+'</ul><b>Частые ошибки:</b><ul class="study-list">'+(c.commonMistakes||[]).map(a=>'<li>'+esc(a)+'</li>').join('')+'</ul></div>'+
+    '<h4>Задача</h4><p class="study-goal">'+esc(c.task)+'</p><div class="study-case-actions"><button class="btn btn-outline btn-sm" data-study-action="toggle-ref" data-study-ref="'+escAttr(c.id)+'-actions">Показать ожидаемые действия</button>'+
+    '<button class="btn btn-primary btn-sm" data-study-action="mark-senior" data-study-id="'+escAttr(c.id)+'">Отметить кейс готовым</button></div>'+
+    '<div class="study-reference" id="study-ref-'+escAttr(c.id)+'-actions"><b>Ожидаемые действия:</b><ul class="study-list">'+(c.expectedActions||[]).map(a=>'<li>'+esc(a)+'</li>').join('')+'</ul><b>Частые ошибки:</b><ul class="study-list">'+(c.commonMistakes||[]).map(a=>'<li>'+esc(a)+'</li>').join('')+'</ul></div>'+
     '<div style="font-size:12px;color:var(--text2);margin-top:10px">Статус: '+esc(prog.status||'не пройден')+'</div></section>';
 }
 function markSeniorCaseDone(id){const p=lsGet('senior_case_prog',{});p[id]={status:'done',completedAt:new Date().toISOString()};lsSet('senior_case_prog',p);renderStudy();}
@@ -2386,7 +2411,7 @@ function renderIncidentList(){
     const res=incDone[inc.id];
     const total=(inc.phases||[]).length;
     const badge=res?'<span class="inc-card-badge'+(res.score===total?' inc-ok':'')+'">'+res.score+' из '+total+'</span>':'';
-    return '<button type="button" class="inc-sc-card'+(res?' done':'')+'" onclick="startIncidentById(\''+esc(inc.id)+'\')">'+
+    return '<button type="button" class="inc-sc-card'+(res?' done':'')+'" data-incident-id="'+escAttr(inc.id)+'">'+
       '<div class="inc-sc-head"><span class="inc-sc-title">'+esc(inc.title)+'</span>'+badge+'</div>'+
       '<div class="inc-sc-meta">'+ttag(inc.topic)+'<span class="tag tag-sr">'+esc(inc.level)+'</span></div>'+
       '<div class="inc-sc-ctx">'+esc(inc.context)+'</div>'+

@@ -150,6 +150,7 @@
     const answers = Array.isArray(q.options) ? q.options : [];
     const answer = Number(q.answer);
     const progress = valueFor(state.progress || {}, q.id) || {};
+    const needsAnswerReview = typeof state.needsAnswerReview === 'function' && state.needsAnswerReview(q, progress);
     const mistake = !!valueFor(state.mistakes || {}, q.id);
     const initialOrder = answers.map((_, index) => index);
     const order = randomized(initialOrder, state.randomize);
@@ -163,6 +164,7 @@
       (state.single && timerSeconds ? '<span class="q-timer" id="timer-' + safeId + '">' + timerSeconds + 'с</span>' : '') +
       '</div>' +
       '<div class="q-text">' + escapeText(q.q) + '</div>' +
+      (needsAnswerReview ? '<p class="q-answer-review">Ответ к этому вопросу исправлен. Пройдите его заново; прежняя оценка сохранена.</p>' : '') +
       '<div class="q-options">' + order.map((originalIndex, visibleIndex) =>
         '<button type="button" class="q-opt" id="opt-' + safeId + '-' + visibleIndex + '" data-exam-action="answer" data-question-id="' + safeId + '" data-orig-idx="' + originalIndex + '" data-answer="' + answer + '">' +
         '<span class="opt-letter">' + String.fromCharCode(65 + visibleIndex) + '</span><span>' + escapeText(answers[originalIndex]) + '</span></button>'
@@ -218,6 +220,7 @@
       const studyMode = !!run('getStudyMode');
       return {
         progress: run('getQuestionProgress') || {}, mistakes: run('getMistakes') || {},
+        needsAnswerReview: (question, progress) => run('needsAnswerReview', question, progress),
         randomize: items => run('randomize', items) || items,
         studyMode, interviewMode: !studyMode && !!run('getInterviewMode'),
         timerSeconds: run('getTimerSeconds'), single: !!single, now: run('now'),

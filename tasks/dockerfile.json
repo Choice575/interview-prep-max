@@ -127,15 +127,15 @@
   },
   {
     "id": 10,
-    "title": "EXPOSE без протокола и HEALTHCHECK",
+    "title": "Зависимости устанавливаются после копирования исходников",
     "code": "FROM python:3.11-slim\nWORKDIR /app\nCOPY . .\nRUN pip install -r requirements.txt\nEXPOSE 5000\nCMD [\"python\", \"app.py\"]",
-    "bug": "1) EXPOSE без указания протокола — только документация, не открывает порт. 2) Нет HEALTHCHECK — Docker не знает живо ли приложение. 3) pip install без --no-cache-dir.",
-    "fix": "FROM python:3.11-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\nCOPY . .\nEXPOSE 5000/tcp\nHEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost:5000/health || exit 1\nCMD [\"python\", \"app.py\"]",
+    "bug": "COPY . . до установки зависимостей сбрасывает слой pip install при каждом изменении исходного кода. EXPOSE 5000 корректен: TCP используется по умолчанию; инструкция лишь документирует порт и не публикует его.",
+    "fix": "FROM python:3.11-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\nCOPY . .\nEXPOSE 5000\nCMD [\"python\", \"app.py\"]\n# Если приложение предоставляет /health, можно добавить HEALTHCHECK с Python stdlib.",
     "opts": [
-      "EXPOSE без /tcp + нет HEALTHCHECK + pip без --no-cache-dir",
-      "EXPOSE 5000 публикует порт на хосте даже без -p и открывает его наружу",
-      "python:3.11-slim не содержит pip — нужен полный образ python:3.11",
-      "HEALTHCHECK нельзя использовать вместе с CMD в одном Dockerfile"
+      "COPY . . сбрасывает кэш слоя pip install",
+      "EXPOSE 5000 без /tcp является ошибкой синтаксиса",
+      "EXPOSE 5000 автоматически публикует порт на хосте",
+      "python:3.11-slim не содержит pip"
     ],
     "answer": 0
   }

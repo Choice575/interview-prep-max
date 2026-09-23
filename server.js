@@ -11,10 +11,6 @@ const MAX_BODY_BYTES = 16 * 1024;
 // объяснениями. 64 КБ достаточно для bounded payload, но не даёт использовать
 // AI route как приёмник произвольно больших тел.
 const MAX_AI_BODY_BYTES = 64 * 1024;
-// Снимок прогресса на порядки больше AI-агрегатов: history допускает 1000
-// записей, qprog — по записи на каждый вопрос. Общий лимит 16 КБ отклонял бы
-// любой реальный синк, поэтому у него свой предел.
-const MAX_SYNC_BODY_BYTES = 2 * 1024 * 1024;
 const contentTypes = {
   '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json', '.png': 'image/png'
@@ -143,6 +139,21 @@ function createAppServer(options = {}) {
   // утечка отдаёт и прогресс, и API-ключ провайдера.
   const adminToken = String(env.IPMAX_ADMIN_TOKEN || '').trim();
   const allowRequest = createRateLimiter(options.rateLimit || 20, options.rateWindowMs || 60000);
+  // Считаем только неудачные попытки авторизации AI. Чужие 401 не расходуют
+  // оплачиваемый лимит владельца, а перебор токена получает 429.
+  const allowRejectedAi = createRateLimiter(options.aiAuthFailureLimit || 30, options.rateWindowMs || 60000);
+  function authoriseAi(request) {
+    try {
+      syncService.authorise(request.headers.authorization);
+    } catch (error) {
+      if (error && error.status === 401 && !allowRejectedAi(clientAddress(request, trustProxy))) {
+        const limited = new Error('Too many invalid AI token attempts');
+        limited.status = 429;
+        throw limited;
+      }
+      throw error;
+    }
+  }
   // Синк вызывается чаще AI-разбора (пуш после каждой сессии), поэтому у него
   // свой, более щедрый счётчик — иначе один активный день упирается в лимит.
   const allowSync = createRateLimiter(options.syncRateLimit || 120, options.rateWindowMs || 60000);
@@ -172,7 +183,7 @@ function createAppServer(options = {}) {
         // AI расходует оплачиваемый баланс. Проверяем общий пользовательский
         // sync-token ДО rate limiter: иначе злоумышленник без токена сможет
         // выжечь квоту владельца одними неавторизованными запросами.
-        syncService.authorise(request.headers.authorization);
+        authoriseAi(request);
         if (!allowRequest(clientAddress(request, trustProxy))) return sendJson(response, 429, { error: 'Too many AI review requests' });
         const payload = await readJson(request, MAX_AI_BODY_BYTES);
         const review = await aiService.review(payload);
@@ -185,7 +196,7 @@ function createAppServer(options = {}) {
     if (url.pathname === '/api/ai/interview') {
       if (request.method !== 'POST') return sendJson(response, 405, { error: 'Method not allowed' });
       try {
-        syncService.authorise(request.headers.authorization);
+        authoriseAi(request);
         if (!allowRequest(clientAddress(request, trustProxy))) return sendJson(response, 429, { error: 'Too many AI interview requests' });
         const payload = await readJson(request, MAX_AI_BODY_BYTES);
         const evaluation = await aiService.evaluateInterview(payload);
@@ -198,7 +209,7 @@ function createAppServer(options = {}) {
     if (url.pathname === '/api/ai/tutor') {
       if (request.method !== 'POST') return sendJson(response, 405, { error: 'Method not allowed' });
       try {
-        syncService.authorise(request.headers.authorization);
+        authoriseAi(request);
         if (!allowRequest(clientAddress(request, trustProxy))) return sendJson(response, 429, { error: 'Too many AI tutor requests' });
         const payload = await readJson(request, MAX_AI_BODY_BYTES);
         const tutor = await aiService.tutor(payload);
@@ -253,7 +264,7 @@ function createAppServer(options = {}) {
           const result = await syncService.pull();
           return sendJson(response, 200, { snapshot: result.snapshot });
         }
-        const payload = await readJson(request, MAX_SYNC_BODY_BYTES);
+        const payload = await readJson(request, syncService.status().maxBytes);
         const result = await syncService.push(payload);
         return sendJson(response, 200, { snapshot: result.snapshot, conflicts: result.conflicts });
       } catch (error) {
