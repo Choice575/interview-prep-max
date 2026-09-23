@@ -74,6 +74,10 @@ version=$(tr -d '\r' < version.js | sed -n "s/^self.IPMAX_VERSION = '\([0-9][0-9
 DOCKER_BUILDKIT=0 docker build --network=host -t "interview-prep-max-app:$target" -t interview-prep-max-app:latest .
 if grep -Eq '^polygon-runner/|^package-lock.json$' <<< "$changes"; then
   DOCKER_BUILDKIT=0 docker build --network=host -f polygon-runner/Dockerfile -t "interview-prep-max-polygon-runner:$target" -t interview-prep-max-polygon-runner:latest .
+  # The deploy checkout uses umask 077. Verify copied files are readable by
+  # the image's unprivileged USER before replacing the live runner.
+  docker run --rm --network none --read-only --entrypoint node "interview-prep-max-polygon-runner:$target" \
+    -e "const fs=require('node:fs'); for(const name of ['server.js','service.js','lab-adapter.js','gateway.js']) fs.accessSync('/runner/'+name,fs.constants.R_OK); require('/runner/node_modules/ws');"
   services+=(polygon-runner)
 fi
 if grep -q '^polygon-runner/task-linux-permissions/' <<< "$changes"; then

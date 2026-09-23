@@ -5,6 +5,7 @@ WORKDIR /runner
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 COPY polygon-runner/service.js polygon-runner/lab-adapter.js polygon-runner/gateway.js polygon-runner/server.js ./
+RUN chmod -R a+rX /runner
 
 ENV NODE_ENV=production POLYGON_HOST=0.0.0.0 POLYGON_PORT=4180 POLYGON_MAX_SESSIONS=1 POLYGON_TTL_MS=1200000
 EXPOSE 4180
