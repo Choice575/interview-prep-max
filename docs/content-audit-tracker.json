@@ -16,13 +16,21 @@
       "current": "«Увеличить число inodes на ext4 нельзя даже при resize2fs»",
       "proposed": "«При расширении resize2fs число inodes растёт пропорционально; нельзя изменить соотношение байт на inode без пересоздания ФС» (образ 64→256 МБ: 16 384 → 32 768)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_fs_002",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Исправлены ограничение ext4 и карточка 1001188: resize2fs добавляет иноды при расширении; соотношение байт на инод сохраняется.",
+      "linkedIds": [
+        "1001188"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man8/mke2fs.8.html",
+        "https://man7.org/linux/man-pages/man8/resize2fs.8.html"
       ]
     },
     {
@@ -38,13 +46,20 @@
       "current": "«число inodes задаётся при mkfs и потом не меняется»",
       "proposed": "«при mkfs задаётся соотношение; число меняется вместе с размером ФС»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_fs_001",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Исправлены ответ, ключевой пункт и карточка 1001389.",
+      "linkedIds": [
+        "1001389"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man8/mke2fs.8.html"
       ]
     },
     {
@@ -60,13 +75,20 @@
       "current": "«`command 2>&1 >/dev/null` не подходит»",
       "proposed": "эта форма выводит только stderr и отправляет в конвейер только stderr: `cmd 2>&1 >/dev/null | grep`; `2>&1 |` — оба потока",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_bash_003",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Исправлены пример, команды, ключевой пункт и карточка 1001130; показаны оба варианта конвейера.",
+      "linkedIds": [
+        "1001130"
+      ],
+      "sources": [
+        "https://www.gnu.org/s/bash/manual/html_node/Redirections.html"
       ]
     },
     {
@@ -82,13 +104,20 @@
       "current": "`awk -F: '$2 !~ /^(!|\\*)?$/'`",
       "proposed": "считает «с паролем» `!!`, `!$6$…`, `!*`; правильно `awk -F: '$2 ~ /^\\$/ {print $1}' /etc/shadow`, пустое поле `$2==\"\"` — отдельно",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_kts_014",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Уточнены значение фильтра и заблокированные записи в банке и видеокарточке 2000300; команда отбирает только модульные хэши.",
+      "linkedIds": [
+        "2000300"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man5/shadow.5.html"
       ]
     },
     {
@@ -104,13 +133,21 @@
       "current": "«SIGCHLD по умолчанию игнорируется, и поэтому появляются зомби»",
       "proposed": "зомби — из-за отсутствия wait; SIG_DFL ≠ SIG_IGN, автосбор только при явном SIG_IGN",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_proc_003",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Разведены действие SIGCHLD по умолчанию и явный SIG_IGN в банке и карточке 1001383.",
+      "linkedIds": [
+        "1001383"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man2/waitpid.2.html",
+        "https://man7.org/linux/man-pages/man7/signal.7.html"
       ]
     },
     {
@@ -126,13 +163,20 @@
       "current": "«вызов означает переключение контекста»",
       "proposed": "переключение режима user → kernel, а не контекста",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_bash_008",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Разведены переход пользовательский режим → ядро и переключение процесса; карточка 1001402 согласована.",
+      "linkedIds": [
+        "1001402"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man2/syscall.2.html"
       ]
     },
     {
@@ -148,13 +192,22 @@
       "current": "нет подвоха copytruncate",
       "proposed": "без `O_APPEND` файл становится разреженным с прежним видимым размером (100 010 байт при 4 КБ данных)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_proc_009",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Добавлен риск разреженного файла без O_APPEND при copytruncate; описана потеря строк. Карточка 1001134 согласована.",
+      "linkedIds": [
+        "1001134"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man8/logrotate.8.html",
+        "https://man7.org/linux/man-pages/man2/truncate.2.html",
+        "https://man7.org/linux/man-pages/man2/open.2.html"
       ]
     },
     {
@@ -170,13 +223,20 @@
       "current": "`shopt -s lastpipe` без условия",
       "proposed": "работает при выключенном управлении заданиями (скрипты); интерактивно нужно `set +m`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_bash_005",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Уточнено условие lastpipe и интерактивное set +m; карточка 1001049 согласована.",
+      "linkedIds": [
+        "1001049"
+      ],
+      "sources": [
+        "https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html"
       ]
     },
     {
@@ -192,13 +252,18 @@
       "current": "«загрузчик распаковывает их в память»",
       "proposed": "загрузчик загружает; initramfs распаковывает ядро",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_boot_001",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Загрузчик загружает образы, а ядро распаковывает initramfs и запускает /init.",
+      "linkedIds": [],
+      "sources": [
+        "https://docs.kernel.org/filesystems/ramfs-rootfs-initramfs.html"
       ]
     },
     {
@@ -214,13 +279,21 @@
       "current": "XFS: «исчерпание inodes практически исключено»",
       "proposed": "возможно при `imaxpct` или фрагментации",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_fs_002",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Убрано обещание отсутствия ENOSPC при динамических инодах; уточнены карточки 1001188 и 1001234.",
+      "linkedIds": [
+        "1001188",
+        "1001234"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man8/mkfs.xfs.8.html"
       ]
     },
     {
@@ -601,13 +674,20 @@
       "current": "«содержимое и формат нельзя выводить в логи»",
       "proposed": "«хэши нельзя выводить в логи и передавать сторонним сервисам»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_kts_014",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Ответ банка и видеокарточка 2000300 уточнены вместе с пунктом 312: запрет относится к раскрытию хэшей.",
+      "linkedIds": [
+        "2000300"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man5/shadow.5.html"
       ]
     },
     {
@@ -689,13 +769,20 @@
       "current": "«число инодов фиксировано и не растёт»",
       "proposed": "как `qb_fs_001`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_srd_003",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Исправлены ответ, ключевой пункт и карточка 1001284.",
+      "linkedIds": [
+        "1001284"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man8/mke2fs.8.html"
       ]
     },
     {
@@ -2569,13 +2656,20 @@
       "current": "resize2fs не увеличивает inodes",
       "proposed": "см. пакет 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001188",
           "file": "tasks/flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Согласована карточка 1001188 с исправленным ответом банка.",
+      "linkedIds": [
+        "1001188"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man8/mke2fs.8.html"
       ]
     },
     {
@@ -2591,13 +2685,20 @@
       "current": "инодов не больше, чем при mkfs",
       "proposed": "см. пакет 2",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001284",
           "file": "tasks/flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Согласована карточка 1001284 с исправленным ответом банка.",
+      "linkedIds": [
+        "1001284"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man8/mke2fs.8.html"
       ]
     },
     {

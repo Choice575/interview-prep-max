@@ -100,7 +100,7 @@ test('keeps KTS command snippets executable in a shell', () => {
     .filter(question => question.sourceVideoId === 'M1tXCebcOBE');
   const byId = Object.fromEntries(questions.map(question => [question.id, question]));
 
-  assert.match(byId.qb_kts_014.commands[1], /awk -F: '\$2 !~ \/\^\(!|\\\*\)\?\$\/ \{print \$1\}'/);
+  assert.equal(byId.qb_kts_014.commands[1], "sudo awk -F: '$2 ~ /^\\$/ {print $1}' /etc/shadow");
   assert.match(byId.qb_kts_018.commands[1], /awk '\{print \$1\}'/);
   assert.match(byId.qb_kts_021.commands[0], /awk '\$3 ~ \/Z\/'/);
   assert.match(byId.qb_kts_041.commands[0], /vtysh -c 'show ip ospf neighbor'/);
@@ -111,8 +111,8 @@ test('keeps KTS command snippets executable in a shell', () => {
 test('reviewed wording and source fields match the approved corpus', () => {
   const video = JSON.parse(fs.readFileSync(videoFile, 'utf8'));
   for (const [corpus, expected] of [
-    [data, '0155bdebbbb2cab9aa5dc68e61cd522bab515cf0048ca83379e53d7198b479c4'],
-    [video, '6c9c84c2d73fe00230f6420d06849794377c067be244fc7a1d9b77c1cdc15229']
+    [data, '63a74b195b9fe8d28d7a38891bbb8ca353e5241f66cd1bc88fc1d532750aed6c'],
+    [video, 'ccf76afeca8b459c869e7ae92c98aba481d5b80d575381c17e0e58ec67c9769c']
   ]) {
     const content = corpus.cards.filter(card => !card.sourceRepository).map(card => Object.fromEntries(Object.entries(card).filter(([key]) => key !== 'collection')));
     assert.equal(createHash('sha256').update(JSON.stringify(content)).digest('hex'), expected);
