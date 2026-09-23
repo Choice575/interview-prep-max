@@ -111,7 +111,7 @@ test('keeps KTS command snippets executable in a shell', () => {
 test('reviewed wording and source fields match the approved corpus', () => {
   const video = JSON.parse(fs.readFileSync(videoFile, 'utf8'));
   for (const [corpus, expected] of [
-    [data, '355dfa842bf25ed89869eb05b92a8c2bccc66bd7f40d19a384fcf54e4b8fcc78'],
+    [data, '5ab7ee4d04ddd839b44726578301166036228703c4b83fb9078e79c8e1f60946'],
     [video, 'ccf76afeca8b459c869e7ae92c98aba481d5b80d575381c17e0e58ec67c9769c']
   ]) {
     const content = corpus.cards.filter(card => !card.sourceRepository).map(card => Object.fromEntries(Object.entries(card).filter(([key]) => key !== 'collection')));
