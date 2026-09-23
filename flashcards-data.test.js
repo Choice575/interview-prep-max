@@ -107,12 +107,12 @@ test('keeps KTS command snippets executable in a shell', () => {
   assert.match(byId.qb_kts_041.commands[1], /vtysh -c 'show ip bgp summary'/);
 });
 
-// Reviewed content fingerprints after the technical review and practice grouping in 15.10.0; category names are excluded.
+// Reviewed content fingerprints after the technical review, practice grouping, and audit wording fixes; category names are excluded.
 test('reviewed wording and source fields match the approved corpus', () => {
   const video = JSON.parse(fs.readFileSync(videoFile, 'utf8'));
   for (const [corpus, expected] of [
     [data, '0155bdebbbb2cab9aa5dc68e61cd522bab515cf0048ca83379e53d7198b479c4'],
-    [video, 'e8d97ba327bf094757c6159c39bf472f8986c1ab2fb89463f2de486b330e7dde']
+    [video, '6c9c84c2d73fe00230f6420d06849794377c067be244fc7a1d9b77c1cdc15229']
   ]) {
     const content = corpus.cards.filter(card => !card.sourceRepository).map(card => Object.fromEntries(Object.entries(card).filter(([key]) => key !== 'collection')));
     assert.equal(createHash('sha256').update(JSON.stringify(content)).digest('hex'), expected);
