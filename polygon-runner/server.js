@@ -1,5 +1,5 @@
 const http = require('node:http');
-const { createLabAdapter } = require('./lab-adapter.js');
+const { createLabAdapter, waitForLab } = require('./lab-adapter.js');
 const { createPolygonGateway } = require('./gateway.js');
 const { createPolygonService } = require('./service.js');
 
@@ -25,7 +25,7 @@ async function cleanup() {
 }
 
 (async () => {
-  await adapter.cleanupOrphans();
+  await waitForLab(adapter, { onRetry: attempt => console.warn(`Polygon lab not ready at startup (attempt ${attempt}); retrying`) });
   server.listen(port, host, () => console.log(`Polygon runner listening on http://${host}:${port}`));
   setInterval(cleanup, 30_000).unref();
 })().catch(error => {
