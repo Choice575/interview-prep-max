@@ -47,15 +47,17 @@ services:
     expose:
       - "4180"
     environment:
-      IPMAX_SYNC_TOKEN: ${IPMAX_SYNC_TOKEN:?IPMAX_SYNC_TOKEN обязателен}
+      POLYGON_TOKEN: ${POLYGON_TOKEN:?POLYGON_TOKEN обязателен}
       POLYGON_HOST: 0.0.0.0
       POLYGON_PORT: 4180
+      POLYGON_LAB_HOST: polygon-lab
+      POLYGON_LAB_CONTROL_PORT: 4181
+      POLYGON_LAB_TERMINAL_PORT: 4182
       POLYGON_MAX_SESSIONS: 1
       POLYGON_TTL_MS: 1200000
-    volumes:
-      # Только доверенный runner управляет заранее ограниченными lab-контейнерами.
-      # Само пользовательское окружение Docker socket не получает.
-      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      polygon-lab:
+        condition: service_healthy
     read_only: true
     tmpfs:
       - /tmp:size=16m,mode=1777
@@ -66,14 +68,37 @@ services:
       - no-new-privileges:true
     networks:
       - ipmax
+      - lab-only
 
-  polygon-task-linux-permissions:
-    image: ipmax-polygon-linux-permissions:v1
+  polygon-lab:
+    image: ipmax-polygon-linux-permissions:v2
     build:
       context: ./polygon-runner/task-linux-permissions
-    profiles:
-      - polygon-images
-    command: ["/bin/true"]
+    restart: unless-stopped
+    expose:
+      - "4181"
+      - "4182"
+    read_only: true
+    tmpfs:
+      - /etc/anketa:size=2m,mode=0700
+      - /var/log/anketa:size=2m,mode=0755
+      - /tmp:size=8m,mode=1777
+      - /root:size=8m,mode=0700
+    mem_limit: 256m
+    cpus: 0.5
+    pids_limit: 64
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - lab-only
 
   caddy:
     image: caddy:2-alpine
@@ -105,3 +130,5 @@ volumes:
 
 networks:
   ipmax:
+  lab-only:
+    internal: true

@@ -5,7 +5,7 @@ const Storage = require('./storage.js');
 const ProgressIO = require('./progress-io.js');
 
 // Ключи, которые принадлежат устройству и не уезжают в снимок.
-const SERVICE_KEYS = ['storage_schema', 'curriculum_version', 'progress_backup', 'sync_token', 'sync_meta', 'admin_token'];
+const SERVICE_KEYS = ['storage_schema', 'curriculum_version', 'progress_backup', 'sync_token', 'sync_meta', 'admin_token', 'polygon_token'];
 
 function snapshot(state, updatedAt, deviceId) {
   return { snapshotVersion: 1, updatedAt, deviceId: deviceId || 'dev', state };

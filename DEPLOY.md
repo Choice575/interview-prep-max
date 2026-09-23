@@ -70,6 +70,7 @@ nano .env
 `IPMAX_DOMAIN` | `ipmax-mikhail.duckdns.org` |
 `IPMAX_ACME_EMAIL` | ваша почта (уведомления Let's Encrypt) |
 `IPMAX_SYNC_TOKEN` | вывод `openssl rand -base64 32` |
+`POLYGON_TOKEN` | отдельный вывод `openssl rand -hex 32` |
 `IPMAX_ADMIN_TOKEN` | второй вызов `openssl rand -base64 32` |
 
 `IPMAX_ADMIN_TOKEN` открывает раздел «Настройки AI» в интерфейсе: провайдера,
@@ -88,29 +89,30 @@ git check-ignore -v .env    # должен показать правило .giti
 
 ## 4. Запуск
 
-Полигон использует заранее собранный образ задачи. Сервис задачи находится в
-Compose-профиле `polygon-images`: профиль не запускают постоянно, но его image
-нужно собрать до старта runner.
+Полигон запускает лабораторию как отдельный постоянный контейнер на закрытой
+внутренней сети. Runner обращается только к узкому интерфейсу лаборатории;
+сокет Docker хоста не монтируется ни в один из них. Каждый запуск сессии
+сбрасывает временные файлы и права лаборатории.
 
 ```bash
-# Образ временной Linux-лаборатории. --network=host нужен на небольшом VPS,
+# Образ Linux-лаборатории. --network=host нужен на небольшом VPS,
 # где обычная build-сеть периодически зависает на apk/pip.
 DOCKER_BUILDKIT=0 docker build --network=host \
-  -t ipmax-polygon-linux-permissions:v1 \
+  -t ipmax-polygon-linux-permissions:v2 \
   ./polygon-runner/task-linux-permissions
 
-# Основное приложение и отдельный доверенный runner.
+# Основное приложение и runner без доступа к Docker API.
 DOCKER_BUILDKIT=0 docker compose build --network=host app polygon-runner
 docker compose up -d --no-build
-docker compose ps           # app healthy, polygon-runner healthy, caddy running
+docker compose ps           # app, polygon-lab, polygon-runner healthy; caddy running
 docker compose logs -f caddy
 ```
 
-Runner — доверенный компонент с доступом к `/var/run/docker.sock`, поэтому его
-код и зависимости проходят review. Пользовательский lab-контейнер socket не
-получает: он запускается без сети и mounts, без `--privileged`, с 256 MiB RAM,
-0.5 CPU и 64 PID. Для hostile multi-tenant эту схему нельзя считать достаточной —
-там нужна отдельная VM/gVisor/Kata; текущий полигон рассчитан на одного владельца.
+Лаборатория не получает Docker socket, host mounts и опубликованных портов.
+Её сеть `lab-only` доступна только runner, корневая файловая система read-only,
+запись разрешена в ограниченные tmpfs. Ограничения: 256 MiB RAM, 0.5 CPU и
+64 PID. Терминал работает внутри этой лаборатории, поэтому пользовательские
+команды не достигают Docker API хоста.
 
 В логах Caddy дождитесь строки о полученном сертификате. Первый выпуск занимает
 до минуты.
@@ -134,6 +136,10 @@ curl https://ipmax-mikhail.duckdns.org/api/polygon/tasks
 настройках приложения вставьте тот же `IPMAX_SYNC_TOKEN` и нажмите
 синхронизацию. Токен хранится в `localStorage` устройства и **не уходит на
 сервер в составе прогресса**.
+
+В разделе «Полигон» отдельно введите `POLYGON_TOKEN`. Прежний токен
+синхронизации для запуска лаборатории больше не действует. Новый токен тоже
+хранится только на данном устройстве и исключён из синхронизации и экспорта.
 
 На телефоне: меню браузера → «Установить приложение» / «На экран Домой».
 
@@ -216,9 +222,9 @@ cd ~/interview-prep-max
 git fetch origin main
 git checkout --detach origin/main
 
-# Сначала task image — старые app/caddy продолжают обслуживать сайт.
+# Сначала образ лаборатории — старые app/caddy продолжают обслуживать сайт.
 DOCKER_BUILDKIT=0 docker build --network=host \
-  -t ipmax-polygon-linux-permissions:v1 \
+  -t ipmax-polygon-linux-permissions:v2 \
   ./polygon-runner/task-linux-permissions
 DOCKER_BUILDKIT=0 docker compose build --network=host app polygon-runner
 
@@ -229,8 +235,8 @@ docker compose ps
 
 Прогресс не теряется: он на именованном томе, а не в образе. Браузер покажет
 баннер обновления, Service Worker подхватит новую версию. При обновлении runner
-его `shutdown()` удаляет активную временную лабораторию; пользователь запускает
-её заново, durable результат остаётся в `polygon_progress`.
+его `shutdown()` сбрасывает активную лабораторию; пользователь запускает
+сессию заново, а сохранённый результат остаётся в `polygon_progress`.
 
 ## Диагностика
 

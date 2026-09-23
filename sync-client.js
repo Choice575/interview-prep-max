@@ -10,7 +10,7 @@
   // Ключи, которые принадлежат устройству и не уезжают на сервер. Токен в
   // снимке разложил бы секрет по всем устройствам, а schema/backup — это
   // локальная служебная информация конкретной установки.
-  const LOCAL_ONLY_KEYS = ['storage_schema', 'curriculum_version', 'progress_backup', 'sync_token', 'sync_meta', 'admin_token', 'theme'];
+  const LOCAL_ONLY_KEYS = ['storage_schema', 'curriculum_version', 'progress_backup', 'sync_token', 'sync_meta', 'admin_token', 'polygon_token', 'theme'];
 
   const DEFAULT_TIMEOUT_MS = 20000;
 

@@ -2519,7 +2519,29 @@ function endIncidentSim(){
     '<button class="btn btn-outline" onclick="nav(\'home\')">🏠 На главную</button></div></div>';
 }
 function requirePolygonUI(){if(typeof IPMaxPolygonUI==='undefined') throw new Error('Модуль полигона не загружен.');return IPMaxPolygonUI;}
-function getPolygonClient(){return requirePolygonUI().createClient({token:()=>appStorage?appStorage.get('sync_token',''):''});}
+function getPolygonClient(){return requirePolygonUI().createClient({token:()=>appStorage?appStorage.get('polygon_token',''):''});}
+function polygonTokenControls(){
+  const configured=!!appStorage?.get('polygon_token','');
+  return '<section class="polygon-auth"><label for="polygon-token-input">Токен полигона</label>'+
+    '<input type="password" id="polygon-token-input" class="form-input" autocomplete="off" spellcheck="false" placeholder="Отдельный токен с сервера">'+
+    '<p id="polygon-token-message" role="status">Хранится только в этом браузере и не входит в синхронизацию прогресса. '+(configured?'Токен сохранён.':'Для запуска лаборатории сохраните токен.')+'</p>'+
+    '<button type="button" class="btn btn-outline btn-sm" data-polygon-token="save">Сохранить токен</button>'+
+    (configured?'<button type="button" class="btn btn-quiet btn-sm" data-polygon-token="forget">Забыть токен</button>':'')+'</section>';
+}
+function bindPolygonTokenControls(host){
+  const input=host.querySelector('#polygon-token-input');
+  const message=host.querySelector('#polygon-token-message');
+  if(input)input.value=appStorage?.get('polygon_token','')||'';
+  host.querySelector('[data-polygon-token="save"]')?.addEventListener('click',()=>{
+    const token=String(input?.value||'').trim();
+    if(token.length<24){if(message)message.textContent='Токен полигона должен содержать минимум 24 символа.';return;}
+    if(!appStorage?.set('polygon_token',token)){if(message)message.textContent='Не удалось сохранить токен в браузере.';return;}
+    renderPolygonCatalog();
+  });
+  host.querySelector('[data-polygon-token="forget"]')?.addEventListener('click',()=>{
+    appStorage?.remove('polygon_token');renderPolygonCatalog();
+  });
+}
 function closePolygonSocket(){
   if(polygonSocket){try{polygonSocket.close();}catch(_){}polygonSocket=null;}
   if(polygonExpiryTimer){clearInterval(polygonExpiryTimer);polygonExpiryTimer=null;}
@@ -2561,9 +2583,8 @@ async function startPolygonSession(taskId){
     host.innerHTML=requirePolygonUI().renderSession(polygonTask(taskId),polygonSession,[]);
     bindPolygonSession();connectPolygonTerminal();
   }catch(error){
-    polygonSession=null;host.innerHTML='<div class="polygon-error">'+esc(error.message||'Не удалось запустить лабораторию.')+
-      (error.code==='POLYGON_AUTH_REQUIRED'?'<button type="button" class="btn btn-outline btn-sm" data-polygon-auth>Настроить синхронизацию</button>':'')+'</div>';
-    host.querySelector('[data-polygon-auth]')?.addEventListener('click',()=>{if(typeof IPMaxSyncUI!=='undefined')IPMaxSyncUI.open();});
+    polygonSession=null;host.innerHTML='<div class="polygon-error">'+esc(error.message||'Не удалось запустить лабораторию.')+'</div>'+polygonTokenControls();
+    bindPolygonTokenControls(host);
   }
 }
 async function checkPolygonSession(){
@@ -2587,7 +2608,8 @@ async function renderPolygonCatalog(){
   if(polygonSession){host.innerHTML=requirePolygonUI().renderSession(polygonTask(polygonSession.taskId),polygonSession,[]);bindPolygonSession();connectPolygonTerminal();return;}
   try{
     polygonTasks=await getPolygonClient().listTasks();
-    host.innerHTML=requirePolygonUI().renderCatalog(polygonTasks,lsGet('polygon_progress',{}));
+    host.innerHTML=polygonTokenControls()+requirePolygonUI().renderCatalog(polygonTasks,lsGet('polygon_progress',{}));
+    bindPolygonTokenControls(host);
     host.querySelectorAll('[data-polygon-action="start"]').forEach(button=>button.addEventListener('click',()=>startPolygonSession(button.dataset.taskId)));
   }catch(error){host.innerHTML='<div class="polygon-error">Живые лаборатории сейчас недоступны. '+esc(error.message||'')+'</div>';}
 }

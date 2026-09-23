@@ -1,14 +1,14 @@
 const http = require('node:http');
-const { createDockerAdapter } = require('./docker-adapter.js');
+const { createLabAdapter } = require('./lab-adapter.js');
 const { createPolygonGateway } = require('./gateway.js');
 const { createPolygonService } = require('./service.js');
 
-const token = String(process.env.IPMAX_SYNC_TOKEN || '').trim();
+const token = String(process.env.POLYGON_TOKEN || '').trim();
 const port = Number(process.env.POLYGON_PORT || 4180);
 const host = process.env.POLYGON_HOST || '0.0.0.0';
-const adapter = createDockerAdapter();
+const adapter = createLabAdapter();
 const service = createPolygonService({
-  syncToken: token,
+  polygonToken: token,
   docker: adapter,
   ttlMs: Number(process.env.POLYGON_TTL_MS) || 20 * 60 * 1000,
   maxSessions: Number(process.env.POLYGON_MAX_SESSIONS) || 1
