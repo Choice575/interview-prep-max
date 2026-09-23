@@ -309,13 +309,21 @@
       "current": "«снимок с заполненным пулом»",
       "proposed": "«закончилось COW-пространство»; `lvextend -r`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_fs_009",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Уточнено COW-пространство обычного снимка; команда lvextend -r расширяет LV и ФС; карточка 1001377 согласована.",
+      "linkedIds": [
+        "1001377"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man8/lvextend.8.html",
+        "https://man7.org/linux/man-pages/man8/lvcreate.8.html"
       ]
     },
     {
@@ -331,13 +339,21 @@
       "current": "Upstart как текущий; нет раздела ошибок",
       "proposed": "«Ubuntu до 15.04»; ошибки: OpenRC/runit в Alpine",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_boot_006",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Указан исторический период Upstart в Ubuntu и OpenRC в Alpine; добавлен раздел типичной ошибки и карточка 1001099.",
+      "linkedIds": [
+        "1001099"
+      ],
+      "sources": [
+        "https://wiki.ubuntu.com/SystemdForUpstartUsers",
+        "https://wiki.alpinelinux.org/wiki/OpenRC"
       ]
     },
     {
@@ -353,13 +369,20 @@
       "current": "только `update-initramfs -u`",
       "proposed": "добавить `dracut -f`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_boot_003",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Добавлен dracut -f в команды банка и карточки 1001410.",
+      "linkedIds": [
+        "1001410"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man8/dracut.8.html"
       ]
     },
     {
@@ -375,13 +398,21 @@
       "current": "сводка htop как сумма RSS",
       "proposed": "шкала htop из `/proc/meminfo`; двойной счёт — при ручном сложении RES (поправка из пакета 2)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_proc_010",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Уточнено, что шкала htop читает /proc/meminfo, а двойной счёт возникает при ручной сумме RSS; исправлены карточки 1001319 и 1001252.",
+      "linkedIds": [
+        "1001319",
+        "1001252"
+      ],
+      "sources": [
+        "https://github.com/htop-dev/htop/blob/main/linux/LinuxMachine.c"
       ]
     },
     {
@@ -607,13 +638,22 @@
       "current": "нет команд и ошибок",
       "proposed": "`tr '\\0' ' ' < /proc/PID/cmdline`, `ls -l /proc/PID/fd`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_002",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Добавлены примеры чтения cmdline и fd, оговорки о достоверности и правах; экзамен 15002 и карточка 1003047 согласованы через манифест Swfuse.",
+      "linkedIds": [
+        "15002",
+        "1003047"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man5/proc_pid_cmdline.5.html",
+        "https://man7.org/linux/man-pages/man5/proc_pid_fd.5.html"
       ]
     },
     {
@@ -629,13 +669,23 @@
       "current": "нет команд и ошибок",
       "proposed": "`ipcs -a`, `ss -xp`, `ls -l /proc/PID/fd | grep -E 'pipe|socket'`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_003",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Добавлены примеры ipcs, ss и fd с явными границами каждого инструмента; экзамен 15003 и карточка 1003048 согласованы через манифест Swfuse.",
+      "linkedIds": [
+        "15003",
+        "1003048"
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man1/ipcs.1.html",
+        "https://man7.org/linux/man-pages/man8/ss.8.html",
+        "https://man7.org/linux/man-pages/man5/proc_pid_fd.5.html"
       ]
     },
     {

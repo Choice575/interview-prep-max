@@ -20,8 +20,11 @@ test('all 60 curated source questions agree across bank, exam and flashcards', (
     assert.ok(bank && exam && card, record.key);
     assert.equal(bank.q, card.question);
     assert.equal(exam.q, card.question);
-    assert.equal(bank.answer, card.answer);
-    assert.equal(exam.explanation, card.answer);
+    assert.equal(bank.answer, record.answer);
+    assert.deepEqual(bank.commands, record.commands);
+    assert.equal(bank.pitfall, record.pitfall);
+    assert.equal(card.answer, record.cardAnswer || record.answer);
+    assert.equal(exam.explanation, record.cardAnswer || record.answer);
     assert.equal(exam.options[exam.answer], record.options[record.answerIndex]);
     assert.equal(card.collection, record.collection);
     for (const item of [bank, exam, card]) {
