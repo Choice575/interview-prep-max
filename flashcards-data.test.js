@@ -100,19 +100,19 @@ test('keeps KTS command snippets executable in a shell', () => {
     .filter(question => question.sourceVideoId === 'M1tXCebcOBE');
   const byId = Object.fromEntries(questions.map(question => [question.id, question]));
 
-  assert.match(byId.qb_kts_014.commands[1], /awk -F: '\$2 !~ \/\^\(!|\\\*\)\?\$\/ \{print \$1\}'/);
+  assert.equal(byId.qb_kts_014.commands[1], "sudo awk -F: '$2 ~ /^\\$/ {print $1}' /etc/shadow");
   assert.match(byId.qb_kts_018.commands[1], /awk '\{print \$1\}'/);
   assert.match(byId.qb_kts_021.commands[0], /awk '\$3 ~ \/Z\/'/);
   assert.match(byId.qb_kts_041.commands[0], /vtysh -c 'show ip ospf neighbor'/);
   assert.match(byId.qb_kts_041.commands[1], /vtysh -c 'show ip bgp summary'/);
 });
 
-// Reviewed content fingerprints after the technical review and practice grouping in 15.10.0; category names are excluded.
+// Reviewed content fingerprints after the technical review, practice grouping, and audit wording fixes; category names are excluded.
 test('reviewed wording and source fields match the approved corpus', () => {
   const video = JSON.parse(fs.readFileSync(videoFile, 'utf8'));
   for (const [corpus, expected] of [
-    [data, '0155bdebbbb2cab9aa5dc68e61cd522bab515cf0048ca83379e53d7198b479c4'],
-    [video, 'e8d97ba327bf094757c6159c39bf472f8986c1ab2fb89463f2de486b330e7dde']
+    [data, '5ab7ee4d04ddd839b44726578301166036228703c4b83fb9078e79c8e1f60946'],
+    [video, 'ccf76afeca8b459c869e7ae92c98aba481d5b80d575381c17e0e58ec67c9769c']
   ]) {
     const content = corpus.cards.filter(card => !card.sourceRepository).map(card => Object.fromEntries(Object.entries(card).filter(([key]) => key !== 'collection')));
     assert.equal(createHash('sha256').update(JSON.stringify(content)).digest('hex'), expected);

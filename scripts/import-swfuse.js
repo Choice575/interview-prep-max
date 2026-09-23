@@ -47,10 +47,10 @@ function buildImport(input) {
     upsert(category.questions, bankQuestion, 'q');
     upsert(data.exam, {
       id: record.examId, topic: record.topic, level: record.level, category: record.category,
-      q: record.q, options, answer, explanation: record.answer, ...source
+      q: record.q, options, answer, explanation: record.cardAnswer || record.answer, ...source
     }, 'q');
     upsert(data.flashcards.cards, {
-      id: record.cardId, collection: record.collection, question: record.q, answer: record.answer, ...source
+      id: record.cardId, collection: record.collection, question: record.q, answer: record.cardAnswer || record.answer, ...source
     }, 'question');
   }
   data.bank.updated = manifest.reviewed;
