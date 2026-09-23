@@ -92,4 +92,18 @@ function createLabAdapter(options = {}) {
   return { createLab, inspect, checkLab, openShell, removeLab, cleanupOrphans };
 }
 
-module.exports = { ALLOWED_IMAGE, CHECK_IDS, createLabAdapter, validateSpec };
+async function waitForLab(adapter, options = {}) {
+  const attempts = Math.max(1, Number(options.attempts) || 8);
+  const delayMs = Math.max(0, Number(options.delayMs) || 1000);
+  const sleep = options.sleep || (ms => new Promise(resolve => setTimeout(resolve, ms)));
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try { return await adapter.cleanupOrphans(); }
+    catch (error) {
+      if (attempt === attempts) throw error;
+      options.onRetry?.(attempt, error);
+      await sleep(delayMs);
+    }
+  }
+}
+
+module.exports = { ALLOWED_IMAGE, CHECK_IDS, createLabAdapter, validateSpec, waitForLab };

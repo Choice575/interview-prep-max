@@ -40,6 +40,11 @@ rollback() {
   trap - ERR HUP INT TERM
   set +e
   echo 'Deployment failed; restoring previous code and images' >&2
+  if (( switched )); then
+    docker logs --tail 30 interview-prep-max-polygon-runner-1 >&2 || true
+    docker inspect --format '{{range .State.Health.Log}}{{.Output}}{{end}}' interview-prep-max-polygon-runner-1 >&2 || true
+    docker logs --tail 15 interview-prep-max-polygon-lab-1 >&2 || true
+  fi
   docker tag "$app_image" interview-prep-max-app:latest
   docker tag "$runner_image" interview-prep-max-polygon-runner:latest
   if [[ -n $task_image ]]; then docker tag "$task_image" ipmax-polygon-linux-permissions:v1; fi

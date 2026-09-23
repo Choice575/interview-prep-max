@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { EventEmitter } = require('node:events');
-const { createLabAdapter, validateSpec } = require('./lab-adapter.js');
+const { createLabAdapter, validateSpec, waitForLab } = require('./lab-adapter.js');
 
 const spec = {
   containerName: 'ipmax-polygon-test1', image: 'ipmax-polygon-linux-permissions:v2', network: 'none',
@@ -61,4 +61,22 @@ test('terminal opens only for the current lab and closes its socket', async () =
   assert.equal(terminal.stdout, socket);
   assert.equal(terminal.stderr, null);
   assert.throws(() => adapter.openShell('ipmax-polygon-other'), /Unsafe polygon lab spec/);
+});
+
+test('runner waits for a lab that becomes reachable during Compose startup', async () => {
+  let calls = 0;
+  const delays = [];
+  const adapter = { cleanupOrphans: async () => {
+    if (++calls < 3) throw new Error('Lab DNS not ready');
+    return 1;
+  } };
+  assert.equal(await waitForLab(adapter, { attempts: 4, sleep: async ms => delays.push(ms) }), 1);
+  assert.equal(calls, 3);
+  assert.deepEqual(delays, [1000, 1000]);
+
+  await assert.rejects(
+    waitForLab({ cleanupOrphans: async () => { throw new Error('Lab unavailable'); } },
+      { attempts: 2, sleep: async () => {} }),
+    /Lab unavailable/
+  );
 });
