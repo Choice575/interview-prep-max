@@ -753,13 +753,21 @@
       "current": "KVM — гипервизор второго типа",
       "proposed": "обычно относят к первому типу (классификация условна)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_virt_001",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Убрана спорная классификация KVM как гипервизора второго типа; объяснена роль ядра и QEMU.",
+      "linkedIds": [
+        1001376
+      ],
+      "sources": [
+        "https://docs.kernel.org/virt/kvm/api.html",
+        "https://www.qemu.org/docs/master/system/introduction.html"
       ]
     },
     {
@@ -775,13 +783,20 @@
       "current": "«htop суммирует RSS процессов»",
       "proposed": "шкала из `/proc/meminfo`; переформулировать про сумму RES",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_lx_010",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Разделены системная шкала htop из /proc/meminfo и ручная сумма RES процессов.",
+      "linkedIds": [
+        1001252
+      ],
+      "sources": [
+        "https://github.com/htop-dev/htop/blob/main/linux/LinuxMachine.c"
       ]
     },
     {
@@ -797,13 +812,20 @@
       "current": "`grep -E Vm(Size|RSS|Swap) …` — синтаксическая ошибка bash",
       "proposed": "`grep -E 'Vm(Size|RSS|Swap)' /proc/1234/status`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_kts_026",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Регулярное выражение grep заключено в кавычки, чтобы shell не разбирал скобки и вертикальную черту.",
+      "linkedIds": [
+        2000312
+      ],
+      "sources": [
+        "https://www.gnu.org/software/bash/manual/html_node/Quoting.html"
       ]
     },
     {
@@ -848,13 +870,21 @@
       "current": "«набор функций задаётся только при mkfs»",
       "proposed": "`tune2fs -O dir_index` работает на готовой ФС; `-m` тоже меняется",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_fsx_001",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Уточнены параметры ext4, изменяемые через tune2fs, и рост числа inode при расширении.",
+      "linkedIds": [
+        1001169
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man8/tune2fs.8.html",
+        "https://man7.org/linux/man-pages/man8/mke2fs.8.html"
       ]
     },
     {
@@ -870,13 +900,21 @@
       "current": "«стандартная для многих задач JFS»",
       "proposed": "«JFS (встречается редко)»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_srd_004",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Удалена неподтверждённая характеристика JFS как стандартной ФС и абсолютное обещание отсутствия ENOSPC.",
+      "linkedIds": [
+        1001234
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man8/mke2fs.8.html",
+        "https://docs.kernel.org/filesystems/ext4/inodes.html"
       ]
     },
     {
@@ -892,13 +930,21 @@
       "current": "«ctime нельзя изменить командой touch»",
       "proposed": "touch обновляет ctime на текущее; нельзя задать произвольное",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_lx_009",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Уточнено: touch обновляет ctime на текущее время, но не задаёт произвольное значение.",
+      "linkedIds": [
+        1001071
+      ],
+      "sources": [
+        "https://www.gnu.org/software/coreutils/manual/html_node/touch-invocation.html",
+        "https://man7.org/linux/man-pages/man2/utimensat.2.html"
       ]
     },
     {
@@ -914,13 +960,21 @@
       "current": "нет `update-initramfs -u` после mdadm.conf",
       "proposed": "иначе массив собирается как md127",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_fsx_004",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Для ранней сборки RAID на Debian/Ubuntu после правки mdadm.conf добавлен update-initramfs -u без универсального обещания имени md127.",
+      "linkedIds": [
+        1001186
+      ],
+      "sources": [
+        "https://manpages.ubuntu.com/manpages/jammy/man8/mdadm.8.html",
+        "https://help.ubuntu.com/community/Installation/UpgradeToSoftwareRaid"
       ]
     },
     {
@@ -936,13 +990,20 @@
       "current": "«границу расширяют» без инструмента",
       "proposed": "`growpart /dev/sdb 1` или `parted resizepart`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_srd_006",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Добавлен исполнимый пример growpart для расширения границы раздела перед pvresize.",
+      "linkedIds": [
+        1001230
+      ],
+      "sources": [
+        "https://manpages.ubuntu.com/manpages/noble/man1/growpart.1.html"
       ]
     },
     {
@@ -958,13 +1019,20 @@
       "current": "переменная окружения как безопасный способ",
       "proposed": "читается через `/proc/PID/environ`, наследуется; файл 0600 или stdin",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_lx_008",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Убрана рекомендация считать переменную окружения безопасным хранилищем секрета; описаны /proc/PID/environ и варианты ввода.",
+      "linkedIds": [
+        1001217
+      ],
+      "sources": [
+        "https://www.man7.org/linux/man-pages/man5/proc_pid_environ.5.html"
       ]
     },
     {
@@ -980,13 +1048,20 @@
       "current": "«оптимизация приложения ничего не даст» при steal",
       "proposed": "сначала решать на хосте",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_lx_003",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Убрано абсолютное утверждение о бесполезности оптимизации приложения при steal time.",
+      "linkedIds": [
+        1001354
+      ],
+      "sources": [
+        "https://man7.org/linux/man-pages/man1/top.1.html"
       ]
     },
     {
@@ -1002,13 +1077,20 @@
       "current": "«QEMU молча уйдёт в эмуляцию»",
       "proposed": "молча — только без явного ускорения",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_virt_001",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Исправлена фраза о молчаливом переходе QEMU в программную эмуляцию при явно указанном KVM.",
+      "linkedIds": [
+        1001376
+      ],
+      "sources": [
+        "https://www.qemu.org/docs/master/system/qemu-manpage.html"
       ]
     },
     {
@@ -1024,13 +1106,20 @@
       "current": "softirq — «программно инициированная обработка»",
       "proposed": "отложенная работа ядра после аппаратного прерывания",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_kts_024",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "Softirq описан как отложенная работа ядра, часто после аппаратного прерывания.",
+      "linkedIds": [
+        2000310
+      ],
+      "sources": [
+        "https://docs.kernel.org/5.17/kernel-hacking/locking.html"
       ]
     },
     {
