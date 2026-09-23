@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { createPolygonService, TASKS } = require('./service.js');
 
-const AUTH = 'Bearer test-polygon-sync-token-at-least-24-characters';
+const AUTH = 'Bearer test-polygon-token-at-least-24-characters';
 
 function createFakeDocker() {
   const calls = [];
@@ -48,7 +48,7 @@ function service(options = {}) {
   const docker = options.docker || createFakeDocker();
   let now = options.now || 1_000_000;
   const result = createPolygonService({
-    syncToken: 'test-polygon-sync-token-at-least-24-characters',
+    polygonToken: 'test-polygon-token-at-least-24-characters',
     docker,
     now: () => now,
     randomId: (() => { let n = 0; return () => `id-${++n}`; })(),
@@ -79,7 +79,7 @@ test('creates one bounded isolated lab and returns a short-lived terminal token'
   assert.equal('containerName' in session, false);
 
   const create = api.docker.calls.find(call => call.action === 'create');
-  assert.equal(create.spec.image, 'ipmax-polygon-linux-permissions:v1');
+  assert.equal(create.spec.image, 'ipmax-polygon-linux-permissions:v2');
   assert.equal(create.spec.network, 'none');
   assert.equal(create.spec.memoryBytes, 256 * 1024 * 1024);
   assert.equal(create.spec.memorySwapBytes, 256 * 1024 * 1024);
@@ -110,7 +110,7 @@ test('serialises concurrent creates so only one lab is started', async () => {
     await new Promise(resolve => { release = () => resolve(originalCreate.call(docker, spec)); });
   };
   const api = createPolygonService({
-    syncToken: AUTH.slice('Bearer '.length), docker,
+    polygonToken: AUTH.slice('Bearer '.length), docker,
     now: () => 1_000_000,
     randomId: (() => { let n = 0; return () => `concurrent-${++n}`; })()
   });

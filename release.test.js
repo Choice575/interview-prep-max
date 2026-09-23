@@ -247,29 +247,33 @@ test('Caddy CSP permits legacy event handlers and the same-origin polygon WebSoc
   assert.doesNotMatch(caddy, /reverse_proxy \/api\/\* polygon-runner/);
 });
 
-test('polygon runner is bounded and is the only service receiving the Docker socket', () => {
+test('polygon runner and lab have no Docker socket or host network access', () => {
   const compose = read('docker-compose.yml').replace(/\r\n/g, '\n');
-  const runner = compose.match(/  polygon-runner:\n([\s\S]*?)\n  polygon-task-linux-permissions:/);
-  const task = compose.match(/  polygon-task-linux-permissions:\n([\s\S]*?)\n  caddy:/);
+  const runner = compose.match(/  polygon-runner:\n([\s\S]*?)\n  polygon-lab:/);
+  const lab = compose.match(/  polygon-lab:\n([\s\S]*?)\n  caddy:/);
   const app = compose.match(/  app:\n([\s\S]*?)\n  polygon-runner:/);
-  assert.ok(runner && task && app, 'compose должен разделять app, runner и task image');
-  assert.match(runner[1], /\/var\/run\/docker\.sock:\/var\/run\/docker\.sock/);
+  assert.ok(runner && lab && app, 'compose должен разделять app, runner и lab');
+  assert.doesNotMatch(compose, /docker\.sock|privileged:/);
   assert.match(runner[1], /read_only: true/);
   assert.match(runner[1], /mem_limit: 160m/);
   assert.match(runner[1], /cpus: 0\.35/);
   assert.match(runner[1], /pids_limit: 96/);
   assert.match(runner[1], /no-new-privileges:true/);
-  assert.doesNotMatch(app[1], /docker\.sock|privileged:/);
-  assert.doesNotMatch(task[1], /docker\.sock|privileged:|ports:/);
-  assert.match(task[1], /profiles:\n\s+- polygon-images/, 'task image не должен стартовать как постоянный сервис');
+  assert.match(runner[1], /POLYGON_TOKEN:/);
+  assert.doesNotMatch(runner[1], /IPMAX_SYNC_TOKEN:/);
+  assert.doesNotMatch(runner[1], /ports:/);
+  assert.match(lab[1], /read_only: true/);
+  assert.match(lab[1], /cap_drop:\n\s+- ALL/);
+  assert.match(lab[1], /mem_limit: 256m/);
+  assert.doesNotMatch(lab[1], /ports:/);
+  assert.doesNotMatch(app[1], /lab-only/);
+  assert.match(compose, /lab-only:\n\s+internal: true/);
 
-  const adapter = read('polygon-runner/docker-adapter.js');
-  assert.match(adapter, /'--network', 'none'/);
-  assert.match(adapter, /'--memory-swap', String\(spec\.memorySwapBytes\)/);
-  assert.match(adapter, /'--cap-drop', 'ALL'/);
-  assert.match(adapter, /'--security-opt', 'no-new-privileges:true'/);
-  assert.match(adapter, /e0403fdd8ef7770dcf60fc143e51dc328998e85fa78b0f0989ce0a625236b236/);
-  assert.doesNotMatch(adapter, /--privileged|docker\.sock/);
+  const adapter = read('polygon-runner/lab-adapter.js');
+  const labServer = read('polygon-runner/task-linux-permissions/lab-server.js');
+  assert.match(adapter, /\/v1\/start/);
+  assert.match(labServer, /e0403fdd8ef7770dcf60fc143e51dc328998e85fa78b0f0989ce0a625236b236/);
+  assert.doesNotMatch(adapter + labServer, /--privileged|docker\.sock|\/containers\/create/);
 });
 
 test('secrets are kept out of git and the image', () => {

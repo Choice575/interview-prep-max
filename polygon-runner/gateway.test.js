@@ -5,7 +5,7 @@ const { EventEmitter } = require('node:events');
 const { WebSocket } = require('ws');
 const { createPolygonGateway } = require('./gateway.js');
 
-const AUTH = 'Bearer test-polygon-sync-token-at-least-24-characters';
+const AUTH = 'Bearer test-polygon-token-at-least-24-characters';
 
 function fakeService() {
   const calls = [];

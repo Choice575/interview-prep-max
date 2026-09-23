@@ -102,6 +102,10 @@ test('runs one live polygon lab, checks it automatically and stores only durable
   await expect(page.locator('#page-external')).toHaveClass(/active/);
   await expect(page.locator('.polygon-card')).toContainText('Права после выкатки');
   await expect(page.locator('.external-task-card')).toHaveCount(5);
+  await expect(page.locator('#polygon-token-message')).toContainText('Для запуска лаборатории');
+  await page.locator('#polygon-token-input').fill('e2e-polygon-token-at-least-24-characters');
+  await page.locator('[data-polygon-token="save"]').click();
+  await expect(page.locator('#polygon-token-message')).toContainText('Токен сохранён');
   await page.locator('[data-polygon-action="start"]').click();
   await expect(page.locator('#polygon-terminal-output')).toContainText('root@lab:#');
 
@@ -110,8 +114,9 @@ test('runs one live polygon lab, checks it automatically and stores only durable
   expect(socket.url).not.toContain('token=');
   expect(socket.protocols).toEqual(['ipmax-polygon', 'secret-terminal-protocol']);
   await expect(page.locator('#page-external')).not.toContainText('secret-terminal-protocol');
-  expect(requests[0].headers().authorization).toBe('Bearer e2e-sync-token-at-least-24-characters');
-  expect(requests[0].postData()).not.toContain('e2e-sync-token');
+  expect(requests[0].headers().authorization).toBe('Bearer e2e-polygon-token-at-least-24-characters');
+  expect(requests[0].postData()).not.toContain('e2e-polygon-token');
+  expect(requests[0].headers().authorization).not.toContain('e2e-sync-token');
 
   await page.locator('#polygon-terminal-input').fill('chmod 750 /etc/anketa');
   await page.locator('#polygon-terminal-form').press('Enter');

@@ -1,2 +1,3 @@
 *.sh text eol=lf
 *.yml text eol=lf
+polygon-runner/task-linux-permissions/*.py text eol=lf

@@ -20,7 +20,7 @@ const PUBLIC_TASKS = {
 
 const TASK_RUNTIME = {
   'linux-permissions-lockout': {
-    image: 'ipmax-polygon-linux-permissions:v1'
+    image: 'ipmax-polygon-linux-permissions:v2'
   }
 };
 
@@ -50,9 +50,9 @@ function bearerToken(header) {
 }
 
 function createPolygonService(options = {}) {
-  const syncToken = String(options.syncToken || '').trim();
-  if (syncToken.length < 24) throw new Error('Polygon sync token must be at least 24 characters');
-  if (!options.docker) throw new Error('Polygon Docker adapter is required');
+  const polygonToken = String(options.polygonToken || '').trim();
+  if (polygonToken.length < 24) throw new Error('Polygon token must be at least 24 characters');
+  if (!options.docker) throw new Error('Polygon lab adapter is required');
   const docker = options.docker;
   const now = typeof options.now === 'function' ? options.now : Date.now;
   const randomId = typeof options.randomId === 'function'
@@ -65,7 +65,7 @@ function createPolygonService(options = {}) {
 
   function authorise(header) {
     const token = bearerToken(header);
-    if (!token || !safeEqual(token, syncToken)) {
+    if (!token || !safeEqual(token, polygonToken)) {
       throw polygonError('Polygon token is invalid', 'POLYGON_UNAUTHORIZED', 401);
     }
     return true;

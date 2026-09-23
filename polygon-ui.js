@@ -71,7 +71,7 @@
     function auth() {
       const token = String(getToken() || '').trim();
       if (!token) {
-        const error = new Error('Для запуска полигона укажите токен синхронизации.');
+        const error = new Error('Для запуска полигона укажите отдельный токен полигона.');
         error.code = 'POLYGON_AUTH_REQUIRED';
         error.status = 401;
         throw error;

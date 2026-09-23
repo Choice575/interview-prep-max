@@ -19,7 +19,8 @@ previous=$(git rev-parse HEAD)
 git merge-base --is-ancestor "$previous" "$target" || { echo 'Target does not descend from deployed commit' >&2; exit 6; }
 app_image=$(docker inspect --format '{{.Image}}' interview-prep-max-app-1)
 runner_image=$(docker inspect --format '{{.Image}}' interview-prep-max-polygon-runner-1)
-task_image=$(docker image inspect --format '{{.Id}}' ipmax-polygon-linux-permissions:v1)
+task_image=$(docker image inspect --format '{{.Id}}' ipmax-polygon-linux-permissions:v1 2>/dev/null || true)
+lab_image=$(docker inspect --format '{{.Image}}' interview-prep-max-polygon-lab-1 2>/dev/null || true)
 backup="$backup_root/release-$(date -u +%Y%m%dT%H%M%SZ)-${target:0:12}"
 mkdir "$backup"
 docker cp interview-prep-max-app-1:/data/. "$backup/data"
@@ -28,6 +29,7 @@ printf '%s\n' "$previous" > "$backup/previous-commit"
 printf '%s\n' "$app_image" > "$backup/previous-app-image"
 docker tag "$app_image" "interview-prep-max-app:rollback-${previous:0:12}"
 docker tag "$runner_image" "interview-prep-max-polygon-runner:rollback-${previous:0:12}"
+if [[ -n $lab_image ]]; then docker tag "$lab_image" "ipmax-polygon-linux-permissions:rollback-${previous:0:12}"; fi
 if [[ -f "$backup/data/snapshot.json" ]]; then
   python3 -c 'import json,sys; json.load(open(sys.argv[1]))' "$backup/data/snapshot.json"
 fi
@@ -40,12 +42,18 @@ rollback() {
   echo 'Deployment failed; restoring previous code and images' >&2
   docker tag "$app_image" interview-prep-max-app:latest
   docker tag "$runner_image" interview-prep-max-polygon-runner:latest
-  docker tag "$task_image" ipmax-polygon-linux-permissions:v1
+  if [[ -n $task_image ]]; then docker tag "$task_image" ipmax-polygon-linux-permissions:v1; fi
+  if [[ -n $lab_image ]]; then docker tag "$lab_image" ipmax-polygon-linux-permissions:v2; fi
   git checkout --detach "$previous"
   if (( switched )); then
+    if grep -q '^  polygon-lab:' docker-compose.yml; then services=(app polygon-lab polygon-runner caddy)
+    else services=(app polygon-runner caddy); fi
     # Keep the live data volume: never overwrite progress saved during a deploy.
-    docker compose up -d --no-deps --no-build --force-recreate --wait --wait-timeout 90 "${services[@]}"
+    docker compose up -d --no-build --force-recreate --wait --wait-timeout 90 "${services[@]}"
     rollback_result=$?
+    if ! grep -q '^  polygon-lab:' docker-compose.yml; then
+      docker rm -f interview-prep-max-polygon-lab-1 >/dev/null 2>&1 || true
+    fi
     if (( rollback_result )); then echo "CRITICAL: rollback health check failed; backup: $backup" >&2; fi
   fi
   exit "${result:-1}"
@@ -64,13 +72,14 @@ if grep -Eq '^polygon-runner/|^package-lock.json$' <<< "$changes"; then
   services+=(polygon-runner)
 fi
 if grep -q '^polygon-runner/task-linux-permissions/' <<< "$changes"; then
-  DOCKER_BUILDKIT=0 docker build --network=host -t ipmax-polygon-linux-permissions:v1 polygon-runner/task-linux-permissions
+  DOCKER_BUILDKIT=0 docker build --network=host -t ipmax-polygon-linux-permissions:v2 polygon-runner/task-linux-permissions
+  services+=(polygon-lab)
 fi
 if grep -Eq '^Caddyfile$|^docker-compose.*yml$' <<< "$changes"; then
-  services=(app polygon-runner caddy)
+  services=(app polygon-lab polygon-runner caddy)
 fi
 switched=1
-docker compose up -d --no-deps --no-build --force-recreate --wait --wait-timeout 90 "${services[@]}"
+docker compose up -d --no-build --force-recreate --wait --wait-timeout 90 "${services[@]}"
 # Inspect public HTTP endpoints, not just the Docker process health check.
 node_check='const v=process.argv[1]; const base="https://prepmax.duckdns.org/";
 (async()=>{for(const p of ["version.js","data-loader.js","api/sync/status","api/polygon/tasks"]){
