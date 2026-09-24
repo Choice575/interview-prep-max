@@ -169,7 +169,7 @@
       : '<button type="button" class="btn btn-primary" data-flashcards-action="reveal">Показать ответ</button>';
 
     return deckSwitch + stats + controls + '<article class="study-card" data-card-id="' + escapeText(card.id) + '">' +
-      '<div class="study-card-meta"><span>' + escapeText(card.collection) + '</span><span>' + (index + 1) + ' / ' + filtered.length + '</span></div>' +
+      '<div class="study-card-meta"><span>' + escapeText(card.collection) + (card.depth === 'deep' ? ' <span class="tag tag-deep">Глубокое погружение</span>' : '') + '</span><span>' + (index + 1) + ' / ' + filtered.length + '</span></div>' +
       '<h2>' + escapeText(card.question) + '</h2>' + code + source + answer +
       '<div class="study-card-nav"><button type="button" class="btn btn-quiet" data-flashcards-action="prev"' + (index === 0 ? ' disabled' : '') + '>← Предыдущая</button>' +
       '<button type="button" class="btn btn-quiet" data-flashcards-action="next"' + (index >= filtered.length - 1 ? ' disabled' : '') + '>Следующая →</button></div></article>';

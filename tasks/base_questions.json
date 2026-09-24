@@ -211,7 +211,7 @@
   },
   {
     "topic": "Terraform",
-    "level": "Middle",
+    "level": "Junior",
     "category": "scenario",
     "q": "Что делать, если ресурс создали вручную и нужно взять его под управление Terraform?",
     "options": [
@@ -226,7 +226,7 @@
   },
   {
     "topic": "Terraform",
-    "level": "Middle",
+    "level": "Junior",
     "category": "definition",
     "q": "Как удалить ресурс из state, не удаляя физически?",
     "options": [
@@ -241,7 +241,7 @@
   },
   {
     "topic": "Terraform",
-    "level": "Middle",
+    "level": "Junior",
     "category": "definition",
     "q": "Как посмотреть список ресурсов в state?",
     "options": [
@@ -301,7 +301,7 @@
   },
   {
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что такое Terragrunt?",
     "options": [
@@ -316,7 +316,7 @@
   },
   {
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что такое Atlantis?",
     "options": [
@@ -331,14 +331,14 @@
   },
   {
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Junior",
     "category": "definition",
     "q": "Как включить debug logs в Terraform?",
     "options": [
-      "terraform --journal",
-      "DEBUG=1",
+      "TF_LOG_PATH",
+      "terraform -verbose",
       "TF_LOG",
-      "SYSLOG=on"
+      "TF_CLI_ARGS"
     ],
     "answer": 2,
     "explanation": "TF_LOG помогает при отладке проблем Terraform.",
@@ -376,7 +376,7 @@
   },
   {
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Junior",
     "category": "definition",
     "q": "Что сделать утром перед началом работы, если коллеги могли что-то менять?",
     "options": [
@@ -421,7 +421,7 @@
   },
   {
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "Что делать, если lock остался после падения процесса?",
     "options": [
@@ -500,10 +500,10 @@
     "category": "definition",
     "q": "Что показывает free -h?",
     "options": [
-      "Маршруты",
-      "Память",
-      "Открытые порты",
-      "DNS"
+      "Занятое и свободное место на смонтированных ФС",
+      "Использование оперативной памяти и swap",
+      "Загрузку CPU по ядрам за последнюю минуту",
+      "Размер кэша страниц отдельно по процессам"
     ],
     "answer": 1,
     "explanation": "Эта команда показывает использование оперативной памяти.",
@@ -545,10 +545,10 @@
     "category": "definition",
     "q": "Что делает chmod?",
     "options": [
-      "Меняет права доступа",
-      "Меняет hostname",
-      "Удаляет пользователей",
-      "Смотрит логи"
+      "Меняет биты прав доступа",
+      "Меняет владельца и группу файла",
+      "Задаёт маску прав для новых файлов",
+      "Меняет атрибуты вроде immutable"
     ],
     "answer": 0,
     "explanation": "chmod управляет битами прав.",
@@ -710,10 +710,10 @@
     "category": "output",
     "q": "Что покажет df -i?",
     "options": [
-      "Права SUID",
-      "Состояние маршрутов",
-      "Открытые TCP-соединения",
-      "Использование inode"
+      "Использование блоков в человекочитаемом виде",
+      "Список inode открытых файлов процесса",
+      "Число жёстких ссылок на каждый файл",
+      "Использование inode на файловых системах"
     ],
     "answer": 3,
     "explanation": "Эта команда помогает при ошибке No space left при свободном месте.",
@@ -740,10 +740,10 @@
     "category": "definition",
     "q": "Что такое symbolic link?",
     "options": [
-      "Копия файла",
-      "Ссылка на путь/имя файла",
-      "Отдельный inode тех же данных",
-      "Сигнал процессу"
+      "Независимая копия файла с тем же содержимым",
+      "Специальный файл, хранящий путь к цели",
+      "Ещё одна запись каталога на тот же inode",
+      "Дескриптор открытого файла в /proc"
     ],
     "answer": 1,
     "explanation": "Symlink хранит путь до цели.",
@@ -1010,9 +1010,9 @@
     "category": "definition",
     "q": "Что означает ping ::1?",
     "options": [
-      "Проверка IPv4 localhost",
-      "broadcast",
-      "Внешний DNS",
+      "Проверка IPv4 localhost 127.0.0.1",
+      "Запрос ко всем узлам сегмента IPv6",
+      "Проверка link-local адреса шлюза fe80::1",
       "Проверка IPv6 loopback"
     ],
     "answer": 3,
@@ -1036,14 +1036,14 @@
   },
   {
     "topic": "Сети",
-    "level": "Middle",
+    "level": "Junior",
     "category": "definition",
     "q": "Какой процесс описывает SYN, SYN-ACK, ACK?",
     "options": [
-      "DNS lookup",
+      "Установление TLS: ClientHello, ServerHello, Finished",
       "TCP three-way handshake",
-      "ARP cache refresh",
-      "TLS termination"
+      "Закрытие TCP-соединения обменом FIN и ACK",
+      "Обновление ARP-кэша: request, reply, gratuitous"
     ],
     "answer": 1,
     "explanation": "Это установка TCP-соединения.",
@@ -1081,14 +1081,14 @@
   },
   {
     "topic": "Сети",
-    "level": "Middle",
+    "level": "Junior",
     "category": "definition",
     "q": "Как ОС различает TCP-соединения на одном порту 443?",
     "options": [
-      "По 4-tuple сокета",
-      "По inode",
-      "По TTL",
-      "По имени процесса"
+      "По 4-tuple: IP и порт клиента, IP и порт сервера",
+      "По номеру порта сервера и PID процесса-слушателя",
+      "По IP клиента: второе соединение с того же адреса ждёт",
+      "По sequence number первого SYN-пакета"
     ],
     "answer": 0,
     "explanation": "Учитываются IP и порты источника и назначения.",
@@ -1146,9 +1146,9 @@
     "q": "Какое сопоставление распространённых DNS record types корректно?",
     "options": [
       "A/AAAA — адреса, CNAME — alias, MX — почта, NS — servers зоны, TXT — текстовые данные",
-      "A/AAAA — transport ports, CNAME — certificate, MX — route, NS — subnet, TXT — binary payload",
-      "A/AAAA — users, CNAME — VLAN, MX — filesystem, NS — process, TXT — memory mapping",
-      "A/AAAA — HTTP methods, CNAME — status code, MX — cookie, NS — header, TXT — request body"
+      "A/AAAA — alias, CNAME — адреса, MX — почта, NS — servers зоны, TXT — текстовые данные",
+      "A/AAAA — адреса, CNAME — почта, MX — alias, NS — servers зоны, TXT — подписи DNSSEC",
+      "A/AAAA — адреса, CNAME — alias, MX — servers зоны, NS — почта, TXT — обратные записи PTR"
     ],
     "answer": 0,
     "explanation": "A и AAAA связывают имя с IPv4/IPv6, CNAME задаёт canonical alias, MX — mail exchangers, NS — authoritative servers зоны. TXT хранит текстовые значения, SRV описывает service endpoint с port и priority.",
@@ -1175,10 +1175,10 @@
     "category": "definition",
     "q": "Как интерпретируются классы HTTP status codes?",
     "options": [
-      "1xx и 2xx обозначают client errors, 3xx — server errors, 4xx и 5xx — успешные ответы",
-      "Класс определяет transport protocol: 1xx — UDP, 2xx — TCP, 3xx–5xx — QUIC",
+      "1xx — успех, 2xx — информация, 3xx — redirect, 4xx — server error, 5xx — client error",
+      "1xx — информация, 2xx — успех, 3xx — client error, 4xx — redirect, 5xx — server error",
       "1xx — информация, 2xx — успех, 3xx — redirect, 4xx — client error, 5xx — server error",
-      "Первая цифра задаёт priority запроса, а последующие две — время кеширования ответа"
+      "1xx — информация, 2xx — redirect, 3xx — успех, 4xx — client error, 5xx — server error"
     ],
     "answer": 2,
     "explanation": "Класс даёт общую категорию результата, а конкретный code уточняет semantics. Например, не каждый 4xx означает ошибку пользователя и не каждый 5xx допускает безопасный retry без учёта метода и контекста.",
@@ -1190,9 +1190,9 @@
     "category": "definition",
     "q": "Как в общем случае различаются POST, PUT и PATCH?",
     "options": [
-      "PATCH удаляет DNS record ресурса, а POST и PUT меняют transport route до endpoint",
-      "Методы имеют одинаковую semantics, а различие определяется порядком headers в запросе",
-      "PUT читает представление ресурса, POST проверяет cache, а PATCH выполняет redirect клиента",
+      "POST идемпотентен, PUT создаёт новый ресурс при каждом вызове, а PATCH заменяет ресурс целиком",
+      "PUT передаёт данные на обработку, POST задаёт состояние target, а PATCH удаляет ресурс",
+      "POST и PUT совпадают по semantics, а PATCH отличается лишь тем, что не требует тела запроса",
       "POST передаёт данные на обработку, PUT задаёт состояние target, PATCH описывает частичное изменение"
     ],
     "answer": 3,
@@ -1206,9 +1206,9 @@
     "q": "Какую роль выполняет reverse proxy?",
     "options": [
       "Принимает запросы клиентов и направляет их к backend, скрывая внутреннюю топологию сервисов",
-      "Объединяет block devices в RAID и распределяет blocks по дискам выбранного уровня",
-      "Загружает kernel network driver и создаёт интерфейс для каждого прикладного процесса",
-      "Запускает systemd units по dependency graph и перезапускает завершившиеся службы"
+      "Выпускает исходящие запросы внутренних клиентов в интернет от своего имени, как forward proxy",
+      "Транслирует адреса пакетов на границе сети без разбора HTTP, как NAT-шлюз",
+      "Распределяет TCP-соединения по backend на уровне L4 без терминации TLS и разбора запросов"
     ],
     "answer": 0,
     "explanation": "Reverse proxy расположен со стороны сервера: он маршрутизирует запросы к backends и может завершать TLS, применять auth, limits, кеширование и observability. Конкретный набор функций зависит от продукта и конфигурации.",
@@ -1216,14 +1216,14 @@
   },
   {
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Junior",
     "category": "definition",
     "q": "Что делает load balancer при обработке трафика?",
     "options": [
-      "Изменяет inode открытых sockets, чтобы несколько процессов разделяли один file descriptor",
+      "Держит все соединения на одном backend до его отказа и переключается по истечении DNS TTL",
       "Выбирает backend из набора целей по алгоритму и результатам health checks",
-      "Собирает application logs с узлов и хранит их в полнотекстовом поисковом индексе",
-      "Изменяет filesystem permissions процесса перед созданием каждого сетевого соединения"
+      "Кэширует ответы backend и отдаёт их клиентам без обращения к целям",
+      "Терминирует TLS и отправляет весь трафик на первый backend из списка"
     ],
     "answer": 1,
     "explanation": "Load balancer распределяет connections или requests между доступными targets. Он помогает масштабированию и переключению при отказах, но итоговая устойчивость зависит от корректных health checks и состояния shared dependencies.",
@@ -1235,10 +1235,10 @@
     "category": "definition",
     "q": "Какую задачу решает network firewall?",
     "options": [
-      "Разрешает DNS names через recursive lookup и подписывает ответы ключом обслуживаемой zone",
-      "Ищет вредоносный код внутри файлов по сигнатурам и удаляет заражённые filesystem blocks",
+      "Транслирует внутренние адреса в публичный при выходе в интернет, как NAT-шлюз",
+      "Балансирует входящие соединения между серверами одного сервиса по round robin и health checks",
       "Разрешает или отклоняет network traffic по правилам о направлении, адресах, protocols и state",
-      "Создаёт filesystem для packets и хранит каждое соединение как отдельный regular file"
+      "Шифрует трафик между сетями и проверяет сертификаты обеих сторон, как VPN-шлюз"
     ],
     "answer": 2,
     "explanation": "Firewall реализует policy на сетевом уровне, часто с отслеживанием состояния соединений. Он не заменяет application authorization, безопасную конфигурацию сервиса и анализ содержимого там, где это требуется.",
@@ -1246,7 +1246,7 @@
   },
   {
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Junior",
     "category": "definition",
     "q": "Какой диапазон IANA называет well-known service ports?",
     "options": [
@@ -1261,7 +1261,7 @@
   },
   {
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "Как последовательно искать причину недоступности БД из контейнера?",
     "options": [
@@ -1276,14 +1276,14 @@
   },
   {
     "topic": "Сети",
-    "level": "Middle",
+    "level": "Junior",
     "category": "definition",
     "q": "Для чего нужен tcpdump?",
     "options": [
-      "Управление файлами",
-      "Сниффинг и анализ пакетов",
-      "Шифрование state",
-      "Создание пользователей"
+      "Трассировка системных вызовов процесса",
+      "Захват и анализ сетевых пакетов",
+      "Проверка доступности портов удалённого хоста",
+      "Просмотр таблицы соединений и сокетов"
     ],
     "answer": 1,
     "explanation": "tcpdump полезен при глубокой сетевой диагностике.",
@@ -1291,14 +1291,14 @@
   },
   {
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Для какой задачи используют nmap?",
     "options": [
-      "Для проверки заполнения inode и поиска каталогов, занимающих место на mounted filesystem",
-      "Для управления systemd units и построения dependency graph загрузки операционной системы",
+      "Для захвата и анализа пакетов на интерфейсе, как tcpdump",
+      "Для измерения пропускной способности канала между двумя узлами в обе стороны, как iperf3",
       "Для исследования доступных hosts, ports и признаков services в разрешённых границах сети",
-      "Для подключения block volume и выбора filesystem options перед выполнением mount"
+      "Для проверки DNS-записей зоны и цепочки делегирования, как dig +trace"
     ],
     "answer": 2,
     "explanation": "nmap отправляет probes и классифицирует доступность ports, hosts и иногда версии services или ОС. Результат зависит от scan type, privileges, firewall и rate limits; сканирование выполняют только с разрешением владельца.",
@@ -1306,7 +1306,7 @@
   },
   {
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Какую диагностику даёт mtr?",
     "options": [
@@ -1321,14 +1321,14 @@
   },
   {
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Junior",
     "category": "tradeoff",
     "q": "Почему успешность ping не определяет доступность TCP endpoint?",
     "options": [
       "ICMP echo и TCP фильтруются разными правилами, поэтому один protocol может работать без другого",
-      "Оба используют одну session, но ping закрывает её раньше завершения TCP three-way handshake",
-      "TCP endpoint хранится в Terraform state, а ping читает адрес из Ansible inventory",
-      "ICMP работает на application port сервиса и зависит от того же listener process"
+      "Ping проверяет разрешение DNS-имени узла, но не его IP-адрес, маршрут и сетевую доступность",
+      "Успешный ping подтверждает маршрут, а TCP может падать лишь из-за несовпадения MTU",
+      "ICMP echo идёт по UDP, поэтому TCP-трафик до того же узла маршрутизируется отдельно"
     ],
     "answer": 0,
     "explanation": "ping проверяет ответы ICMP echo, а приложение — конкретный address, port и transport path. Firewall или host могут не отвечать на echo и при этом разрешать TCP, либо ситуация может быть обратной.",
@@ -1336,14 +1336,14 @@
   },
   {
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Junior",
     "category": "definition",
     "q": "На каких портах по умолчанию работают HTTP и HTTPS?",
     "options": [
-      "53 и 443",
+      "8080 и 8443",
       "80 и 443",
-      "22 и 25",
-      "110 и 995"
+      "81 и 444",
+      "80 и 8443"
     ],
     "answer": 1,
     "explanation": "Это базовый факт, который часто спрашивают.",
@@ -1355,10 +1355,10 @@
     "category": "definition",
     "q": "Для чего применяют Ansible?",
     "options": [
-      "Для планирования kernel threads и распределения CPU time между процессами Linux",
-      "Для хранения relational data и выполнения транзакционных SQL-запросов приложений",
+      "Для сборки контейнерных образов из Dockerfile и публикации их в registry",
+      "Для декларативного создания облачной инфраструктуры с хранением state, как в Terraform",
       "Для автоматизации конфигурации, deployment и оркестрации через modules и playbooks",
-      "Для коммутации Ethernet frames и построения MAC address table сетевого устройства"
+      "Для сбора метрик с узлов и отправки алертов по правилам, как в Prometheus"
     ],
     "answer": 2,
     "explanation": "Ansible выполняет declarative modules и при необходимости orchestration steps по inventory. Обычно он подключается к managed nodes по SSH или другим transports и не требует постоянного agent на Linux-хосте.",
@@ -1415,10 +1415,10 @@
     "category": "definition",
     "q": "Какой шаблонизатор использует Ansible?",
     "options": [
-      "ERB",
-      "Smarty",
+      "Go templates",
+      "Mustache",
       "Jinja2",
-      "XSLT"
+      "Handlebars"
     ],
     "answer": 2,
     "explanation": "Jinja2 используется в templates.",
@@ -1430,9 +1430,9 @@
     "category": "definition",
     "q": "Что такое inventory?",
     "options": [
-      "Список пакетов Linux",
-      "State-файл",
-      "Сетевой сокет",
+      "Список ролей и коллекций из Galaxy",
+      "Файл с переменными роли по умолчанию",
+      "Журнал выполненных задач плейбука",
       "Список хостов и групп"
     ],
     "answer": 3,
@@ -1460,10 +1460,10 @@
     "category": "definition",
     "q": "Зачем Ansible использует roles?",
     "options": [
-      "Чтобы фильтровать network traffic managed host по правилам addresses, ports и connection state",
+      "Чтобы группировать hosts inventory по окружениям и задавать им переменные вместо group_vars и host_vars",
       "Чтобы упаковать reusable tasks, handlers, defaults, vars, templates и files в стандартную структуру",
-      "Чтобы создавать DNS records для controller и автоматически делегировать authoritative zones",
-      "Чтобы запускать shell commands без module interface и считать каждую команду идемпотентной"
+      "Чтобы шифровать variables и files, заменяя ansible-vault для секретов проекта",
+      "Чтобы выполнять tasks на всех hosts одновременно без ограничения forks и serial"
     ],
     "answer": 1,
     "explanation": "Role организует связанную автоматизацию и предоставляет понятный interface через defaults, variables и dependencies. Переиспользование не отменяет необходимости документировать inputs, поддерживаемые platforms и side effects.",
@@ -1486,13 +1486,13 @@
   },
   {
     "topic": "Ansible",
-    "level": "Middle",
+    "level": "Junior",
     "category": "scenario",
     "q": "Как проверить поведение плейбука без реальных изменений?",
     "options": [
-      "--fork",
-      "--destroy",
-      "--dns",
+      "--syntax-check",
+      "--list-tasks",
+      "--step",
       "--check"
     ],
     "answer": 3,
@@ -1546,13 +1546,13 @@
   },
   {
     "topic": "Ansible",
-    "level": "Middle",
+    "level": "Junior",
     "category": "definition",
     "q": "Что такое Ansible Facts?",
     "options": [
-      "Содержимое Vault",
-      "Логи Terraform",
-      "Список DNS-записей",
+      "Переменные, заданные в group_vars",
+      "Результаты задач, сохранённые через register",
+      "Значения, переданные через --extra-vars",
       "Собранные сведения о хосте"
     ],
     "answer": 3,
@@ -1566,9 +1566,9 @@
     "q": "Когда разумно отключить gather_facts в play?",
     "options": [
       "Когда play не использует facts и стоимость setup заметна на большом числе или медленных hosts",
-      "Когда нужно вызвать DNS resolver, поскольку facts блокируют исходящие network connections",
-      "Когда Vault должен расшифровать variables до чтения playbook и проверки его syntax",
-      "Когда controller требуется игнорировать inventory и выполнить tasks на localhost"
+      "Когда play использует ansible_facts в шаблонах и нужно ускорить рендеринг этих шаблонов на controller",
+      "Когда hosts недоступны по SSH и facts нужно получить через API облака",
+      "Когда включён --check, поскольку в проверочном режиме setup выполняется дважды"
     ],
     "answer": 0,
     "explanation": "gather_facts запускает setup перед tasks и создаёт сетевую и вычислительную работу на каждом host. Его можно пропустить, если данные не нужны, но references на ansible_facts тогда следует заменить или собирать выборочно.",
@@ -1626,9 +1626,9 @@
     "q": "Как keyword serial влияет на Ansible play?",
     "options": [
       "Делит target hosts на batches указанного размера или доли и выполняет play по партиям",
-      "Шифрует variables для каждой task и передаёт отдельный Vault password каждому host",
-      "Превращает notified handler в обычную task и запускает его сразу после изменения",
-      "Создаёт DNS SRV record для каждой группы inventory и выбирает порядок hosts по priority"
+      "Задаёт число параллельных соединений controller, как forks, сразу для всех hosts play",
+      "Выполняет tasks по одной на всех hosts, дожидаясь завершения каждой, как strategy: linear",
+      "Останавливает play после первой ошибки на любом host, как any_errors_fatal"
     ],
     "answer": 0,
     "explanation": "serial ограничивает число hosts в текущей batch и полезен для rolling changes. Его сочетают с health checks, max_fail_percentage, any_errors_fatal и осознанной стратегией, поскольку batch сама по себе не проверяет здоровье сервиса.",
@@ -1651,14 +1651,14 @@
   },
   {
     "topic": "Ansible",
-    "level": "Middle",
+    "level": "Junior",
     "category": "definition",
     "q": "Что такое Ansible Vault?",
     "options": [
-      "Сетевой балансировщик",
-      "Система контейнеров",
+      "Хранилище ролей и коллекций сообщества",
+      "Кэш собранных facts между запусками",
       "Средство шифрования секретов",
-      "Формат YAML"
+      "Встроенный менеджер SSH-ключей"
     ],
     "answer": 2,
     "explanation": "Vault защищает чувствительные данные в репозитории.",
@@ -1686,9 +1686,9 @@
     "q": "Для чего применяют Molecule при разработке Ansible content?",
     "options": [
       "Для описания test scenarios: создать environment, применить role, проверить результат и удалить resources",
-      "Для генерации dynamic inventory production из DNS records и cloud billing reports",
-      "Для установки OS packages на controller без package manager целевой операционной системы",
-      "Для загрузки kernel driver, который ускоряет SSH connections к большому числу targets"
+      "Для проверки синтаксиса YAML и стиля плейбуков по набору правил и best practices, как это делает ansible-lint",
+      "Для публикации ролей и коллекций в Galaxy с проверкой версии, зависимостей и метаданных meta/main.yml",
+      "Для запуска плейбуков по расписанию с RBAC, журналом заданий и хранением учётных данных, как в AWX"
     ],
     "answer": 0,
     "explanation": "Molecule организует lifecycle тестового scenario и интегрируется с drivers, provisioners и verifiers. Конкретная среда может быть container, VM или cloud; тест должен проверять convergence и по возможности idempotence.",
@@ -1696,14 +1696,14 @@
   },
   {
     "topic": "Ansible",
-    "level": "Senior",
+    "level": "Junior",
     "category": "definition",
     "q": "Что называют magic variables в Ansible?",
     "options": [
-      "Зашифрованные Vault values, которые автоматически становятся plaintext на managed host",
+      "Переменные, собранные модулем setup на хосте, например ansible_distribution и ansible_memtotal_mb",
       "Встроенный execution context, например inventory_hostname, hostvars, groups и ansible_play_hosts",
-      "DNS variables resolver, содержащие address и TTL каждого имени из inventory",
-      "Terraform state outputs, которые Ansible загружает без inventory plugin или lookup"
+      "Переменные из group_vars/all, которые Ansible подключает ко всем хостам автоматически",
+      "Значения, переданные через --extra-vars, с наивысшим приоритетом"
     ],
     "answer": 1,
     "explanation": "Magic variables создаёт Ansible для сведений о текущем inventory, play и execution. Они отличаются от gathered facts и пользовательских vars; менять их как обычные inputs не следует.",
@@ -1711,14 +1711,14 @@
   },
   {
     "topic": "Ansible",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "Какие параметры CLI помогают разбирать сбой Ansible playbook?",
     "options": [
-      "--fmt и --compile для форматирования YAML и сборки playbook в executable binary",
-      "-rf и --purge для удаления temporary files со всех managed hosts перед повтором",
+      "--syntax-check и --list-hosts, которые выполняют задачи на части хостов с подробным выводом",
+      "-f 1 и --forks, которые сами показывают diff изменённых файлов",
       "-vvv, --check/--diff, --step, --start-at-task и --limit для контекста и сужения запуска",
-      "--lock и --unlock для блокировки inventory на время диагностики параллельных процессов"
+      "--flush-cache и --force-handlers, которые повторяют упавшие задачи"
     ],
     "answer": 2,
     "explanation": "Verbosity показывает connection и module details, limit и start-at-task уменьшают scope, step подтверждает tasks. Check/diff прогнозируют изменения там, где modules это поддерживают, и не являются полной гарантией обычного запуска.",
@@ -1730,9 +1730,9 @@
     "category": "definition",
     "q": "Какие командные задачи закрывают Git, Galaxy и automation controller?",
     "options": [
-      "Git управляет inode, Galaxy выполняет DNS recursion, controller заменяет kernel managed host",
-      "Git хранит runtime logs, Galaxy маршрутизирует traffic, controller компилирует Linux packages",
-      "Git выдаёт SSH certificates, Galaxy создаёт VPC, controller преобразует YAML в Terraform state",
+      "Git запускает playbooks по расписанию, Galaxy хранит inventory, controller версионирует roles",
+      "Git шифрует секреты, Galaxy выполняет tasks на hosts, controller заменяет ansible-lint",
+      "Git хранит facts, Galaxy управляет RBAC, controller публикует collections",
       "Git версионирует код, Galaxy распространяет content, controller управляет jobs, RBAC и schedules"
     ],
     "answer": 3,
@@ -1741,7 +1741,7 @@
   },
   {
     "topic": "Ansible",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Чем Ansible Collection отличается от Role?",
     "options": [
@@ -1756,7 +1756,7 @@
   },
   {
     "topic": "Ansible",
-    "level": "Senior",
+    "level": "Middle",
     "category": "tradeoff",
     "q": "Почему Ansible лучше устанавливать в изолированное Python-окружение?",
     "options": [
@@ -3423,6 +3423,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Что создаёт SR-IOV на совместимом PCIe-устройстве?",
     "options": [
       "PF с несколькими облегчёнными Virtual Functions",
@@ -3438,6 +3439,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Как DPDK ускоряет обработку пакетов?",
     "options": [
       "Передаёт каждый пакет в отдельный процесс ядра",
@@ -3453,6 +3455,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Какую роль выполняет EVPN в overlay-сети?",
     "options": [
       "Шифрует VXLAN-пакеты между удалёнными VTEP",
@@ -3466,7 +3469,7 @@
   },
   {
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Какие свойства характерны для WireGuard?",
     "options": [
@@ -3481,7 +3484,7 @@
   },
   {
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Какие возможности объединяет QUIC?",
     "options": [
@@ -3498,6 +3501,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Как ingress-узел задаёт путь в segment routing?",
     "options": [
       "Создаёт по TCP-соединению к каждому маршрутизатору",
@@ -3511,7 +3515,7 @@
   },
   {
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что изолирует Linux network namespace?",
     "options": [
@@ -3528,6 +3532,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Где XDP выполняет eBPF-программу при native-режиме?",
     "options": [
       "В userspace после чтения пакета обычным сокетом",
@@ -3543,6 +3548,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Как MPTCP переносит одно логическое соединение?",
     "options": [
       "Через несколько TCP-subflow по доступным путям",
@@ -3558,6 +3564,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Что отличает RDMA в пути передачи данных?",
     "options": [
       "Копирование каждого блока через буферы приложения",
@@ -3573,6 +3580,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Какую цель преследует набор стандартов TSN?",
     "options": [
       "Увеличить число адресов в Ethernet-заголовке",
@@ -3588,6 +3596,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Что описывает программа на P4?",
     "options": [
       "Политику выдачи IP-адресов клиентам DHCP",
@@ -4202,7 +4211,7 @@
   {
     "id": 281,
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "terraform apply завис и показывает 'Acquiring state lock'. Коллега сказал, что его apply упал с ошибкой 10 минут назад. Ваши действия?",
     "options": [
@@ -4382,7 +4391,7 @@
   {
     "id": 293,
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "Между двумя хостами периодические потери пакетов. mtr показывает потери на 3-м хопе (промежуточный роутер), но дальше всё ок. Что это означает?",
     "options": [
@@ -4397,7 +4406,7 @@
   {
     "id": 294,
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "TCP сессии обрываются примерно через 4 минуты простоя между двумя датацентрами. При активном трафике всё работает. Что скорее всего происходит?",
     "options": [
@@ -4414,6 +4423,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "scenario",
+    "depth": "deep",
     "q": "Сессия BGP с вышестоящим провайдером (upstream) установлена — Established, но маршруты не приходят. Что проверить?",
     "options": [
       "Перезапустить BGP daemon, не сохраняя counters и состояние neighbor",
@@ -4502,7 +4512,7 @@
   {
     "id": 301,
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "tradeoff",
     "q": "Когда использовать count вместо for_each в Terraform?",
     "options": [
@@ -4517,7 +4527,7 @@
   {
     "id": 302,
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "tradeoff",
     "q": "Terraform workspaces vs отдельные директории для разных окружений (dev/stage/prod). Что выбрать?",
     "options": [
@@ -4577,7 +4587,7 @@
   {
     "id": 306,
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "tradeoff",
     "q": "Terraform provisioner (remote-exec/local-exec) vs Ansible для настройки ВМ после создания. Что предпочесть?",
     "options": [
@@ -4622,7 +4632,7 @@
   {
     "id": 309,
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "tradeoff",
     "q": "Remote backend vs local backend. Когда local state допустим?",
     "options": [
@@ -4652,7 +4662,7 @@
   {
     "id": 311,
     "topic": "Ansible",
-    "level": "Senior",
+    "level": "Middle",
     "category": "tradeoff",
     "q": "include_tasks vs import_tasks: в чём ключевое различие для работы с тегами?",
     "options": [
@@ -4684,6 +4694,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "tradeoff",
+    "depth": "deep",
     "q": "Чем различается применение BGP ECMP и LACP (LAG) для распределения трафика?",
     "options": [
       "LACP bundles links между logical peers; BGP ECMP использует несколько routed next hops",
@@ -4712,7 +4723,7 @@
   {
     "id": 315,
     "topic": "Ansible",
-    "level": "Senior",
+    "level": "Middle",
     "category": "tradeoff",
     "q": "В каком порядке Ansible применяет приоритет переменных (от низшего к высшему)?",
     "options": [
@@ -4847,7 +4858,7 @@
   {
     "id": 324,
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Middle",
     "category": "output",
     "q": "На клиенте tcpdump показывает исходящие SYN, но ответ не возвращается. Как локализовать проблему?",
     "options": [
@@ -4892,7 +4903,7 @@
   {
     "id": 327,
     "topic": "Сети",
-    "level": "Middle",
+    "level": "Junior",
     "category": "output",
     "q": "ip route show показывает: '10.0.0.0/8 via 192.168.1.1 dev eth0'. Что означает 'via 192.168.1.1'?",
     "options": [
@@ -5267,7 +5278,7 @@
   {
     "id": 352,
     "topic": "Docker",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "Какая комбинация даёт сильную стартовую изоляцию production-контейнера?",
     "options": [
@@ -5297,7 +5308,7 @@
   {
     "id": 354,
     "topic": "Docker",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "Контейнер завершился с OOMKilled. Какой план диагностики разумен?",
     "options": [
@@ -5312,7 +5323,7 @@
   {
     "id": 355,
     "topic": "Docker",
-    "level": "Senior",
+    "level": "Middle",
     "category": "tradeoff",
     "q": "Каков trade-off host и bridge networking на Linux Docker Engine?",
     "options": [
@@ -5342,7 +5353,7 @@
   {
     "id": 357,
     "topic": "Docker",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "Как BuildKit передаёт secret в один RUN step без записи в image layer?",
     "options": [
@@ -5387,7 +5398,7 @@
   {
     "id": 360,
     "topic": "Docker",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "Какая стратегия обычно уменьшает production image Python-приложения?",
     "options": [
@@ -5402,7 +5413,7 @@
   {
     "id": 361,
     "topic": "Docker",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Что именно предоставляет команда docker events?",
     "options": [
@@ -5417,7 +5428,7 @@
   {
     "id": 362,
     "topic": "Docker",
-    "level": "Middle",
+    "level": "Junior",
     "category": "scenario",
     "q": "Как собрать image, остановившись на named stage builder?",
     "options": [
@@ -5462,7 +5473,7 @@
   {
     "id": 365,
     "topic": "Docker",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Каков основной trade-off distroless image по сравнению с Alpine?",
     "options": [
@@ -5777,7 +5788,7 @@
   {
     "id": 386,
     "topic": "Kubernetes",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Как QoS влияет на eviction при memory pressure?",
     "options": [
@@ -5852,7 +5863,7 @@
   {
     "id": 391,
     "topic": "Kubernetes",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Какова роль CoreDNS при обычной конфигурации кластера?",
     "options": [
@@ -5867,7 +5878,7 @@
   {
     "id": 392,
     "topic": "Kubernetes",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "Что снижает риск downtime при Deployment rollout?",
     "options": [
@@ -5882,7 +5893,7 @@
   {
     "id": 393,
     "topic": "Kubernetes",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Когда NetworkPolicy реально ограничивает traffic?",
     "options": [
@@ -5957,7 +5968,7 @@
   {
     "id": 398,
     "topic": "Kubernetes",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Какой сигнал запускает scale-up Cluster Autoscaler?",
     "options": [
@@ -5987,7 +5998,7 @@
   {
     "id": 400,
     "topic": "Kubernetes",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "Что фактически ограничивает PodDisruptionBudget?",
     "options": [
@@ -6062,7 +6073,7 @@
   {
     "id": 405,
     "topic": "Kubernetes",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "Какая последовательность помогает диагностировать DNS внутри Pod?",
     "options": [
@@ -6332,7 +6343,7 @@
   {
     "id": 423,
     "topic": "CI/CD",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Как вызывается reusable workflow в GitHub Actions?",
     "options": [
@@ -6362,7 +6373,7 @@
   {
     "id": 425,
     "topic": "CI/CD",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Чем SAST отличается от DAST в CI/CD?",
     "options": [
@@ -6377,7 +6388,7 @@
   {
     "id": 426,
     "topic": "CI/CD",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "Какая rollback-стратегия надёжнее при неудачном deployment?",
     "options": [
@@ -6392,7 +6403,7 @@
   {
     "id": 427,
     "topic": "CI/CD",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Как соотносятся Jenkinsfile и Jenkins Shared Libraries?",
     "options": [
@@ -6422,7 +6433,7 @@
   {
     "id": 429,
     "topic": "CI/CD",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Как feature flags меняют стратегию выпуска?",
     "options": [
@@ -6467,7 +6478,7 @@
   {
     "id": 432,
     "topic": "CI/CD",
-    "level": "Senior",
+    "level": "Junior",
     "category": "definition",
     "q": "Как применять Semantic Versioning в release pipeline?",
     "options": [
@@ -6962,7 +6973,7 @@
   {
     "id": 465,
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "tradeoff",
     "q": "Почему -target не подходит для обычного deployment workflow?",
     "options": [
@@ -7052,7 +7063,7 @@
   {
     "id": 471,
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "Как условно создать resource или module instance?",
     "options": [
@@ -7217,7 +7228,7 @@
   {
     "id": 482,
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Как используется alias у Terraform provider?",
     "options": [
@@ -7232,7 +7243,7 @@
   {
     "id": 483,
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Junior",
     "category": "definition",
     "q": "Как Terraform определяет порядок операций над ресурсами?",
     "options": [
@@ -7277,7 +7288,7 @@
   {
     "id": 486,
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Как условно создавать экземпляр Terraform module?",
     "options": [
@@ -7979,6 +7990,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Как BGP communities управляют routing policy?",
     "options": [
       "Community меняет BGP best-path algorithm сама по себе: меньшее числовое значение получает больший local-pref",
@@ -7994,6 +8006,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Почему iBGP требует full mesh или route reflectors?",
     "options": [
       "iBGP работает на другом TCP port, поэтому intermediate routers не могут передавать session между peers одной AS",
@@ -8024,6 +8037,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Как stub и NSSA areas уменьшают OSPF LSDB?",
     "options": [
       "Stub area фильтрует router/network LSAs, поэтому routers внутри неё не знают topology и используют default",
@@ -8069,6 +8083,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Чем traffic policing отличается от shaping при использовании DSCP?",
     "options": [
       "DSCP выбирает per-hop behavior; policer drop/remark-ит excess, shaper буферизует его до заданного rate и добавляет delay",
@@ -8204,6 +8219,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Чем отличаются RTBH и BGP FlowSpec при отражении DDoS-атаки?",
     "options": [
       "RTBH фильтрует HTTP-запросы по URI, а FlowSpec меняет DNS-ответы, направляя клиентов в scrubbing center",
@@ -8249,6 +8265,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "В чём практическое различие телеметрии IPFIX/NetFlow и sFlow?",
     "options": [
       "IPFIX экспортирует записи о потоках, а sFlow обычно семплирует заголовки пакетов и счётчики интерфейсов",
@@ -8339,6 +8356,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "tradeoff",
+    "depth": "deep",
     "q": "Где MPLS сохраняет ценность рядом с SDN и Segment Routing?",
     "options": [
       "В leaf-spine fabric он заменяет VXLAN, когда endpoint обучаются через ARP вместо control plane на базе EVPN",
@@ -8459,6 +8477,7 @@
     "topic": "Сети",
     "level": "Middle",
     "category": "definition",
+    "depth": "deep",
     "q": "Какие угрозы уменьшают BGP-фильтры и что именно подтверждает RPKI origin validation?",
     "options": [
       "Prefix-list подтверждает владельца адресов криптографически, а RPKI проверяет каждый AS в полном пути объявления",
@@ -8504,6 +8523,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Как маршрутизация по сегментам кодирует заданный путь в MPLS- и IPv6-вариантах?",
     "options": [
       "Каждый транзитный узел создаёт RSVP state для потока, а ingress помещает идентификатор этого state в TCP option",
@@ -8534,6 +8554,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Как построить отказоустойчивость двух BGP border routers без виртуального gateway IP?",
     "options": [
       "Сделать один router route reflector для второго и считать сохранение iBGP session резервированием внешнего dataplane",
@@ -8684,6 +8705,7 @@
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Что добавляет Workflow Job Template поверх отдельного Job Template в AWX/AAP?",
     "options": [
       "Он объединяет tasks одного play в блоки и заменяет block/rescue условиями success и failure на уровне task",
@@ -8699,6 +8721,7 @@
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Как безопасно оценивать Mitogen как ускоритель Ansible?",
     "options": [
       "Считать его встроенной strategy ansible-core и включать без version pin, поскольку интерфейс plugins стабилен между releases",
@@ -8714,6 +8737,7 @@
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Из каких частей состоит Event-Driven Ansible rulebook?",
     "options": [
       "Из cron expression, inventory refresh и playbook, который controller запускает по расписанию без входного event",
@@ -8744,6 +8768,7 @@
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Как устроен custom Jinja filter plugin для Ansible?",
     "options": [
       "Это YAML-файл с mapping filter→shell command; Ansible запускает command на managed host для каждого template value",
@@ -8819,6 +8844,7 @@
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Чем connection plugins network_cli, httpapi и netconf отличаются в network automation?",
     "options": [
       "network_cli использует локальный shell, httpapi передаёт Python modules по SFTP, netconf запускает commands через sudo",
@@ -9014,6 +9040,7 @@
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Что ansible-navigator добавляет к запуску playbook в разработке и CI?",
     "options": [
       "Он заменяет inventory и controller database локальным SQLite, поэтому один artifact можно продолжить с failed task",
@@ -9044,6 +9071,7 @@
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Как безопасно связать GitLab webhook с запуском AWX Job Template?",
     "options": [
       "Разрешить anonymous launch шаблона и передавать inventory, credentials и become password полями каждого GitLab event",
@@ -9134,6 +9162,7 @@
     "topic": "Ansible",
     "level": "Senior",
     "category": "definition",
+    "depth": "deep",
     "q": "Как connection: psrp выполняет Ansible tasks на Windows?",
     "options": [
       "Копирует Python module через SMB, запускает CPython service и возвращает JSON по отдельному WinRM event channel",
@@ -9626,7 +9655,7 @@
   },
   {
     "topic": "Сети",
-    "level": "Senior",
+    "level": "Junior",
     "category": "definition",
     "q": "На каком механизме строится `traceroute`?",
     "options": [
@@ -10316,7 +10345,7 @@
   },
   {
     "topic": "Monitoring",
-    "level": "Senior",
+    "level": "Junior",
     "category": "definition",
     "q": "Как связаны SLI, SLO, SLA и error budget?",
     "options": [
@@ -10736,7 +10765,7 @@
   },
   {
     "topic": "Security",
-    "level": "Senior",
+    "level": "Middle",
     "category": "tradeoff",
     "q": "Какой подход соответствует принципам Zero Trust в облачной системе?",
     "options": [
@@ -11006,7 +11035,7 @@
   },
   {
     "topic": "Monitoring",
-    "level": "Senior",
+    "level": "Middle",
     "category": "definition",
     "q": "Какие четыре сигнала помогают оценивать пользовательское состояние сервиса по Google SRE?",
     "options": [
@@ -11292,7 +11321,7 @@
   {
     "id": 14060,
     "topic": "System Design",
-    "level": "Senior",
+    "level": "Middle",
     "category": "tradeoff",
     "q": "Балансировщику нужно сохранить привязку клиента к серверу. Чем отличается выбор sticky-сессий от consistent hashing?",
     "options": [
@@ -11412,7 +11441,7 @@
   {
     "id": 14068,
     "topic": "Terraform",
-    "level": "Senior",
+    "level": "Middle",
     "category": "scenario",
     "q": "Процесс применения прервался, и файл состояния остался заблокированным. Как поступить правильно?",
     "options": [
@@ -11487,7 +11516,7 @@
   {
     "id": 14073,
     "topic": "CI/CD",
-    "level": "Senior",
+    "level": "Junior",
     "category": "tradeoff",
     "q": "Нужно выпускать версии с малым риском отказа. Чем отличается канареечный выпуск от синего-зелёного?",
     "options": [
@@ -11562,7 +11591,7 @@
   {
     "id": 14078,
     "topic": "Security",
-    "level": "Senior",
+    "level": "Middle",
     "category": "tradeoff",
     "q": "Нужно подтвердить происхождение образа перед запуском. Чем отличается вклад подписи от списка компонентов?",
     "options": [
@@ -12449,7 +12478,7 @@
   },
   {
     "topic": "Kubernetes",
-    "level": "Senior",
+    "level": "Middle",
     "category": "tradeoff",
     "q": "Какие QoS-классы бывают в Kubernetes и как выбирается Pod при eviction?",
     "options": [
@@ -12483,7 +12512,7 @@
   },
   {
     "topic": "Kubernetes",
-    "level": "Senior",
+    "level": "Middle",
     "category": "tradeoff",
     "q": "Почему для control plane часто выбирают три ноды, а не четыре?",
     "options": [
@@ -13028,7 +13057,7 @@
   {
     "id": 15001,
     "topic": "Linux",
-    "level": "Middle",
+    "level": "Senior",
     "category": "definition",
     "q": "Чем политики планирования SCHED_FIFO и SCHED_RR отличаются от SCHED_OTHER?",
     "options": [
@@ -13048,7 +13077,7 @@
   {
     "id": 15002,
     "topic": "Linux",
-    "level": "Middle",
+    "level": "Junior",
     "category": "scenario",
     "q": "Где посмотреть аргументы запуска и открытые дескрипторы процесса Linux с известным PID?",
     "options": [
@@ -13168,7 +13197,7 @@
   {
     "id": 15008,
     "topic": "Сети",
-    "level": "Middle",
+    "level": "Junior",
     "category": "scenario",
     "q": "Хост отправляет IPv4-пакет в другую подсеть. Чей MAC-адрес он обычно ищет через ARP?",
     "options": [
@@ -13413,9 +13442,9 @@
     "q": "Что обычно происходит с EBS-томом при stop EC2 и от чего зависит его удаление при terminate?",
     "options": [
       "Stop сохраняет том; при terminate важен флаг DeleteOnTermination.",
-      "Stop удаляет том; terminate создаёт его автоматическую архивную копию.",
-      "Обе операции сохраняют том независимо от параметров подключения.",
-      "Обе операции перемещают содержимое тома в instance store."
+      "Stop удаляет корневой том, а при terminate сохраняются дополнительные тома.",
+      "Stop и terminate сохраняют тома, пока не удалён снимок, из которого они созданы.",
+      "Stop переносит том в instance store, а terminate удаляет все подключённые тома."
     ],
     "answer": 0,
     "explanation": "Остановка EBS-backed инстанса сохраняет его EBS-тома, тогда как данные instance store при остановке теряются. При завершении инстанса судьба каждого EBS-тома определяется DeleteOnTermination. Нельзя считать остановку, завершение и удаление диска одной операцией; резервные копии и флаги проверяют до изменения жизненного цикла.",
@@ -13432,10 +13461,10 @@
     "category": "scenario",
     "q": "Почему переключение DNS-записи в Route 53 не переводит всех клиентов на новый адрес мгновенно?",
     "options": [
-      "Route 53 ожидает перезагрузки операционной системы каждого клиента.",
+      "Route 53 применяет изменения по одной зоне доступности, начиная с региона записи.",
       "Резолверы и клиенты могут ещё использовать ответ до истечения TTL.",
-      "TLS-сертификат навсегда закрепляет прежний IP-адрес у клиента.",
-      "Смена записи требует пересоздать сетевые интерфейсы всех клиентов."
+      "Клиенты держат открытые TCP-соединения к старому адресу до их закрытия, а новые пойдут сразу.",
+      "Запись сначала проходит проверку health check, и до её завершения ответ не меняется."
     ],
     "answer": 1,
     "explanation": "Route 53 публикует новые DNS-данные, но ранее полученные ответы остаются в кешах резолверов и приложений. Время обновления зависит от TTL и поведения конкретного клиента; уже открытые соединения также могут продолжить работать. При миграции заранее уменьшают TTL и оставляют старую сторону доступной на переходный период.",
@@ -13450,12 +13479,13 @@
     "topic": "Cloud",
     "level": "Middle",
     "category": "tradeoff",
+    "depth": "deep",
     "q": "Чем EKS Anywhere отличается от управляемого Amazon EKS в AWS?",
     "options": [
-      "Предоставляет EKS-кластер без узлов, сети и плоскости управления.",
-      "Переносит прикладную базу данных из Kubernetes в сервис DynamoDB.",
+      "Это отдельный дистрибутив Kubernetes, несовместимый с API обычного EKS.",
+      "Это вариант EKS, где AWS управляет и узлами, как в режиме Fargate.",
       "Позволяет эксплуатировать Kubernetes на собственной инфраструктуре.",
-      "Является названием сетевого плагина для подов Amazon EKS."
+      "Это режим EKS для запуска кластеров сразу в нескольких регионах AWS."
     ],
     "answer": 2,
     "explanation": "Amazon EKS предоставляет управляемую плоскость управления Kubernetes в AWS. EKS Anywhere ориентирован на развёртывание и жизненный цикл кластеров на собственной инфраструктуре, где обязанности эксплуатации значительно шире. Выбор зависит от размещения оборудования, сетевых ограничений и ответственности команды; это не просто другой тариф того же управляемого кластера.",
@@ -13472,9 +13502,9 @@
     "category": "scenario",
     "q": "Как приложению на EC2 получать доступ к AWS API без статического ключа в конфигурации?",
     "options": [
-      "Передавать пароль AWS Console в HTTP-заголовке каждого запроса.",
-      "Включить публичный доступ к API для IP-адреса инстанса.",
-      "Сохранить постоянный ключ администратора в образе машины.",
+      "Выдать приложению ключ IAM-пользователя с условием доступа из VPC инстанса.",
+      "Сохранить ключ доступа в переменных окружения, заданных в user data инстанса.",
+      "Хранить ключ в Secrets Manager и читать его тем же ключом при старте приложения.",
       "Использовать IAM role инстанса и цепочку получения учётных данных SDK."
     ],
     "answer": 3,
@@ -13493,9 +13523,9 @@
     "q": "Какая цепочка приводит новый Pod от запроса к API до запуска контейнеров на узле?",
     "options": [
       "API сохраняет объект, scheduler назначает узел, kubelet запускает нагрузку.",
-      "Scheduler принимает HTTP-запрос и напрямую запускает контейнеры на узле.",
-      "Kubelet выбирает узел кластера и сохраняет Pod напрямую в etcd.",
-      "CoreDNS создаёт контейнеры после регистрации имени Service."
+      "Scheduler сохраняет объект в etcd, kubelet назначает узел, runtime запускает Pod.",
+      "API сразу назначает узел по requests, а controller manager запускает контейнеры.",
+      "Kubelet опрашивает etcd напрямую и сам выбирает, какие Pod запустить на узле."
     ],
     "answer": 0,
     "explanation": "API server проверяет запрос и сохраняет объект Pod в хранилище. Scheduler наблюдает неназначенные Pod и выбирает узел с учётом ресурсов и ограничений; kubelet этого узла организует тома, сеть и запуск через runtime. При создании Deployment сначала контроллеры создают ReplicaSet и Pod, поэтому путь включает дополнительные шаги согласования.",
@@ -13512,10 +13542,10 @@
     "category": "scenario",
     "q": "Могут ли контейнеры одного Pod одновременно работать на двух разных узлах?",
     "options": [
-      "Да, scheduler распределяет контейнеры Pod независимо друг от друга.",
+      "Да, если у Pod несколько контейнеров с разными nodeSelector.",
       "Нет, Pod назначается одному узлу; для распределения нужны отдельные Pod.",
-      "Да, достаточно указать две реплики у объекта Service.",
-      "Нет, поскольку Kubernetes запрещает запуск многоконтейнерных Pod."
+      "Да, при включённой topologySpreadConstraints scheduler разнесёт контейнеры.",
+      "Нет, но sidecar-контейнеры можно вынести на соседний узел через affinity."
     ],
     "answer": 1,
     "explanation": "Pod является единицей размещения и назначается одному узлу. Его контейнеры разделяют сетевую среду Pod и могут совместно использовать тома, поэтому не распределяются scheduler по разным машинам. Отказоустойчивость достигают несколькими Pod и правилами размещения; после потери узла контроллер обычно создаёт замену с новым UID.",
@@ -13532,10 +13562,10 @@
     "category": "scenario",
     "q": "Что происходит после изменения шаблона StatefulSet со стратегией OnDelete?",
     "options": [
-      "Изменение шаблона немедленно удаляет все связанные PVC.",
-      "Контроллер последовательно заменяет Pod без дополнительного действия.",
+      "Все Pod пересоздаются одновременно, а PVC сохраняются.",
+      "Контроллер заменяет Pod по одному, начиная со старшего порядкового номера.",
       "Работающие Pod сохраняются; замена создаётся после их удаления.",
-      "API server отклоняет изменение образа до остановки StatefulSet."
+      "Новый шаблон применяется на месте к работающим контейнерам без их перезапуска."
     ],
     "answer": 2,
     "explanation": "При OnDelete контроллер не обновляет существующие Pod автоматически после изменения шаблона. Новый шаблон используется при создании замены, поэтому оператор управляет порядком удаления и восстановления Pod. Для системы с состоянием перед каждым шагом проверяют кворум, готовность, репликацию и возможность восстановления.",
@@ -13552,9 +13582,9 @@
     "category": "tradeoff",
     "q": "Зачем при переключении active-standby системы нужен fencing прежнего активного узла?",
     "options": [
-      "Чтобы увеличить количество DNS-ответов в локальном кеше.",
-      "Чтобы ускорить сжатие журналов на резервном узле системы.",
-      "Чтобы отключить проверку готовности перед сменой активного узла.",
+      "Чтобы прежний узел перезагрузился и вернулся в кластер как резервный.",
+      "Чтобы резервный узел успел догнать журнал и не потерял последние транзакции.",
+      "Чтобы балансировщик быстрее снял прежний узел с health check после переключения.",
       "Чтобы исключить одновременную запись двух узлов после сетевого разделения."
     ],
     "answer": 3,
@@ -13592,10 +13622,10 @@
     "category": "definition",
     "q": "Чем роль PostgreSQL с LOGIN отличается от роли без LOGIN?",
     "options": [
-      "Первая владеет базой автоматически, вторая хранит резервные копии.",
+      "Первая может владеть объектами базы, вторая предназначена для чтения данных.",
       "Первая может начинать сеанс, вторая удобна для объединения прав.",
-      "Первая обходит проверку привилегий, вторая отвечает за репликацию.",
-      "Первая является схемой базы, вторая представляет табличное пространство."
+      "Первая хранит пароль, вторая аутентифицируется через peer или сертификат.",
+      "Первая действует в одной базе, вторая наследует права во всех базах кластера."
     ],
     "answer": 1,
     "explanation": "В PostgreSQL одна сущность role используется и для учётных записей, и для группировки привилегий. Атрибут LOGIN разрешает использовать роль для подключения; права на объекты и членство в других ролях назначают отдельно. LOGIN не делает роль суперпользователем и не даёт доступа ко всем таблицам.",
@@ -13612,10 +13642,10 @@
     "category": "tradeoff",
     "q": "Как fork-based workflow позволяет внести изменения без права записи в основной Git-репозиторий?",
     "options": [
-      "Основной репозиторий добавляют как submodule и заменяют его историю.",
-      "Изменения записывают в upstream без аутентификации через git fetch.",
+      "Разработчик создаёт patch через git format-patch, и сервер применяет его сам при push.",
+      "Изменения отправляют в ветку upstream, а права на запись выдаются на время pull request.",
       "Изменения отправляют в свой fork и предлагают через pull request.",
-      "Создают локальный tag, после чего сервер сам переносит коммиты."
+      "Изменения коммитят в upstream через git push --force-with-lease без отдельных прав."
     ],
     "answer": 2,
     "explanation": "Fork создаёт отдельный репозиторий, в который автор может отправлять свои ветки. Связь с исходным проектом поддерживают отдельным remote, получают его обновления и предлагают изменения через pull request. Внешний код в CI рассматривают как недоверенный: секреты и привилегии не должны автоматически становиться доступны сборке из fork.",
@@ -13632,9 +13662,9 @@
     "category": "scenario",
     "q": "Какую задачу решает KRaft в Apache Kafka?",
     "options": [
-      "Перераспределяет сообщения между группами по HTTP-заголовкам.",
-      "Заменяет хранение записей топика файловой системой PostgreSQL.",
-      "Шифрует полезную нагрузку каждого сообщения ключом потребителя.",
+      "Распределяет партиции между потребителями группы вместо координатора.",
+      "Заменяет ZooKeeper для хранения самих сообщений топиков вместо брокеров.",
+      "Реплицирует партиции между дата-центрами вместо MirrorMaker.",
       "Управляет метаданными кластера через кворум контроллеров на Raft."
     ],
     "answer": 3,
@@ -13653,9 +13683,9 @@
     "q": "Почему успешный запрос через curl не доказывает, что запрос браузера пройдёт проверку CORS?",
     "options": [
       "Ограничения CORS проверяет браузер при доступе скрипта к другому origin.",
-      "Curl автоматически добавляет разрешение сервера к браузерному origin.",
-      "Браузер использует для HTTP другой диапазон транспортных портов.",
-      "Curl проверяет CORS по DNS, а браузер проверяет его по сертификату."
+      "Curl по умолчанию отправляет preflight-запрос, а браузер сразу шлёт основной.",
+      "CORS проверяет сервер по заголовку User-Agent и пропускает запросы curl.",
+      "Браузер не отправляет cookie на другой origin, поэтому сервер отвечает 401."
     ],
     "answer": 0,
     "explanation": "CORS регулирует, может ли браузерный скрипт читать ответ другого origin. Для части запросов браузер сначала выполняет preflight OPTIONS и проверяет разрешённые origin, методы и заголовки. Curl не применяет браузерную политику, поэтому успешный сетевой запрос подтверждает доступность сервера, но не корректность CORS; механизм не заменяет аутентификацию.",
@@ -13672,10 +13702,10 @@
     "category": "scenario",
     "q": "Helm сообщает another operation is in progress после сбоя CI. С чего начать восстановление?",
     "options": [
-      "Удалить namespace приложения вместе с его томами и секретами.",
+      "Удалить secret релиза в статусе pending и сразу повторить upgrade.",
       "Проверить историю релиза и наличие активной операции перед откатом.",
-      "Запустить несколько параллельных upgrade для снятия блокировки.",
-      "Изменить имя релиза без проверки состояния существующей нагрузки."
+      "Запустить helm upgrade --force, чтобы пересоздать все ресурсы релиза.",
+      "Выполнить helm uninstall и установить релиз заново с тем же именем."
     ],
     "answer": 1,
     "explanation": "Сначала проверяют helm status, helm history и процессы CI, чтобы не вмешаться в реально выполняющееся обновление. Зависший pending-релиз восстанавливают управляемым откатом к рабочей ревизии, если это соответствует состоянию ресурсов и данным. Ручное удаление метаданных Helm опасно рассогласованием истории; после восстановления проверяют приложение и ограничивают параллельные деплои.",
@@ -13692,10 +13722,10 @@
     "category": "scenario",
     "q": "Истекли сертификаты control plane kubeadm-кластера. Что проверить перед восстановлением?",
     "options": [
-      "Размер clusterIP-диапазона и число публичных DNS-записей.",
-      "Количество образов Docker и наличие локального кеша сборки.",
+      "Срок CA-сертификата etcd и срок сертификатов в kubeconfig пользователей.",
+      "Сертификат kubelet на каждом узле и срок токенов ServiceAccount.",
       "Сроки, способ управления сертификатами, время узлов и резервные копии.",
-      "Срок сертификата внешнего Ingress вместо сертификатов control plane."
+      "Сертификаты Ingress и cert-manager, так как они подписаны тем же CA."
     ],
     "answer": 2,
     "explanation": "Проверяют время узлов и kubeadm certs check-expiration, определяют, какие сертификаты управляются kubeadm, а какие внешней CA. После резервного копирования выполняют предусмотренное для этой схемы обновление и перезапускают компоненты, чтобы они прочитали новые файлы. Также обновляют нужные kubeconfig и проверяют API; удаление PKI-каталога не является процедурой восстановления.",
@@ -13712,9 +13742,9 @@
     "category": "scenario",
     "q": "Trivy падает при загрузке базы уязвимостей. Как сохранить надёжность проверки в CI?",
     "options": [
-      "Удалить сведения о зависимостях из образа перед запуском сканера.",
-      "Заменить сканирование проверкой названия тега собираемого образа.",
-      "Считать сбой загрузки успешным результатом без замечаний.",
+      "Перейти на сканирование по тегам образа без анализа пакетов внутри.",
+      "Разрешить пропускать сканирование при сбое загрузки, чтобы не блокировать релиз.",
+      "Скачивать базу при каждом запуске заново, отключив кеш, чтобы она была свежей.",
       "Проверить доступ к реестру БД, настроить кеш и контролировать свежесть базы."
     ],
     "answer": 3,
@@ -13733,9 +13763,9 @@
     "q": "Как сохранить метрики за год, если локальный Prometheus хранит их три месяца?",
     "options": [
       "Заранее настроить внешнее долговременное хранилище метрик.",
-      "Увеличить временной диапазон запроса после удаления старых блоков.",
-      "Включить подробные access-логи у интерфейса Grafana.",
-      "Уменьшить интервал обновления панели для старых дат."
+      "Увеличить --storage.tsdb.retention.time до года на том же локальном диске без оценки объёма.",
+      "Уменьшить scrape_interval, чтобы старые данные сжимались сильнее и помещались.",
+      "Сохранять снапшоты TSDB раз в квартал и восстанавливать нужный при запросе."
     ],
     "answer": 0,
     "explanation": "Для годовой истории заранее предусматривают долговременное хранилище, например систему с remote write или объектным хранением блоков. Планируют retention, стоимость, кардинальность и доступность запросов. Удалённые три месяца назад данные не появятся от изменения настройки retention сегодня; восстановить их можно из существующего архива.",
@@ -13752,10 +13782,10 @@
     "category": "scenario",
     "q": "Как организовать выдачу очень больших объектов без чтения файла целиком в память API-сервера?",
     "options": [
-      "Сохранять файл в HTTP-cookie и возвращать его при каждом запросе.",
+      "Читать файл в память целиком, но сжимать ответ gzip для экономии трафика.",
       "Использовать объектное хранилище, потоковую передачу и диапазонные запросы.",
-      "Преобразовывать весь файл в Base64 перед первым байтом ответа.",
-      "Передавать файл через DNS TXT-записи с коротким TTL."
+      "Разбивать файл на части в базе данных и собирать его в памяти перед отправкой.",
+      "Отдавать файл через API-сервер одним ответом с большим таймаутом."
     ],
     "answer": 1,
     "explanation": "API хранит метаданные и проверяет доступ, а сами объекты выдаются потоково из подходящего хранилища, при необходимости через подписанные URL. Range-запросы позволяют получать части объекта, а multipart помогает загружать большие файлы с повтором отдельных частей. Учитывают лимиты сервиса, контроль целостности и ограничения CDN на размер кешируемого объекта.",
@@ -13772,10 +13802,10 @@
     "category": "scenario",
     "q": "Как спланировать переход kubeadm-кластера через две minor-версии Kubernetes?",
     "options": [
-      "Заменить версию kubectl и считать кластер обновлённым.",
-      "Обновить kubelet на всех узлах раньше API server через две версии.",
+      "Обновить kubelet на всех узлах первым, а control plane — после них.",
+      "Обновить control plane сразу на две версии, затем узлы, так как skew это допускает.",
       "Обновлять последовательно по minor-версии с проверкой совместимости и нагрузки.",
-      "Сразу пересоздать все узлы без проверки PDB и доступной ёмкости."
+      "Перейти на новую версию сменой образов в static pod манифестах без kubeadm upgrade."
     ],
     "answer": 2,
     "explanation": "Для kubeadm переход выполняют по поддерживаемой последовательности minor-версий, проверяя version skew, удалённые API и совместимость дополнений. Сохраняют резервную копию etcd и план восстановления, затем поочерёдно обновляют control plane и рабочие узлы с проверкой готовности. Отсутствие простоя требует реплик, запаса ёмкости и корректных ограничений disruption.",
@@ -13792,9 +13822,9 @@
     "category": "scenario",
     "q": "Что даёт размещение служебного контейнера рядом с приложением в одном Pod?",
     "options": [
-      "Отдельный IP-адрес Service для каждого процесса контейнера.",
-      "Независимое масштабирование контейнера на другой узел кластера.",
-      "Автоматическую репликацию базы приложения между всеми узлами.",
+      "Изоляцию памяти sidecar от приложения на уровне cgroup Pod.",
+      "Отдельное масштабирование sidecar по своей метрике HPA.",
+      "Раздельные IP-адреса контейнеров внутри одного Pod.",
       "Общий жизненный контекст Pod, сеть и возможность совместных томов."
     ],
     "answer": 3,
@@ -13832,10 +13862,10 @@
     "category": "scenario",
     "q": "Чем magic variables Ansible отличаются от обычных переменных пользователя?",
     "options": [
-      "Их значения обязательно зашифрованы отдельным ключом Vault.",
+      "Их задают в group_vars/all, и они подключаются ко всем хостам автоматически.",
       "Их формирует Ansible для описания текущего контекста выполнения.",
-      "Их разрешено использовать в inventory, но запрещено в playbook.",
-      "Они автоматически загружаются из переменных окружения каждой машины."
+      "Это facts, собранные модулем setup при каждом подключении к хосту.",
+      "Их читают в условиях when, но не в шаблонах Jinja2."
     ],
     "answer": 1,
     "explanation": "Magic variables, например inventory_hostname, hostvars и groups, описывают inventory и контекст выполнения Ansible. Их значения поддерживает движок, поэтому переопределять их как обычные переменные не следует. Факты об ОС и оборудовании относятся к другой группе данных и обычно собираются модулем setup или его аналогами.",
@@ -13852,10 +13882,10 @@
     "category": "scenario",
     "q": "Как связаны индекс, primary shard и replica shard в Elasticsearch?",
     "options": [
-      "Primary shard хранит схему, replica shard хранит документы без схемы.",
-      "Каждый индекс хранится одним файлом на всех узлах одновременно.",
+      "Primary shards хранят документы, а replica shards — инвертированный индекс без самих документов.",
+      "Индекс — это один primary shard, а реплики хранят другие индексы.",
       "Индекс разделён на primary shards, реплики копируют их данные.",
-      "Реплики разделяют документы primary shard на непересекающиеся части."
+      "Реплики принимают запись, а primary shards служат лишь для чтения."
     ],
     "answer": 2,
     "explanation": "Индекс — логическое пространство документов, разбитое на первичные шарды. Реплика содержит копию шарда для доступности и части операций чтения; она не является новой независимой частью данных. Число шардов и реплик влияет на память, размещение и восстановление, поэтому избыток маленьких шардов тоже может стать проблемой.",
@@ -13872,9 +13902,9 @@
     "category": "tradeoff",
     "q": "Что происходит при fast-forward слиянии, если целевая ветка не имеет собственных новых коммитов?",
     "options": [
-      "Git удаляет промежуточные коммиты и заменяет их одним squash.",
-      "Каждый входящий коммит получает новый хеш и нового автора.",
-      "Создаётся новая корневая история без общего предка веток.",
+      "Все коммиты ветки объединяются в один, как при squash merge.",
+      "Git создаёт merge-коммит с двумя родителями, даже если конфликтов нет.",
+      "Коммиты ветки переписываются поверх цели, как при rebase, с новыми хешами.",
       "Указатель ветки перемещается вперёд без отдельного merge-коммита."
     ],
     "answer": 3,
@@ -13912,10 +13942,10 @@
     "category": "scenario",
     "q": "Почему отсутствие ответа на UDP-пробу не доказывает, что удалённый порт закрыт?",
     "options": [
-      "UDP подтверждает каждый пакет, поэтому отсутствие ответа означает успех.",
+      "UDP-порт считается открытым, если на пробу пришёл ICMP port unreachable.",
       "Сервис может молчать, а фильтр может отбрасывать пакеты без ответа.",
-      "Открытый UDP-порт обязан возвращать TCP SYN-ACK на пробу.",
-      "UDP-пробы проверяют DNS-кеш, а не доступность сетевого сервиса."
+      "Закрытый UDP-порт отвечает RST, поэтому молчание означает, что порт открыт.",
+      "UDP-пробы теряются на NAT без включённой трансляции портов, а TCP проходит."
     ],
     "answer": 1,
     "explanation": "У UDP нет обязательного установления соединения и подтверждения каждого пакета. Молчание может означать фильтрацию, потерю пакета или отсутствие реакции приложения на неподходящий запрос. Используют корректную пробу прикладного протокола, анализ ICMP-ошибок и захват трафика на обеих сторонах, чтобы отделить сеть от поведения сервиса.",
@@ -13932,10 +13962,10 @@
     "category": "scenario",
     "q": "Как один Terraform-модуль может создавать AWS-ресурсы в двух регионах?",
     "options": [
-      "Через увеличение parallelism без изменения конфигурации provider.",
-      "Через два вызова terraform plan с разными именами лог-файлов.",
+      "Через переменную region в ресурсе, так как provider задаёт лишь значение по умолчанию.",
+      "Через workspace для каждого региона в одном запуске plan.",
       "Через несколько конфигураций provider с alias и явное назначение ресурсов.",
-      "Через смену DNS-сервера машины, запускающей terraform apply."
+      "Через два terraform init с разными backend для каждого региона."
     ],
     "answer": 2,
     "explanation": "Для разных регионов объявляют отдельные конфигурации AWS provider с alias. Ресурсы выбирают нужную конфигурацию через provider, а дочерним модулям её передают явно с учётом configuration_aliases. Alias выбирает контекст API, но сам по себе не изолирует state, права или окружения приложения.",
@@ -13952,9 +13982,9 @@
     "category": "scenario",
     "q": "Как EC2 в приватной подсети обращаться к S3 своего региона без маршрута через NAT gateway?",
     "options": [
-      "Отключить проверку IAM-политик для приватной подсети.",
-      "Добавить публичный IP в каждую запись объекта S3.",
-      "Разрешить входящий SSH на security group инстанса.",
+      "Настроить VPC peering с аккаунтом S3 в том же регионе.",
+      "Подключить interface endpoint для S3 и открыть к нему выход в интернет через IGW.",
+      "Разместить инстанс в публичной подсети, но без Elastic IP.",
       "Добавить S3 gateway endpoint в нужные таблицы маршрутизации."
     ],
     "answer": 3,
@@ -13973,9 +14003,9 @@
     "q": "Что ограничивает permissions boundary у IAM-роли?",
     "options": [
       "Максимум прав, которые могут дать её identity-based политики.",
-      "Список подсетей, в которых разрешено размещать EC2-инстансы.",
-      "Количество временных паролей для входа в AWS Console.",
-      "Срок хранения сетевых журналов для ресурсов этой роли."
+      "Права, которые роль может передать другим ролям через AssumeRole.",
+      "Ресурсы, к которым роль получает доступ без явных политик.",
+      "Действия, разрешённые роли сверх её identity-based политик."
     ],
     "answer": 0,
     "explanation": "Permissions boundary задаёт верхнюю границу разрешений, выдаваемых identity-based политиками роли, и сама права не предоставляет. Эффективный доступ зависит также от других применимых политик и явных запретов. Resource-based политики и предоставление прав сессиям имеют отдельные правила, поэтому boundary нельзя считать универсальной заменой анализа всей модели доступа.",
@@ -13992,10 +14022,10 @@
     "category": "scenario",
     "q": "Обновлён user data в Launch Template. Изменится ли конфигурация уже работающих EC2 в Auto Scaling Group?",
     "options": [
-      "Да, Auto Scaling немедленно повторно выполняет скрипт на каждом инстансе.",
+      "Да, при следующей перезагрузке инстанс перечитает новый user data.",
       "Нет автоматически; для новых настроек планируют замену или управляемое изменение.",
-      "Да, EC2 переписывает корневую файловую систему из Launch Template.",
-      "Нет, поскольку user data поддерживается вне Auto Scaling Group."
+      "Да, если в Launch Template выбрана версия $Latest.",
+      "Нет, но cloud-init применит изменения при следующем запуске агента SSM."
     ],
     "answer": 1,
     "explanation": "Новая версия Launch Template определяет параметры новых инстансов, если группа настроена использовать эту версию. Работающие машины не перечитывают user data автоматически из-за её изменения. Для распространения обновления используют управляемый Instance Refresh или отдельный инструмент конфигурации, проверяя ёмкость, health checks и возможность отката.",
@@ -14133,9 +14163,9 @@
     "q": "Почему manual job в GitLab CI иногда блокирует pipeline, а иногда считается необязательной?",
     "options": [
       "Поведение зависит от allow_failure и от способа задания when: manual.",
-      "Поведение определяется количеством runner в том же проекте.",
-      "Поведение меняется при выборе другого цвета окружения в интерфейсе.",
-      "Поведение зависит от расширения файла, указанного в artifacts."
+      "Manual job блокирует pipeline при любом when, пока её не запустят вручную.",
+      "Поведение задаёт стадия: manual в последней стадии не блокирует pipeline.",
+      "Поведение определяется защищённостью ветки и правами пользователя."
     ],
     "answer": 0,
     "explanation": "Manual job ожидает ручного запуска, но обязательность выполнения задаётся allow_failure. Значения по умолчанию различаются для when: manual вне rules и внутри rules, поэтому для критичного деплоя параметр лучше указывать явно. Защита окружения и права запуска задаются отдельно от того, блокирует ли job дальнейшие стадии.",

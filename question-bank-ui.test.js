@@ -304,3 +304,8 @@ test('question_bank.json: каждая категория рендерится �
     });
   });
 });
+
+test('renderList помечает вопросы глубокого погружения', () => {
+  const html = ui.renderList([{ id: 'qb_swf_022', level: 'Middle', depth: 'deep', q: 'EKS Anywhere?', answer: 'Ответ.' }], null);
+  assert.match(html, /tag-deep">Глубокое погружение</);
+});
