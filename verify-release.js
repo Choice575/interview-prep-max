@@ -3,16 +3,18 @@ const fs = require('fs');
 const path = require('path');
 
 const root = __dirname;
+const publicRoot = path.join(root, 'public');
+const assetsManifest = require('./public/asset-manifest.js');
 const errors = [];
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const expect = (condition, message) => { if (!condition) errors.push(message); };
 
-const version = read('version.js');
-const app = read('app.js');
-const sw = read('sw.js');
-const html = read('index.html');
+const version = read('public/version.js');
+const app = read('public/app.js');
+const sw = read('public/sw.js');
+const html = read('public/index.html');
 const changelog = read('CHANGELOG.md');
-const manifest = JSON.parse(read('interview-prep-max.webmanifest'));
+const manifest = JSON.parse(read('public/interview-prep-max.webmanifest'));
 
 const versionMatch = version.match(/self\.IPMAX_VERSION\s*=\s*'(\d+\.\d+\.\d+)'/);
 const appVersion = versionMatch && versionMatch[1];
@@ -21,34 +23,25 @@ expect(/self\.IPMAX_CACHE_PREFIX\s*=\s*'ipmax-v'/.test(version), 'version.js д�
 expect(/self\.IPMAX_CACHE_NAME\s*=\s*self\.IPMAX_CACHE_PREFIX\s*\+\s*self\.IPMAX_VERSION/.test(version), 'имя offline-кеша должно строиться из префикса и IPMAX_VERSION');
 expect(!!appVersion && changelog.includes(`## v${appVersion} (`), 'CHANGELOG должен начинаться с записи текущей версии');
 expect(/const APP_VERSION\s*=\s*self\.IPMAX_VERSION\s*\|\|\s*'dev'/.test(app), 'app.js должен использовать IPMAX_VERSION из version.js');
-expect(/importScripts\('\.\/version\.js'\);/.test(sw), 'sw.js должен импортировать version.js');
+expect(/importScripts\('\.\/version\.js', '\.\/asset-manifest\.js'\);/.test(sw), 'sw.js должен импортировать version.js и asset-manifest.js');
 expect(/const CACHE_NAME\s*=\s*self\.IPMAX_CACHE_NAME;/.test(sw), 'sw.js должен использовать IPMAX_CACHE_NAME');
 expect(/const CACHE_PREFIX\s*=\s*self\.IPMAX_CACHE_PREFIX;/.test(sw), 'sw.js должен использовать собственный префикс при очистке кешей');
 
-const versionScriptIndex = html.indexOf('<script src="./version.js"></script>');
-const dateScriptIndex = html.indexOf('<script src="./date.js"></script>');
-const storageScriptIndex = html.indexOf('<script src="./storage.js"></script>');
-const progressScriptIndex = html.indexOf('<script src="./progress.js"></script>');
-const coachScriptIndex = html.indexOf('<script src="./coach.js"></script>');
-const aiCoachScriptIndex = html.indexOf('<script src="./ai-coach.js"></script>');
-const progressIoScriptIndex = html.indexOf('<script src="./progress-io.js"></script>');
-const offlineUiScriptIndex = html.indexOf('<script src="./offline-ui.js"></script>');
-const sourcesUiScriptIndex = html.indexOf('<script src="./sources-ui.js"></script>');
-const catalogUiScriptIndex = html.indexOf('<script src="./catalog-ui.js"></script>');
-const chapterUiScriptIndex = html.indexOf('<script src="./chapter-ui.js"></script>');
-const aiTutorScriptIndex = html.indexOf('<script src="./ai-tutor.js"></script>');
-const aiTutorUiScriptIndex = html.indexOf('<script src="./ai-tutor-ui.js"></script>');
-const routerScriptIndex = html.indexOf('<script src="./router.js"></script>');
-const questionBankUiScriptIndex = html.indexOf('<script src="./question-bank-ui.js"></script>');
-const polygonUiScriptIndex = html.indexOf('<script src="./polygon-ui.js"></script>');
-const analyticsUiScriptIndex = html.indexOf('<script src="./analytics-ui.js"></script>');
-const homeUiScriptIndex = html.indexOf('<script src="./home-ui.js"></script>');
-const examUiScriptIndex = html.indexOf('<script src="./exam-ui.js"></script>');
-const flashcardsUiScriptIndex = html.indexOf('<script src="./flashcards-ui.js"></script>');
-const studyUiScriptIndex = html.indexOf('<script src="./study-ui.js"></script>');
-const coachUiScriptIndex = html.indexOf('<script src="./coach-ui.js"></script>');
-const appScriptIndex = html.indexOf('<script src="./app.js"></script>');
-expect(versionScriptIndex !== -1 && dateScriptIndex > versionScriptIndex && storageScriptIndex > dateScriptIndex && progressScriptIndex > storageScriptIndex && coachScriptIndex > progressScriptIndex && aiCoachScriptIndex > coachScriptIndex && progressIoScriptIndex > aiCoachScriptIndex && offlineUiScriptIndex > progressIoScriptIndex && sourcesUiScriptIndex > offlineUiScriptIndex && catalogUiScriptIndex > sourcesUiScriptIndex && chapterUiScriptIndex > catalogUiScriptIndex && aiTutorScriptIndex > chapterUiScriptIndex && aiTutorUiScriptIndex > aiTutorScriptIndex && routerScriptIndex > aiTutorUiScriptIndex && questionBankUiScriptIndex > routerScriptIndex && polygonUiScriptIndex > questionBankUiScriptIndex && analyticsUiScriptIndex > polygonUiScriptIndex && homeUiScriptIndex > analyticsUiScriptIndex && examUiScriptIndex > homeUiScriptIndex && flashcardsUiScriptIndex > examUiScriptIndex && studyUiScriptIndex > flashcardsUiScriptIndex && coachUiScriptIndex > studyUiScriptIndex && appScriptIndex > coachUiScriptIndex, 'index.html должен загружать browser-модули до app.js в установленном порядке');
+// Единый список скриптов — public/asset-manifest.js (аудит A4.1). index.html
+// обязан подключать ровно их и в том же порядке; каждый скрипт должен лежать
+// в public/, а в public/ не должно быть JS-файлов, которых нет в манифесте.
+const htmlScripts = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(match => match[1]);
+expect(JSON.stringify(htmlScripts) === JSON.stringify(assetsManifest.scripts),
+  'index.html должен подключать скрипты ровно в порядке public/asset-manifest.js');
+expect(assetsManifest.scripts[0] === './version.js' && assetsManifest.scripts.at(-1) === './app.js',
+  'version.js грузится первым, app.js — последним');
+assetsManifest.scripts.concat(assetsManifest.shell, assetsManifest.data).filter(file => file !== './').forEach(file => {
+  expect(fs.existsSync(path.join(publicRoot, file.slice(2))), `в public/ нет ${file} из asset-manifest.js`);
+});
+const listed = new Set(assetsManifest.scripts.concat(assetsManifest.shell));
+fs.readdirSync(publicRoot).filter(file => file.endsWith('.js') && file !== 'sw.js').forEach(file => {
+  expect(listed.has('./' + file), `public/${file} не указан в asset-manifest.js`);
+});
 expect(manifest.start_url === './' && manifest.scope === './', 'manifest должен использовать относительные start_url и scope');
 
 const requiredIcons = [
@@ -57,7 +50,7 @@ const requiredIcons = [
 ];
 requiredIcons.forEach(icon => {
   const declared = manifest.icons.find(candidate => candidate.src === icon.src && candidate.sizes === icon.sizes && candidate.type === 'image/png' && candidate.purpose === icon.purpose);
-  const target = path.join(root, icon.src.slice(2));
+  const target = path.join(publicRoot, icon.src.slice(2));
   expect(!!declared, `manifest не содержит ${icon.sizes} PNG-иконку`);
   expect(fs.existsSync(target), `отсутствует ${icon.src}`);
   if (fs.existsSync(target)) {
@@ -73,22 +66,19 @@ const dataFilesBlock = app.match(/const DATA_FILES = \{([\s\S]*?)\n\};/);
 expect(!!dataFilesBlock, 'не найден DATA_FILES в app.js');
 const dataFiles = dataFilesBlock ? [...dataFilesBlock[1].matchAll(/'((?:tasks\/)[^']+\.json)'/g)].map(match => match[1]) : [];
 expect(dataFiles.length > 0, 'DATA_FILES не содержит JSON-наборов');
-dataFiles.forEach(file => expect(fs.existsSync(path.join(root, file)), `отсутствует ${file}, указанный в DATA_FILES`));
+dataFiles.forEach(file => expect(fs.existsSync(path.join(publicRoot, file)), `отсутствует ${file}, указанный в DATA_FILES`));
 
-const shellBlock = sw.match(/const SHELL_ASSETS = \[([\s\S]*?)\];/);
-const dataBlock = sw.match(/const DATA_ASSETS = \[([\s\S]*?)\];/);
-expect(!!shellBlock, 'не найден SHELL_ASSETS в sw.js');
-expect(!!dataBlock, 'не найден DATA_ASSETS в sw.js');
-expect(/const ASSETS = SHELL_ASSETS\.concat\(DATA_ASSETS\);/.test(sw), 'sw.js должен объединять shell и датасеты в ASSETS');
+expect(/const SHELL_ASSETS = MANIFEST\.shell\.concat\(MANIFEST\.scripts\);/.test(sw), 'sw.js должен брать оболочку из asset-manifest.js');
+expect(/const DATA_ASSETS = MANIFEST\.data;/.test(sw), 'sw.js должен брать датасеты из asset-manifest.js');
 expect(/await cache\.addAll\(SHELL_ASSETS\);/.test(sw), 'offline-shell обязан кешироваться атомарно');
 expect(/cache\.add\(asset\)\.then\(\(\) => null\)\.catch\(\(\) => asset\)/.test(sw), 'датасеты обязаны кешироваться по отдельности с обработкой сбоя');
-const shellAssets = shellBlock ? [...shellBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
-const dataAssets = dataBlock ? [...dataBlock[1].matchAll(/'(\.\/[^']+)'/g)].map(match => match[1]) : [];
-const assets = shellAssets.concat(dataAssets);
-['./answer-ui.js', './index.html', './styles.css', './version.js', './data-loader.js', './date.js', './storage.js', './progress.js', './coach.js', './ai-coach.js', './progress-io.js', './sync-merge.js', './sync-client.js', './sync-ui.js', './ai-settings-client.js', './ai-settings-ui.js', './offline-ui.js', './sources-ui.js', './best-practices-ui.js', './ai-tutor.js', './ai-tutor-ui.js', './external-tasks-ui.js', './polygon-ui.js', './interview-practice-ui.js', './analytics-ui.js', './home-ui.js', './exam-ui.js', './flashcards-ui.js', './study-ui.js', './coach-ui.js', './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
+const assets = assetsManifest.shell.concat(assetsManifest.scripts, assetsManifest.data);
+['./index.html', './styles.css', './interview-prep-max.webmanifest', './assets/icon-192.png', './assets/icon-512.png'].forEach(file => {
   expect(assets.includes(file), `offline-кеш не содержит ${file}`);
 });
-dataFiles.forEach(file => expect(assets.includes('./' + file), `offline-кеш не содержит ./${file}`));
+dataFiles.forEach(file => expect(assetsManifest.data.includes('./' + file), `asset-manifest.js не содержит ./${file} из DATA_FILES`));
+assetsManifest.data.forEach(file => expect(dataFiles.includes(file.slice(2)), `${file} из asset-manifest.js не загружается приложением`));
+assetsManifest.coreData.forEach(file => expect(assetsManifest.data.includes(file), `${file} должен входить в data`));
 
 if (errors.length) {
   console.error('Release integrity check failed:');

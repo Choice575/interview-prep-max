@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const PolygonUI = require('./polygon-ui.js');
+const PolygonUI = require('./public/polygon-ui.js');
 
 const task = {
   id: 'linux-permissions-lockout', title: 'Права после выкатки', technology: 'Linux',

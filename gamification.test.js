@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const Gamification = require('./gamification.js');
+const Gamification = require('./public/gamification.js');
 
 test('buildMetrics counts answered and mastered questions separately', () => {
   const metrics = Gamification.buildMetrics({

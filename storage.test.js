@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const storage = require('./storage.js');
+const storage = require('./public/storage.js');
 
 function createAdapter() {
   const values = new Map();

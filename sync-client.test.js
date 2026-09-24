@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const SyncClient = require('./sync-client.js');
-const Storage = require('./storage.js');
+const SyncClient = require('./public/sync-client.js');
+const Storage = require('./public/storage.js');
 
 function memoryStorage(seed) {
   const map = new Map(Object.entries(seed || {}));
@@ -202,7 +202,7 @@ test('a timeout produces a clear message', async () => {
 test('a full round trip between two devices converges', async () => {
   // Общий «сервер» в памяти: проверяем, что после обмена оба устройства
   // видят одинаковый прогресс.
-  const Merge = require('./sync-merge.js');
+  const Merge = require('./public/sync-merge.js');
   let stored = { snapshotVersion: 1, updatedAt: 0, revision: 0, state: {} };
   const server = async (_url, options) => {
     if (options.method !== 'POST') return jsonResponse(200, { snapshot: stored });

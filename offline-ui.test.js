@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const OfflineUI = require('./offline-ui.js');
+const OfflineUI = require('./public/offline-ui.js');
 
 test('summarises a fully cached installation', () => {
   const report = OfflineUI.buildReport([
@@ -19,7 +19,7 @@ test('summarises a fully cached installation', () => {
 test('reports every missing asset instead of the first few', () => {
   const results = [{ asset: './index.html', cached: true }];
   for (let index = 0; index < 14; index++) {
-    results.push({ asset: `./tasks/dataset-${index}.json`, cached: false });
+    results.push({ asset: `./public/tasks/dataset-${index}.json`, cached: false });
   }
 
   const report = OfflineUI.buildReport(results);

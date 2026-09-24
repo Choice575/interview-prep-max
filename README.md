@@ -2,7 +2,7 @@
 
 ⚙ DevOps-тренажёр и персональный тренер для подготовки к собеседованиям Middle+/Senior.
 
-**Live**: [choice575.github.io/interview-prep-max](https://choice575.github.io/interview-prep-max/)
+**Где работает**: на собственном VPS за Caddy (HTTPS, синхронизация прогресса, AI и полигон). Инструкция — [DEPLOY.md](DEPLOY.md). GitHub Pages отключён: статическая копия не умеет синк, AI и CSP.
 
 ## Возможности
 
@@ -17,40 +17,32 @@
 
 ## Архитектура
 
+Всё, что получает браузер, лежит в `public/`; сервер отдаёт этот каталог целиком и ничего вне него.
+Серверный код, тесты, скрипты и документация остаются в корне репозитория.
+
 ```
-index.html          — SPA shell
-app.js              — логика приложения (UI, state, SRS, trainers)
-date.js             — локальные календарные даты без UTC/DST-сдвигов
-storage.js          — контракт localStorage и безопасная JSON-сериализация
-coach.js            — чистая логика персонального плана: роль, уровень, дата интервью, приоритет тем
-ai-coach.js         — приватный клиентский контракт AI-разбора и локальный fallback
-coach-ui.js         — UI персонального тренера, weekly review, журнал и AI-разбор
-progress.js         — единый SRS и журнал попыток по всем форматам тренировки
-progress-io.js      — безопасный экспорт, проверка и транзакционный импорт прогресса
-analytics-ui.js     — UI аналитики, готовности и рекомендованных вопросов
-home-ui.js          — UI главной, mastery-карточек, истории и быстрых действий
-server.js           — статический Node-сервер и same-origin API-прокси для внешнего AI
-server/ai-service.js — адаптер OpenAI-compatible провайдера; секреты остаются на сервере
-styles.css          — стили (тёмная/светлая тема, responsive)
-sw.js               — Service Worker (PWA, offline cache)
-validate.js         — валидатор JSON-данных
-date.test.js        — unit-тесты календарных границ
-coach.test.js       — unit-тесты приоритизации персонального плана
-progress.test.js    — unit-тесты SRS и журнала компетенций
-*.integration.test.js — проверка цепочки рекомендаций и отдачи app shell
-tasks/              — данные
-  base_questions.json     — 746 вопросов
-  subnet.json             — задачи на подсети
-  ts.json                 — troubleshooting-сценарии
-  cmd.json, code.json, git.json, regex.json — тренажёры
-  ansible_pb.json, dockerfile.json, k8s.json — code review
-  ports.json, labs.json   — порты и debugging
-  tips.json               — шпаргалки
-  study_map.json          — карта 32 учебных недель
-  study_tests.json        — мини-тесты и пятничные тесты (160 + 32)
-  senior_cases.json       — 38 production-кейсов
-  incidents.json          — сценарии инцидентов
+public/                   — корень статики (браузер видит только его)
+  index.html              — SPA shell
+  asset-manifest.js       — единый список скриптов, оболочки и датасетов (читают sw.js и verify-release.js)
+  app.js                  — логика приложения (UI, state, SRS, trainers)
+  *-ui.js, *.js           — модули интерфейса и общая логика (UMD: работают и в браузере, и в Node)
+  sw.js                   — Service Worker (PWA, offline cache)
+  styles.css              — стили (тёмная/светлая тема, responsive)
+  version.js              — версия приложения и имя офлайн-кеша
+  assets/                 — иконки PWA
+  tasks/                  — данные: вопросы, банк, карточки, тренажёры, учебная карта
+server.js                 — статический сервер для public/ и API синка, AI и настроек
+server/                   — сервисы синхронизации, AI-провайдера и авторизации
+polygon-runner/           — изолированные Linux-лаборатории полигона
+scripts/                  — генераторы и импорт данных, деплой, conceptId (concept-links.json)
+validate.js, verify-release.js, question-quality.js — проверки данных и релиза
+*.test.js                 — unit- и интеграционные тесты (npm test находит их по маске)
+e2e/                      — браузерные тесты Playwright
 ```
+
+Новый браузерный модуль: положить файл в `public/`, добавить его в `public/asset-manifest.js`
+и тот же `<script>` в `public/index.html` в том же порядке. `verify-release.js` остановит релиз,
+если файл есть в `public/`, но не указан в манифесте, или порядок в `index.html` расходится.
 
 ## Curriculum
 
@@ -78,36 +70,21 @@ npm run test:e2e
 
 ## Публикация
 
-Приложение публикуется на GitHub Pages **из ветки `main`, корень репозитория** (classic Pages,
-`build_type: legacy`). Отдельного deploy-job в CI нет и он не нужен: после `git push origin main`
-GitHub сам собирает и публикует сайт своим служебным workflow `pages build and deployment`.
+Основной и единственный деплой — VPS (см. [DEPLOY.md](DEPLOY.md)). После слияния в `main`
+CI прогоняет проверки и e2e, затем задание `deploy` по SSH запускает на сервере
+`deploy-production.sh` с резервной копией и автоматическим откатом и публикует GitHub Release.
 
 ```bash
 # перед push — обязательный минимум
 npm test
-node validate.js
-node verify-release.js
-
-git push origin main
+npm run lint:strict
+npm run verify:release
 ```
 
-Проверить, что опубликована именно нужная версия:
-
-```bash
-# статус и источник Pages
-gh api repos/Choice575/interview-prep-max/pages
-
-# последние публикации
-gh run list --workflow 'pages build and deployment' --limit 5
-```
-
-В браузере на `https://choice575.github.io/interview-prep-max/` версию видно в консоли:
-`self.IPMAX_VERSION`. Она должна совпадать с `version.js` в `main`.
-
-Если CI зелёный, но на Pages старая версия — это кеш Service Worker, а не сбой сборки.
-Приложение показывает баннер обновления; кроме того версия кеша меняется вместе с
-`IPMAX_VERSION`, поэтому новый Service Worker удаляет прежний кеш при активации.
-Для ручной проверки откройте сайт в приватном окне или сравните с `raw.githubusercontent.com`.
+Версию на сервере видно в консоли браузера (`self.IPMAX_VERSION`) и по адресу `/version.js`;
+она должна совпадать с `public/version.js` в `main`. Если CI зелёный, а в браузере старая
+версия — это кеш Service Worker: приложение показывает баннер обновления, а новая версия
+создаёт новый кеш и удаляет прежний при активации.
 
 ## Персональный план
 

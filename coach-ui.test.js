@@ -34,8 +34,8 @@ class FakeDocument {
 
 function loadCoachUI() {
   // Fresh module instance per test: `services` and `bound` are module-level.
-  delete require.cache[require.resolve('./coach-ui.js')];
-  return require('./coach-ui.js');
+  delete require.cache[require.resolve('./public/coach-ui.js')];
+  return require('./public/coach-ui.js');
 }
 
 function basePlan(overrides) {

@@ -93,7 +93,7 @@ jobs:
           # Refuse to move an existing tag to different code, before deploying.
           existing=$(git ls-remote origin "refs/tags/$tag" | cut -f1)
           if [ -n "$existing" ] && [ "$existing" != "$DEPLOY_SHA" ]; then
-            echo "Version $tag already belongs to another commit; bump version.js and CHANGELOG.md."
+            echo "Version $tag already belongs to another commit; bump public/version.js and CHANGELOG.md."
             exit 1
           fi
       - name: Install restricted deployment credential

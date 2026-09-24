@@ -302,7 +302,13 @@ test('serves only browser assets and blocks server-side files', async () => {
     const homeUi = await request(server, 'GET', '/home-ui.js');
     assert.equal(homeUi.status, 200);
 
-    for (const privatePath of ['/server.js', '/server/ai-service.js', '/.env', '/.git/config', '/package-lock.json']) {
+    // Корень статики — public/: серверный код и секреты лежат вне его и
+    // отсутствуют (404), а скрытые пути и обходы каталога запрещены (403).
+    for (const privatePath of ['/server.js', '/server/ai-service.js', '/package-lock.json', '/scripts/concept-links.json']) {
+      const result = await request(server, 'GET', privatePath);
+      assert.equal(result.status, 404, privatePath);
+    }
+    for (const privatePath of ['/.env', '/.git/config', '/tasks/.hidden.json', '/%2e%2e%2fserver.js', '/..%2fserver.js', '/app.js%00.png']) {
       const result = await request(server, 'GET', privatePath);
       assert.equal(result.status, 403, privatePath);
     }

@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 function readTask(name) {
-  return JSON.parse(fs.readFileSync(path.join(__dirname, 'tasks', name), 'utf8'));
+  return JSON.parse(fs.readFileSync(path.join(__dirname, 'public', 'tasks', name), 'utf8'));
 }
 
 test('uses roadmap v5.1 as the shared curriculum contract', () => {

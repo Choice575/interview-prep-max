@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const coach = require('./coach.js');
+const coach = require('./public/coach.js');
 
 const questions = [
   { id: 1, topic: 'Linux', level: 'Middle' },

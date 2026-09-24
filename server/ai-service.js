@@ -1,6 +1,6 @@
-const AICoach = require('../ai-coach.js');
-const InterviewPractice = require('../interview-practice-ui.js');
-const AITutor = require('../ai-tutor.js');
+const AICoach = require('../public/ai-coach.js');
+const InterviewPractice = require('../public/interview-practice-ui.js');
+const AITutor = require('../public/ai-tutor.js');
 const { createAiSettingsStore } = require('./ai-settings.js');
 
 const SYSTEM_PROMPT = [

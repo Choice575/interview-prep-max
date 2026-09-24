@@ -164,7 +164,7 @@ function editRecord(record) {
 
 function main() {
   const root = path.resolve(__dirname, '..');
-  const files = ['tasks/base_questions.json','tasks/question_bank.json','tasks/flashcards.json','tasks/video_flashcards.json','scripts/imports/swfuse.json'];
+  const files = ['public/tasks/base_questions.json','public/tasks/question_bank.json','public/tasks/flashcards.json','public/tasks/video_flashcards.json','scripts/imports/swfuse.json'];
   for (const file of files) {
     const location = path.join(root,file);
     const original = fs.readFileSync(location,'utf8');

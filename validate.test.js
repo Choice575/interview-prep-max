@@ -1,8 +1,8 @@
 const assert = require('node:assert/strict');
 const { spawnSync } = require('node:child_process');
 const test = require('node:test');
-const studyMap = require('./tasks/study_map.json');
-const mlopsMap = require('./tasks/mlops_map.json');
+const studyMap = require('./public/tasks/study_map.json');
+const mlopsMap = require('./public/tasks/mlops_map.json');
 const { REQUIRED_TERMS_BY_WEEK, findMissingRequiredTerms } = require('./study-curriculum-rules');
 
 test('accepts the complete curriculum in strict mode', () => {

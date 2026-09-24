@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const FlashcardsUI = require('./flashcards-ui.js');
+const FlashcardsUI = require('./public/flashcards-ui.js');
 
 const cards = [
   { id: 1000001, collection: 'Linux и Bash', question: 'Что делает pwd?', answer: 'Печатает текущий каталог.' },

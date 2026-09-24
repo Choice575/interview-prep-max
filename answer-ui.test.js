@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const Answer = require('./answer-ui.js');
+const Answer = require('./public/answer-ui.js');
 
 test('short answers remain complete and reviewed summaries keep the full explanation', () => {
   assert.deepEqual(Answer.parts('Короткий ответ.'), {short:'Короткий ответ.',full:''});

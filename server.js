@@ -15,23 +15,10 @@ const contentTypes = {
   '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json', '.png': 'image/png'
 };
-const publicFiles = new Set([
-  'index.html', 'styles.css', 'version.js', 'data-loader.js', 'date.js', 'storage.js', 'progress.js', 'coach.js', 'ai-coach.js', 'progress-io.js',
-  // Модули синхронизации нужны браузеру, поэтому они публичные. Серверная
-  // часть (server/sync-service.js) сюда НЕ попадает и остаётся закрытой.
-  'sync-merge.js', 'sync-client.js', 'sync-ui.js', 'ai-settings-client.js', 'ai-settings-ui.js',
-  'offline-ui.js', 'sources-ui.js', 'best-practices-ui.js', 'catalog-ui.js', 'chapter-ui.js', 'ai-tutor.js', 'ai-tutor-ui.js', 'router.js',
-  // Новый модуль, не добавленный сюда, отдаётся как 403: страница молча теряет
-  // скрипт, а sw.js не устанавливается вовсе — SHELL_ASSETS кешируется
-  // атомарным addAll, и один недоступный файл роняет всю установку.
-  'gamification.js', 'gamification-ui.js', 'daily.js', 'daily-ui.js', 'trainers-ui.js', 'subnet.js',
-  'answer-ui.js', 'question-bank-ui.js', 'external-tasks-ui.js', 'polygon-ui.js', 'interview-practice-ui.js', 'analytics-ui.js', 'home-ui.js', 'exam-ui.js', 'flashcards-ui.js', 'study-ui.js', 'sw.js',
-  'coach-ui.js', 'app.js', 'interview-prep-max.webmanifest', 'assets/icon-192.png', 'assets/icon-512.png',
-  'tasks/base_questions.json', 'tasks/subnet.json', 'tasks/ts.json', 'tasks/cmd.json', 'tasks/code.json',
-  'tasks/git.json', 'tasks/regex.json', 'tasks/ansible_pb.json', 'tasks/dockerfile.json', 'tasks/k8s.json',
-  'tasks/ports.json', 'tasks/labs.json', 'tasks/tips.json', 'tasks/incidents.json', 'tasks/study_map.json',
-  'tasks/study_tests.json', 'tasks/mlops_map.json', 'tasks/mlops_tests.json', 'tasks/senior_cases.json', 'tasks/best_practices.json', 'tasks/question_sources.json', 'tasks/interview_practice.json', 'tasks/external_tasks.json', 'tasks/courses.json', 'tasks/question_bank.json', 'tasks/flashcards.json', 'tasks/video_flashcards.json'
-]);
+// Браузеру отдаётся только каталог public/ (аудит A4.1): отдельного списка
+// файлов больше нет, поэтому новый модуль не может «потеряться» как 403, а
+// серверный код, тесты и .env физически лежат вне корня статики.
+const PUBLIC_ROOT = path.join(__dirname, 'public');
 
 function sendJson(response, status, body) {
   const data = Buffer.from(JSON.stringify(body));
@@ -122,15 +109,18 @@ function safeStaticPath(root, pathname) {
   let decoded;
   try { decoded = decodeURIComponent(pathname); } catch (_) { return null; }
   if (decoded === '/') decoded = '/index.html';
-  const publicName = decoded.replace(/^\/+/, '').replace(/\\/g, '/');
-  if (!publicFiles.has(publicName)) return null;
+  if (decoded.includes('\0') || decoded.includes('\\')) return null;
+  const segments = decoded.split('/').filter(Boolean);
+  // Скрытые файлы и каталоги (.git, .env) не отдаются даже внутри public/.
+  if (!segments.length || segments.some(segment => segment.startsWith('.'))) return null;
+  if (!Object.prototype.hasOwnProperty.call(contentTypes, path.extname(decoded))) return null;
   const target = path.resolve(root, '.' + decoded);
   const relative = path.relative(root, target);
-  return !relative.startsWith('..') && !path.isAbsolute(relative) ? target : null;
+  return relative && !relative.startsWith('..') && !path.isAbsolute(relative) ? target : null;
 }
 
 function createAppServer(options = {}) {
-  const root = path.resolve(options.root || __dirname);
+  const root = path.resolve(options.root || PUBLIC_ROOT);
   const env = options.env || process.env;
   const aiService = options.aiService || createAiService(env, options.dependencies);
   const aiSettings = options.aiSettings || createAiSettingsStore(env, options.dependencies);

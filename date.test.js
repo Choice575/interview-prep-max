@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const dates = require('./date.js');
+const dates = require('./public/date.js');
 
 test('validates calendar date keys', () => {
   assert.equal(dates.isValidDateKey('2026-07-22'), true);

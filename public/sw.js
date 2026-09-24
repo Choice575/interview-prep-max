@@ -1,38 +1,16 @@
-importScripts('./version.js');
+importScripts('./version.js', './asset-manifest.js');
 const CACHE_NAME = self.IPMAX_CACHE_NAME;
 const CACHE_PREFIX = self.IPMAX_CACHE_PREFIX;
 
+// Списки ресурсов живут в asset-manifest.js (аудит A4.1).
+const MANIFEST = self.IPMAX_ASSETS;
 // The shell installs atomically: without it the app cannot start offline at all.
-const SHELL_ASSETS = [
-  './', './index.html', './styles.css',
-  './version.js', './data-loader.js', './date.js', './storage.js',
-  './progress.js', './coach.js', './ai-coach.js',
-  './progress-io.js', './sync-merge.js', './sync-client.js', './sync-ui.js',
-  './ai-settings-client.js', './ai-settings-ui.js',
-  './offline-ui.js', './sources-ui.js', './best-practices-ui.js', './catalog-ui.js', './chapter-ui.js', './ai-tutor.js', './ai-tutor-ui.js', './router.js',
-  './gamification.js', './gamification-ui.js', './daily.js', './daily-ui.js', './trainers-ui.js', './subnet.js',
-  './answer-ui.js', './question-bank-ui.js', './external-tasks-ui.js', './polygon-ui.js', './interview-practice-ui.js', './analytics-ui.js', './home-ui.js',
-  './exam-ui.js', './flashcards-ui.js', './study-ui.js', './coach-ui.js',
-  './app.js', './interview-prep-max.webmanifest', './assets/icon-192.png',
-  './assets/icon-512.png'
-];
-
+const SHELL_ASSETS = MANIFEST.shell.concat(MANIFEST.scripts);
 // Datasets cache individually so one unavailable file cannot block the install.
-const DATA_ASSETS = [
-  './tasks/base_questions.json', './tasks/ts.json', './tasks/subnet.json',
-  './tasks/cmd.json', './tasks/code.json', './tasks/git.json',
-  './tasks/regex.json', './tasks/ansible_pb.json', './tasks/dockerfile.json',
-  './tasks/k8s.json', './tasks/ports.json', './tasks/labs.json',
-  './tasks/tips.json', './tasks/incidents.json', './tasks/study_map.json',
-  './tasks/study_tests.json', './tasks/mlops_map.json', './tasks/mlops_tests.json', './tasks/senior_cases.json', './tasks/best_practices.json', './tasks/external_tasks.json', './tasks/question_sources.json', './tasks/interview_practice.json', './tasks/courses.json', './tasks/question_bank.json', './tasks/flashcards.json', './tasks/video_flashcards.json'
-];
-
-// Full asset list. Not read by precache() (shell and datasets are cached
-// separately), but verify-release.js asserts this line exists as the single
-// place where the complete cache manifest is visible.
+const DATA_ASSETS = MANIFEST.data;
 // eslint-disable-next-line no-unused-vars
 const ASSETS = SHELL_ASSETS.concat(DATA_ASSETS);
-const CORE_DATA_ASSETS = ['./tasks/base_questions.json', './tasks/best_practices.json'];
+const CORE_DATA_ASSETS = MANIFEST.coreData;
 
 async function precache() {
   const cache = await caches.open(CACHE_NAME);

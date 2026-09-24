@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const Merge = require('./sync-merge.js');
+const Merge = require('./public/sync-merge.js');
 
 // sync-ui.js читает голый `document` в момент вызова, поэтому глобального
 // стаба достаточно — jsdom в проекте нет.
@@ -36,8 +36,8 @@ class FakeDocument {
 
 function loadSyncUI() {
   // Свежий модуль на каждый тест: services/bound/syncing — на уровне модуля.
-  delete require.cache[require.resolve('./sync-ui.js')];
-  return require('./sync-ui.js');
+  delete require.cache[require.resolve('./public/sync-ui.js')];
+  return require('./public/sync-ui.js');
 }
 
 function fakeClient(overrides) {

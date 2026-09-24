@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const ET = require('./external-tasks-ui.js');
+const ET = require('./public/external-tasks-ui.js');
 
 const progressKey = 'external_tasks_completed';
 const recoveryKey = 'external_tasks_completed_recovery';

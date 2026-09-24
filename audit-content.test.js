@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const questions = require('./tasks/base_questions.json');
+const questions = require('./public/tasks/base_questions.json');
 
 const correctedTerraformAnswers = new Map([
   [9, /Снимок соответствия адресов Terraform реальным объектам/],
@@ -22,7 +22,7 @@ test('five corrected Terraform keys point to the intended answers with stable ID
 });
 
 test('study flashcards copied from exam questions start with the keyed answer, not a distractor', () => {
-  const cards = require('./tasks/flashcards.json').cards;
+  const cards = require('./public/tasks/flashcards.json').cards;
   const byQuestion = new Map();
   questions.forEach(question => {
     const key = question.q.trim();
@@ -60,10 +60,10 @@ test('explanation-vs-key gate flags a shuffled Terraform key and only reviewed I
 });
 
 test('audited regex and command trainers stay consistent with their study flashcards', () => {
-  const cards = new Map(require('./tasks/flashcards.json').cards.map(card => [card.id, card]));
+  const cards = new Map(require('./public/tasks/flashcards.json').cards.map(card => [card.id, card]));
   const trainers = {
-    regex: new Map(require('./tasks/regex.json').map(task => [task.id, task])),
-    cmd: new Map(require('./tasks/cmd.json').map(task => [task.id, task]))
+    regex: new Map(require('./public/tasks/regex.json').map(task => [task.id, task])),
+    cmd: new Map(require('./public/tasks/cmd.json').map(task => [task.id, task]))
   };
   const linked = [
     [1001089, 'regex', 3], [1001103, 'regex', 6], [1001226, 'regex', 8], [1001105, 'regex', 9],
@@ -81,20 +81,20 @@ test('audited regex and command trainers stay consistent with their study flashc
 });
 
 test('Ansible trainers describe lineinfile and when braces as verified on ansible-core', () => {
-  const lineinfile = require('./tasks/ansible_pb.json').find(task => task.id === 6);
+  const lineinfile = require('./public/tasks/ansible_pb.json').find(task => task.id === 6);
   assert.doesNotMatch(lineinfile.bug, /при КАЖДОМ запуске/);
   assert.match(lineinfile.opts[lineinfile.answer], /другим IP не заменится/);
-  const braces = require('./tasks/code.json').find(task => task.id === 12);
+  const braces = require('./public/tasks/code.json').find(task => task.id === 12);
   assert.doesNotMatch(braces.bug + braces.opts[braces.answer], /deprecated/);
   assert.match(braces.bug, /Template delimiters are not supported in expressions/);
 });
 
 test('trainer-derived study cards keep source punctuation and never point at invisible options', () => {
-  const cards = require('./tasks/flashcards.json').cards;
+  const cards = require('./public/tasks/flashcards.json').cards;
   const byQuestion = new Map(cards.map(card => [card.question.trim(), card]));
   let linked = 0;
   for (const file of ['regex', 'cmd', 'git']) {
-    for (const task of require(`./tasks/${file}.json`)) {
+    for (const task of require(`./public/tasks/${file}.json`)) {
       const card = byQuestion.get(task.task.trim());
       if (!card) continue;
       linked++;
@@ -120,7 +120,7 @@ test('trainer-derived study cards keep source punctuation and never point at inv
 });
 
 test('template and rubric flashcards and empty senior cases are flagged as generated', () => {
-  const cards = require('./tasks/flashcards.json').cards;
+  const cards = require('./public/tasks/flashcards.json').cards;
   const templates = [
     /^К какому production-сбою приведёт ошибка/, /^Как в задаче «.*» применить навык/,
     /^Какими диагностическими данными \(evidence\) и повторными проверками доказать/, /^К какому сбою приведёт ошибка/,
@@ -135,7 +135,7 @@ test('template and rubric flashcards and empty senior cases are flagged as gener
   assert.equal(visibleStudy.length, 2330);
   assert.equal(cards.filter(card => card.practice).length, 90, 'колода практических сценариев не меняется');
 
-  const cases = require('./tasks/senior_cases.json').cases;
+  const cases = require('./public/tasks/senior_cases.json').cases;
   const empty = cases.filter(item => item.evidence.some(line => /^Topic:/.test(line)));
   assert.equal(empty.length, 17);
   assert.ok(empty.every(item => item.generated === true));
@@ -143,9 +143,9 @@ test('template and rubric flashcards and empty senior cases are flagged as gener
 });
 
 test('practice cards keep trainer and lab code as a multi-line block in sync with their sources', () => {
-  const cards = require('./tasks/flashcards.json').cards.filter(card => card.question.startsWith('[Практика] '));
-  const trainers = ['ansible_pb', 'code', 'k8s', 'dockerfile'].flatMap(file => require(`./tasks/${file}.json`));
-  const labs = require('./tasks/labs.json');
+  const cards = require('./public/tasks/flashcards.json').cards.filter(card => card.question.startsWith('[Практика] '));
+  const trainers = ['ansible_pb', 'code', 'k8s', 'dockerfile'].flatMap(file => require(`./public/tasks/${file}.json`));
+  const labs = require('./public/tasks/labs.json');
   for (const card of cards) {
     assert.ok(card.code, `${card.id}: нет code`);
     const task = trainers.find(item => item.code === card.code) || labs.find(item => item.code === card.code);
@@ -158,8 +158,8 @@ test('practice cards keep trainer and lab code as a multi-line block in sync wit
 });
 
 test('incident cards separate the scenario from the step and carry the command output', () => {
-  const cards = require('./tasks/flashcards.json').cards.filter(card => card.question.startsWith('[Инцидент: '));
-  const incidents = require('./tasks/incidents.json');
+  const cards = require('./public/tasks/flashcards.json').cards.filter(card => card.question.startsWith('[Инцидент: '));
+  const incidents = require('./public/tasks/incidents.json');
   assert.equal(cards.length, 44);
   for (const card of cards) assert.match(card.question, / Сейчас: .+\. — /, `${card.id}`);
   const withEvidence = incidents.flatMap(item => item.phases).filter(phase => phase.evidence).length;
@@ -170,9 +170,9 @@ test('копии вопроса в тестах, банке и карточка�
   const fs = require('node:fs');
   const { assignConcepts } = require('./scripts/assign-concepts.js');
   const read = file => JSON.parse(fs.readFileSync(file, 'utf8'));
-  const input = { exam: read('tasks/base_questions.json'), bank: read('tasks/question_bank.json'),
-    study: read('tasks/flashcards.json'), video: read('tasks/video_flashcards.json') };
-  const result = assignConcepts(input, read('tasks/concept-links.json'));
+  const input = { exam: read('public/tasks/base_questions.json'), bank: read('public/tasks/question_bank.json'),
+    study: read('public/tasks/flashcards.json'), video: read('public/tasks/video_flashcards.json') };
+  const result = assignConcepts(input, read('scripts/concept-links.json'));
   assert.deepEqual(result.data, input, 'запустите node scripts/assign-concepts.js');
   assert.ok(result.groups > 900, `групп ${result.groups}`);
   const load = input.exam.find(question => /load average/i.test(question.q) && question.conceptId);

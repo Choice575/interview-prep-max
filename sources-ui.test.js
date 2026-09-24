@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const SourcesUI = require('./sources-ui.js');
+const SourcesUI = require('./public/sources-ui.js');
 
 const DAY = 86400000;
 const now = Date.parse('2026-07-28T12:00:00Z');

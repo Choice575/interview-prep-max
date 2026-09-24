@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = __dirname;
-const QUESTIONS_FILE = path.join(ROOT, 'tasks', 'base_questions.json');
+const QUESTIONS_FILE = path.join(ROOT, 'public', 'tasks', 'base_questions.json');
 const BASELINE_FILE = path.join(ROOT, 'question-quality-baseline.json');
 // Датасеты тренажёров лежат в другой схеме (opts/answer вместо options/answer),
 // поэтому раньше не попадали под этот гейт — и подсказка по длине выжила в них,
@@ -272,7 +272,7 @@ function readQuestions() {
  * регрессию, а не унаследованный долг.
  */
 function analyzeTrainerFile(name) {
-  const full = path.join(ROOT, 'tasks', name);
+  const full = path.join(ROOT, 'public', 'tasks', name);
   if (!fs.existsSync(full)) return { file: name, missing: true, checked: 0, failures: [`нет файла ${name}`] };
   const raw = JSON.parse(fs.readFileSync(full, 'utf8'));
   const items = Array.isArray(raw) ? raw : (raw.tasks || []);

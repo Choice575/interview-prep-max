@@ -1,8 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const ui = require('./gamification-ui.js');
-const core = require('./gamification.js');
-const coach = require('./coach.js');
+const ui = require('./public/gamification-ui.js');
+const core = require('./public/gamification.js');
+const coach = require('./public/coach.js');
 
 function buildProfile(state) {
   return core.buildProfile(state || {});

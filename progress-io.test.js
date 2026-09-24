@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const ProgressIO = require('./progress-io.js');
+const ProgressIO = require('./public/progress-io.js');
 
 const dependencies = {
   baseQuestions: [{ id: 1 }],

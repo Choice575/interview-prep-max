@@ -70,7 +70,7 @@ function buildImport(input) {
 function main() {
   const root = path.resolve(__dirname, '..');
   const files = { bank: 'question_bank.json', exam: 'base_questions.json', flashcards: 'flashcards.json' };
-  const originals = Object.fromEntries(Object.entries(files).map(([key, file]) => [key, fs.readFileSync(path.join(root, 'tasks', file), 'utf8')]));
+  const originals = Object.fromEntries(Object.entries(files).map(([key, file]) => [key, fs.readFileSync(path.join(root, 'public', 'tasks', file), 'utf8')]));
   const input = Object.fromEntries(Object.entries(originals).map(([key, value]) => [key, JSON.parse(value)]));
   const result = buildImport(input);
   for (const [key, file] of Object.entries(files)) {
@@ -81,7 +81,7 @@ function main() {
       const pretty = old.trim().split('\n').length > 1;
       const suffix = old.endsWith('\n') ? newline : '';
       const text = JSON.stringify(result[key], null, pretty ? 2 : undefined).replace(/\n/g, newline) + suffix;
-      fs.writeFileSync(path.join(root, 'tasks', file), text);
+      fs.writeFileSync(path.join(root, 'public', 'tasks', file), text);
     }
   }
   console.log(`Swfuse: ${manifest.questions.length} questions synchronized across bank, exam and flashcards.`);

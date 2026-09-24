@@ -3,9 +3,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 
-const ui = require('./catalog-ui.js');
+const ui = require('./public/catalog-ui.js');
 
-const doc = JSON.parse(fs.readFileSync(path.join(__dirname, 'tasks', 'courses.json'), 'utf8'));
+const doc = JSON.parse(fs.readFileSync(path.join(__dirname, 'public', 'tasks', 'courses.json'), 'utf8'));
 
 const fakeCourse = (id, chapterIds, extra) => Object.assign({
   id: id,
