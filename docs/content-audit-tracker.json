@@ -1453,13 +1453,19 @@
       "current": "взять из `/proc/PID/fd`; `--reinstall nginx-core`",
       "proposed": "у master только `/dev/null`, логи и сокеты; файл принадлежит `nginx-common`; удалённый conffile возвращает только `--reinstall -o Dpkg::Options::=--force-confmiss nginx-common`; `nginx -T` читает с диска",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000052",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Убран неверный совет извлекать конфигурацию из дескрипторов Nginx; добавлены резервная копия, проверка пакета, восстановление conffile и проверка синтаксиса.",
+      "sources": [
+        "https://nginx.org/en/docs/switches.html",
+        "https://packages.ubuntu.com/jammy/all/nginx-common/filelist",
+        "https://manpages.debian.org/bookworm/dpkg/dpkg.1.en.html"
       ]
     },
     {
@@ -1475,13 +1481,18 @@
       "current": "основной путь — `ulimit` и `limits.conf`",
       "proposed": "limits.conf не действует на службы systemd; сначала `/proc/PID/limits` и рост `/proc/PID/fd` (утечка); для службы — `LimitNOFILE`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000051",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Диагностика начинается с лимита и числа дескрипторов конкретного процесса; для systemd-службы указан LimitNOFILE.",
+      "sources": [
+        "https://man7.org/linux/man-pages/man5/proc_pid_limits.5.html",
+        "https://github.com/systemd/systemd/blob/main/man/systemd.exec.xml"
       ]
     },
     {
@@ -1497,13 +1508,17 @@
       "current": "«равно ядрам — норма, вдвое — перегрузка»",
       "proposed": "ориентир, решать по задержкам и iowait; включает выполняющиеся задачи",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000023",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Средняя нагрузка описана через состояния R и D; убран универсальный порог по числу ядер.",
+      "sources": [
+        "https://man7.org/linux/man-pages/man5/proc_loadavg.5.html"
       ]
     },
     {
@@ -1519,13 +1534,17 @@
       "current": "«высокий %util — перегруз»",
       "proposed": "на NVMe/RAID не так; поля `r_await`, `w_await`, `aqu-sz`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000049",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Добавлены задержки чтения/записи и очередь; уточнена ограниченная пригодность %util для RAID и SSD.",
+      "sources": [
+        "https://github.com/sysstat/sysstat/blob/master/man/iostat.in"
       ]
     },
     {
@@ -1541,13 +1560,17 @@
       "current": "контроль «сети»",
       "proposed": "в v2 нет сетевого контроллера; CPU, память, I/O, pids",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000054",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Убран несуществующий встроенный сетевой контроллер cgroup v2; перечислены основные контроллеры.",
+      "sources": [
+        "https://docs.kernel.org/admin-guide/cgroup-v2.html"
       ]
     },
     {
@@ -1563,13 +1586,18 @@
       "current": "«браузер блокирует запросы»",
       "proposed": "простой запрос уходит, скрыт ответ; preflight; аннотации специфичны для ingress-nginx; `*` нельзя с credentials",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000074",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Разделены отправка запроса и доступ к ответу, описаны preflight, учётные данные и специфика ingress-nginx.",
+      "sources": [
+        "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS",
+        "https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/"
       ]
     },
     {
@@ -1585,13 +1613,17 @@
       "current": "«LoadBalancer направляет на NodePort»",
       "proposed": "обычно, но не всегда",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000178",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Уточнено, что LoadBalancer не всегда использует NodePort.",
+      "sources": [
+        "https://kubernetes.io/docs/concepts/services-networking/service/"
       ]
     },
     {
@@ -1608,7 +1640,7 @@
       "current": "из `qb_kts_024`, `qb_kts_025`",
       "proposed": "исправить вместе с банком",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000310",
@@ -1620,6 +1652,12 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Видеокарточки 2000310 и 2000311 уже совпадают с исправленными вопросами банка qb_kts_024 и qb_kts_025.",
+      "sources": [],
+      "linkedIds": [
+        "qb_kts_024",
+        "qb_kts_025"
       ]
     },
     {
@@ -1635,14 +1673,16 @@
       "current": "«для диагностика неисправностей»",
       "proposed": "«для диагностики неисправностей»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000262",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлены падеж и лишний английский дубль в вопросе.",
+      "sources": []
     },
     {
       "id": "audit-p03-386",
@@ -1658,7 +1698,7 @@
       "current": "«В рабочей среде (production)»",
       "proposed": "«на рабочих серверах»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000192",
@@ -1670,7 +1710,9 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Убрана избыточная англоязычная вставка и переведены общие слова в карточке 2000192; 2000311 уже использует русскую формулировку.",
+      "sources": []
     },
     {
       "id": "audit-p03-387",
@@ -1685,13 +1727,18 @@
       "current": "Сети",
       "proposed": "Kubernetes",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000178",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Карточка о типах Kubernetes Service перенесена в категорию Kubernetes.",
+      "sources": [],
+      "linkedIds": [
+        2000178
       ]
     },
     {
@@ -1707,13 +1754,18 @@
       "current": "Сети",
       "proposed": "Карьера",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000326",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Карточка о развитии карьеры сетевого инженера перенесена в категорию «Карьера и собеседования».",
+      "sources": [],
+      "linkedIds": [
+        2000326
       ]
     },
     {
