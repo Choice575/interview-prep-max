@@ -1,3 +1,5 @@
+# Единый LF: CRLF и LF были смешаны в app.js, index.html, styles.css и других файлах.
+* text=auto eol=lf
 *.sh text eol=lf
 *.yml text eol=lf
 polygon-runner/task-linux-permissions/*.py text eol=lf

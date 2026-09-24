@@ -1,0 +1,33 @@
+# Обновления зависимостей раз в неделю. Мажорные версии Node и образов
+# принимаются вручную: они меняют среду выполнения, а не только патчи.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: docker
+    directories:
+      - /
+      - /polygon-runner
+      - /polygon-runner/task-linux-permissions
+    schedule:
+      interval: weekly
+    ignore:
+      - dependency-name: node
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+    ignore:
+      - dependency-name: caddy
+        update-types: [version-update:semver-major]

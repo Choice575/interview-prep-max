@@ -7,6 +7,10 @@ on:
   pull_request:
     branches: [main]
 
+# По умолчанию только чтение; права на запись выдаются явно заданию deploy.
+permissions:
+  contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -31,14 +35,12 @@ jobs:
           python3 -m unittest discover -s scripts -p 'test_deploy.py' -v
       - name: Lint
         run: npm run lint:strict
+      # npm test уже запускает validate.js --strict (validate.test.js) и
+      # verify-release.js (release.test.js), поэтому отдельных шагов нет.
       - name: Unit and integration tests
         run: npm test
-      - name: JSON validation
-        run: node validate.js
       - name: Question quality baseline
         run: npm run quality:questions
-      - name: Release integrity check
-        run: node verify-release.js
   e2e:
     needs: validate
     runs-on: ubuntu-latest
