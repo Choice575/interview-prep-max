@@ -1835,8 +1835,18 @@
       "current": "hard link — «отдельный файл с тем же inode»",
       "proposed": "«ещё одна запись каталога на тот же inode»; противоречит #167",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Уточнено, что жёсткая ссылка — ещё одна запись каталога для того же inode; заменены отвлекающие варианты.",
+      "sources": [
+        "https://man7.org/linux/man-pages/man7/symlink.7.html",
+        "https://man7.org/linux/man-pages/man2/link.2.html"
+      ],
+      "linkedIds": [
+        49,
+        307,
+        1001387
+      ]
     },
     {
       "id": "audit-p04-398",
@@ -1849,8 +1859,17 @@
       "current": "«Состояния R, S, D, Z, T?» — «Состояния процессов»",
       "proposed": "спросить по сути: что такое D и почему не действует SIGKILL",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Вопрос о буквах состояний заменён диагностикой зависшей задачи в состоянии D.",
+      "sources": [
+        "https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html",
+        "https://man7.org/linux/man-pages/man1/ps.1.html"
+      ],
+      "linkedIds": [
+        39,
+        1001176
+      ]
     },
     {
       "id": "audit-p04-399",
@@ -1863,8 +1882,19 @@
       "current": "«PV, VG, LV?» — «Элементы LVM», Senior",
       "proposed": "удалить или «в каком порядке создаются…», Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Вместо угадывания аббревиатур вопрос проверяет связи PV, VG и LV; уровень понижен до Junior.",
+      "sources": [
+        "https://man7.org/linux/man-pages/man8/pvcreate.8.html",
+        "https://man7.org/linux/man-pages/man8/vgcreate.8.html",
+        "https://man7.org/linux/man-pages/man8/lvcreate.8.html"
+      ],
+      "linkedIds": [
+        52,
+        184,
+        1001353
+      ]
     },
     {
       "id": "audit-p04-400",
@@ -1877,8 +1907,15 @@
       "current": "неверный вариант «наборы учётных записей и групп» частично верен (user namespace)",
       "proposed": "заменить вариант",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Заменён частично верный вариант про учётные записи и группы: user namespace действительно изолирует UID и GID.",
+      "sources": [
+        "https://man7.org/linux/man-pages/man7/user_namespaces.7.html"
+      ],
+      "linkedIds": [
+        181
+      ]
     },
     {
       "id": "audit-p04-401",
@@ -1891,8 +1928,17 @@
       "current": "нет оговорки про `O_APPEND`",
       "proposed": "добавить",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "К аварийному усечению журнала добавлена оговорка про O_APPEND и разреженный файл.",
+      "sources": [
+        "https://man7.org/linux/man-pages/man2/open.2.html",
+        "https://man7.org/linux/man-pages/man2/lseek.2.html"
+      ],
+      "linkedIds": [
+        288,
+        1000984
+      ]
     },
     {
       "id": "audit-p04-402",
@@ -1933,8 +1979,14 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Уровень вопросов 54 и 56 изменён с Senior на Middle.",
+      "sources": [],
+      "linkedIds": [
+        54,
+        56
+      ]
     },
     {
       "id": "audit-p04-405",
@@ -1947,8 +1999,15 @@
       "current": "Senior",
       "proposed": "Junior/Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Вопросы об iostat, strace и lsof отнесены к Middle.",
+      "sources": [],
+      "linkedIds": [
+        57,
+        58,
+        59
+      ]
     },
     {
       "id": "audit-p04-406",
@@ -1961,8 +2020,15 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Уровень вопросов 53, 287 и 308 изменён на Middle.",
+      "sources": [],
+      "linkedIds": [
+        53,
+        287,
+        308
+      ]
     },
     {
       "id": "audit-p04-407",
@@ -1975,8 +2041,14 @@
       "current": "Middle",
       "proposed": "Junior (если оставлять)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Базовые вопросы 44 и 48 отнесены к Junior.",
+      "sources": [],
+      "linkedIds": [
+        44,
+        48
+      ]
     },
     {
       "id": "audit-p04-408",
@@ -2003,8 +2075,13 @@
       "current": "«тем же код завершения»",
       "proposed": "«с тем же кодом завершения»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено согласование «с тем же кодом завершения» в отвлекающем варианте вопроса 41.",
+      "sources": [],
+      "linkedIds": [
+        41
+      ]
     },
     {
       "id": "audit-p04-410",
@@ -2017,8 +2094,13 @@
       "current": "«устраняет первопричина»",
       "proposed": "«первопричину»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлен падеж и убран лишний английский дубль в варианте вопроса 318.",
+      "sources": [],
+      "linkedIds": [
+        318
+      ]
     },
     {
       "id": "audit-p04-411",
