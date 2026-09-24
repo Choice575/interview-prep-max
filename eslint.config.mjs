@@ -94,6 +94,7 @@ const appGlobals = {
   IPMaxDailyUI: 'readonly',
   IPMaxSubnet: 'readonly',
   IPMaxProfileScope: 'readonly',
+  IPMaxCommandCheck: 'readonly',
   IPMaxTrainersUI: 'readonly',
   IPMaxQuestionBankUI: 'readonly',
   IPMaxExternalTasksUI: 'readonly',

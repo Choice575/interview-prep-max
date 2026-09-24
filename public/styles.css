@@ -1352,3 +1352,6 @@ button:disabled,[aria-disabled="true"]{cursor:not-allowed}
 /* Keep section controls inert until their data is available. */
 .page-data-pending > :not(.page-data-status){display:none!important}
 .page-data-status{max-width:640px;margin:24px auto}
+.ip-timer-running{border-color:var(--primary);color:var(--primary-h)}
+.ip-timer-over{border-color:var(--red);color:var(--red)}
+#ip-record-audio{width:100%;margin-top:8px}

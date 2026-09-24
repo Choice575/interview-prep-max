@@ -170,3 +170,22 @@ test('a long flashcard answer offers recall points that suggest the rating', asy
   await page.locator('.study-card-recall input').nth(2).check();
   await expect(page.locator('[data-outcome="pass"]')).toHaveClass(/rate-suggested/);
 });
+
+test('spoken answers include bank questions, a two-minute timer and a key-point checklist', async ({page}) => {
+  await page.clock.install();
+  await page.goto('/#/interview');
+  await page.getByRole('button', { name: '📚 Вопросы банка' }).click();
+  await expect(page.locator('#ip-detail .ip-kicker')).toContainText('Вопрос банка');
+  await expect(page.locator('#ip-ai-evaluate-btn')).toBeHidden();
+  await expect(page.locator('#ip-rubric input[type="checkbox"]').first()).toBeVisible();
+  const timer = page.locator('#ip-timer-btn');
+  await expect(timer).toHaveText('⏱ 2:00');
+  await timer.click();
+  await page.clock.runFor(30000);
+  await expect(timer).toHaveText('⏹ 1:30');
+  await page.clock.runFor(91000);
+  await expect(timer).toHaveText('⏰ Время вышло');
+  await page.locator('#ip-rubric input[type="checkbox"]').first().check();
+  await page.locator('#ip-reveal-btn').click();
+  await expect(page.locator('#ip-reference')).toContainText('Эталонный ответ');
+});

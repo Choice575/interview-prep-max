@@ -58,7 +58,7 @@ const PAGE_DATA={
   study:STUDY_DATA,catalog:['courses'],
   chapter:['courses','study_map','study_tests','senior_cases','labs','external_tasks','ts'],
   flashcards:['flashcards','video_flashcards'],practices:['best_practices'],
-  qbank:['question_bank'],external:['external_tasks'],interview:['interview_practice'],
+  qbank:['question_bank'],external:['external_tasks'],interview:['interview_practice','question_bank'],
   trainers:TRAINER_DATA,subnet:['subnet'],ts:['ts'],cmd:['cmd'],labs:['labs'],code:['code'],
   ansible:['ansible_pb'],dockerfile:['dockerfile'],k8s:['k8s'],ports:['ports'],git:['git'],
   regex:['regex'],tips:['tips'],incidents:['incidents']
@@ -1779,7 +1779,7 @@ function renderCmd(){cmdDone=lsGet('cmd_prog',{});const L=['A','B','C','D'];docu
 function startCmdMuscle(){cmdMuscleActive=true;cmdMuscleQs=shuffle(CMD_TASKS).slice(0,10);cmdMuscleIdx=0;document.getElementById('cmd-container').innerHTML='<div id="muscle-area"></div>';renderMuscleQ();}
 function renderMuscleQ(){if(cmdMuscleIdx>=cmdMuscleQs.length){cmdMuscleActive=false;renderCmd();return;}const t=cmdMuscleQs[cmdMuscleIdx];document.getElementById('muscle-area').innerHTML='<div class="card" style="max-width:600px;margin:0 auto;text-align:center"><div style="font-size:12px;color:var(--text3);margin-bottom:8px">'+(cmdMuscleIdx+1)+' / 10</div><div class="cmd-task-text" style="font-size:15px;margin-bottom:14px">'+esc(t.task)+'</div><input class="form-input" id="muscle-inp" style="width:100%;font-family:JetBrains Mono,monospace;font-size:14px;text-align:center;margin-bottom:10px" placeholder="Введите команду..." onkeydown="if(event.key===\'Enter\')checkMuscle()"><button class="btn btn-primary" onclick="checkMuscle()">Проверить</button><div id="muscle-fb" style="display:none;margin-top:12px"></div><div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="cmdMuscleIdx++;renderMuscleQ()">Пропустить</button></div></div>';setTimeout(()=>document.getElementById('muscle-inp')?.focus(),100);}
 function normalizeCommand(command){return command.trim().replace(/\s+/g,' ');}
-function checkMuscle(){const inp=document.getElementById('muscle-inp');const fb=document.getElementById('muscle-fb');const t=cmdMuscleQs[cmdMuscleIdx];const correct=t.opts[t.answer];const userCmd=normalizeCommand(inp.value);const ok=userCmd===normalizeCommand(correct);fb.style.display='block';if(ok){fb.innerHTML='<span style="color:var(--green);font-weight:700">✅ Верно!</span>';if(cmdDone[t.id]===undefined){cmdDone[t.id]=t.answer;lsSet('cmd_prog',cmdDone);}}else{fb.innerHTML='<span style="color:var(--red);font-weight:700">❌ Правильно:</span><br><code style="color:var(--green)">'+esc(correct)+'</code><br><div style="font-size:12px;color:var(--text2);margin-top:4px">💡 '+esc(t.exp)+'</div>';}recordTrainerResult('command-muscle','Linux',ok,'Commands');inp.disabled=true;setTimeout(()=>{cmdMuscleIdx++;renderMuscleQ();},ok?800:2000);}
+function checkMuscle(){const inp=document.getElementById('muscle-inp');const fb=document.getElementById('muscle-fb');const t=cmdMuscleQs[cmdMuscleIdx];const correct=t.opts[t.answer];const result=typeof IPMaxCommandCheck!=='undefined'?IPMaxCommandCheck.check(inp.value,t):{ok:normalizeCommand(inp.value)===normalizeCommand(correct),hint:''};const ok=result.ok;fb.style.display='block';if(ok){fb.innerHTML='<span style="color:var(--green);font-weight:700">✅ Верно!</span>';if(cmdDone[t.id]===undefined){cmdDone[t.id]=t.answer;lsSet('cmd_prog',cmdDone);}}else{fb.innerHTML=(result.hint?'<div style="font-size:12px;color:var(--yellow);margin-bottom:4px">'+esc(result.hint)+'</div>':'')+'<span style="color:var(--red);font-weight:700">❌ Правильно:</span><br><code style="color:var(--green)">'+esc(correct)+'</code><br><div style="font-size:12px;color:var(--text2);margin-top:4px">💡 '+esc(t.exp)+'</div>';}recordTrainerResult('command-muscle','Linux',ok,'Commands');inp.disabled=true;setTimeout(()=>{cmdMuscleIdx++;renderMuscleQ();},ok?800:2000);}
 function applyCmdState(id,chosen){const t=CMD_TASKS.find(x=>x.id===id);if(!t) return;applyOptionState('#cmd-'+id+' .cmd-opt',t.answer,chosen,'correct','wrong');document.getElementById('cexp-'+id).style.display='block';}
 function pickCmd(tid,chosen){if(cmdDone[tid]!==undefined) return;const task=CMD_TASKS.find(t=>t.id===tid);cmdDone[tid]=chosen;lsSet('cmd_prog',cmdDone);recordTrainerResult('command','Linux',!!task&&task.answer===chosen,'Commands');applyCmdState(tid,chosen);updateCmdProg();}
 function updateCmdProg(){const done=Object.keys(cmdDone).length;const ok=Object.entries(cmdDone).filter(([id,c])=>CMD_TASKS.find(t=>t.id===parseInt(id))?.answer===c).length;document.getElementById('cmd-progress-fill').style.width=(done/CMD_TASKS.length*100)+'%';document.getElementById('cmd-score-display').textContent=ok+' / '+CMD_TASKS.length+' правильно';}
@@ -2239,8 +2239,9 @@ document.addEventListener('keydown',function(e){
 // ═══ OFFLINE READINESS CHECK ═══
 function requireOfflineUI(){if(typeof IPMaxOfflineUI==='undefined') throw new Error('Модуль offline-отчёта не загружен.');return IPMaxOfflineUI;}
 function offlineAssetList(){
-  const shell=['./','./index.html','./styles.css','./version.js', './data-loader.js','./date.js','./storage.js','./progress.js','./coach.js','./ai-coach.js','./progress-io.js','./sync-merge.js','./sync-client.js','./sync-ui.js','./ai-settings-client.js','./ai-settings-ui.js','./offline-ui.js','./sources-ui.js','./catalog-ui.js','./chapter-ui.js','./ai-tutor.js','./ai-tutor-ui.js','./router.js','./gamification.js','./gamification-ui.js','./daily.js','./daily-ui.js','./trainers-ui.js','./answer-ui.js','./question-bank-ui.js','./external-tasks-ui.js','./polygon-ui.js','./interview-practice-ui.js','./analytics-ui.js','./home-ui.js','./exam-ui.js','./flashcards-ui.js','./study-ui.js','./coach-ui.js','./app.js','./interview-prep-max.webmanifest','./assets/icon-192.png','./assets/icon-512.png'];
-  return shell.concat(Object.values(DATA_FILES).map(file=>'./'+file));
+  // Тот же список, что кеширует sw.js: public/asset-manifest.js (аудит A4.1).
+  const manifest=self.IPMAX_ASSETS||{shell:['./','./index.html'],scripts:[]};
+  return manifest.shell.concat(manifest.scripts,Object.values(DATA_FILES).map(file=>'./'+file));
 }
 async function probeOfflineAssets(assets){
   const results=[];
@@ -2272,6 +2273,7 @@ let interviewKind='star', interviewItemId=null, interviewRenderedKey='', intervi
 let interviewFollowUpTurn=0, interviewFollowUpQuestion=null, interviewRecognition=null, interviewRecognitionActive=false, interviewRequestId=0;
 function resetInterviewAIState(){
   interviewRequestId++;
+  if(typeof stopInterviewTimer==='function'){stopInterviewTimer();releaseInterviewRecording();}
   const recognition=interviewRecognition;
   interviewRecognition=null;interviewRecognitionActive=false;
   if(recognition){try{recognition.stop();}catch(_) { /* уже остановлена браузером */ }}
@@ -2285,15 +2287,21 @@ function resetInterviewAIState(){
   const followAnswer=document.getElementById('ip-follow-up-answer');if(followAnswer)followAnswer.value='';
 }
 function setInterviewKind(kind,btn){
-  interviewKind=(kind==='systemDesign')?'systemDesign':'star';
+  interviewKind=['systemDesign','bank'].includes(kind)?kind:'star';
   interviewItemId=null;
   if(btn){document.querySelectorAll('#ip-kind-chips .chip').forEach(c=>{c.classList.remove('active');c.setAttribute('aria-pressed','false');});btn.classList.add('active');btn.setAttribute('aria-pressed','true');}
   renderInterviewPractice();
 }
 function selectInterviewItem(id){interviewItemId=id;renderInterviewPractice();}
+// Данные «Ответов вслух»: задания STAR и проектирования плюс вопросы банка (аудит B8).
+function interviewData(){
+  const ui=requireInterviewPracticeUI();
+  return Object.assign({},INTERVIEW_PRACTICE||{},{bank:ui.bankItems?ui.bankItems(QUESTION_BANK):[]});
+}
 function renderInterviewPractice(){
   const ui=requireInterviewPracticeUI();
-  const list=ui.items(INTERVIEW_PRACTICE,interviewKind);
+  const data=interviewData();
+  const list=ui.items(data,interviewKind);
   const listEl=document.getElementById('ip-list');
   const detailEl=document.getElementById('ip-detail');
   const refEl=document.getElementById('ip-reference');
@@ -2301,18 +2309,21 @@ function renderInterviewPractice(){
   const scoreEl=document.getElementById('ip-score');
   if(!listEl||!detailEl) return;
   if(!list.length){listEl.innerHTML='';detailEl.innerHTML='<div class="empty-state"><div class="icon">🎤</div><p>Задания не загружены</p></div>';if(refEl){refEl.innerHTML='';refEl.hidden=true;}if(rubricEl)rubricEl.innerHTML='';if(scoreEl)scoreEl.innerHTML='';return;}
-  if(!interviewItemId||!ui.findItem(INTERVIEW_PRACTICE,interviewKind,interviewItemId)) interviewItemId=list[0].id;
+  if(!interviewItemId||!ui.findItem(interviewData(),interviewKind,interviewItemId)) interviewItemId=list[0].id;
   listEl.innerHTML=list.map(item=>{
-    const label=interviewKind==='star'?item.prompt:item.title;
+    const label=interviewKind==='systemDesign'?item.title:item.prompt;
     const active=item.id===interviewItemId?' active':'';
     return '<button type="button" class="ip-list-item'+active+'" aria-pressed="'+(active?'true':'false')+'" data-ip-id="'+esc(item.id)+'"><span class="ip-list-topic">'+esc(item.topic)+'</span>'+esc(label)+'</button>';
   }).join('');
   listEl.querySelectorAll('[data-ip-id]').forEach(btn=>btn.addEventListener('click',()=>selectInterviewItem(btn.getAttribute('data-ip-id'))));
-  const item=ui.findItem(INTERVIEW_PRACTICE,interviewKind,interviewItemId);
+  const item=ui.findItem(interviewData(),interviewKind,interviewItemId);
   const renderedKey=interviewKind+':'+interviewItemId;
   if(interviewRenderedKey&&interviewRenderedKey!==renderedKey) resetInterviewAIState();
   interviewRenderedKey=renderedKey;
-  detailEl.innerHTML=interviewKind==='star'?ui.renderStar(item):ui.renderSystemDesign(item);
+  detailEl.innerHTML=interviewKind==='star'?ui.renderStar(item):interviewKind==='bank'?ui.renderBankQuestion(item):ui.renderSystemDesign(item);
+  const aiButton=document.getElementById('ip-ai-evaluate-btn');
+  if(aiButton){aiButton.style.display=interviewKind==='bank'?'none':'';}
+  bindInterviewAnswerTools();
   if(refEl){refEl.innerHTML=ui.renderReference(item,interviewKind);refEl.hidden=true;}
   const revealBtn=document.getElementById('ip-reveal-btn');
   if(revealBtn) revealBtn.textContent='Показать рубрику';
@@ -2324,6 +2335,74 @@ function renderInterviewPractice(){
   if(dictateBtn){dictateBtn.disabled=!SpeechRecognition;dictateBtn.title=SpeechRecognition?'Речь добавится в поле ответа':'Диктовка не поддерживается этим браузером';}
   if(dictateStatus&&!SpeechRecognition) dictateStatus.textContent='Диктовка недоступна — используйте печать.';
 }
+// ── Таймер ответа и запись голоса (аудит B8) ──
+let interviewTimer=null, interviewTimerLeft=0, interviewRecorder=null, interviewRecordStream=null, interviewRecordUrl='';
+function bindInterviewAnswerTools(){
+  document.querySelectorAll('[data-ip-action]').forEach(button=>{
+    if(button.dataset.bound) return;
+    button.dataset.bound='1';
+    button.addEventListener('click',()=>button.getAttribute('data-ip-action')==='timer'?toggleInterviewTimer():toggleInterviewRecording());
+  });
+  const record=document.getElementById('ip-record-btn');
+  const supported=typeof window!=='undefined'&&typeof window.MediaRecorder==='function'&&!!navigator.mediaDevices?.getUserMedia;
+  if(record){record.disabled=!supported;record.title=supported?'Запись остаётся в этой вкладке':'Запись не поддерживается этим браузером';}
+}
+function stopInterviewTimer(){
+  if(interviewTimer){clearInterval(interviewTimer);interviewTimer=null;}
+  const button=document.getElementById('ip-timer-btn');
+  if(button){button.textContent='⏱ '+requireInterviewPracticeUI().formatTimer(requireInterviewPracticeUI().ANSWER_SECONDS);button.classList.remove('ip-timer-running','ip-timer-over');}
+}
+function toggleInterviewTimer(){
+  const ui=requireInterviewPracticeUI();
+  const button=document.getElementById('ip-timer-btn');
+  if(interviewTimer){stopInterviewTimer();return;}
+  const deadline=Date.now()+ui.ANSWER_SECONDS*1000;
+  button.classList.add('ip-timer-running');
+  const tick=()=>{
+    interviewTimerLeft=Math.max(0,Math.ceil((deadline-Date.now())/1000));
+    button.textContent='⏹ '+ui.formatTimer(interviewTimerLeft);
+    if(!interviewTimerLeft){clearInterval(interviewTimer);interviewTimer=null;button.textContent='⏰ Время вышло';button.classList.remove('ip-timer-running');button.classList.add('ip-timer-over');}
+  };
+  tick();interviewTimer=setInterval(tick,250);
+}
+function releaseInterviewRecording(){
+  if(interviewRecorder&&interviewRecorder.state!=='inactive'){try{interviewRecorder.stop();}catch(_){/* already stopped */}}
+  interviewRecorder=null;
+  if(interviewRecordStream){interviewRecordStream.getTracks().forEach(track=>track.stop());interviewRecordStream=null;}
+  if(interviewRecordUrl){URL.revokeObjectURL(interviewRecordUrl);interviewRecordUrl='';}
+  const audio=document.getElementById('ip-record-audio');if(audio){audio.removeAttribute('src');audio.hidden=true;}
+  const button=document.getElementById('ip-record-btn');if(button)button.textContent='⏺ Записать ответ';
+  const status=document.getElementById('ip-record-status');if(status)status.textContent='';
+}
+async function toggleInterviewRecording(){
+  const button=document.getElementById('ip-record-btn');
+  const status=document.getElementById('ip-record-status');
+  if(interviewRecorder&&interviewRecorder.state==='recording'){interviewRecorder.stop();return;}
+  releaseInterviewRecording();
+  try{
+    interviewRecordStream=await navigator.mediaDevices.getUserMedia({audio:true});
+  }catch(_){
+    if(status)status.textContent='Нет доступа к микрофону — разрешите его в браузере или отвечайте без записи.';
+    return;
+  }
+  const chunks=[];
+  const recorder=new window.MediaRecorder(interviewRecordStream);
+  interviewRecorder=recorder;
+  recorder.addEventListener('dataavailable',event=>{if(event.data&&event.data.size)chunks.push(event.data);});
+  recorder.addEventListener('stop',()=>{
+    if(interviewRecorder!==recorder) return;
+    if(interviewRecordStream){interviewRecordStream.getTracks().forEach(track=>track.stop());interviewRecordStream=null;}
+    interviewRecordUrl=URL.createObjectURL(new Blob(chunks,{type:recorder.mimeType||'audio/webm'}));
+    const audio=document.getElementById('ip-record-audio');
+    if(audio){audio.src=interviewRecordUrl;audio.hidden=false;}
+    if(button)button.textContent='⏺ Записать заново';
+    if(status)status.textContent='Запись готова: прослушайте её и сверьтесь с рубрикой.';
+  });
+  recorder.start();
+  if(button)button.textContent='⏹ Остановить запись';
+  if(status)status.textContent='Идёт запись…';
+  if(!interviewTimer) toggleInterviewTimer();
+}
 function revealInterviewReference(){
   const refEl=document.getElementById('ip-reference');
   const btn=document.getElementById('ip-reveal-btn');
@@ -2333,7 +2412,7 @@ function revealInterviewReference(){
 }
 function scoreInterviewAnswer(){
   const ui=requireInterviewPracticeUI();
-  const item=ui.findItem(INTERVIEW_PRACTICE,interviewKind,interviewItemId);
+  const item=ui.findItem(interviewData(),interviewKind,interviewItemId);
   const scoreEl=document.getElementById('ip-score');
   if(!item||!scoreEl) return;
   const checked=[...document.querySelectorAll('#ip-rubric input[type="checkbox"]:checked')].map(i=>Number(i.value));
@@ -2361,7 +2440,7 @@ function renderInterviewAIResult(evaluation,payload){
 // eslint-disable-next-line no-unused-vars
 async function evaluateInterviewAnswer(){
   const ui=requireInterviewPracticeUI();
-  const item=ui.findItem(INTERVIEW_PRACTICE,interviewKind,interviewItemId);
+  const item=ui.findItem(interviewData(),interviewKind,interviewItemId);
   const answerEl=document.getElementById('ip-answer');
   const host=document.getElementById('ip-ai-result');
   const button=document.getElementById('ip-ai-evaluate-btn');

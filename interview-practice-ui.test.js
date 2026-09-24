@@ -355,3 +355,31 @@ test('renders an empty state for a missing item', () => {
   assert.match(IP.renderStar(null), /Задание не найдено/);
   assert.match(IP.renderSystemDesign(null), /Задание не найдено/);
 });
+
+test('bank questions become spoken-answer tasks with key points as the rubric', () => {
+  const bank = { categories: [
+    { title: 'Linux и Bash', questions: [
+      { id: 'qb_lx_001', level: 'Junior', q: 'Что такое inode?', answer: 'Структура метаданных.', keyPoints: ['Метаданные', 'Без имени файла', 'df -i'], commands: ['df -i'], pitfall: 'Иноды кончаются.' },
+      { id: 'qb_lx_002', q: 'Без пунктов', answer: 'x', keyPoints: ['один'] }
+    ] }
+  ] };
+  const items = IP.bankItems(bank);
+  assert.equal(items.length, 1, 'вопрос без двух ключевых пунктов не подходит для самопроверки');
+  const item = IP.findItem({ bank: items }, 'bank', 'qb_lx_001');
+  assert.equal(item.topic, 'Linux и Bash');
+  assert.deepEqual(IP.score(item, [0, 2]).covered, 2);
+  assert.match(IP.renderBankQuestion(item), /Что такое inode\?/);
+  const reference = IP.renderReference(item, 'bank');
+  assert.match(reference, /Эталонный ответ/);
+  assert.match(reference, /Команды для проверки/);
+  assert.match(reference, /Иноды кончаются\./);
+  assert.match(IP.renderRubricForm(item, 'ip-rb'), /Без имени файла/);
+  assert.equal(IP.summary({ bank: items }).bank, 1);
+});
+
+test('the answer timer counts two minutes', () => {
+  assert.equal(IP.ANSWER_SECONDS, 120);
+  assert.equal(IP.formatTimer(120), '2:00');
+  assert.equal(IP.formatTimer(65), '1:05');
+  assert.equal(IP.formatTimer(-3), '0:00');
+});
