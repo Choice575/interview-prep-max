@@ -48,6 +48,65 @@
     });
   }
 
+  // Метрика готовности (аудит B10): тема закрыта, когда освоено ≥80% её
+  // вопросов нужного уровня. Процент по отвеченным завышал готовность —
+  // он не видел тем, к которым ещё не приступали.
+  const TOPIC_THRESHOLD = 0.8;
+
+  function calculateTopicReadiness(questions, progress, level, threshold) {
+    const target = GRADES.includes(level) ? level : 'Junior';
+    const limit = Number.isFinite(threshold) ? threshold : TOPIC_THRESHOLD;
+    const topics = new Map();
+    (Array.isArray(questions) ? questions : []).forEach(question => {
+      if (!question || (question.level || 'Junior') !== target || !question.topic) return;
+      if (!topics.has(question.topic)) topics.set(question.topic, { topic: question.topic, total: 0, mastered: 0 });
+      const item = topics.get(question.topic);
+      item.total++;
+      if (isMastered(question, progress)) item.mastered++;
+    });
+    const list = [...topics.values()].map(item => ({
+      ...item,
+      score: Math.round(item.mastered / item.total * 100),
+      closed: item.mastered / item.total >= limit
+    })).sort((a, b) => Number(b.closed) - Number(a.closed) || b.score - a.score || a.topic.localeCompare(b.topic, 'ru'));
+    return { level: target, closed: list.filter(item => item.closed).length, total: list.length, topics: list };
+  }
+
+  // Ошибки дня: вопросы из списка ошибок, на которые отвечали в этот день.
+  function dayMistakes(questions, progress, mistakes, dateKey, localDateKey) {
+    const marked = mistakes && typeof mistakes === 'object' ? mistakes : {};
+    return (Array.isArray(questions) ? questions : []).filter(question => {
+      if (!question || !marked[question.id]) return false;
+      const item = progressFor(question, progress);
+      return !!item && Number.isFinite(item.lastSeen) && localDateKey(item.lastSeen) === dateKey;
+    });
+  }
+
+  // Markdown для журнала learning/: по разделу на тему, правильный ответ и пояснение.
+  function mistakesMarkdown(list, dateKey) {
+    const clean = value => String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
+    const lines = ['# Ошибки за ' + dateKey, ''];
+    if (!list.length) return lines.concat('Ошибок за день нет.', '').join('\n');
+    lines.push('Всего: ' + list.length + '.', '');
+    const byTopic = new Map();
+    list.forEach(question => {
+      const topic = clean(question.topic) || 'Без темы';
+      if (!byTopic.has(topic)) byTopic.set(topic, []);
+      byTopic.get(topic).push(question);
+    });
+    byTopic.forEach((items, topic) => {
+      lines.push('## ' + topic, '');
+      items.forEach(question => {
+        const options = Array.isArray(question.options) ? question.options : [];
+        lines.push('- **' + clean(question.q) + '** (#' + question.id + ', ' + clean(question.level || 'Junior') + ')');
+        if (options[question.answer] !== undefined) lines.push('  - Правильно: ' + clean(options[question.answer]));
+        if (question.explanation) lines.push('  - Почему: ' + clean(question.explanation));
+      });
+      lines.push('');
+    });
+    return lines.join('\n');
+  }
+
   // A 15-question screening indicates coverage gaps; it cannot certify seniority.
   function describeDiagnostic(correct, total) {
     const answered = Math.max(0, Math.floor(Number(total) || 0));
@@ -355,7 +414,56 @@
         low: ['🔴 Низкая', 'Сосредоточьтесь на базовых темах и регулярной практике']
       };
       const label = labels[readiness.band];
-      target.innerHTML = '<div style="font-size:48px;font-weight:800;color:var(--primary-h);margin-bottom:6px">' + readiness.score + '%</div><div style="font-size:16px;font-weight:700;margin-bottom:8px">' + label[0] + '</div><div style="font-size:12px;color:var(--text2);max-width:300px;margin:0 auto">' + label[1] + '</div><div style="font-size:11px;color:var(--text3);margin-top:8px">' + readiness.mastered + '/' + readiness.answered + ' вопросов освоено</div>';
+      target.innerHTML = renderTopicReadiness(questions, progress) + '<div style="font-size:48px;font-weight:800;color:var(--primary-h);margin-bottom:6px">' + readiness.score + '%</div><div style="font-size:16px;font-weight:700;margin-bottom:8px">' + label[0] + '</div><div style="font-size:12px;color:var(--text2);max-width:300px;margin:0 auto">' + label[1] + '</div><div style="font-size:11px;color:var(--text3);margin-top:8px">' + readiness.mastered + '/' + readiness.answered + ' вопросов освоено</div>' + renderMistakesExport();
+      bindMistakesExport(target);
+    }
+
+    function profileLevel() {
+      const value = typeof source.getProfileLevel === 'function' ? source.getProfileLevel() : null;
+      return GRADES.includes(value) ? value : 'Junior';
+    }
+
+    function topicSummary(questions, progress) {
+      const result = calculateTopicReadiness(questions, progress, profileLevel());
+      return { result, text: 'Тем ' + result.level + '-профиля закрыто на ≥80%: ' + result.closed + ' из ' + result.total };
+    }
+
+    function renderTopicReadiness(questions, progress) {
+      const summary = topicSummary(questions, progress);
+      const open = summary.result.topics.filter(item => !item.closed).slice(0, 3);
+      const next = open.length ? '<div class="topic-readiness-next">Ближе всего к закрытию: ' + open.map(item => escapeHtml(item.topic) + ' ' + item.score + '%').join(', ') + '</div>' : '';
+      return '<div class="topic-readiness" data-topic-readiness><strong>' + escapeHtml(summary.text) + '</strong>' + next + '</div>';
+    }
+
+    function todayKey() {
+      return localDateKey(Date.now());
+    }
+
+    function localDateKey(timestamp) {
+      if (typeof source.localDateKey === 'function') return source.localDateKey(timestamp);
+      return new Date(timestamp).toISOString().slice(0, 10);
+    }
+
+    function currentDayMistakes() {
+      const mistakes = typeof source.getMistakes === 'function' ? source.getMistakes() : {};
+      return dayMistakes(getQuestions(), getProgress(), mistakes, todayKey(), localDateKey);
+    }
+
+    function renderMistakesExport() {
+      const count = currentDayMistakes().length;
+      return '<div class="mistakes-export"><button type="button" class="btn btn-outline btn-sm" data-analytics-action="export-mistakes"' + (count ? '' : ' disabled') + '>⬇ Ошибки дня в Markdown (' + count + ')</button></div>';
+    }
+
+    function bindMistakesExport(target) {
+      const button = target.querySelector('[data-analytics-action="export-mistakes"]');
+      if (button) button.addEventListener('click', exportDayMistakes);
+    }
+
+    function exportDayMistakes() {
+      const date = todayKey();
+      const text = mistakesMarkdown(currentDayMistakes(), date);
+      if (typeof source.saveText === 'function') source.saveText('mistakes-' + date + '.md', text);
+      return text;
     }
 
     function renderNextQuestions(questions, progress) {
@@ -417,14 +525,15 @@
         content.appendChild(row);
       }
       const icon = readiness.band === 'high' ? '🟢' : readiness.band === 'medium' ? '🟡' : '🔴';
-      row.innerHTML = '<span>🎯 Готовность</span><span class="home-readiness-score">' + icon + ' ' + readiness.score + '%</span>';
+      const summary = topicSummary(getQuestions(), getProgress());
+      row.innerHTML = '<span>🎯 Готовность</span><span class="home-readiness-score">' + icon + ' ' + readiness.score + '%</span><span class="home-readiness-topics">' + escapeHtml(summary.text) + '</span>';
     }
 
-    return { renderAnalytics, renderReadinessHome };
+    return { renderAnalytics, renderReadinessHome, exportDayMistakes };
   }
 
   return {
-    GRADES, CATEGORIES, isMastered, calculateReadiness, calculateGradeReadiness, describeDiagnostic,
+    GRADES, CATEGORIES, TOPIC_THRESHOLD, isMastered, calculateReadiness, calculateTopicReadiness, dayMistakes, mistakesMarkdown, calculateGradeReadiness, describeDiagnostic,
     selectNextQuestions, calculateWeakSpots, calculateAverageSeconds, create
   };
 });

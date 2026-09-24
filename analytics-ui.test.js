@@ -110,3 +110,40 @@ test('keeps the diagnostic verdict safe for an empty run', () => {
   assert.equal(empty.percent, 0);
   assert.ok(empty.verdict.length > 0);
 });
+
+test('topic readiness counts profile-level topics closed at 80 percent', () => {
+  const questions = [
+    { id: 1, topic: 'Linux', level: 'Junior' }, { id: 2, topic: 'Linux', level: 'Junior' },
+    { id: 3, topic: 'Linux', level: 'Junior' }, { id: 4, topic: 'Linux', level: 'Junior' },
+    { id: 5, topic: 'Linux', level: 'Junior' }, { id: 6, topic: 'Docker', level: 'Junior' },
+    { id: 7, topic: 'Docker', level: 'Junior' }, { id: 8, topic: 'Kubernetes', level: 'Senior' }
+  ];
+  const mastered = { correct: 1, wrong: 0 };
+  const progress = { 1: mastered, 2: mastered, 3: mastered, 4: mastered, 6: mastered, 8: mastered };
+  const result = AnalyticsUI.calculateTopicReadiness(questions, progress, 'Junior');
+  assert.equal(result.level, 'Junior');
+  assert.equal(result.total, 2);
+  assert.equal(result.closed, 1);
+  assert.deepEqual(result.topics.map(item => [item.topic, item.score, item.closed]), [['Linux', 80, true], ['Docker', 50, false]]);
+  assert.equal(AnalyticsUI.calculateTopicReadiness(questions, progress, 'Senior').closed, 1);
+  assert.equal(AnalyticsUI.calculateTopicReadiness(questions, progress, 'unknown').level, 'Junior');
+});
+
+test('day mistakes export only today\'s wrong answers as markdown', () => {
+  const day = Date.UTC(2026, 8, 24, 10);
+  const questions = [
+    { id: 1, topic: 'Linux', level: 'Junior', q: 'Что  показывает\nuptime?', options: ['Время работы', 'Диск'], answer: 0, explanation: 'Время с загрузки и load average.' },
+    { id: 2, topic: 'Linux', level: 'Junior', q: 'Старая ошибка', options: ['a'], answer: 0 },
+    { id: 3, topic: 'Сети', level: 'Middle', q: 'Что такое MTU?', options: ['Размер кадра', 'Порт'], answer: 0 },
+    { id: 4, topic: 'Сети', level: 'Junior', q: 'Исправлено', options: ['a'], answer: 0 }
+  ];
+  const progress = { 1: { lastSeen: day }, 2: { lastSeen: day - 3 * 86400000 }, 3: { lastSeen: day + 3600000 }, 4: { lastSeen: day } };
+  const key = timestamp => new Date(timestamp).toISOString().slice(0, 10);
+  const list = AnalyticsUI.dayMistakes(questions, progress, { 1: 1, 2: 1, 3: 1 }, '2026-09-24', key);
+  assert.deepEqual(list.map(item => item.id), [1, 3]);
+  const markdown = AnalyticsUI.mistakesMarkdown(list, '2026-09-24');
+  assert.match(markdown, /^# Ошибки за 2026-09-24\n\nВсего: 2\./);
+  assert.match(markdown, /## Linux\n\n- \*\*Что показывает uptime\?\*\* \(#1, Junior\)\n {2}- Правильно: Время работы\n {2}- Почему: Время с загрузки и load average\./);
+  assert.match(markdown, /## Сети\n\n- \*\*Что такое MTU\?\*\* \(#3, Middle\)\n {2}- Правильно: Размер кадра\n\n?$/);
+  assert.match(AnalyticsUI.mistakesMarkdown([], '2026-09-24'), /Ошибок за день нет\./);
+});
