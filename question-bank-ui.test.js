@@ -239,7 +239,7 @@ test('question_bank.json: структура и уникальность иде�
   });
 
   assert.equal(ids.size, ui.totalQuestions(BANK));
-  assert.equal(ids.size, 333);
+  assert.equal(ids.size, 336);
 });
 
 test('сохранённые старые категории переходят в новые разделы без потери вопросов', () => {
@@ -260,8 +260,8 @@ test('сохранённые старые категории переходят 
 
 test('все вопросы охватывают весь банк один раз и находят все 60 дополнений Swfuse', () => {
   const all = ui.selectCategory(BANK, 'all', 'linux');
-  assert.equal(all.questions.length, 333);
-  assert.equal(new Set(all.questions.map(q => q.id)).size, 333);
+  assert.equal(all.questions.length, 336);
+  assert.equal(new Set(all.questions.map(q => q.id)).size, 336);
   assert.equal(ui.selectCategory(BANK, null, 'all').slug, 'all');
   assert.equal(ui.filterQuestions(all, 'Swfuse', 'all').length, 60);
   const senior = ui.filterQuestions(all, 'Swfuse', 'Senior');

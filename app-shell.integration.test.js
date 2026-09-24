@@ -184,7 +184,7 @@ test('serves the complete app shell and personal-coach modules', async () => {
     assert.match(app, /recordQuestionResult/);
     assert.match(app, /configureCoachUI\(\)/);
     const questionData = JSON.parse(questions);
-    assert.equal(questionData.length, 922);
+    assert.equal(questionData.length, 928);
     assert.equal(new Set(questionData.map(question => question.id)).size, questionData.length);
     assert.equal(JSON.parse(practices).topics.length, 16);
     const labelledControls = [
