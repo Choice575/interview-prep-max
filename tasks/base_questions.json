@@ -14254,5 +14254,20 @@
     "sourceQuestionId": "swfuse_060",
     "sourceTitle": "Swfuse/devops-interview",
     "sourceUrl": "https://github.com/Swfuse/devops-interview/blob/6ac2d8620c87352c4c0f3c115e0352a1e6552ca4/per-company/broker.com.md"
+  },
+  {
+    "id": 15061,
+    "topic": "Terraform",
+    "level": "Middle",
+    "category": "scenario",
+    "q": "terraform init не может скачать провайдеры: доступ к registry.terraform.io из сети заблокирован. Как продолжить работу, не отключая проверку версий?",
+    "options": [
+      "В ~/.terraformrc задать provider_installation с network_mirror, например облачного провайдера, и сохранить lock-файл",
+      "Удалить .terraform.lock.hcl и required_providers, чтобы init взял первый найденный в системе бинарник провайдера",
+      "Запустить init с -upgrade=false: Terraform пропустит обращение к реестру и возьмёт версии провайдеров прямо из state",
+      "Скачать провайдер из стороннего архива без проверки подписи и положить его в каталог модуля рядом с файлами .tf"
+    ],
+    "answer": 0,
+    "explanation": "Блок provider_installation в CLI-конфигурации (~/.terraformrc или файл из TF_CLI_CONFIG_FILE) перенаправляет установку провайдеров на network_mirror — например, зеркало Yandex Cloud — или на filesystem_mirror с заранее скачанными пакетами. Ограничения версий и .terraform.lock.hcl продолжают работать: контрольные суммы сверяются, а для нескольких платформ хеши добавляют через terraform providers lock. Для прочих провайдеров оставляют блок direct с exclude или include."
   }
 ]

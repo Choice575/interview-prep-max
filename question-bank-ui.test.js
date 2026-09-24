@@ -211,12 +211,12 @@ test('question_bank.json: структура и уникальность иде�
   assert.equal(BANK.schemaVersion, 1);
   assert.ok(BANK.source && BANK.source.url, 'должен быть указан источник тем');
   const categories = ui.categoriesOf(BANK);
-  assert.equal(categories.length, 11, 'банк использует крупные категории без подтем');
+  assert.equal(categories.length, 12, 'банк использует крупные категории без подтем');
 
   const ids = new Set();
   const slugs = new Set();
   const KNOWN_TOPICS = ['Terraform', 'Linux', 'Сети', 'Ansible', 'Docker', 'Kubernetes',
-    'CI/CD', 'Git', 'Regex', 'Monitoring', 'Cloud', 'Security', 'System Design', 'DevOps'];
+    'CI/CD', 'Git', 'Regex', 'Monitoring', 'Cloud', 'Security', 'System Design', 'DevOps', 'Python'];
   const KNOWN_LEVELS = ['Junior', 'Middle', 'Senior'];
 
   categories.forEach(category => {

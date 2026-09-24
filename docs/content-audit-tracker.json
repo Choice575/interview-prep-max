@@ -1287,7 +1287,7 @@
       "current": "Python в Linux",
       "proposed": "тема «Python»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_016",
@@ -1295,7 +1295,13 @@
           "exists": true
         }
       ],
-      "resolution": "Для тестов тема Python создана в 15.11.5; в банке категории Python нет, вопросы остаются в Linux и Bash."
+      "resolution": "В банке появилась категория «Python»: qb_swf_016–019 перенесены из «Linux и Bash» через манифест Swfuse (импорт теперь убирает вопрос из прежней категории).",
+      "linkedIds": [
+        "qb_swf_016",
+        "qb_swf_017",
+        "qb_swf_018",
+        "qb_swf_019"
+      ]
     },
     {
       "id": "audit-p02-360",
@@ -1857,8 +1863,21 @@
       "current": "советы, как отвечать",
       "proposed": "перенести в «Ответы вслух»; добавить «почему переходите в DevOps»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "В «Ответы вслух» добавлены 8 заданий STAR по карьерным видеокарточкам (путь в DevOps, сложная задача, инцидент, программирование, процессы, ИИ-инструменты, выбор технологии, мотивация) с полем sourceCardIds. Вопрос «почему переходите в DevOps» уже есть (star-transition-001). Видеокарточки оставлены, чтобы не терять прогресс.",
+      "linkedIds": [
+        "star-path-001",
+        "star-hardest-001",
+        "star-incident-002",
+        "star-coding-001",
+        "star-process-001",
+        "star-ai-001",
+        "star-choice-001",
+        "star-motivation-001",
+        "2000233",
+        "2000128"
+      ]
     },
     {
       "id": "audit-p04-397",
@@ -3913,7 +3932,7 @@
       "current": "Python",
       "proposed": "Python",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1003061",
@@ -3926,7 +3945,13 @@
           "exists": true
         }
       ],
-      "resolution": "Решение 15.11.5: учебные карточки Python остаются в общей группе Linux и скриптов."
+      "resolution": "Карточки 1003061–1003064 перенесены в новую группу «Python» (после «Linux и Bash»); прогресс хранится по ID и не теряется.",
+      "linkedIds": [
+        "1003061",
+        "1003062",
+        "1003063",
+        "1003064"
+      ]
     },
     {
       "id": "audit-p08-491",
@@ -12474,8 +12499,13 @@
       "current": "прокси, корпоративный CA, provider mirror",
       "proposed": "хорошая основа для вопроса о зеркале провайдеров в России (C9, пакет 35): добавить вариант «доступ к registry.terraform.io заблокирован — `~/.terraformrc` с `network_mirror`»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Добавлен тест #15061 и карточка 1003106: registry.terraform.io заблокирован — provider_installation с network_mirror в ~/.terraformrc, lock-файл сохраняется.",
+      "linkedIds": [
+        "15061",
+        "1003106"
+      ]
     },
     {
       "id": "audit-p37-1195",

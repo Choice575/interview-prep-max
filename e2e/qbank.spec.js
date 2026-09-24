@@ -10,7 +10,7 @@ const profile = { role: 'SRE', level: 'Middle', date: '', completedAt: '2026-07-
 
 // Реальные значения из tasks/question_bank.json — выдуманные дали бы ложно зелёный тест.
 const FIRST_CATEGORY = 'linux';
-const SECOND_CATEGORY = 'network';
+const SECOND_CATEGORY = 'python';
 const FIRST_QUESTION_ID = 'qb_boot_001';
 
 async function seedProfile(page) {
@@ -37,7 +37,7 @@ test('открывается по прямой ссылке и показыва�
     .not.toBe('0');
   const categories = Number(await page.locator('#qbank-category-count').textContent());
   const questions = Number(await page.locator('#qbank-question-count').textContent());
-  expect(categories).toBe(11);
+  expect(categories).toBe(12);
   expect(questions).toBe(333);
 
   // Помимо 11 категорий есть общий список «Все вопросы».

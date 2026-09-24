@@ -132,7 +132,7 @@ test('template and rubric flashcards and empty senior cases are flagged as gener
   }
   assert.equal(cards.filter(card => card.generated).length, 776);
   const visibleStudy = cards.filter(card => !card.practice && !card.generated);
-  assert.equal(visibleStudy.length, 2329);
+  assert.equal(visibleStudy.length, 2330);
   assert.equal(cards.filter(card => card.practice).length, 90, 'колода практических сценариев не меняется');
 
   const cases = require('./tasks/senior_cases.json').cases;
