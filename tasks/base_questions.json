@@ -12759,8 +12759,8 @@
     "category": "definition",
     "q": "Какие PostgreSQL-метрики важны для эксплуатации?",
     "options": [
-      "Cache hit ratio и latency запросов",
-      "Размер таблиц и скорость их роста",
+      "Число таблиц в схеме и длина их имён",
+      "Версия psql на ноутбуках разработчиков",
       "Uptime процесса и число рестартов",
       "Connections, locks, WAL, lag, latency"
     ],

@@ -1120,7 +1120,7 @@
         ]
       },
       "check_logs": {
-        "obs": "Логи предыдущего контейнера: 'FATAL: OutOfMemoryError - heap space exhausted. Used: 125MB/128MB'. Приложению нужно больше памяти. Что делать?",
+        "obs": "Логи предыдущего контейнера обрываются без ошибки: процесс убит ядром сигналом KILL и не успел ничего записать. По метрикам память контейнера перед падением — 127Mi из лимита 128Mi. Что делать?",
         "choices": [
           {
             "text": "kubectl edit deployment api-backend — установить resources.limits.memory: 512Mi и requests.memory: 256Mi",
@@ -1622,7 +1622,7 @@
         ]
       },
       "ping_test": {
-        "obs": "ping 8.8.8.8 из контейнера: connect: Network is unreachable. Проблема на уровне маршрутизации. Что проверить на хосте?",
+        "obs": "ping 8.8.8.8 из контейнера: 5 packets transmitted, 0 received, 100% packet loss. Маршрут через docker0 есть, пакеты уходят, но ответов нет. Что проверить на хосте?",
         "choices": [
           {
             "text": "sysctl net.ipv4.ip_forward — проверить включён ли IP forwarding",
@@ -1654,7 +1654,7 @@
         "obs": "sysctl net.ipv4.ip_forward = 0. IP forwarding отключён — пакеты от контейнеров не маршрутизируются на хосте! Что делать?",
         "choices": [
           {
-            "text": "sysctl -w net.ipv4.ip_forward=1 && echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf",
+            "text": "sysctl -w net.ipv4.ip_forward=1 && echo 'net.ipv4.ip_forward=1' > /etc/sysctl.d/99-ip-forward.conf && sysctl --system",
             "next": "fix_ip_forward",
             "pts": 25,
             "ok": true
@@ -1750,10 +1750,10 @@
         ]
       },
       "temp_fix": {
-        "obs": "sysctl -w применяет изменение только до перезагрузки. После reboot проблема вернётся если не добавить в /etc/sysctl.conf.",
+        "obs": "sysctl -w применяет изменение только до перезагрузки. После reboot проблема вернётся, если не сохранить параметр в /etc/sysctl.d/.",
         "choices": [
           {
-            "text": "echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf",
+            "text": "echo 'net.ipv4.ip_forward=1' > /etc/sysctl.d/99-ip-forward.conf && sysctl --system",
             "next": "fix_ip_forward",
             "pts": 15,
             "ok": true
@@ -1761,7 +1761,7 @@
         ]
       },
       "restart_docker": {
-        "obs": "Docker при рестарте должен восстанавливать iptables правила, но ip_forward=0 блокирует форвардинг на уровне ядра.",
+        "obs": "dockerd при старте сам включает net.ipv4.ip_forward (--ip-forward по умолчанию true), поэтому связь вернётся. Но корневая причина осталась: кто-то выключил forwarding — файл в /etc/sysctl.d/ или профиль харденинга, и после следующего sysctl --system проблема повторится.",
         "choices": [
           {
             "text": "sysctl -w net.ipv4.ip_forward=1",

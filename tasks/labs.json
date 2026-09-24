@@ -58,13 +58,13 @@
     "type": "yaml",
     "topic": "Terraform",
     "title": "Почини Terraform — неверный тип переменной",
-    "scenario": "terraform plan выдаёт ошибку: 'Invalid value for input variable'. Вы смотрите в конфиг.",
-    "code": "variable \"instance_count\" {\n  type    = number\n  default = \"3\"\n}\n\nresource \"aws_instance\" \"web\" {\n  count = var.instance_count\n  ami   = \"ami-0c55b159cbfafe1f0\"\n  instance_type = \"t3.micro\"\n}",
-    "bug": "default = \"3\" — строка, а type = number. Terraform не может преобразовать строку в число для значения по умолчанию.",
-    "fix": "default = 3 (без кавычек)",
+    "scenario": "terraform plan падает с ошибкой 'Invalid default value for variable'. Вы смотрите в конфиг.",
+    "code": "variable \"instance_count\" {\n  type    = number\n  default = \"three\"\n}\n\nresource \"aws_instance\" \"web\" {\n  count = var.instance_count\n  ami   = \"ami-0c55b159cbfafe1f0\"\n  instance_type = \"t3.micro\"\n}",
+    "bug": "default = \"three\" нельзя привести к number. Строку \"3\" Terraform привёл бы к числу сам и ошибки бы не было — ошибку даёт только неприводимое значение.",
+    "fix": "default = 3",
     "question": "В чём ошибка?",
     "opts": [
-      "default = \"3\" — строка вместо числа для type = number",
+      "default = \"three\" нельзя привести к числу для type = number",
       "count принимает только литеральное число — var в count запрещён",
       "type = number нельзя объявлять вместе с default без validation",
       "ami-0c55b159cbfafe1f0 отсутствует в текущем регионе провайдера"

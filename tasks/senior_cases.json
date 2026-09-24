@@ -2223,19 +2223,19 @@
       "title": "Pod переехал на другую node и потерял данные",
       "context": "Учебный production-инцидент недели 30: Kubernetes storage и HA workloads. Нужно сохранить evidence, ограничить impact и восстановить проверяемое состояние.",
       "evidence": [
-        "После reschedule StatefulSet Pod смонтировал новый empty volume вместо прежнего PVC.",
-        "PV прежнего тома имеет topology zone-a, новая node находится в zone-b.",
-        "CSI events показывают failed attachment.",
+        "После drain node Pod db-0 StatefulSet поднялся на другой node, каталог /var/lib/app/data пуст.",
+        "kubectl get pod db-0 -o yaml: volume data — emptyDir: {}; volumeClaimTemplates в StatefulSet отсутствуют (потеряны при миграции Helm-чарта).",
+        "PVC и PV для db-0 не существуют: данные жили только в emptyDir на прежнем узле и удалены вместе с подом.",
         "Longhorn backup существует; Ceph не развёрнут и рассматривается только как архитектурная альтернатива."
       ],
       "task": "Определи root cause, безопасный mitigation, постоянный fix, rollback/DR, проверку результата и prevention.",
       "expectedActions": [
-        "Остановить запись и сопоставить Pod, PVC, PV и volumeAttachment.",
-        "Проверить StorageClass, reclaim policy и topology constraints.",
-        "Оценить целостность исходного volume и доступный backup.",
-        "Восстановить Longhorn backup в отдельный PVC при необходимости.",
-        "Переключить StatefulSet после проверки данных и зафиксировать RTO/RPO.",
-        "Исправить topology/backup runbook; не внедрять Ceph во время инцидента."
+        "Остановить запись и сопоставить Pod, его volumes и volumeClaimTemplates StatefulSet.",
+        "Проверить, какой тип тома реально используется (emptyDir, hostPath, PVC), StorageClass и reclaim policy.",
+        "Оценить доступный Longhorn backup и его возраст (RPO).",
+        "Восстановить Longhorn backup в отдельный PVC и проверить данные.",
+        "Вернуть volumeClaimTemplates, переключить StatefulSet на восстановленный PVC и зафиксировать RTO/RPO.",
+        "Добавить проверку чартов (StatefulSet без volumeClaimTemplates) и регулярный restore drill; не внедрять Ceph во время инцидента."
       ],
       "commonMistakes": [
         "Удалить PVC в попытке перепривязать volume.",
