@@ -40,6 +40,10 @@
     return '<span class="tag tag-' + (CATEGORY_CLASSES[name] || 'sc') + '">' + escapeText(CATEGORY_LABELS[name] || name) + '</span>';
   }
 
+  function depthTag(depth) {
+    return depth === 'deep' ? '<span class="tag tag-deep">Глубокое погружение</span>' : '';
+  }
+
   function randomized(items, randomize) {
     const original = items.slice();
     if (typeof randomize !== 'function') return original;
@@ -158,7 +162,7 @@
     if (typeof state.onStart === 'function') state.onStart(q.id, Number.isFinite(Number(state.now)) ? Number(state.now) : Date.now());
 
     return '<div class="q-card" id="qcard-' + safeId + '">' +
-      '<div class="q-meta">' + topicTag(q.topic) + levelTag(q.level) + categoryTag(q.category) +
+      '<div class="q-meta">' + topicTag(q.topic) + levelTag(q.level) + categoryTag(q.category) + depthTag(q.depth) +
       '<span class="q-num">#' + escapeText(id) + (mistake ? ' ❌' : '') +
       ' <span style="color:var(--text3)">✅' + finiteCount(progress.correct) + ' ❌' + finiteCount(progress.wrong) + '</span></span>' +
       (state.single && timerSeconds ? '<span class="q-timer" id="timer-' + safeId + '">' + timerSeconds + 'с</span>' : '') +
@@ -185,7 +189,7 @@
       const safeId = escapeAttribute(id);
       const answers = Array.isArray(q.options) ? q.options : [];
       return '<div class="flashcard" id="fc-' + safeId + '" role="button" tabindex="0" data-exam-action="flip" data-question-id="' + safeId + '">' +
-        '<div class="flashcard-inner"><div class="fc-front"><div class="q-meta" style="justify-content:center;margin-bottom:10px">' + topicTag(q.topic) + levelTag(q.level) + '</div>' +
+        '<div class="flashcard-inner"><div class="fc-front"><div class="q-meta" style="justify-content:center;margin-bottom:10px">' + topicTag(q.topic) + levelTag(q.level) + depthTag(q.depth) + '</div>' +
         '<p>' + escapeText(q.q) + '</p><div style="margin-top:10px;font-size:11px;color:var(--text3)">Нажмите для ответа</div></div>' +
         '<div class="fc-back"><div style="font-weight:700;color:var(--primary-h);margin-bottom:8px">✅ ' + escapeText(answers[Number(q.answer)] || '') + '</div>' +
         (q.explanation ? '<p style="font-size:13px;color:var(--text2)">' + escapeText(q.explanation) + '</p>' : '') + '</div></div></div>';

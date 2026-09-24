@@ -109,3 +109,10 @@ test('renders keyboard-ready flashcards with escaped content', () => {
   assert.match(markup, /&lt;strong&gt;answer&lt;\/strong&gt;/);
   assert.match(markup, /Use &lt;code&gt;pwd&lt;\/code&gt;/);
 });
+
+test('marks advanced questions in both exam views without adding a category', () => {
+  const deep = { ...questions[2], depth: 'deep' };
+  assert.match(ExamUI.renderQuestionCard(deep), /class="tag tag-deep">Глубокое погружение<\/span>/);
+  assert.match(ExamUI.renderFlashcardMarkup([deep]), /class="tag tag-deep">Глубокое погружение<\/span>/);
+  assert.doesNotMatch(ExamUI.renderQuestionCard(questions[0]), /tag-deep/);
+});

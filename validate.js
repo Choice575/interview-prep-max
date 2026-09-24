@@ -108,6 +108,8 @@ else {
       warn(`${prefix}: неизвестный уровень "${q.level}"`);
     if (q.category && !KNOWN_CATEGORIES.includes(q.category))
       warn(`${prefix}: неизвестная категория "${q.category}"`);
+    if (q.depth && q.depth !== 'deep')
+      err(`${prefix}: неизвестная метка глубины "${q.depth}"`);
 
     // Валидация ответа
     if (q.answer !== undefined && typeof q.answer !== 'number')

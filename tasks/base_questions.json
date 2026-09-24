@@ -7362,7 +7362,8 @@
       "v2 распределяет ресурсы поровну между containers и обходится без controller files"
     ],
     "answer": 2,
-    "explanation": "cgroups v2 объединяет controllers в одну hierarchy и задаёт более строгую модель membership и delegation. memory.high создаёт reclaim pressure и throttling без немедленного OOM, а memory.max служит жёстким пределом и при невозможности reclaim вызывает cgroup OOM."
+    "explanation": "cgroups v2 объединяет controllers в одну hierarchy и задаёт более строгую модель membership и delegation. memory.high создаёт reclaim pressure и throttling без немедленного OOM, а memory.max служит жёстким пределом и при невозможности reclaim вызывает cgroup OOM.",
+    "depth": "deep"
   },
   {
     "id": 492,
@@ -7377,7 +7378,8 @@
       "Для проверяемых программ в kernel hooks: tracing, profiling, networking и security telemetry"
     ],
     "answer": 3,
-    "explanation": "Ядро проверяет eBPF program verifier-ом, затем выполняет её в разрешённом hook и обменивается данными через maps и ring buffers. bpftrace/BCC применяют для трассировки, Cilium — для networking, Tetragon и подобные средства — для security telemetry. Накладные расходы зависят от hook, частоты событий и программы."
+    "explanation": "Ядро проверяет eBPF program verifier-ом, затем выполняет её в разрешённом hook и обменивается данными через maps и ring buffers. bpftrace/BCC применяют для трассировки, Cilium — для networking, Tetragon и подобные средства — для security telemetry. Накладные расходы зависят от hook, частоты событий и программы.",
+    "depth": "deep"
   },
   {
     "id": 493,
@@ -7392,7 +7394,8 @@
       "Оба механизма имеют одинаковый lifecycle; различаются пути статистики и mount options"
     ],
     "answer": 0,
-    "explanation": "Оба механизма уменьшают TLB pressure для больших working sets. THP прозрачно продвигает и может делить страницы, но compaction и лишнее потребление памяти способны давать latency spikes. hugetlb опирается на заранее управляемый pool и участие приложения, что повышает предсказуемость ценой резервирования и настройки."
+    "explanation": "Оба механизма уменьшают TLB pressure для больших working sets. THP прозрачно продвигает и может делить страницы, но compaction и лишнее потребление памяти способны давать latency spikes. hugetlb опирается на заранее управляемый pool и участие приложения, что повышает предсказуемость ценой резервирования и настройки.",
+    "depth": "deep"
   },
   {
     "id": 494,
@@ -7407,7 +7410,8 @@
       "Повысить scheduler priority и сравнить load average; снижение очереди укажет имя горячей функции"
     ],
     "answer": 1,
-    "explanation": "Сначала находят thread через top -H или ps, затем perf record -g -p PID либо по TID собирает call stacks. perf report или flame graph показывает on-CPU path, а perf stat помогает увидеть IPC, cache misses и branches. strace полезен лишь когда стоимость связана с syscalls и сам может заметно искажать нагрузку."
+    "explanation": "Сначала находят thread через top -H или ps, затем perf record -g -p PID либо по TID собирает call stacks. perf report или flame graph показывает on-CPU path, а perf stat помогает увидеть IPC, cache misses и branches. strace полезен лишь когда стоимость связана с syscalls и сам может заметно искажать нагрузку.",
+    "depth": "deep"
   },
   {
     "id": 495,
@@ -7422,7 +7426,8 @@
       "Привязка к одному NUMA node ускоряет workload и при превышении доступной local memory"
     ],
     "answer": 2,
-    "explanation": "В NUMA-системе локальная память обычно доступна быстрее удалённой. numactl задаёт CPU affinity и memory policy: bind, preferred или interleave. Эффект зависит от topology, threads и working set; слишком жёсткий bind может вызвать pressure. Проверяют numa_maps, numastat и workload latency, согласуя CPU и memory placement."
+    "explanation": "В NUMA-системе локальная память обычно доступна быстрее удалённой. numactl задаёт CPU affinity и memory policy: bind, preferred или interleave. Эффект зависит от topology, threads и working set; слишком жёсткий bind может вызвать pressure. Проверяют numa_maps, numastat и workload latency, согласуя CPU и memory placement.",
+    "depth": "deep"
   },
   {
     "id": 496,
@@ -7437,7 +7442,8 @@
       "Для измеренной latency или cache-locality задачи; affinity согласуют с cpuset, NUMA, IRQ и system work"
     ],
     "answer": 3,
-    "explanation": "taskset задаёт affinity процесса или thread, а cpuset cgroup ограничивает допустимые CPU и memory nodes для группы. Pinning полезен в RT, packet processing и других измеренно latency-sensitive workloads, но уменьшает гибкость scheduler. Настройку проверяют под нагрузкой и согласуют с NUMA locality, IRQ affinity и системными потоками."
+    "explanation": "taskset задаёт affinity процесса или thread, а cpuset cgroup ограничивает допустимые CPU и memory nodes для группы. Pinning полезен в RT, packet processing и других измеренно latency-sensitive workloads, но уменьшает гибкость scheduler. Настройку проверяют под нагрузкой и согласуют с NUMA locality, IRQ affinity и системными потоками.",
+    "depth": "deep"
   },
   {
     "id": 497,
@@ -7452,7 +7458,8 @@
       "Режим выбирает block device при mount, и приложение не увидит различий после power loss"
     ],
     "answer": 0,
-    "explanation": "data=ordered — типичный default: metadata журналируются, а связанные data blocks уходят до их commit. data=journal журналирует и данные, но отключает delayed allocation и O_DIRECT. data=writeback не сохраняет такое упорядочение и после crash может показать stale data. В рабочей среде (production) выбор подтверждают durability-требованиями и тестами; barriers без доказанной защиты cache не отключают."
+    "explanation": "data=ordered — типичный default: metadata журналируются, а связанные data blocks уходят до их commit. data=journal журналирует и данные, но отключает delayed allocation и O_DIRECT. data=writeback не сохраняет такое упорядочение и после crash может показать stale data. В рабочей среде (production) выбор подтверждают durability-требованиями и тестами; barriers без доказанной защиты cache не отключают.",
+    "depth": "deep"
   },
   {
     "id": 498,
@@ -7467,7 +7474,8 @@
       "Ориентироваться на максимальный volume size: recovery, tooling, support и характер файлов не влияют на выбор"
     ],
     "answer": 1,
-    "explanation": "Универсального победителя нет: проверяют размер и число файлов, concurrency, latency, recovery time, backup tooling и поддержку дистрибутива. XFS хорошо масштабирует параллельные и крупные workloads и умеет online grow, но не shrink. ext4 знаком операционно и поддерживает offline shrink; конкретную производительность подтверждают репрезентативным benchmark."
+    "explanation": "Универсального победителя нет: проверяют размер и число файлов, concurrency, latency, recovery time, backup tooling и поддержку дистрибутива. XFS хорошо масштабирует параллельные и крупные workloads и умеет online grow, но не shrink. ext4 знаком операционно и поддерживает offline shrink; конкретную производительность подтверждают репрезентативным benchmark.",
+    "depth": "deep"
   },
   {
     "id": 499,
@@ -7482,7 +7490,8 @@
       "Thin snapshot копирует исходный LV при создании, освобождая одинаковые extents после merge"
     ],
     "answer": 2,
-    "explanation": "Thin LV получает большой virtual size без немедленного резервирования всех extents; blocks выделяются при записи. Snapshots разделяют существующие blocks и потребляют место по мере изменений. Overcommit требует alerts и auto-extension как для data, так и metadata pool: заполнение может остановить или повредить I/O workload."
+    "explanation": "Thin LV получает большой virtual size без немедленного резервирования всех extents; blocks выделяются при записи. Snapshots разделяют существующие blocks и потребляют место по мере изменений. Overcommit требует alerts и auto-extension как для data, так и metadata pool: заполнение может остановить или повредить I/O workload.",
+    "depth": "deep"
   },
   {
     "id": 500,
@@ -7497,7 +7506,8 @@
       "Найти AVC в audit log, проверить process/file contexts и исправить label, volume option, boolean или policy"
     ],
     "answer": 3,
-    "explanation": "SELinux применяет MAC после обычных Unix permissions; контейнерные процессы и volumes должны иметь совместимые labels. Диагностику начинают с ausearch или sealert и сопоставления source/target contexts. Часто помогает корректное :z/:Z relabeling либо документированный boolean. audit2allow используют только после понимания denial, а не как автоматическое разрешение всего журнала."
+    "explanation": "SELinux применяет MAC после обычных Unix permissions; контейнерные процессы и volumes должны иметь совместимые labels. Диагностику начинают с ausearch или sealert и сопоставления source/target contexts. Часто помогает корректное :z/:Z relabeling либо документированный boolean. audit2allow используют только после понимания denial, а не как автоматическое разрешение всего журнала.",
+    "depth": "deep"
   },
   {
     "id": 501,
@@ -7512,7 +7522,8 @@
       "Добавлять правила через auditctl после старта: runtime configuration переживёт reboot и package upgrade"
     ],
     "answer": 0,
-    "explanation": "Правила выбирают по threat model: изменения identity files, privilege use, config и другие критичные syscalls. Persistent files загружают через augenrules или service tooling, используют arch, filters и keys, затем проверяют ausearch/aureport и forwarding. Слишком широкие правила создают шум и нагрузку; retention и защиту audit logs планируют отдельно."
+    "explanation": "Правила выбирают по threat model: изменения identity files, privilege use, config и другие критичные syscalls. Persistent files загружают через augenrules или service tooling, используют arch, filters и keys, затем проверяют ausearch/aureport и forwarding. Слишком широкие правила создают шум и нагрузку; retention и защиту audit logs планируют отдельно.",
+    "depth": "deep"
   },
   {
     "id": 502,
@@ -7557,7 +7568,8 @@
       "Создать netns и veth pair, перенести один конец, поднять lo, назначить addresses/routes и при нужде NAT на host"
     ],
     "answer": 3,
-    "explanation": "Network namespace имеет собственные interfaces, routes, firewall state и sockets. Для безопасной лабораторной связности создают veth pair: один конец остаётся на host, второй переносится через ip link set ... netns. Внутри поднимают loopback и veth, назначают адрес и route; forwarding/NAT добавляют явно, если нужен внешний доступ."
+    "explanation": "Network namespace имеет собственные interfaces, routes, firewall state и sockets. Для безопасной лабораторной связности создают veth pair: один конец остаётся на host, второй переносится через ip link set ... netns. Внутри поднимают loopback и veth, назначают адрес и route; forwarding/NAT добавляют явно, если нужен внешний доступ.",
+    "depth": "deep"
   },
   {
     "id": 505,
@@ -7572,7 +7584,8 @@
       "fq_codel задаёт firewall policy по пяти полям, а nftables распределяет bandwidth между очередями"
     ],
     "answer": 0,
-    "explanation": "tc управляет очередями interface: TBF и HTB ограничивают или распределяют скорость, fq_codel борется с queueing delay, filters классифицируют трафик, netem добавляет delay/loss для тестов. Egress shaping прямолинеен; для ingress часто применяют policing или redirect в IFB. Настройку проверяют tc -s и метриками drops, backlog и latency."
+    "explanation": "tc управляет очередями interface: TBF и HTB ограничивают или распределяют скорость, fq_codel борется с queueing delay, filters классифицируют трафик, netem добавляет delay/loss для тестов. Egress shaping прямолинеен; для ingress часто применяют policing или redirect в IFB. Настройку проверяют tc -s и метриками drops, backlog и latency.",
+    "depth": "deep"
   },
   {
     "id": 506,
@@ -7602,7 +7615,8 @@
       "Выключить SYN cookies и увеличить keepalive time: accept queue освободится без влияния на failure detection"
     ],
     "answer": 2,
-    "explanation": "Универсального sysctl-рецепта нет. Сначала смотрят ss -s, nstat, softnet, listen queue, retransmits, drops, CPU и memory. Затем согласуют application listen backlog с somaxconn, при необходимости SYN backlog, buffer ceilings или local port range. Изменения версионируют в /etc/sysctl.d, применяют поэтапно и проверяют нагрузочным тестом и откат (rollback)."
+    "explanation": "Универсального sysctl-рецепта нет. Сначала смотрят ss -s, nstat, softnet, listen queue, retransmits, drops, CPU и memory. Затем согласуют application listen backlog с somaxconn, при необходимости SYN backlog, buffer ceilings или local port range. Изменения версионируют в /etc/sysctl.d, применяют поэтапно и проверяют нагрузочным тестом и откат (rollback).",
+    "depth": "deep"
   },
   {
     "id": 508,
@@ -7617,7 +7631,8 @@
       "Начать с aa-genprof/complain, прогнать реальные сценарии, разобрать aa-logprof, сузить правила и проверить enforce"
     ],
     "answer": 3,
-    "explanation": "AppArmor — path-based MAC: профиль описывает доступ к files, capabilities, network и другим ресурсам. Complain mode логирует нарушения и помогает собрать начальный набор, но обучение должно покрыть штатные сценарии и ошибки. Перед production правила ревьюят, убирают лишние разрешения, включают enforce и тестируют startup, reload, upgrades и log rotation."
+    "explanation": "AppArmor — path-based MAC: профиль описывает доступ к files, capabilities, network и другим ресурсам. Complain mode логирует нарушения и помогает собрать начальный набор, но обучение должно покрыть штатные сценарии и ошибки. Перед production правила ревьюят, убирают лишние разрешения, включают enforce и тестируют startup, reload, upgrades и log rotation.",
+    "depth": "deep"
   },
   {
     "id": 509,
@@ -7632,7 +7647,8 @@
       "dm-crypt управляет filesystem permissions, тогда как LUKS шифрует имена файлов и directory metadata"
     ],
     "answer": 0,
-    "explanation": "LUKS описывает формат контейнера, KDF и key slots, а device-mapper target dm-crypt выполняет block encryption после unlock. Несколько slots позволяют разным passphrases или tokens получить один volume key без повторного шифрования данных. Header резервируют отдельно, новый ключ проверяют до удаления старого и никогда не удаляют последний рабочий slot."
+    "explanation": "LUKS описывает формат контейнера, KDF и key slots, а device-mapper target dm-crypt выполняет block encryption после unlock. Несколько slots позволяют разным passphrases или tokens получить один volume key без повторного шифрования данных. Header резервируют отдельно, новый ключ проверяют до удаления старого и никогда не удаляют последний рабочий slot.",
+    "depth": "deep"
   },
   {
     "id": 510,
@@ -7647,7 +7663,8 @@
       "Оба API дают ordered event log без потерь: queue сохраняет повторяющиеся события при overflow"
     ],
     "answer": 1,
-    "explanation": "inotify удобен для изменений конкретных файлов и каталогов, но recursive monitoring требует управлять watches, а очередь может переполниться. fanotify умеет широкие marks на mount или filesystem и permission events, поэтому подходит некоторым antivirus и FIM tools, часто с повышенными privileges. Оба API требуют обработки overflow, races и повторного сканирования."
+    "explanation": "inotify удобен для изменений конкретных файлов и каталогов, но recursive monitoring требует управлять watches, а очередь может переполниться. fanotify умеет широкие marks на mount или filesystem и permission events, поэтому подходит некоторым antivirus и FIM tools, часто с повышенными privileges. Оба API требуют обработки overflow, races и повторного сканирования.",
+    "depth": "deep"
   },
   {
     "id": 511,
@@ -7677,7 +7694,8 @@
       "Перемещает занятые extents на другие PV при доступных LV; после проверки старый PV исключают через vgreduce"
     ],
     "answer": 3,
-    "explanation": "pvmove создаёт временное LVM mapping и переносит physical extents внутри той же VG, обновляя metadata по ходу операции, поэтому активные LV обычно остаются доступны. Нужны свободные extents на подходящих PV, backup metadata и мониторинг I/O/ошибок. Это не замена redundancy: после успешной проверки выполняют vgreduce и только затем выводят устройство."
+    "explanation": "pvmove создаёт временное LVM mapping и переносит physical extents внутри той же VG, обновляя metadata по ходу операции, поэтому активные LV обычно остаются доступны. Нужны свободные extents на подходящих PV, backup metadata и мониторинг I/O/ошибок. Это не замена redundancy: после успешной проверки выполняют vgreduce и только затем выводят устройство.",
+    "depth": "deep"
   },
   {
     "id": 513,
@@ -7692,7 +7710,8 @@
       "Записать весь kernel без filters на часы: ring buffer расширяется автоматически и overhead остаётся постоянным"
     ],
     "answer": 0,
-    "explanation": "ftrace — встроенная инфраструктура ядра; tracefs обычно смонтирован в /sys/kernel/tracing, а на старых системах виден через debugfs. function_graph показывает вход, выход и длительность kernel functions. set_graph_function, set_ftrace_pid и event filters ограничивают объём; trace-cmd упрощает запись и отчёт. На production сначала оценивают overhead и используют короткое окно."
+    "explanation": "ftrace — встроенная инфраструктура ядра; tracefs обычно смонтирован в /sys/kernel/tracing, а на старых системах виден через debugfs. function_graph показывает вход, выход и длительность kernel functions. set_graph_function, set_ftrace_pid и event filters ограничивают объём; trace-cmd упрощает запись и отчёт. На production сначала оценивают overhead и используют короткое окно.",
+    "depth": "deep"
   },
   {
     "id": 514,
@@ -7752,7 +7771,8 @@
       "Режим 2 исключает OOM при любых условиях, включая kernel allocations, cgroup limits и depletion reserved memory"
     ],
     "answer": 0,
-    "explanation": "Overcommit относится к обещанной virtual memory, а не к текущему RSS. Mode 0 использует heuristic, mode 1 не отказывает из-за commit accounting, mode 2 ограничивает commitment через CommitLimit. В mode 2 участвует overcommit_ratio либо overcommit_kbytes и swap. Выбор зависит от workload: строгий режим может раньше вернуть ENOMEM, а permissive — допустить поздний OOM."
+    "explanation": "Overcommit относится к обещанной virtual memory, а не к текущему RSS. Mode 0 использует heuristic, mode 1 не отказывает из-за commit accounting, mode 2 ограничивает commitment через CommitLimit. В mode 2 участвует overcommit_ratio либо overcommit_kbytes и swap. Выбор зависит от workload: строгий режим может раньше вернуть ENOMEM, а permissive — допустить поздний OOM.",
+    "depth": "deep"
   },
   {
     "id": 518,
@@ -7767,7 +7787,8 @@
       "LVM thin snapshot требует заранее фиксированный COW volume, тогда как legacy LVM snapshot растёт динамически"
     ],
     "answer": 1,
-    "explanation": "Снимок btrfs бывает доступным для записи или только для чтения и представляет копирование при записи (CoW) конкретного подтома; вложенные подтома не включаются рекурсивно. send/receive передаёт полные и инкрементальные снимки. Классическим снимкам LVM нужно место для изменённых блоков, а тонкие снимки LVM тоже выделяют блоки динамически, поэтому простое сравнение некорректно. Снимок, согласованный лишь на уровне сбоя, не гарантирует согласованность приложения без предварительного сброса данных."
+    "explanation": "Снимок btrfs бывает доступным для записи или только для чтения и представляет копирование при записи (CoW) конкретного подтома; вложенные подтома не включаются рекурсивно. send/receive передаёт полные и инкрементальные снимки. Классическим снимкам LVM нужно место для изменённых блоков, а тонкие снимки LVM тоже выделяют блоки динамически, поэтому простое сравнение некорректно. Снимок, согласованный лишь на уровне сбоя, не гарантирует согласованность приложения без предварительного сброса данных.",
+    "depth": "deep"
   },
   {
     "id": 519,
@@ -7797,7 +7818,8 @@
       "Сначала ограничить cgroups и capacity, затем точечно настроить OOMScoreAdjust; memory.oom.group завершает workload целиком"
     ],
     "answer": 3,
-    "explanation": "OOMScoreAdjust лишь смещает вероятность выбора и не создаёт память; -1000 почти исключает task и потому оправдан только для действительно системно-критичных процессов. Cgroup boundaries ограничивают область воздействия сбоя (blast radius), а memory.oom.group помогает не оставлять полуработающий multi-process workload. Global OOM и memcg OOM различаются; systemd-oomd также имеет отдельную PSI-based policy."
+    "explanation": "OOMScoreAdjust лишь смещает вероятность выбора и не создаёт память; -1000 почти исключает task и потому оправдан только для действительно системно-критичных процессов. Cgroup boundaries ограничивают область воздействия сбоя (blast radius), а memory.oom.group помогает не оставлять полуработающий multi-process workload. Global OOM и memcg OOM различаются; systemd-oomd также имеет отдельную PSI-based policy.",
+    "depth": "deep"
   },
   {
     "id": 521,
@@ -7812,7 +7834,8 @@
       "Socket захватывает весь interface без BPF program, поэтому остальной трафик нельзя оставить kernel network stack"
     ],
     "answer": 0,
-    "explanation": "AF_XDP socket привязан к network device и queue, использует shared UMEM и RX/TX/fill/completion rings. XDP program направляет выбранные frames через XSKMAP и XDP_REDIRECT; остальные пакеты могут идти обычным stack. Native zero-copy требует поддержки driver, а generic/copy mode имеет другие затраты. Решение применяют после измерений для high-rate packet processing."
+    "explanation": "AF_XDP socket привязан к network device и queue, использует shared UMEM и RX/TX/fill/completion rings. XDP program направляет выбранные frames через XSKMAP и XDP_REDIRECT; остальные пакеты могут идти обычным stack. Native zero-copy требует поддержки driver, а generic/copy mode имеет другие затраты. Решение применяют после измерений для high-rate packet processing.",
+    "depth": "deep"
   },
   {
     "id": 522,
@@ -7857,7 +7880,8 @@
       "Background threshold будит flusher, верхний threshold заставляет dirtying tasks писать; byte settings имеют приоритет"
     ],
     "answer": 3,
-    "explanation": "При фоновом пороге kernel writeback threads начинают очищать dirty pages. У верхнего порога процесс, создающий dirty pages, участвует в writeback и может throttling-оваться. Расчёт идёт от памяти, доступной для dirtying, а dirty_background_bytes/dirty_bytes заменяют ratio-варианты. Значения выбирают по workload, storage latency и burst size, а не копируют как универсальный database рецепт."
+    "explanation": "При фоновом пороге kernel writeback threads начинают очищать dirty pages. У верхнего порога процесс, создающий dirty pages, участвует в writeback и может throttling-оваться. Расчёт идёт от памяти, доступной для dirtying, а dirty_background_bytes/dirty_bytes заменяют ratio-варианты. Значения выбирают по workload, storage latency и burst size, а не копируют как универсальный database рецепт.",
+    "depth": "deep"
   },
   {
     "id": 525,
@@ -7887,7 +7911,8 @@
       "Преимущественно для virtual NIC: physical devices нельзя привязать к DPDK driver без модификации firmware"
     ],
     "answer": 1,
-    "explanation": "DPDK poll-mode drivers и user-space packet buffers убирают interrupt/socket-stack overhead, но обычно занимают CPU cores, требуют careful NUMA placement, hugepage-backed memory и совместимого device path. Это полезно для NFV, appliances и очень высокой packet rate после profiling. Для большинства сервисов kernel stack, XDP или AF_XDP проще и достаточно производительны."
+    "explanation": "DPDK poll-mode drivers и user-space packet buffers убирают interrupt/socket-stack overhead, но обычно занимают CPU cores, требуют careful NUMA placement, hugepage-backed memory и совместимого device path. Это полезно для NFV, appliances и очень высокой packet rate после profiling. Для большинства сервисов kernel stack, XDP или AF_XDP проще и достаточно производительны.",
+    "depth": "deep"
   },
   {
     "id": 527,
