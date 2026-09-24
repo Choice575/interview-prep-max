@@ -24,7 +24,7 @@ const publicFiles = new Set([
   // Новый модуль, не добавленный сюда, отдаётся как 403: страница молча теряет
   // скрипт, а sw.js не устанавливается вовсе — SHELL_ASSETS кешируется
   // атомарным addAll, и один недоступный файл роняет всю установку.
-  'gamification.js', 'gamification-ui.js', 'daily.js', 'daily-ui.js', 'trainers-ui.js',
+  'gamification.js', 'gamification-ui.js', 'daily.js', 'daily-ui.js', 'trainers-ui.js', 'subnet.js',
   'answer-ui.js', 'question-bank-ui.js', 'external-tasks-ui.js', 'polygon-ui.js', 'interview-practice-ui.js', 'analytics-ui.js', 'home-ui.js', 'exam-ui.js', 'flashcards-ui.js', 'study-ui.js', 'sw.js',
   'coach-ui.js', 'app.js', 'interview-prep-max.webmanifest', 'assets/icon-192.png', 'assets/icon-512.png',
   'tasks/base_questions.json', 'tasks/subnet.json', 'tasks/ts.json', 'tasks/cmd.json', 'tasks/code.json',

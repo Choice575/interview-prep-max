@@ -121,3 +121,18 @@ test('flashcards open the daily SRS queue and the home card counts due reviews',
   await page.locator('[data-flashcards-filter="search"]').fill('Swfuse');
   await expect(page.locator('.flashcards-results')).toContainText('Найдено: 54 из 2089');
 });
+
+test('subnet trainer generates a host-address task and checks the computed network', async ({page}) => {
+  await page.goto('/#/subnet');
+  await expect(page.locator('#sp-0 .subnet-ip')).toHaveText('192.168.1.77/24');
+  await page.locator('[data-subnet-action="generate"]').click();
+  const ip = (await page.locator('#sp-g .subnet-ip').textContent()).trim();
+  const [address, prefix] = ip.split('/');
+  const answer = await page.evaluate(([value, bits]) => window.IPMaxSubnet.calcSubnet(value, Number(bits)), [address, prefix]);
+  expect(answer.network).not.toBe(address);
+  for (const field of ['network', 'broadcast', 'first', 'last', 'mask']) await page.locator('#si-g-' + field).fill(answer[field]);
+  await page.locator('#si-g-hosts').fill(String(answer.hosts));
+  await page.locator('#sp-g button', { hasText: 'Проверить' }).click();
+  await expect(page.locator('#sp-badge-g')).toContainText('Верно');
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_subnet_prog') || '{}'))).toEqual({});
+});
