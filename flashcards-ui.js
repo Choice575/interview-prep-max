@@ -7,7 +7,7 @@
 
   const hasOwn = (object, key) => !!object && Object.prototype.hasOwnProperty.call(object, key);
   const CATEGORY_ORDER = [
-    'Linux и Bash', 'Сети и протоколы', 'Docker и реестры образов', 'Kubernetes',
+    'Linux и Bash', 'Python', 'Сети и протоколы', 'Docker и реестры образов', 'Kubernetes',
     'Git и CI/CD', 'Ansible', 'Terraform и облака', 'Мониторинг и диагностика',
     'Базы данных и очереди', 'Безопасность', 'Архитектура и надёжность',
     'Карьера и собеседования', 'MLOps'

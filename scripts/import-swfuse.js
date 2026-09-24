@@ -45,6 +45,10 @@ function buildImport(input) {
     const existingBank = data.bank.categories.flatMap(item => item.questions);
     // Check the whole bank, including other categories, before updating this category.
     upsert(existingBank, bankQuestion, 'q');
+    // Вопрос живёт в одной категории: при смене bankCategory убираем его из прежней.
+    for (const other of data.bank.categories) {
+      if (other !== category) other.questions = other.questions.filter(item => item.id !== record.bankId);
+    }
     upsert(category.questions, bankQuestion, 'q');
     upsert(data.exam, {
       id: record.examId, topic: record.topic, level: record.level, category: record.category, ...(record.depth ? { depth: record.depth } : {}),

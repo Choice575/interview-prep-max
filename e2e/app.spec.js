@@ -135,11 +135,11 @@ test('keeps curriculum and video flashcards as separate visible decks', async ({
   await page.locator('[data-page="flashcards"]').click();
 
   await expect(page.locator('#page-flashcards')).toHaveClass(/active/);
-  await expect(page.locator('#sb-flashcards-count')).toHaveText('2658');
+  await expect(page.locator('#sb-flashcards-count')).toHaveText('2659');
   const studyDeck = page.locator('[data-flashcards-action="deck"][data-deck="study"]');
   const videoDeck = page.locator('[data-flashcards-action="deck"][data-deck="video"]');
   await expect(studyDeck).toContainText('Учебная программа');
-  await expect(studyDeck.locator('strong')).toHaveText('2329');
+  await expect(studyDeck.locator('strong')).toHaveText('2330');
   await expect(videoDeck).toContainText('Собеседования из видео');
   await expect(videoDeck.locator('strong')).toHaveText('329');
   await expect(page.locator('.study-card').first()).toHaveAttribute('data-card-id', '1000001');
@@ -640,7 +640,7 @@ test('defers exam cards and renders the full list in batches', async ({ page }) 
   await expect(page.locator('#questions-container .q-card')).toHaveCount(0);
   await page.locator('[data-page="exam"]').click();
   await expect(page.locator('#questions-container .q-card')).toHaveCount(12);
-  await expect(page.locator('#questions-load-more')).toContainText('12/921');
+  await expect(page.locator('#questions-load-more')).toContainText('12/922');
   await page.locator('#questions-load-more button').click();
   await expect(page.locator('#questions-container .q-card')).toHaveCount(24);
 });
@@ -1135,8 +1135,8 @@ test('flat flashcard categories preserve progress, filter independently and keep
   await page.goto('/');
   await page.locator('[data-page="flashcards"]').click();
   const categories = page.getByRole('group', { name: 'Категории карточек' });
-  await expect(categories.getByRole('button')).toHaveCount(14);
-  const linux = categories.getByRole('button', { name: 'Linux и Bash 367', exact: true });
+  await expect(categories.getByRole('button')).toHaveCount(15);
+  const linux = categories.getByRole('button', { name: 'Linux и Bash 363', exact: true });
   await linux.click();
   await expect(linux).toHaveAttribute('aria-pressed', 'true');
   await expect(linux).toBeFocused();
@@ -1148,7 +1148,7 @@ test('flat flashcard categories preserve progress, filter independently and keep
   await expect(search).toHaveValue('несуществующий вопрос');
   await expect(search).toBeFocused();
   await expect(page.locator('#flashcards-host .empty-state')).toBeVisible();
-  await expect(linux.locator('strong')).toHaveText('367');
+  await expect(linux.locator('strong')).toHaveText('363');
   await search.fill('');
   await page.locator('[data-flashcards-action="mode"][data-mode="all"]').click();
   await categories.getByRole('button', { name: 'Docker и реестры образов 123', exact: true }).click();

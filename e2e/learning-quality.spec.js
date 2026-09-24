@@ -12,7 +12,7 @@ test.beforeEach(async ({page}) => {
 
 test('template practice deck is hidden without dropping its stored progress', async ({page}) => {
   await page.goto('/#/flashcards');
-  await expect(page.locator('[data-deck="study"] strong')).toHaveText('2329');
+  await expect(page.locator('[data-deck="study"] strong')).toHaveText('2330');
   await expect(page.locator('[data-deck="practice"]')).toHaveCount(0);
   await expect(page.locator('[data-deck="video"]')).toBeVisible();
   await page.locator('[data-flashcards-filter="search"]').fill('Дан вывод для');

@@ -15,9 +15,9 @@ test('ships the complete themed flashcard corpus with stable ids', () => {
   assert.equal(data.version, '1.0.0');
   assert.equal(data.source, 'Interview Prep Max study corpus');
   assert.equal(data.sourceCsvSha256, '113241009bb68c8df5d16a3f944a747dd40243e3111bbae20581eb00f0e1fcc9');
-  assert.equal(data.cards.length, 3105);
-  assert.equal(new Set(data.cards.map(card => card.collection)).size, 13);
-  assert.deepEqual(data.cards.map(card => card.id), Array.from({ length: 3105 }, (_, index) => 1000001 + index));
+  assert.equal(data.cards.length, 3106);
+  assert.equal(new Set(data.cards.map(card => card.collection)).size, 14);
+  assert.deepEqual(data.cards.map(card => card.id), Array.from({ length: 3106 }, (_, index) => 1000001 + index));
 });
 
 test('keeps every flashcard answerable and free of exact duplicates', () => {
@@ -111,7 +111,7 @@ test('keeps KTS command snippets executable in a shell', () => {
 test('reviewed wording and source fields match the approved corpus', () => {
   const video = JSON.parse(fs.readFileSync(videoFile, 'utf8'));
   for (const [corpus, expected] of [
-    [data, 'faf81fd0e790b3a7d72d292bff445ae07ce2c135d438e46b5fcc7594797cee90'],
+    [data, 'bec18319b33090488de2df914da9e6d2460d762bbafefb8ecd7007fd369a5aca'],
     [video, '2da24d22dcd80c44309190a63fbf31a42ea8fef530746432448f85301b41d98e']
   ]) {
     const content = corpus.cards.filter(card => !card.sourceRepository).map(card => Object.fromEntries(Object.entries(card).filter(([key]) => key !== 'collection')));
@@ -119,7 +119,7 @@ test('reviewed wording and source fields match the approved corpus', () => {
   }
 });
 
-test('both decks use the same flat categories, with MLOps only in study', () => {
+test('both decks use the same flat categories, with Python and MLOps only in study', () => {
   const categories = [
     'Linux и Bash', 'Сети и протоколы', 'Docker и реестры образов', 'Kubernetes',
     'Git и CI/CD', 'Ansible', 'Terraform и облака', 'Мониторинг и диагностика',
@@ -127,5 +127,5 @@ test('both decks use the same flat categories, with MLOps only in study', () => 
   ];
   const video = JSON.parse(fs.readFileSync(videoFile, 'utf8'));
   assert.deepEqual(Object.keys(video.collections), categories);
-  assert.deepEqual(Object.keys(data.collections), [...categories, 'MLOps']);
+  assert.deepEqual(Object.keys(data.collections), [categories[0], 'Python', ...categories.slice(1), 'MLOps']);
 });
