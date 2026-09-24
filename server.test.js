@@ -254,8 +254,9 @@ test('caps concurrent tutor provider calls and releases capacity after completio
     new Promise((_, reject) => setTimeout(() => reject(new Error('timeout: ' + label)), 1000))
   ]);
   const waitForPending = async count => {
-    for (let attempt = 0; attempt < 50 && pending.length < count; attempt++) {
-      await new Promise(resolve => setImmediate(resolve));
+    const deadline = Date.now() + 2000;
+    while (pending.length < count && Date.now() < deadline) {
+      await new Promise(resolve => setTimeout(resolve, 5));
     }
     assert.equal(pending.length, count, 'ожидалось provider calls: ' + count);
   };

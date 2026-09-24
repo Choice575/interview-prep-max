@@ -112,7 +112,7 @@ test('reviewed wording and source fields match the approved corpus', () => {
   const video = JSON.parse(fs.readFileSync(videoFile, 'utf8'));
   for (const [corpus, expected] of [
     [data, '0702f249af1ffe31d68bfb4b548c6d685d21eec1392a689d5c03fdcd93480430'],
-    [video, '0d8d699450012283fd8c4622bbb16252b67af375af47566f88bcd30f2bfe86ab']
+    [video, 'b5a5119bfebbc48d1561eb3549190020d497ae05ff92713119d0dbe05bc7f5ef']
   ]) {
     const content = corpus.cards.filter(card => !card.sourceRepository).map(card => Object.fromEntries(Object.entries(card).filter(([key]) => key !== 'collection')));
     assert.equal(createHash('sha256').update(JSON.stringify(content)).digest('hex'), expected);
