@@ -37,7 +37,7 @@
 
     if (collection !== 'all') result = result.filter(card => card && card.collection === collection);
     if (search) {
-      result = result.filter(card => [card && card.question, card && card.answer, card && card.collection, card && card.sourceTitle]
+      result = result.filter(card => [card && card.question, card && card.code, card && card.answer, card && card.collection, card && card.sourceTitle]
         .some(value => String(value || '').toLowerCase().includes(search)));
     }
     if (mode === 'due') result = result.filter(card => isDue(card, progress, now));
@@ -150,6 +150,9 @@
       return deckSwitch + stats + controls + '<div class="empty-state"><div class="icon">✅</div><p>Для выбранных фильтров карточек нет.</p></div>';
     }
 
+    // Код и вывод команд хранятся отдельно от вопроса: склеенный в строку YAML
+    // или лог нечитаем, а ответ часто ссылается именно на него (аудит C5).
+    const code = card.code ? '<pre class="study-evidence study-card-code" aria-label="Код или вывод к вопросу">' + escapeText(card.code) + '</pre>' : '';
     const sourceUrl = safeHttpUrl(card.sourceUrl);
     const source = card.sourceTitle
       ? '<div class="study-card-source">Источник: ' + (sourceUrl
@@ -167,7 +170,7 @@
 
     return deckSwitch + stats + controls + '<article class="study-card" data-card-id="' + escapeText(card.id) + '">' +
       '<div class="study-card-meta"><span>' + escapeText(card.collection) + '</span><span>' + (index + 1) + ' / ' + filtered.length + '</span></div>' +
-      '<h2>' + escapeText(card.question) + '</h2>' + source + answer +
+      '<h2>' + escapeText(card.question) + '</h2>' + code + source + answer +
       '<div class="study-card-nav"><button type="button" class="btn btn-quiet" data-flashcards-action="prev"' + (index === 0 ? ' disabled' : '') + '>← Предыдущая</button>' +
       '<button type="button" class="btn btn-quiet" data-flashcards-action="next"' + (index >= filtered.length - 1 ? ' disabled' : '') + '>Следующая →</button></div></article>';
   }

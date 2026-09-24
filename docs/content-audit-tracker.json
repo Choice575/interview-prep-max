@@ -2740,14 +2740,16 @@
       "current": "вывод dmesg не показан, совет без диагностики",
       "proposed": "добавить строку вывода, связать с 1001165",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001048",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.18: код и вывод команды хранятся в поле code карточки и показываются многострочным блоком под вопросом; у карточек инцидентов вводная отделена от шага («Сейчас: …»).",
+      "sources": []
     },
     {
       "id": "audit-p06-447",
@@ -5099,14 +5101,16 @@
       "current": "вводная и контекст склеены без точки",
       "proposed": "C5",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002098",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.18: код и вывод команды хранятся в поле code карточки и показываются многострочным блоком под вопросом; у карточек инцидентов вводная отделена от шага («Сейчас: …»).",
+      "sources": []
     },
     {
       "id": "audit-p12-624",
@@ -5121,14 +5125,16 @@
       "current": "«Вы смотрите логи приложения» — логов на карточке нет",
       "proposed": "добавить строку ошибки из лога в вопрос",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002101",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.18: код и вывод команды хранятся в поле code карточки и показываются многострочным блоком под вопросом; у карточек инцидентов вводная отделена от шага («Сейчас: …»).",
+      "sources": []
     },
     {
       "id": "audit-p12-625",
@@ -7159,7 +7165,7 @@
       "current": "Dockerfile и YAML склеены в строку, отступы потеряны",
       "proposed": "C5 (многострочный код)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000336",
@@ -7171,7 +7177,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.18: код и вывод команды хранятся в поле code карточки и показываются многострочным блоком под вопросом; у карточек инцидентов вводная отделена от шага («Сейчас: …»).",
+      "sources": []
     },
     {
       "id": "audit-p16-738",
@@ -7222,14 +7230,16 @@
       "current": "вводная инцидента склеена с контекстом шага («Лимит контейнера — 512 МБ Размер…»)",
       "proposed": "C5",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000332",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.18: код и вывод команды хранятся в поле code карточки и показываются многострочным блоком под вопросом; у карточек инцидентов вводная отделена от шага («Сейчас: …»).",
+      "sources": []
     },
     {
       "id": "audit-p16-740",
@@ -8061,7 +8071,7 @@
       "current": "вводная инцидента склеена с шагом без точек («…docker login Права токена включают push…»)",
       "proposed": "C5",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000527",
@@ -8073,7 +8083,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.18: код и вывод команды хранятся в поле code карточки и показываются многострочным блоком под вопросом; у карточек инцидентов вводная отделена от шага («Сейчас: …»).",
+      "sources": []
     },
     {
       "id": "audit-p19-831",
@@ -9957,7 +9969,7 @@
       "current": "ответ ссылается на вывод («команда лишь разрешает имя», «не находит файл /app/dist/server.js»), которого нет в вопросе",
       "proposed": "добавить вывод команды и строку лога в вопрос (C5)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000747",
@@ -9969,7 +9981,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.18: код и вывод команды хранятся в поле code карточки и показываются многострочным блоком под вопросом; у карточек инцидентов вводная отделена от шага («Сейчас: …»).",
+      "sources": []
     },
     {
       "id": "audit-p24-964",
@@ -10053,7 +10067,7 @@
       "current": "YAML склеен в строку",
       "proposed": "C5",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000751",
@@ -10065,7 +10079,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.18: код и вывод команды хранятся в поле code карточки и показываются многострочным блоком под вопросом; у карточек инцидентов вводная отделена от шага («Сейчас: …»).",
+      "sources": []
     },
     {
       "id": "audit-p24-968",
@@ -10083,7 +10099,7 @@
       "current": "вводная склеена с шагом без точек",
       "proposed": "C5",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000743",
@@ -10105,7 +10121,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.18: код и вывод команды хранятся в поле code карточки и показываются многострочным блоком под вопросом; у карточек инцидентов вводная отделена от шага («Сейчас: …»).",
+      "sources": []
     },
     {
       "id": "audit-p24-969",
@@ -10478,7 +10496,7 @@
       "current": "ответ ссылается на данные, которых нет в вопросе («сегмент r7», строки error.log, ошибка в `/api/users`)",
       "proposed": "добавить в вопрос вывод и строки лога (C5)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001451",
@@ -10495,7 +10513,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.18: код и вывод команды хранятся в поле code карточки и показываются многострочным блоком под вопросом; у карточек инцидентов вводная отделена от шага («Сейчас: …»).",
+      "sources": []
     },
     {
       "id": "audit-p27-1015",
