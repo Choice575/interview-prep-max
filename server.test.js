@@ -437,3 +437,18 @@ test('survives malformed request targets instead of crashing', async () => {
     assert.equal(alive.status, 200, 'сервер не выжил после некорректных запросов');
   });
 });
+
+test('static assets carry an ETag and answer 304 to a matching revalidation', async () => {
+  await withServer(createAiService({}), async server => {
+    const first = await request(server, 'GET', '/tasks/base_questions.json');
+    assert.equal(first.status, 200);
+    assert.match(first.headers.etag, /^W\/"[0-9a-f]+-[0-9a-f]+"$/);
+    assert.equal(first.headers['cache-control'], 'no-cache');
+    assert.ok(first.headers['last-modified']);
+    const again = await request(server, 'GET', '/tasks/base_questions.json', undefined, { 'If-None-Match': first.headers.etag });
+    assert.equal(again.status, 304);
+    assert.equal(again.body, '');
+    const stale = await request(server, 'GET', '/tasks/base_questions.json', undefined, { 'If-None-Match': 'W/"0-0"' });
+    assert.equal(stale.status, 200);
+  });
+});
