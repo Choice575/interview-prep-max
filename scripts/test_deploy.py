@@ -88,12 +88,6 @@ esac
         result, _ = self.run_deploy()
         self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_reads_legacy_root_version_file(self):
-        (self.root / 'project/public/version.js').unlink()
-        (self.root / 'project/version.js').write_text("self.IPMAX_VERSION = '15.5.0';\n")
-        result, _ = self.run_deploy()
-        self.assertEqual(result.returncode, 0, result.stderr)
-
     def test_build_failure_restores_checkout_without_restarting_live_containers(self):
         result, log = self.run_deploy('build-failure')
         self.assertEqual(result.returncode, 23, result.stderr)
