@@ -16,9 +16,9 @@
   {
     "id": 2,
     "title": "COPY . . — копирует мусор",
-    "code": "FROM node:18\nCOPY . .\nRUN npm ci --only=production\nCMD [\"node\", \"app.js\"]",
+    "code": "FROM node:22\nCOPY . .\nRUN npm ci --omit=dev\nCMD [\"node\", \"app.js\"]",
     "bug": "COPY . . копирует ВСЁ: node_modules, .git, тесты, Dockerfile — лишний вес в образе и инвалидация кэша при любом изменении в проекте.",
-    "fix": "FROM node:18\nCOPY package.json package-lock.json ./\nRUN npm ci --only=production\nCOPY src/ ./src/\nCMD [\"node\", \"app.js\"]",
+    "fix": "FROM node:22\nCOPY package.json package-lock.json ./\nRUN npm ci --omit=dev\nCOPY src/ ./src/\nCMD [\"node\", \"app.js\"]",
     "opts": [
       "COPY . . копирует node_modules, .git, тесты в образ",
       "npm ci требует флаг --production вместо --only=production",
@@ -72,9 +72,9 @@
   {
     "id": 6,
     "title": "Запуск от root — проблема безопасности",
-    "code": "FROM node:18-alpine\nWORKDIR /app\nCOPY . .\nRUN npm ci --only=production\nCMD [\"node\", \"app.js\"]",
+    "code": "FROM node:22-alpine\nWORKDIR /app\nCOPY . .\nRUN npm ci --omit=dev\nCMD [\"node\", \"app.js\"]",
     "bug": "Процесс запускается от root. Если злоумышленник получит доступ к приложению — получит root в контейнере. При пробросе томов может повредить файлы хоста.",
-    "fix": "FROM node:18-alpine\nRUN addgroup -S appgroup && adduser -S appuser -G appgroup\nWORKDIR /app\nCOPY --chown=appuser:appgroup . .\nUSER appuser\nRUN npm ci --only=production\nCMD [\"node\", \"app.js\"]",
+    "fix": "FROM node:22-alpine\nRUN addgroup -S appgroup && adduser -S appuser -G appgroup\nWORKDIR /app\nCOPY --chown=appuser:appgroup . .\nUSER appuser\nRUN npm ci --omit=dev\nCMD [\"node\", \"app.js\"]",
     "opts": [
       "Процесс запускается от root — угроза безопасности",
       "node:18-alpine не содержит npm ci — нужен полный образ node:18",
@@ -86,9 +86,9 @@
   {
     "id": 7,
     "title": "ENV NODE_ENV после npm install",
-    "code": "FROM node:18\nWORKDIR /app\nCOPY package*.json ./\nRUN npm install\nENV NODE_ENV=production\nCOPY . .\nCMD [\"node\", \"app.js\"]",
+    "code": "FROM node:22\nWORKDIR /app\nCOPY package*.json ./\nRUN npm install\nENV NODE_ENV=production\nCOPY . .\nCMD [\"node\", \"app.js\"]",
     "bug": "ENV NODE_ENV=production стоит ПОСЛЕ npm install. При npm install NODE_ENV не был production → установились devDependencies. Образ содержит ненужные пакеты.",
-    "fix": "FROM node:18\nENV NODE_ENV=production\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci --only=production\nCOPY . .\nCMD [\"node\", \"app.js\"]",
+    "fix": "FROM node:22\nENV NODE_ENV=production\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci --omit=dev\nCOPY . .\nCMD [\"node\", \"app.js\"]",
     "opts": [
       "ENV NODE_ENV=production после npm install — установлены devDependencies",
       "npm install требует прав root, поэтому USER объявляют только после установки",

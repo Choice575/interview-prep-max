@@ -2628,14 +2628,16 @@
       "current": "`kill -CHLD PARENT_PID` как решение",
       "proposed": "убрать (противоречит 1001056)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000987",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p06-442",
@@ -2650,14 +2652,16 @@
       "current": "`ps aux | grep \" D \"`",
       "proposed": "`ps -eo stat,pid,wchan:32,cmd | awk '$1 ~ /^D/'`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000986",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p06-443",
@@ -2672,14 +2676,16 @@
       "current": "`find` считает только файлы, выходит за ФС",
       "proposed": "`du --inodes -x / | sort -n | tail -20`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001047",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p06-444",
@@ -2694,14 +2700,16 @@
       "current": "«`$2 > 100` — числовое» (печатает заголовок)",
       "proposed": "`NR>1 && $2+0 > 100`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001068",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.13 (regex#12: NR>1).",
+      "sources": []
     },
     {
       "id": "audit-p06-445",
@@ -2765,7 +2773,7 @@
       "current": "87 и 1000 транзакций; пропущена точка",
       "proposed": "согласовать",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001040",
@@ -2777,7 +2785,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p06-448",
@@ -2792,14 +2802,16 @@
       "current": "ctime и touch",
       "proposed": "как `qb_lx_009`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001071",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Карточка уже согласована с qb_lx_009 (15.11.1–15.11.2).",
+      "sources": []
     },
     {
       "id": "audit-p06-449",
@@ -3218,7 +3230,7 @@
       "current": "функции mkfs; htop; D-state; MemoryMax; окружение",
       "proposed": "см. источники",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001169",
@@ -3245,7 +3257,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Карточки уже согласованы с исправленным банком и тестами (15.11.1–15.11.5).",
+      "sources": []
     },
     {
       "id": "audit-p07-468",
@@ -3260,14 +3274,16 @@
       "current": "«SIGKILL оставляет блокировки»",
       "proposed": "flock снимается, остаются lock-файлы",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001305",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p07-469",
@@ -3326,14 +3342,16 @@
       "current": "`--force --grace-period=0`",
       "proposed": "контейнер на ноде может ещё работать",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001276",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p07-472",
@@ -3348,14 +3366,16 @@
       "current": "«exec + cat портит бинарные»",
       "proposed": "портит только `-t`; `exec -i … cat` корректен",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001291",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.13 (cmd#36).",
+      "sources": []
     },
     {
       "id": "audit-p07-473",
@@ -3674,14 +3694,16 @@
       "current": "«отсюда зомби»",
       "proposed": "см. пакет 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001383",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Карточка уже согласована с qb_proc_003 (15.11.1).",
+      "sources": []
     },
     {
       "id": "audit-p08-486",
@@ -3753,7 +3775,7 @@
       "current": "htop; steal; QEMU молча; «пул»; inode при mkfs; переключение контекста",
       "proposed": "см. источники",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001319",
@@ -3785,7 +3807,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Карточки уже согласованы с исправленным банком (15.11.1–15.11.2).",
+      "sources": []
     },
     {
       "id": "audit-p08-489",
@@ -3899,14 +3923,16 @@
       "current": "sticky bit: «только владелец файла»",
       "proposed": "и владелец каталога, и root",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001384",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p08-494",
@@ -3921,14 +3947,16 @@
       "current": "только `update-initramfs`",
       "proposed": "`dracut -f`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001410",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "dracut -f уже указан (15.11.2).",
+      "sources": []
     },
     {
       "id": "audit-p08-495",
@@ -4005,14 +4033,16 @@
       "current": "переполнение conntrack — «обрывы без внятных ошибок»",
       "proposed": "в `dmesg` есть явное `nf_conntrack: table full, dropping packet`; добавить; conntrack нужен и stateful-фильтрации, не только NAT",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_net_007",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p09-520",
@@ -4027,14 +4057,16 @@
       "current": "«инициатор выжидает TIME_WAIT»",
       "proposed": "«инициатор **закрытия**» — иначе читается как инициатор соединения",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_net_002",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p09-521",
@@ -4049,14 +4081,16 @@
       "current": "«по TCP работают… DoT и DoH»",
       "proposed": "DoH поверх HTTP/3 и DNS over QUIC идут по UDP; правильно «DoT и DoH по HTTP/1.1–2»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_net_004",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p09-522",
@@ -4071,14 +4105,16 @@
       "current": "«сервер отправляет проверку, которую клиент подписывает»",
       "proposed": "в SSH-2 клиент подписывает идентификатор сессии из обмена ключами, отдельного вызова сервер не шлёт",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_nx_001",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p09-523",
@@ -4093,14 +4129,16 @@
       "current": "ARP отнесён к межсетевому уровню; команда `arp -an`",
       "proposed": "ARP обычно относят к канальному уровню (служит IP, но работает в сегменте); `ip neigh`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_ntr_001",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p09-524",
@@ -4115,14 +4153,16 @@
       "current": "traceroute «отправляет пакеты с TTL…» без указания транспорта",
       "proposed": "Linux по умолчанию UDP на высокие порты, `-I` — ICMP, `-T` — TCP (как в `qb_ntr_005`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_net_012",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p09-525",
@@ -4137,14 +4177,16 @@
       "current": "301 и 302 без 307/308",
       "proposed": "добавить: 307 и 308 сохраняют метод и тело запроса",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_net_010",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p09-526",
@@ -4159,14 +4201,16 @@
       "current": "частные диапазоны без 100.64.0.0/10",
       "proposed": "добавить CGNAT 100.64.0.0/10 — часто встречается в облаках и у провайдеров",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_net_006",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p09-527",
@@ -4920,14 +4964,16 @@
       "current": "«TIME_WAIT у инициатора»",
       "proposed": "«у инициатора закрытия»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002160",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p12-617",
@@ -4942,14 +4988,16 @@
       "current": "DoT и DoH только по TCP",
       "proposed": "DoH по HTTP/3 и DoQ — по UDP",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002192",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p12-618",
@@ -4964,14 +5012,16 @@
       "current": "«клиент подписывает проверку»",
       "proposed": "подписывается идентификатор сессии",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002202",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p12-619",
@@ -5635,14 +5685,16 @@
       "current": "«Настрой: `net.ipv4.tcp_keepalive_time=60`»",
       "proposed": "sysctl действует только на сокеты, где приложение включило `SO_KEEPALIVE`; без этого нужен heartbeat на уровне приложения",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002337",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p13-644",
@@ -5657,14 +5709,16 @@
       "current": "«Refused: хост доступен, но порт закрыт»",
       "proposed": "ещё и firewall с `REJECT --reject-with tcp-reset`; timeout — чаще `DROP` или нет маршрута",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002348",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p13-645",
@@ -5704,7 +5758,7 @@
       "current": "ARP на межсетевом уровне, `arp -an`; нет 100.64.0.0/10",
       "proposed": "см. пакет 9",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002316",
@@ -5716,7 +5770,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p13-647",
@@ -6394,7 +6450,7 @@
       "current": "«ADD с URL не проверяет контрольную сумму»",
       "proposed": "в Dockerfile syntax 1.6+ есть `ADD --checksum=sha256:… URL`; ADD также умеет Git-URL. Совет «лучше COPY» остаётся верным",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_dock_006",
@@ -6406,7 +6462,9 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p14-681",
@@ -6421,14 +6479,16 @@
       "current": "промежуточные образы многоэтапной сборки видны в `docker images -a`",
       "proposed": "так работал классический сборщик; с BuildKit (по умолчанию с Docker 23) промежуточные стадии не становятся образами, кэш — в `docker buildx du` / `docker builder prune`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_dock_012",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p14-682",
@@ -6443,14 +6503,16 @@
       "current": "«аргументы после имени образа дополняют ENTRYPOINT»",
       "proposed": "только при exec-форме ENTRYPOINT; при shell-форме CMD и аргументы `docker run` игнорируются",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_dock_004",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p14-683",
@@ -6465,14 +6527,16 @@
       "current": "WORKDIR «не создаёт слоёв данных»",
       "proposed": "WORKDIR создаёт каталог, если его нет, и это изменение попадает в слой",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_dkx_003",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p14-684",
@@ -6823,8 +6887,10 @@
       "current": "«Именованный том… переносим»; в объяснении — «переносим между хостами»",
       "proposed": "том с драйвером `local` хранится на конкретном хосте, данные не переносятся; верно другое — том не зависит от структуры каталогов хоста. Правильно: «том управляется Docker и не привязан к пути на хосте»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p15-710",
@@ -7047,14 +7113,16 @@
       "current": "«том… переносим между хостами»",
       "proposed": "см. пакет 15",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000367",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p16-734",
@@ -7072,7 +7140,7 @@
       "current": "ADD без контрольной суммы; промежуточные образы в `docker images -a`; WORKDIR без слоя; аргументы и ENTRYPOINT",
       "proposed": "см. пакет 14",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000485",
@@ -7094,7 +7162,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p16-735",
@@ -7111,7 +7181,7 @@
       "current": "`node:18`, `npm ci --only=production`",
       "proposed": "Node 18 без поддержки с апреля 2025 — актуальная LTS; `--only=production` заменён на `--omit=dev`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000339",
@@ -7128,7 +7198,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p16-736",
@@ -7143,14 +7215,16 @@
       "current": "«`docker stop` даёт код 143»",
       "proposed": "143 — если процесс завершился по SIGTERM без обработчика; при корректной обработке — 0; если не успел — SIGKILL и 137",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000333",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p16-737",
@@ -7255,14 +7329,16 @@
       "current": "«docker ps выдаёт ошибку» — текст ошибки не показан",
       "proposed": "добавить сообщение (`Cannot connect to the Docker daemon…`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000346",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.18: текст ошибки в поле code карточки.",
+      "sources": []
     },
     {
       "id": "audit-p16-741",
@@ -7551,14 +7627,16 @@
       "current": "«Хук без бита исполнения молча игнорируется»",
       "proposed": "Git выводит `hint: The '.git/hooks/pre-commit' hook was ignored because it's not set as executable` (проверено); подсказку можно отключить `advice.ignoredHook false` — тогда молча",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_gitp_006",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p17-756",
@@ -7573,14 +7651,16 @@
       "current": "«незакоммиченные изменения… восстановить нечем» после `reset --hard`",
       "proposed": "то, что было проиндексировано (`git add`), остаётся объектами и находится через `git fsck --lost-found`; безвозвратно теряются только правки, не добавленные в индекс",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_gitp_002",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p17-757",
@@ -7595,14 +7675,16 @@
       "current": "«after_script — отдельная оболочка, переменных не видит»",
       "proposed": "не видит переменных, объявленных в shell в `script`; переменные CI/CD из настроек и `variables:` доступны",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_ci_002",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p17-758",
@@ -8027,14 +8109,16 @@
       "current": "«Без `-a` создаётся lightweight тег»",
       "proposed": "`-m` без `-a` тоже создаёт аннотированный тег (проверено в разборе тренажёров, `git#17`); lightweight — без `-a`, `-m`, `-s`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000665",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.13 (git#17).",
+      "sources": []
     },
     {
       "id": "audit-p19-829",
@@ -8049,14 +8133,16 @@
       "current": "`git worktree add ./hotfix hotfix/critical` без оговорки",
       "proposed": "ветка должна существовать; для новой — `git worktree add -b hotfix/critical ./hotfix`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000666",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p19-830",
@@ -8335,14 +8421,16 @@
       "current": "«Guaranteed (request=limit), Burstable (request<limit)»",
       "proposed": "Guaranteed — requests равны limits по CPU и памяти во всех контейнерах; Burstable — любые настройки, не дотягивающие до Guaranteed (в 2000221 и 2000296 сказано верно)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000038",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p20-858",
@@ -8357,14 +8445,16 @@
       "current": "«Если init-контейнер падает, pod перезапускается»",
       "proposed": "kubelet перезапускает сам init-контейнер по `restartPolicy`; при `Never` под переходит в Failed",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000069",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p20-859",
@@ -8379,14 +8469,16 @@
       "current": "«`<pod-ip>.<namespace>.pod.cluster.local`»",
       "proposed": "IP записывается через дефисы: `10-1-2-3.ns.pod.cluster.local`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000070",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p20-860",
@@ -8401,14 +8493,16 @@
       "current": "«Встроенные provisioner облаков (AWS EBS, GCE PD, Azure Disk)»",
       "proposed": "встроенные (in-tree) плагины заменены CSI-драйверами и удалены из Kubernetes; сейчас это `ebs.csi.aws.com`, `pd.csi.storage.gke.io`, `disk.csi.azure.com`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000172",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p20-861",
@@ -8423,14 +8517,16 @@
       "current": "в списке Weave",
       "proposed": "Weave Net больше не развивается (Weaveworks закрылась в 2024)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000171",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p20-862",
@@ -8447,7 +8543,7 @@
       "current": "«kube-proxy iptables/IPVS»",
       "proposed": "IPVS объявлен устаревшим (1.35); добавить режим nftables",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000075",
@@ -8464,7 +8560,9 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p20-863",
@@ -8953,14 +9051,16 @@
       "current": "изменение ресурсов «долго оставалось в альфе и требует включения»",
       "proposed": "GA с Kubernetes 1.35 (декабрь 2025), включено по умолчанию с 1.33 (`kubectl patch pod … --subresource resize`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_012",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17–15.11.20: resize, GA с 1.35.",
+      "sources": []
     },
     {
       "id": "audit-p21-886",
@@ -8975,14 +9075,16 @@
       "current": "«Burstable — requests заданы и меньше limits»",
       "proposed": "любой под, не удовлетворяющий Guaranteed, при хотя бы одном request или limit; Guaranteed — равенство по CPU и памяти во всех контейнерах",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_008",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p21-887",
@@ -8997,14 +9099,16 @@
       "current": "«смонтированные файлом обновляются автоматически с задержкой»",
       "proposed": "кроме подключения через `subPath` — такие файлы не обновляются; добавить в раздел ошибок",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_013",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p21-888",
@@ -9019,14 +9123,16 @@
       "current": "«при перезапуске создаётся новый объект с новым адресом»",
       "proposed": "при перезапуске контейнера под и его IP сохраняются; новый объект с новым адресом — при пересоздании пода",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_003",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p21-889",
@@ -9041,14 +9147,16 @@
       "current": "«Удаление StatefulSet не удаляет созданные им PVC»",
       "proposed": "по умолчанию — да; с 1.32 (GA) поведение настраивается `persistentVolumeClaimRetentionPolicy` (`whenDeleted: Delete`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_004",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p21-890",
@@ -9063,14 +9171,16 @@
       "current": "режимы доступа без ReadWriteOncePod",
       "proposed": "добавить ReadWriteOncePod (GA 1.29): том монтируется одним подом",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_015",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p21-891",
@@ -9085,14 +9195,16 @@
       "current": "ingress-nginx как пример контроллера и в командах",
       "proposed": "указать, что Ingress NGINX выведен из эксплуатации в марте 2026; пример — другой контроллер или Gateway API (C9)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_007",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p21-892",
@@ -9333,14 +9445,16 @@
       "current": "«узел один, поэтому антиаффинити, PDB… не проверяются вообще», а в командах — `minikube start --nodes=2`",
       "proposed": "minikube поддерживает несколько узлов (`--nodes`), это противоречие внутри ответа; различие с продакшеном — не число узлов, а отсутствие реального HA, облачного LB и дисков",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8o_001",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p22-911",
@@ -9355,14 +9469,16 @@
       "current": "`--kubernetes-version=v1.30.0`",
       "proposed": "версия 1.30 без поддержки с 2025 года; указать актуальную или убрать флаг",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8o_001",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p22-912",
@@ -9377,14 +9493,16 @@
       "current": "`kubectl set image … --record=false`",
       "proposed": "флаг `--record` объявлен устаревшим; причину изменения пишут в аннотацию `kubernetes.io/change-cause`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8o_008",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p22-913",
@@ -9399,14 +9517,16 @@
       "current": "операторы affinity «In, NotIn, Exists и Gt»",
       "proposed": "ещё `DoesNotExist` и `Lt`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8o_006",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p22-914",
@@ -9881,14 +10001,16 @@
       "current": "под назван `cron-task`, а ответ «`restartPolicy: Never` для сервиса — не перезапустится»; в команде `[\"python\", \"-\", \"process_batch.py\"]`",
       "proposed": "для разовой задачи `Never` допустим, правильный совет — Job или CronJob; `python -` читает программу из stdin — вероятно, потерян флаг (`-u`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000756",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p24-960",
@@ -9903,14 +10025,16 @@
       "current": "воркеру без открытого порта добавлен `livenessProbe: httpGet /healthz :8080`",
       "proposed": "такая проба будет постоянно проваливаться и перезапускать контейнер; воркеру подходит `exec`-проба или файл-маркер",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000758",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p24-961",
@@ -9925,14 +10049,16 @@
       "current": "в исправлении `limits.cpu: \"500m\"` без оговорок",
       "proposed": "лимит памяти нужен, лимит CPU спорен — троттлинг ухудшает задержки (это сказано в `qb_k8s_008`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000755",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p24-962",
@@ -9947,14 +10073,16 @@
       "current": "«Service не знает, куда маршрутизировать»",
       "proposed": "Service без selector — допустимый вариант для внешних адресов с EndpointSlice, созданным вручную; ошибкой это становится, только если нужны поды",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000759",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p24-963",
@@ -10227,14 +10355,16 @@
       "current": "«Для очередей и брокеров практичнее третий вариант — RED»",
       "proposed": "RED (Rate, Errors, Duration) — метод для сервисов, обрабатывающих запросы; для очередей смотрят длину очереди и отставание потребителя (насыщение)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_obs_003",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p26-994",
@@ -10473,14 +10603,16 @@
       "current": "«Срочно: `CONFIG SET maxmemory-policy allkeys-lru`» без оговорок",
       "proposed": "вытеснение допустимо, только если Redis — кэш; если это основное хранилище (очереди, сессии), `allkeys-lru` молча удалит данные. Кроме того, `CONFIG SET` не сохраняется после перезапуска без `CONFIG REWRITE`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001454",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p27-1014",
@@ -10785,8 +10917,10 @@
       "current": "«HTTPRoute ResolvedRefs=False», объяснение — пустой EndpointSlice из-за несовпадения labels",
       "proposed": "`ResolvedRefs=False` означает неверную ссылку (нет Service, не тот порт, чужой namespace без ReferenceGrant), а пустые endpoints его не меняют; оставить одну причину",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p28-1051",
@@ -10859,8 +10993,10 @@
       "current": "блокировки через таблицу DynamoDB как единственный вариант",
       "proposed": "с Terraform 1.11 у S3-бэкенда есть собственная блокировка (`use_lockfile = true`), а блокировка через DynamoDB объявлена устаревшей; упомянуть оба варианта",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p29-1065",
@@ -10873,8 +11009,10 @@
       "current": "`: > /proc/2417/fd/3` «сразу возвращает место»",
       "proposed": "место вернётся, но без `O_APPEND` процесс продолжит писать по старому смещению и файл станет разреженным с прежним видимым размером (проверено в пакете 1)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p29-1066",
@@ -10979,8 +11117,10 @@
       "current": "`kubectl create secret generic regcred --from-file=.dockerconfigjson=…` «тоже работает»",
       "proposed": "без `--type=kubernetes.io/dockerconfigjson` секрет получит тип Opaque и не подойдёт для `imagePullSecrets`; пароль в командной строке попадает в историю shell; альтернатива — `imagePullSecrets` у ServiceAccount",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p30-1084",
@@ -10993,8 +11133,10 @@
       "current": "`ALTER SYSTEM SET checkpoint_completion_target='0.9'` как решение",
       "proposed": "начиная с PostgreSQL 14 значение по умолчанию и так 0.9 — команда ничего не меняет; для массового импорта помогают `max_wal_size`, загрузка частями, в крайнем случае временные настройки для сеанса импорта. Кроме того, у файлов WAL нет расширения `.wal`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p30-1085",
@@ -11007,8 +11149,10 @@
       "current": "«jstack: сотни потоков в состоянии GC waiting»",
       "proposed": "в дампе потоков jstack нет такого состояния; GC диагностируют через `jstat -gcutil PID 1000` (доля времени в GC) и журналы GC",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p30-1086",
@@ -11021,8 +11165,10 @@
       "current": "финал «Найдена корневая причина (OOM), heap увеличен»",
       "proposed": "OOM — симптом: причина — недостаточный heap или утечка; при утечке `-Xmx2g` лишь отсрочит падение (узел `add_swap` сам говорит «не решит утечку памяти»). Нужен heap dump, как в дереве #5",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p30-1087",
@@ -11035,8 +11181,10 @@
       "current": "лучший ответ «`chown myapp:myapp config.yaml`»",
       "proposed": "сервис получает право менять собственный конфиг; принятая практика — `chown root:myapp` и `chmod 640` (так и сделано в кейсе `linux-perm-001`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p30-1088",
@@ -11049,8 +11197,10 @@
       "current": "«после ротации SSH-ключей» — «REMOTE HOST IDENTIFICATION HAS CHANGED»; «ssh-keyscan лучше»",
       "proposed": "ротация ключей пользователя не меняет ключ хоста — нужно «после пересоздания ВМ» или «ротации host-ключей». `ssh-keyscan` без сверки отпечатка по доверенному каналу так же уязвим к подмене, как и отключение проверки",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p30-1089",
@@ -11063,8 +11213,10 @@
       "current": "«Токен регистрации мог устареть… `gitlab-runner register`»",
       "proposed": "регистрационные токены объявлены устаревшими; сейчас runner создают в интерфейсе и регистрируют токеном аутентификации (`glrt-…`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p30-1090",
@@ -11077,8 +11229,10 @@
       "current": "блокировка только через DynamoDB",
       "proposed": "S3-бэкенд с Terraform 1.11 блокирует сам (`use_lockfile`) — см. `inc-tf-state-lock`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p30-1091",
@@ -11091,8 +11245,10 @@
       "current": "`> /var/log/app/debug.log` «22 ГБ освободились, процесс продолжил запись»",
       "proposed": "без `O_APPEND` файл станет разреженным с прежним видимым размером (пакет 1); в неверном варианте `awk NR>1{print $2}` без кавычек — синтаксическая ошибка shell",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p30-1092",
@@ -11136,14 +11292,16 @@
       "current": "модули «`ec2`/`azure_rm_*`», «`docker_container`/`docker_image`»",
       "proposed": "модуль `ec2` удалён, сейчас `amazon.aws.ec2_instance`; модули Docker — в коллекции `community.docker`; называть модули полными именами коллекций",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000170",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p31-1104",
@@ -11158,14 +11316,16 @@
       "current": "порядок приоритета «extra-vars > role vars > playbook vars > host_vars > group_vars > role defaults»",
       "proposed": "упрощение без `set_fact`, registered vars, task vars и include params, которые выше role vars; в 2000125 сказано корректно — оставить её",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000060",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p31-1105",
@@ -11406,8 +11566,10 @@
       "current": "«changed=0 при повторном запуске подтверждает идемпотентность»",
       "proposed": "changed=0 — необходимое, но не достаточное условие: пропущенные по `when` задачи тоже дают 0 (это даже один из неверных вариантов); смотреть ещё `skipped` и проверять состояние (Molecule verify)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p32-1127",
@@ -11532,14 +11694,16 @@
       "current": "`terraform refresh`",
       "proposed": "команда объявлена устаревшей; вместо неё `terraform apply -refresh-only` (так и сделано в `qb_tf_005`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_tf_004",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p35-1156",
@@ -12133,14 +12297,16 @@
       "current": "«двойные скобки deprecated»",
       "proposed": "в актуальном Ansible это ошибка выполнения, а не предупреждение (C8.1)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001867",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.9 (code#12).",
+      "sources": []
     },
     {
       "id": "audit-p39-1231",
@@ -12186,7 +12352,7 @@
       "current": "блокировка только через DynamoDB",
       "proposed": "см. пакет 29",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001863",
@@ -12198,7 +12364,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p39-1233",
@@ -12213,14 +12381,16 @@
       "current": "«получаете ошибку… команда упала на середине» — самой ошибки нет, а ответ «force-unlock»",
       "proposed": "добавить в вопрос текст ошибки `Error acquiring the state lock` с Lock ID",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001883",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.18: ошибка с Lock ID в поле code карточки.",
+      "sources": []
     },
     {
       "id": "audit-p39-1234",
@@ -12359,14 +12529,16 @@
       "current": "«Уровень изоляции по умолчанию — read committed»",
       "proposed": "так в PostgreSQL, Oracle и SQL Server; в MySQL с InnoDB по умолчанию REPEATABLE READ — указать СУБД",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_db_003",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p41-1262",
@@ -12381,14 +12553,16 @@
       "current": "`DELETE FROM t WHERE id IN (SELECT id FROM t WHERE cond LIMIT 5000)` без указания СУБД",
       "proposed": "в PostgreSQL работает; MySQL не поддерживает `LIMIT` в подзапросе с `IN` — там `DELETE FROM t WHERE cond LIMIT 5000`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_db_007",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p41-1263",
@@ -12403,14 +12577,16 @@
       "current": "«устраняя зависимость от ZooKeeper»",
       "proposed": "с Kafka 4.0 (2025) режим ZooKeeper удалён полностью, KRaft — единственный вариант; добавить",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_031",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.20 вычитанной правкой во всех копиях текста (банк, тесты, карточки, видео, тренажёры, деревья, инциденты, кейсы).",
+      "sources": []
     },
     {
       "id": "audit-p41-1264",

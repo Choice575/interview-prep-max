@@ -242,7 +242,7 @@
         },
         {
           "q": "Чем connection refused отличается от timeout?",
-          "expected": "Refused: хост доступен, но порт закрыт/никто не слушает. Timeout: ответа нет, возможны сеть/firewall/маршрут.",
+          "expected": "Refused: пришёл RST — порт не слушается или firewall отвечает REJECT --reject-with tcp-reset. Timeout: ответа нет — чаще DROP на firewall или нет маршрута.",
           "score": 1
         },
         {
@@ -3451,7 +3451,7 @@
         }
       ],
       "commonMistakes": [
-        "Менять Gateway до проверки пустых endpoints.",
+        "Менять Gateway до чтения условий HTTPRoute.",
         "Считать Accepted=True доказательством доступного backend.",
         "Строить новую production-схему на ingress-nginx после EOL."
       ],
@@ -3492,7 +3492,7 @@
         }
       ],
       "commonMistakes": [
-        "Менять Gateway до проверки пустых endpoints.",
+        "Менять Gateway до чтения условий HTTPRoute.",
         "Считать Accepted=True доказательством доступного backend.",
         "Строить новую production-схему на ingress-nginx после EOL."
       ],
@@ -3533,7 +3533,7 @@
         }
       ],
       "commonMistakes": [
-        "Менять Gateway до проверки пустых endpoints.",
+        "Менять Gateway до чтения условий HTTPRoute.",
         "Считать Accepted=True доказательством доступного backend.",
         "Строить новую production-схему на ingress-nginx после EOL."
       ],
@@ -3574,7 +3574,7 @@
         }
       ],
       "commonMistakes": [
-        "Менять Gateway до проверки пустых endpoints.",
+        "Менять Gateway до чтения условий HTTPRoute.",
         "Считать Accepted=True доказательством доступного backend.",
         "Строить новую production-схему на ingress-nginx после EOL."
       ],
@@ -3615,7 +3615,7 @@
         }
       ],
       "commonMistakes": [
-        "Менять Gateway до проверки пустых endpoints.",
+        "Менять Gateway до чтения условий HTTPRoute.",
         "Считать Accepted=True доказательством доступного backend.",
         "Строить новую production-схему на ingress-nginx после EOL."
       ],

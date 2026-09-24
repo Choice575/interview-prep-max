@@ -17,8 +17,8 @@
     "id": 2,
     "title": "Нет livenessProbe — подвисший под не перезапустится",
     "code": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: worker\nspec:\n  containers:\n  - name: worker\n    image: myworker:v1\n    resources:\n      requests:\n        memory: \"128Mi\"\n        cpu: \"100m\"",
-    "bug": "Без livenessProbe K8s не узнает что приложение зависло (deadlock, бесконечный цикл). Под будет висеть вечно, не обрабатывая запросы.",
-    "fix": "livenessProbe:\n  httpGet:\n    path: /healthz\n    port: 8080\n  initialDelaySeconds: 15\n  periodSeconds: 10\n  failureThreshold: 3",
+    "bug": "Без livenessProbe K8s не узнает, что приложение зависло (deadlock, бесконечный цикл). У воркера нет HTTP-порта, поэтому httpGet-проба постоянно проваливалась бы и перезапускала контейнер — нужна exec-проба или файл-маркер.",
+    "fix": "livenessProbe:\n  exec:\n    command: [\"sh\", \"-c\", \"test $(( $(date +%s) - $(stat -c %Y /tmp/heartbeat) )) -lt 60\"]\n  initialDelaySeconds: 15\n  periodSeconds: 10\n  failureThreshold: 3\n# Воркер раз в N секунд обновляет /tmp/heartbeat, проба проверяет свежесть файла",
     "opts": [
       "Нет livenessProbe — зависший под не перезапустится",
       "restartPolicy: Always сам перезапустит зависший под",
@@ -43,9 +43,9 @@
   },
   {
     "id": 4,
-    "title": "Service без selector",
+    "title": "Service без selector для подов api",
     "code": "apiVersion: v1\nkind: Service\nmetadata:\n  name: api-svc\nspec:\n  ports:\n  - port: 80\n    targetPort: 8080\n  type: ClusterIP",
-    "bug": "Service без selector не знает на какие поды отправлять трафик. Endpoints останутся пустыми. Запросы будут виснуть/падать.",
+    "bug": "Service без selector не создаёт EndpointSlice автоматически. Это допустимо для внешних адресов, если EndpointSlice создан вручную, но здесь трафик должен идти на поды api — endpoints останутся пустыми, запросы будут падать.",
     "fix": "spec:\n  selector:\n    app: api\n  ports:\n  - port: 80\n    targetPort: 8080\n  type: ClusterIP",
     "opts": [
       "Нет selector — Service не знает куда маршрутизировать трафик",
@@ -59,8 +59,8 @@
     "id": 5,
     "title": "resources без limits",
     "code": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: app\nspec:\n  containers:\n  - name: app\n    image: myapp:v1\n    resources:\n      requests:\n        memory: \"128Mi\"\n        cpu: \"100m\"",
-    "bug": "Указаны requests, но нет limits. K8s позволяет контейнеру съесть всю память ноды. При утечке памяти — OOMKiller убьёт процесс. QoS класс — Burstable (не Guaranteed).",
-    "fix": "resources:\n  requests:\n    memory: \"128Mi\"\n    cpu: \"100m\"\n  limits:\n    memory: \"256Mi\"\n    cpu: \"500m\"",
+    "bug": "Указаны requests, но нет limits. Без лимита памяти контейнер может занять всю память ноды, и при нехватке пострадают соседи. QoS класс — Burstable (не Guaranteed). Лимит CPU спорен: троттлинг ухудшает задержки, поэтому его задают осознанно.",
+    "fix": "resources:\n  requests:\n    memory: \"128Mi\"\n    cpu: \"100m\"\n  limits:\n    memory: \"256Mi\"\n# Лимит CPU не обязателен: троттлинг ухудшает задержки, задавайте его осознанно",
     "opts": [
       "Нет limits — контейнер может занять всю память ноды",
       "requests: 128Mi — это жёсткий предел, память сверх него не выдадут",
@@ -127,12 +127,12 @@
   },
   {
     "id": 10,
-    "title": "Pod без restartPolicy для критичной задачи",
-    "code": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: cron-task\nspec:\n  containers:\n  - name: worker\n    image: myworker:v1\n    command: [\"python\", \"-\", \"process_batch.py\"]\n  restartPolicy: Never",
-    "bug": "restartPolicy: Never означает что упавший под НЕ перезапустится. Для воркера/батча это может быть ок, но если под упадёт из-за OOM — задача потеряна навсегда. Для долгоживущих сервисов нужен OnFailure или Always.",
-    "fix": "Для сервисов:\nrestartPolicy: Always\nДля задач с ретраями:\nrestartPolicy: OnFailure\n// Или использовать Job/CronJob вместо Pod",
+    "title": "Разовая задача запущена голым Pod",
+    "code": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: cron-task\nspec:\n  containers:\n  - name: worker\n    image: myworker:v1\n    command: [\"python\", \"process_batch.py\"]\n  restartPolicy: Never",
+    "bug": "Для разовой пакетной задачи restartPolicy: Never допустим, но голый Pod не повторит попытку при ошибке и не будет пересоздан при потере узла — задача пропадёт. Правильный инструмент — Job (или CronJob) с backoffLimit.",
+    "fix": "apiVersion: batch/v1\nkind: Job\nmetadata:\n  name: process-batch\nspec:\n  backoffLimit: 3\n  template:\n    spec:\n      restartPolicy: Never\n      containers:\n      - name: worker\n        image: myworker:v1\n        command: [\"python\", \"process_batch.py\"]",
     "opts": [
-      "restartPolicy: Never для сервиса — при падении под не перезапустится",
+      "Голый Pod не повторит задачу и не переживёт узел — нужен Job",
       "restartPolicy: Never допустим только внутри Job, у Pod он игнорируется",
       "restartPolicy задаётся внутри containers, а не в spec пода",
       "command в Pod требует обёртки sh -c, иначе не запустится"
