@@ -165,3 +165,16 @@ test('incident cards separate the scenario from the step and carry the command o
   const withEvidence = incidents.flatMap(item => item.phases).filter(phase => phase.evidence).length;
   assert.equal(cards.filter(card => card.code && card.code.startsWith('$ ')).length, withEvidence);
 });
+
+test('копии вопроса в тестах, банке и карточках связаны актуальным conceptId', () => {
+  const fs = require('node:fs');
+  const { assignConcepts } = require('./scripts/assign-concepts.js');
+  const read = file => JSON.parse(fs.readFileSync(file, 'utf8'));
+  const input = { exam: read('tasks/base_questions.json'), bank: read('tasks/question_bank.json'),
+    study: read('tasks/flashcards.json'), video: read('tasks/video_flashcards.json') };
+  const result = assignConcepts(input, read('tasks/concept-links.json'));
+  assert.deepEqual(result.data, input, 'запустите node scripts/assign-concepts.js');
+  assert.ok(result.groups > 900, `групп ${result.groups}`);
+  const load = input.exam.find(question => /load average/i.test(question.q) && question.conceptId);
+  assert.ok(load, 'вопрос о load average связан с копиями');
+});

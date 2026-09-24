@@ -72,8 +72,9 @@ const dataLoader=IPMaxDataLoader.create({files:DATA_FILES,fetch:(url,options)=>f
     }
     if(key==='flashcards'||key==='video_flashcards'){
       const count=document.getElementById('sb-flashcards-count');
-      if(count)count.textContent=visibleStudyCards().length+(VIDEO_FLASHCARDS_DATA?.cards?.length||0);
+      if(count)count.textContent=visibleStudyCards().length+visibleVideoCards().length;
     }
+    if(key==='base_questions'||key==='flashcards'||key==='video_flashcards') alignConceptProgressOnce();
   }
 });
 let navigationRequest=0;
@@ -141,6 +142,21 @@ function recordSkillEvent(input){
   if(typeof ProgressTracker==='undefined') return;
   lsSet('skill_events',ProgressTracker.appendSkillEvent(getSkillEvents(),input));
 }
+// Копии одного вопроса в тестах и карточках связаны conceptId (аудит B3): расписание повторения у них общее.
+let conceptIndexCache=null;
+function conceptIndex(){
+  if(typeof ProgressTracker==='undefined'||!ProgressTracker.buildConceptIndex) return null;
+  const lists=[BASE_QUESTIONS,FLASHCARDS_DATA?.cards,VIDEO_FLASHCARDS_DATA?.cards];
+  const key=lists.map(list=>Array.isArray(list)?list.length:0).join(':');
+  if(!conceptIndexCache||conceptIndexCache.key!==key) conceptIndexCache={key,index:ProgressTracker.buildConceptIndex(lists)};
+  return conceptIndexCache.index;
+}
+function alignConceptProgressOnce(){
+  const index=conceptIndex();
+  if(!index||!index.size) return;
+  const aligned=ProgressTracker.alignConceptProgress(getQProg(),index);
+  if(aligned.changed) lsSet('qprog',aligned.progress);
+}
 function recordQuestionResult(question,input){
   if(!question||typeof ProgressTracker==='undefined') return null;
   const now=Number.isFinite(input?.now)?input.now:Date.now();
@@ -148,6 +164,8 @@ function recordQuestionResult(question,input){
   if(CORRECTED_TERRAFORM_ANSWER_IDS.has(Number(question.id))&&['exam','blitz','daily-blitz','diagnostic'].includes(input?.source)){
     result.progress[question.id].answerKeyReviewedVersion=CORRECTED_ANSWER_VERSION;
   }
+  const index=conceptIndex();
+  if(index) result.progress=ProgressTracker.shareConceptSchedule(result.progress,String(question.id),index.siblings(question.id));
   lsSet('qprog',result.progress);
   if(input?.syncMistakes){
     const mistakes=getMistakes();
@@ -753,13 +771,16 @@ function renderQCard(q,sMode){return requireExamUI().renderQuestionCard(q,sMode)
 // Шаблонные карточки (generated) не показываются: у сотен из них один и тот же
 // ответ, а недельные — рубрика вместо ответа (аудит C2). Это касается и 90
 // «практических сценариев» с выдуманным выводом; прогресс скрытых карточек не удаляется.
-function visibleStudyCards(){return (FLASHCARDS_DATA?.cards||[]).filter(card=>!card.generated);}
+// Смысловые копии одного понятия (conceptId) видны одной карточкой, расписание у них общее.
+function collapseConceptCards(cards){return typeof IPMaxFlashcardsUI!=='undefined'&&IPMaxFlashcardsUI.collapseConcepts?IPMaxFlashcardsUI.collapseConcepts(cards):cards;}
+function visibleStudyCards(){return collapseConceptCards((FLASHCARDS_DATA?.cards||[]).filter(card=>!card.generated));}
+function visibleVideoCards(){return collapseConceptCards(Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards:[]);}
 function requireFlashcardsUIModule(){if(typeof IPMaxFlashcardsUI==='undefined') throw new Error('Модуль учебных карточек не загружен.');return IPMaxFlashcardsUI;}
 const flashcardsUI=requireFlashcardsUIModule().create({
   getCards:visibleStudyCards,
   getDecks:()=>[
     {id:'study',label:'Учебная программа',description:'Вопросы по DevOps и MLOps, включая Swfuse/devops-interview.',cards:visibleStudyCards().filter(card=>!card.practice)},
-    {id:'video',label:'Собеседования из видео',description:(Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards.length:0)+' реальных вопросов из '+(Array.isArray(VIDEO_FLASHCARDS_DATA?.sources)?VIDEO_FLASHCARDS_DATA.sources.length:0)+' видео с техническими собеседованиями.',cards:Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards:[]},
+    {id:'video',label:'Собеседования из видео',description:visibleVideoCards().length+' реальных вопросов из '+(Array.isArray(VIDEO_FLASHCARDS_DATA?.sources)?VIDEO_FLASHCARDS_DATA.sources.length:0)+' видео с техническими собеседованиями; повторы из разных видео объединены.',cards:visibleVideoCards()},
     {id:'practice',label:'Практические сценарии',description:'Разбор вывода команд: объясните результат, границы проверки и следующий шаг. Прежний прогресс этих заданий сохранён.',cards:visibleStudyCards().filter(card=>card.practice)}
   ].filter(deck=>deck.id==='study'||deck.cards.length),
   getProgress:getQProg,now:()=>Date.now(),

@@ -597,7 +597,7 @@
       "current": "SIGTERM/SIGKILL",
       "proposed": "оставить `proc_004`, перенести мысль про PID 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_kts_016",
@@ -609,7 +609,8 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: SIGTERM и SIGKILL). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p01-331",
@@ -625,7 +626,7 @@
       "current": "kill отправляет сигнал",
       "proposed": "объединить или «как systemd останавливает службу»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_kts_015",
@@ -637,7 +638,8 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: kill и сигналы). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p01-332",
@@ -1314,8 +1316,9 @@
       "current": "6 вопросов",
       "proposed": "3: базовый, нормализация, высокий load с NFS",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: load average: что это; load average: нормализация; load average: высокий при живом сервисе и NFS). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p02-361",
@@ -1328,8 +1331,9 @@
       "current": "4",
       "proposed": "2",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: VIRT, RES и сумма RSS). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p02-362",
@@ -1342,8 +1346,9 @@
       "current": "2",
       "proposed": "1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: iowait). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p02-363",
@@ -1356,8 +1361,9 @@
       "current": "2",
       "proposed": "1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: user space и kernel space). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p02-364",
@@ -1370,8 +1376,9 @@
       "current": "5",
       "proposed": "3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: что такое inode; закончились иноды; динамические иноды). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p02-365",
@@ -1384,8 +1391,9 @@
       "current": "по 2",
       "proposed": "по 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: RAID; LVM; fstab и монтирование; символьные и блочные устройства). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p02-366",
@@ -1824,7 +1832,7 @@
       "current": "17 дословных копий банка",
       "proposed": "хранить в банке со ссылкой на видео",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000300",
@@ -1836,7 +1844,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p03-390",
@@ -1849,8 +1858,9 @@
       "current": "load average (3 видео из 7), df/du, иноды, ссылки, SIGTERM/SIGKILL, зомби, syscalls",
       "proposed": "одна карточка со счётчиком «в N собеседованиях» (B11)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p03-391",
@@ -2120,8 +2130,9 @@
       "current": "—",
       "proposed": "оставить по одному",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: chmod; жёсткие и символические ссылки; OOM killer; lsof; strace). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p04-409",
@@ -2467,8 +2478,9 @@
       "current": "7 вопросов",
       "proposed": "2–3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: load average в тестах). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p05-428",
@@ -2481,8 +2493,9 @@
       "current": "—",
       "proposed": "по одному (из chmod оставить #10025)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: df и du; cgroup; socket activation). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p06-434",
@@ -3145,8 +3158,9 @@
       "current": "—",
       "proposed": "C6",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p07-462",
@@ -3735,8 +3749,9 @@
       "current": "7 групп",
       "proposed": "C6",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p08-484",
@@ -4060,8 +4075,9 @@
       "current": "—",
       "proposed": "C6",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p09-517",
@@ -4410,8 +4426,9 @@
       "current": "2",
       "proposed": "1 (`ntr_002` полнее: границы датаграмм, head-of-line)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: TCP и UDP). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p09-532",
@@ -4424,8 +4441,9 @@
       "current": "2",
       "proposed": "1 (`ntr_003`: CLOSE_WAIT, tw_recycle)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: рукопожатие и закрытие TCP). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p09-533",
@@ -4438,8 +4456,9 @@
       "current": "2",
       "proposed": "1 (`nx_004` точнее)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: DNS по UDP и TCP). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p09-534",
@@ -4452,8 +4471,9 @@
       "current": "3",
       "proposed": "2: «как проверяется сертификат» и «как устроен TLS»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: проверка сертификата). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p09-535",
@@ -4466,8 +4486,9 @@
       "current": "4",
       "proposed": "3: `nx_003`, `ntr_004`, `ntr_005`; `net_012` удалить",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: ICMP, ping и traceroute). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p09-536",
@@ -4480,8 +4501,9 @@
       "current": "2",
       "proposed": "1 (`ntr_006`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: L4 и L7). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p09-537",
@@ -4494,8 +4516,9 @@
       "current": "2, противоречат",
       "proposed": "1 (`ntr_007`) + команды и conntrack из `net_007`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: NAT). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p09-538",
@@ -4508,8 +4531,9 @@
       "current": "2",
       "proposed": "оставить в одном месте",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p09-539",
@@ -4790,8 +4814,9 @@
       "current": "по 2",
       "proposed": "по 1 (из пары оставить вариант с лучшими неверными вариантами: #202, #203, #207, #220)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: VLAN; ARP). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p10-564",
@@ -4804,8 +4829,9 @@
       "current": "дублируют банк",
       "proposed": "объединить через `conceptId`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p11-574",
@@ -4958,9 +4984,9 @@
       "current": "consistent hashing дважды",
       "proposed": "Архитектура, один вопрос",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [],
-      "resolution": "В 15.11.15 #544 и #14060 перенесены в System Design; объединение дубля — шаг 13 (conceptId)."
+      "resolution": "В 15.11.15 #544 и #14060 перенесены в System Design; объединение дубля — шаг 13 (conceptId). Копии связаны общим conceptId через tasks/concept-links.json (группы: consistent hashing). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p11-583",
@@ -5037,8 +5063,9 @@
       "current": "4 в тестах",
       "proposed": "1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p11-588",
@@ -5051,8 +5078,9 @@
       "current": "4",
       "proposed": "1–2",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p11-589",
@@ -5065,8 +5093,9 @@
       "current": "4",
       "proposed": "2: «что делает ARP», «чей MAC ищется для другой подсети»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p11-590",
@@ -5079,8 +5108,9 @@
       "current": "—",
       "proposed": "по 1–2",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: VXLAN; ECMP; QUIC и HTTP/3). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p11-591",
@@ -5093,8 +5123,9 @@
       "current": "по 2–3",
       "proposed": "по 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: SR-IOV; EVPN; XDP; Segment Routing; congestion window; anycast; traceroute; роли DNS-серверов). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p11-592",
@@ -5107,8 +5138,9 @@
       "current": "12 копий банка (`qb_kts_040`, `041`, `qb_swf_008`–`015`, `032`, `045`)",
       "proposed": "`conceptId`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p12-615",
@@ -5521,7 +5553,7 @@
       "current": "consistent hashing дважды",
       "proposed": "Архитектура, одна карточка",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002104",
@@ -5534,7 +5566,7 @@
           "exists": true
         }
       ],
-      "resolution": "В 15.11.15 1002104 и 1002135 перенесены в «Архитектура и надёжность»; объединение дубля — шаг 13."
+      "resolution": "В 15.11.15 1002104 и 1002135 перенесены в «Архитектура и надёжность»; объединение дубля — шаг 13. Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p12-629",
@@ -5665,7 +5697,7 @@
       "current": "3",
       "proposed": "1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002083",
@@ -5682,7 +5714,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p12-631",
@@ -5699,7 +5732,7 @@
       "current": "3",
       "proposed": "1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002134",
@@ -5716,7 +5749,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p12-632",
@@ -5744,7 +5778,7 @@
       "current": "по 2",
       "proposed": "по 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002195",
@@ -5816,7 +5850,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: записи DNS). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p12-633",
@@ -5838,7 +5873,7 @@
       "current": "копии банка в формате «пункты; команды; важно»",
       "proposed": "`conceptId`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002082",
@@ -5880,7 +5915,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p13-643",
@@ -6267,7 +6303,7 @@
       "current": "5 карточек",
       "proposed": "1–2 (что такое VLAN; 802.1Q, access и trunk)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002294",
@@ -6294,7 +6330,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p13-653",
@@ -6313,7 +6350,7 @@
       "current": "5",
       "proposed": "2: `ntr_007` (SNAT/DNAT и входящие) + conntrack",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002356",
@@ -6340,7 +6377,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p13-654",
@@ -6357,7 +6395,7 @@
       "current": "3",
       "proposed": "1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002343",
@@ -6374,7 +6412,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p13-655",
@@ -6393,7 +6432,7 @@
       "current": "5",
       "proposed": "2: «что проверяет ping», «почему ping ≠ доступность сервиса»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002319",
@@ -6420,7 +6459,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: что проверяет ping; ping и доступность сервиса). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p13-656",
@@ -6446,7 +6486,7 @@
       "current": "по 2–3",
       "proposed": "по 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002307",
@@ -6508,7 +6548,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: mtr; ENOTFOUND; keepalive). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p13-657",
@@ -6525,7 +6566,7 @@
       "current": "копии банка `qb_swf_*`",
       "proposed": "`conceptId`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1003053",
@@ -6542,7 +6583,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p13-663",
@@ -6968,7 +7010,7 @@
       "current": "3",
       "proposed": "1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000025",
@@ -6980,7 +7022,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: контейнер и ВМ). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p14-692",
@@ -6996,7 +7039,7 @@
       "current": "4",
       "proposed": "2 (механизмы; pid namespace)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000029",
@@ -7008,7 +7051,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: механизмы ядра для контейнеров). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p14-693",
@@ -7023,14 +7067,15 @@
       "current": "3",
       "proposed": "1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000082",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: слои образа). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p14-694",
@@ -7045,14 +7090,15 @@
       "current": "3",
       "proposed": "1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000026",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: CMD и ENTRYPOINT). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p14-695",
@@ -7069,7 +7115,7 @@
       "current": "4",
       "proposed": "1–2",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000028",
@@ -7086,7 +7132,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: размер образа и multi-stage). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p14-696",
@@ -7099,8 +7146,9 @@
       "current": "по 2",
       "proposed": "по 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: COPY и ADD; сети Docker). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p14-697",
@@ -7116,7 +7164,7 @@
       "current": "5 дословных копий `qb_kts_001`–`005`",
       "proposed": "C6",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000287",
@@ -7128,7 +7176,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p15-709",
@@ -7280,8 +7329,9 @@
       "current": "по 2–3",
       "proposed": "по 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: EXPOSE; docker ps; docker build -t; том и bind mount; логи остановленного контейнера; OOM в контейнере; Docker Engine). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p15-718",
@@ -7294,8 +7344,9 @@
       "current": "копии банка",
       "proposed": "`conceptId`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p16-730",
@@ -7711,7 +7762,7 @@
       "current": "по 2–3",
       "proposed": "по 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000368",
@@ -7823,7 +7874,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: Docker Compose). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p17-753",
@@ -8064,8 +8116,9 @@
       "current": "по 2",
       "proposed": "по 1 (`gitp_*` полнее)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: merge и rebase; cherry-pick). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p17-763",
@@ -8085,7 +8138,7 @@
       "current": "6 карточек «какие стадии нужны в pipeline»",
       "proposed": "2: «базовые стадии» и «чего не хватает в минимальном pipeline»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000112",
@@ -8117,7 +8170,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: базовые стадии pipeline; чего не хватает в минимальном pipeline). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p17-764",
@@ -8362,8 +8416,9 @@
       "current": "по 2–3",
       "proposed": "по 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: Continuous Integration; Continuous Delivery и Deployment; артефакты CI; runner и pipeline; self-hosted runner; Argo CD; Argo Rollouts; matrix; canary и blue-green). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p18-817",
@@ -8376,8 +8431,9 @@
       "current": "копии банка `qb_swf_030`, `043`, `044`, `056`",
       "proposed": "`conceptId`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p19-827",
@@ -8564,7 +8620,7 @@
       "current": "5 карточек",
       "proposed": "2: «что делать при конфликте» и «что означают маркеры»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000628",
@@ -8591,7 +8647,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: что делать при конфликте; маркеры конфликта). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p19-834",
@@ -8609,7 +8666,7 @@
       "current": "4",
       "proposed": "2",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000637",
@@ -8631,7 +8688,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: revert и reset). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p19-835",
@@ -8652,7 +8710,7 @@
       "current": "по 2–3",
       "proposed": "по 1–2",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000531",
@@ -8689,7 +8747,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: git stash; git bisect). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p20-856",
@@ -8964,7 +9023,7 @@
       "current": "9 карточек из 5 видео",
       "proposed": "3: «requests и limits», «QoS и eviction», «под без limits» (2000281) — с отметкой «5 из 8 собеседований»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000038",
@@ -9011,7 +9070,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: requests и limits; QoS и eviction; как scheduler проверяет место). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p20-867",
@@ -9031,7 +9091,7 @@
       "current": "8 из 4 видео",
       "proposed": "3: «виды проб», «провал readiness и liveness», «медленный старт»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000065",
@@ -9063,7 +9123,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: виды проб; провал readiness и liveness). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p20-868",
@@ -9083,7 +9144,7 @@
       "current": "6",
       "proposed": "2: «Deployment и ReplicaSet», «StatefulSet и обновления»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000035",
@@ -9115,7 +9176,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: Deployment и ReplicaSet; StatefulSet и обновления). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p20-869",
@@ -9135,7 +9197,7 @@
       "current": "6 из 4 видео",
       "proposed": "3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000040",
@@ -9167,7 +9229,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: Ingress и Service; путь запроса через Ingress; реализации Ingress). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p20-870",
@@ -9186,7 +9249,7 @@
       "current": "5",
       "proposed": "2",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000105",
@@ -9213,7 +9276,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: способы развёртывания Kubernetes; managed и self-managed). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p20-871",
@@ -9237,7 +9301,7 @@
       "current": "по 3–4",
       "proposed": "по 1–2",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000032",
@@ -9289,7 +9353,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: архитектура Kubernetes; размещение подов; распределение реплик; service mesh). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p20-872",
@@ -9306,7 +9371,7 @@
       "current": "копии банка",
       "proposed": "C6",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000292",
@@ -9323,7 +9388,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p21-884",
@@ -9682,7 +9748,7 @@
       "current": "3",
       "proposed": "2: `k8s_005` (виды) и `kts_008` (что происходит при провале)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_005",
@@ -9699,7 +9765,8 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p21-899",
@@ -9715,7 +9782,7 @@
       "current": "2",
       "proposed": "1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_006",
@@ -9727,7 +9794,8 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: Service). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p21-900",
@@ -9946,7 +10014,7 @@
       "current": "почти один и тот же вопрос",
       "proposed": "1 (`k8o_005` полнее)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_022",
@@ -9958,7 +10026,8 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: автоскейлер и утилизация). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p22-918",
@@ -9974,7 +10043,7 @@
       "current": "2",
       "proposed": "1 (`k8o_003`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_021",
@@ -9986,7 +10055,8 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p22-919",
@@ -10002,7 +10072,7 @@
       "current": "2",
       "proposed": "1 (`k8o_006`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_010",
@@ -10014,7 +10084,8 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p22-920",
@@ -10033,7 +10104,7 @@
       "current": "5",
       "proposed": "3: «requests и limits», «QoS и eviction», «как scheduler проверяет место»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_008",
@@ -10060,7 +10131,8 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p22-921",
@@ -10078,7 +10150,7 @@
       "current": "по 2",
       "proposed": "по 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_011",
@@ -10100,7 +10172,8 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: обновление Deployment; зачем Kubernetes). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p22-922",
@@ -10287,8 +10360,9 @@
       "current": "по 2–4",
       "proposed": "по 1–2",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: Pod; ConfigMap; Namespace; NetworkPolicy; admission webhooks; Helm; CrashLoopBackOff). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p23-945",
@@ -10301,8 +10375,9 @@
       "current": "23 копии банка (`qb_kts_*`, `qb_swf_*`)",
       "proposed": "`conceptId`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p24-957",
@@ -10637,7 +10712,7 @@
       "current": "3",
       "proposed": "1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000746",
@@ -10654,7 +10729,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: 503 после деплоя). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p26-991",
@@ -10849,14 +10925,15 @@
       "current": "повторяют флешкарты Linux (1001066, 1001091, 1001282, 1001062, 1001299)",
       "proposed": "`conceptId`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_dbg_002",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p26-999",
@@ -10878,7 +10955,7 @@
       "current": "по 2",
       "proposed": "по 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000087",
@@ -10920,7 +10997,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: мониторинг: пары видеокарточек 1; мониторинг: пары видеокарточек 2; мониторинг: пары видеокарточек 3; мониторинг: пары видеокарточек 4). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p26-1000",
@@ -11245,7 +11323,7 @@
       "current": "2",
       "proposed": "1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001481",
@@ -11257,7 +11335,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: OpenTelemetry Collector). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p28-1048",
@@ -11819,7 +11898,7 @@
       "current": "по 2–6",
       "proposed": "по 1–2",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_ans_003",
@@ -11856,7 +11935,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: handlers; Ansible Vault; playbook; inventory; serial; defaults и vars; Molecule; collections; facts; производительность Ansible; loop; роли в видео). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p31-1111",
@@ -12078,8 +12158,9 @@
       "current": "по 2–9",
       "proposed": "по 1–2",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: import и include; Missing sudo password; ansible-pull). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p32-1133",
@@ -12092,8 +12173,9 @@
       "current": "копии банка `qb_swf_041`, `057`",
       "proposed": "`conceptId`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p35-1155",
@@ -12220,7 +12302,7 @@
       "current": "по 2",
       "proposed": "по 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_tf_003",
@@ -12277,7 +12359,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: state Terraform; блокировка state: зачем; окружения и workspaces; модули Terraform; зачем Terraform). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p35-1160",
@@ -12430,8 +12513,9 @@
       "current": "по 2–5",
       "proposed": "по 1–2",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: remote backend; count и for_each; import; переменные Terraform; Terragrunt; секреты в Terraform). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p37-1191",
@@ -12518,8 +12602,9 @@
       "current": "**8 вопросов** на одну тему",
       "proposed": "2: «зачем блокировка», «осиротевший lock»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: осиротевшая блокировка state; блокировка state в S3). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p37-1196",
@@ -12532,8 +12617,9 @@
       "current": "по 2–5",
       "proposed": "по 1–2",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: миграция count → for_each; provider alias; moved; removed; условное создание; drift; замена -/+; provisioner; data source; taint и replace). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p38-1208",
@@ -12662,7 +12748,7 @@
       "current": "по 2–4",
       "proposed": "по 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_cld_008",
@@ -12679,7 +12765,8 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: разделение ответственности в облаке; доступ CI к облаку; VPC; автомасштабирование в облаке; секрет в Git; подпись и SBOM; policy as code). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p38-1216",
@@ -12692,8 +12779,9 @@
       "current": "копии банка",
       "proposed": "`conceptId`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p39-1228",
@@ -12951,7 +13039,7 @@
       "current": "count и for_each; блокировка state",
       "proposed": "C6",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001843",
@@ -12973,7 +13061,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p41-1261",
@@ -13269,7 +13358,7 @@
       "current": "по 2–4",
       "proposed": "по 1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_obs_001",
@@ -13361,7 +13450,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Копии связаны общим conceptId через tasks/concept-links.json (группы: SLO; инциденты; HashiCorp Vault; cert-manager; с какими БД работал; KRaft; проверки безопасности). У копий одно расписание повторения, в колоде карточек понятие показывается одной карточкой; тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p41-1272",
@@ -13383,7 +13473,7 @@
       "current": "копии банка",
       "proposed": "C6",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000314",
@@ -13425,7 +13515,8 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Дословные копии связаны общим conceptId автоматически (scripts/assign-concepts.js): одно расписание повторения на понятие, в колодах одна карточка на понятие, в видеоколоде — счётчик «Встречалось в N собеседованиях». Тексты, ID и прогресс сохранены."
     },
     {
       "id": "audit-p41-1273",
