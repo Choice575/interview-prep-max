@@ -167,12 +167,12 @@
   {
     "id": 12,
     "tool": "Ansible",
-    "title": "Неверный синтаксис when с двойными скобками",
+    "title": "Двойные скобки в when",
     "code": "- name: Configure production settings\n  template:\n    src: prod.conf.j2\n    dest: /etc/app/app.conf\n  when: \"{{ env }} == 'production'\"",
-    "bug": "Двойные фигурные скобки в when — deprecated синтаксис. Jinja2 рендерит {{ env }} в строку, сравнение работает непредсказуемо.",
+    "bug": "when уже вычисляется как выражение Jinja2, поэтому {{ }} в нём не нужны. В ansible-core 2.19 и новее это ошибка выполнения: «Template delimiters are not supported in expressions»; в старых версиях было предупреждение.",
     "fix": "Убрать двойные скобки:\nwhen: env == \"production\"\nили:\nwhen: env is defined and env == \"production\"",
     "opts": [
-      "Неверный синтаксис when: двойные скобки deprecated, правильно: when: env == \"production\"",
+      "В when не нужны {{ }}: в ansible-core 2.19+ это ошибка; верно when: env == \"production\"",
       "Непустая строка в when всегда истинна, поэтому всё выражение нужно обернуть в фильтр | bool",
       "В when к переменным обращаются через vars: when: vars.env == \"production\"",
       "Нужны одинарные кавычки внутри двойных, иначе Jinja2 не прочитает значение"

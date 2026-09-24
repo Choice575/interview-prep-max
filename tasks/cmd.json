@@ -277,7 +277,7 @@
   },
   {
     "id": 24,
-    "task": "Загрузить Docker образ из файла /tmp/myapp.tar в локальный registry",
+    "task": "Загрузить Docker-образ из файла /tmp/myapp.tar в локальное хранилище образов Docker",
     "opts": [
       "docker load -i /tmp/myapp.tar",
       "docker import /tmp/myapp.tar",
@@ -285,7 +285,7 @@
       "docker restore -i /tmp/myapp.tar"
     ],
     "answer": 0,
-    "exp": "docker load -i загружает образ сохранённый через docker save, восстанавливая все слои. docker import создаёт образ из tar-архива файловой системы (без истории слоёв). docker pull — только из registry."
+    "exp": "docker load -i загружает образ, сохранённый через docker save, в локальное хранилище образов демона Docker и восстанавливает все слои и теги; registry при этом не используется. docker import создаёт образ из tar-архива файловой системы (без истории слоёв). docker pull — только из registry."
   },
   {
     "id": 25,
@@ -381,7 +381,7 @@
       "kubectl exec -it --image=busybox -- sh"
     ],
     "answer": 0,
-    "exp": "--rm удаляет pod после завершения. -it: интерактивный терминал. --restart=Never: запустить как Job, не как Deployment (иначе pod будет перезапускаться). -- sh: команда для запуска."
+    "exp": "--rm удаляет pod после завершения. -it: интерактивный терминал. --restart=Never задаёт restartPolicy: Never: после выхода из sh контейнер не перезапускается. Начиная с kubectl 1.18, kubectl run создаёт только Pod, а не Deployment или Job. -- sh: команда для запуска."
   },
   {
     "id": 33,

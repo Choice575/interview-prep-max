@@ -2425,13 +2425,20 @@
       "current": "`sed 's/\\.*$//'` — строка не меняется",
       "proposed": "`sed 's/\\..*$//'`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001105",
           "file": "tasks/flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Исправлена схлопнутая точка в команде: карточка пересобрана из regex#9, где выражение s/\\..*$// верно; проверено запуском sed.",
+      "linkedIds": [
+        "regex#9"
+      ],
+      "sources": [
+        "https://www.gnu.org/software/sed/manual/sed.html#Regular-Expressions"
       ]
     },
     {
@@ -2447,13 +2454,20 @@
       "current": "`grep -oE '\" [0-9]{3} '` «только коды»",
       "proposed": "выводит `\" 200 `; `grep -oP '(?<=\" )[0-9]{3}(?= )'` или `awk '{print $9}'`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001103",
           "file": "tasks/flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "В regex#6 и карточке верный вариант заменён на grep -oP с просмотром назад и вперёд, который выводит только код; объяснено, что прежний паттерн выводит кавычку и пробелы. Проверено запуском grep. Второй потенциально верный вариант этого задания — шаг 8 (C8.2).",
+      "linkedIds": [
+        "regex#6"
+      ],
+      "sources": [
+        "https://nginx.org/en/docs/http/ngx_http_log_module.html#log_format"
       ]
     },
     {
@@ -2469,13 +2483,20 @@
       "current": "`s/:[^:]*$//` «работает с несколькими `:` и digest»",
       "proposed": "`registry:5000/team/app` → `registry`; `app@sha256:abcd` → `app@sha256`; убрать утверждение",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001101",
           "file": "tasks/flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Из regex#17 и карточки убрано ложное утверждение про несколько двоеточий и digest; показаны контрпримеры с портом реестра и digest и общая команда. Проверено запуском sed.",
+      "linkedIds": [
+        "regex#17"
+      ],
+      "sources": [
+        "https://github.com/distribution/reference/blob/main/reference.go"
       ]
     },
     {
@@ -2491,13 +2512,20 @@
       "current": "«`\\d` и `{1,}` — ERE, нужен `-E`»",
       "proposed": "`\\d` в sed не работает (это код символа); в BRE `\\{1,\\}`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001089",
           "file": "tasks/flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "В regex#3 и карточке исправлено: \\d sed не поддерживает (в GNU sed \\dNNN — код символа), переносимая BRE-запись — [0-9]\\{1,\\}. Проверено запуском sed.",
+      "linkedIds": [
+        "regex#3"
+      ],
+      "sources": [
+        "https://www.gnu.org/software/sed/manual/sed.html#Escapes"
       ]
     },
     {
@@ -2513,13 +2541,20 @@
       "current": "`--restart=Never` — «как Job, не Deployment»",
       "proposed": "с kubectl 1.18 создаётся только Pod; это restartPolicy",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001096",
           "file": "tasks/flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "В cmd#32 и карточке --restart=Never описан как restartPolicy пода; kubectl run с 1.18 создаёт только Pod.",
+      "linkedIds": [
+        "cmd#32"
+      ],
+      "sources": [
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_run/"
       ]
     },
     {
@@ -2535,13 +2570,20 @@
       "current": "`docker load` «в локальный registry»",
       "proposed": "в локальное хранилище образов демона",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001087",
           "file": "tasks/flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "В cmd#24 и карточке «локальный registry» заменён на локальное хранилище образов демона Docker.",
+      "linkedIds": [
+        "cmd#24"
+      ],
+      "sources": [
+        "https://docs.docker.com/reference/cli/docker/image/load/"
       ]
     },
     {
@@ -2557,13 +2599,17 @@
       "current": "«чему равно a?» — ответа нет",
       "proposed": "первой строкой «a=5: правая часть в подпроцессе»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001049",
           "file": "tasks/flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Ответ начинается с результата: a останется 5, звено конвейера выполняется в подпроцессе; исключение — lastpipe без управления заданиями. Проверено в bash.",
+      "sources": [
+        "https://www.gnu.org/software/bash/manual/bash.html#Pipelines"
       ]
     },
     {
@@ -3013,13 +3059,20 @@
       "current": "`-regex '.*/.*[0-9]+.*'` находит `/opt/v2/readme.txt`",
       "proposed": "`-regex '.*/[^/]*[0-9][^/]*'` или `-name '*[0-9]*'`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001227",
           "file": "tasks/flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "В regex#16 и карточке шаблон ограничен именем файла: find /opt -type f -regex '.*/[^/]*[0-9][^/]*'; объяснено, почему прежний находит /opt/v2/readme.txt. Проверено запуском find.",
+      "linkedIds": [
+        "regex#16"
+      ],
+      "sources": [
+        "https://www.gnu.org/software/findutils/manual/html_mono/find.html#Full-Name-Patterns"
       ]
     },
     {
@@ -3035,14 +3088,19 @@
       "current": "«ограничивает часы до 09-29»",
       "proposed": "«00–29»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001226",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "В regex#8 и карточке диапазон часов исправлен на 00–29.",
+      "linkedIds": [
+        "regex#8"
+      ],
+      "sources": []
     },
     {
       "id": "audit-p07-464",
@@ -3115,14 +3173,16 @@
       "current": "ответ повторяет вопрос",
       "proposed": "см. пакет 4",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001176",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Уже исправлено вместе с тестом #39 в 15.11.4–15.11.5: карточка объясняет состояние D и отложенную обработку SIGKILL. Повторная сверка в 15.11.9.",
+      "sources": []
     },
     {
       "id": "audit-p07-467",
@@ -3567,14 +3627,16 @@
       "current": "hard link — отдельный файл",
       "proposed": "см. пакет 4",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001387",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Уже исправлено вместе с тестом #49 в 15.11.4: жёсткая ссылка описана как ещё одна запись каталога для того же inode. Повторная сверка в 15.11.9.",
+      "sources": []
     },
     {
       "id": "audit-p08-485",
@@ -3611,14 +3673,16 @@
       "current": "«Элементы LVM»",
       "proposed": "см. пакет 4",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001353",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Уже исправлено вместе с тестом #52 в 15.11.4: карточка описывает связь PV → VG → LV. Повторная сверка в 15.11.9.",
+      "sources": []
     },
     {
       "id": "audit-p08-487",

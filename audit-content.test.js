@@ -54,3 +54,33 @@ test('explanation-vs-key gate flags a shuffled Terraform key and only reviewed I
   const shuffled = findExplanationMismatches([{ ...tfstate, answer: wrong }]);
   assert.deepEqual(shuffled.map(item => item.id), [9]);
 });
+
+test('audited regex and command trainers stay consistent with their study flashcards', () => {
+  const cards = new Map(require('./tasks/flashcards.json').cards.map(card => [card.id, card]));
+  const trainers = {
+    regex: new Map(require('./tasks/regex.json').map(task => [task.id, task])),
+    cmd: new Map(require('./tasks/cmd.json').map(task => [task.id, task]))
+  };
+  const linked = [
+    [1001089, 'regex', 3], [1001103, 'regex', 6], [1001226, 'regex', 8], [1001105, 'regex', 9],
+    [1001227, 'regex', 16], [1001101, 'regex', 17], [1001087, 'cmd', 24], [1001096, 'cmd', 32]
+  ];
+  for (const [cardId, trainer, taskId] of linked) {
+    const task = trainers[trainer].get(taskId);
+    const card = cards.get(cardId);
+    assert.equal(card.question, task.task, `${cardId}: вопрос`);
+    assert.equal(card.answer, `${task.opts[task.answer]}. ${task.exp}`, `${cardId}: ответ`);
+  }
+  assert.match(cards.get(1001105).answer, /sed 's\/\\\.\.\*\$\/\/'/);
+  assert.doesNotMatch(trainers.regex.get(17).exp, /корректно обрабатывает/);
+  assert.doesNotMatch(trainers.cmd.get(32).exp, /как Job/);
+});
+
+test('Ansible trainers describe lineinfile and when braces as verified on ansible-core', () => {
+  const lineinfile = require('./tasks/ansible_pb.json').find(task => task.id === 6);
+  assert.doesNotMatch(lineinfile.bug, /при КАЖДОМ запуске/);
+  assert.match(lineinfile.opts[lineinfile.answer], /другим IP не заменится/);
+  const braces = require('./tasks/code.json').find(task => task.id === 12);
+  assert.doesNotMatch(braces.bug + braces.opts[braces.answer], /deprecated/);
+  assert.match(braces.bug, /Template delimiters are not supported in expressions/);
+});
