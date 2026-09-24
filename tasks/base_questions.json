@@ -6526,7 +6526,7 @@
   },
   {
     "id": 436,
-    "topic": "CI/CD",
+    "topic": "Terraform",
     "level": "Senior",
     "category": "definition",
     "q": "Что делает Sentinel в HCP Terraform?",
@@ -8051,7 +8051,7 @@
   },
   {
     "id": 536,
-    "topic": "Сети",
+    "topic": "Kubernetes",
     "level": "Senior",
     "category": "definition",
     "q": "Что означает kube-proxy replacement в Cilium?",
@@ -8081,7 +8081,7 @@
   },
   {
     "id": 538,
-    "topic": "Сети",
+    "topic": "Kubernetes",
     "level": "Senior",
     "category": "definition",
     "q": "Как разделены control plane и data plane в современном Istio?",
@@ -8141,7 +8141,7 @@
   },
   {
     "id": 542,
-    "topic": "Сети",
+    "topic": "Security",
     "level": "Senior",
     "category": "definition",
     "q": "Как связаны mTLS, SPIFFE и SPIRE в инфраструктуре идентификации сервисов?",
@@ -8171,7 +8171,7 @@
   },
   {
     "id": 544,
-    "topic": "Сети",
+    "topic": "System Design",
     "level": "Senior",
     "category": "definition",
     "q": "Зачем балансировщику consistent hashing и какую роль играют virtual nodes?",
@@ -8231,7 +8231,7 @@
   },
   {
     "id": 548,
-    "topic": "Сети",
+    "topic": "Security",
     "level": "Senior",
     "category": "definition",
     "q": "Как Zero Trust меняет решение о доступе по сравнению с периметровой моделью?",
@@ -8321,7 +8321,7 @@
   },
   {
     "id": 554,
-    "topic": "Сети",
+    "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
     "q": "Кто вызывает CNI-плагины и какие данные они получают при создании Pod sandbox?",
@@ -8351,7 +8351,7 @@
   },
   {
     "id": 556,
-    "topic": "Сети",
+    "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
     "q": "Как сегодня оценивать режимы kube-proxy iptables, IPVS и nftables?",
@@ -8411,7 +8411,7 @@
   },
   {
     "id": 560,
-    "topic": "Сети",
+    "topic": "Kubernetes",
     "level": "Senior",
     "category": "scenario",
     "q": "Как построить диагностику периодических потерь пакетов между Pod?",
@@ -8516,7 +8516,7 @@
   },
   {
     "id": 567,
-    "topic": "Сети",
+    "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
     "q": "Чем Ingress отличается от Service type LoadBalancer и какова роль Gateway API?",
@@ -8546,7 +8546,7 @@
   },
   {
     "id": 569,
-    "topic": "Сети",
+    "topic": "Kubernetes",
     "level": "Middle",
     "category": "definition",
     "q": "Как Kubernetes NetworkPolicy выбирает трафик и кто применяет решение?",
@@ -8561,7 +8561,7 @@
   },
   {
     "id": 570,
-    "topic": "Сети",
+    "topic": "Kubernetes",
     "level": "Middle",
     "category": "tradeoff",
     "q": "Как выбирать между VXLAN overlay и нативной маршрутизацией Pod-префиксов?",
@@ -10825,7 +10825,7 @@
     "id": 14016
   },
   {
-    "topic": "Cloud",
+    "topic": "Terraform",
     "level": "Middle",
     "category": "scenario",
     "q": "Как организовать Terraform state для совместной работы команды в облаке?",
@@ -11291,7 +11291,7 @@
   },
   {
     "id": 14060,
-    "topic": "Сети",
+    "topic": "System Design",
     "level": "Senior",
     "category": "tradeoff",
     "q": "Балансировщику нужно сохранить привязку клиента к серверу. Чем отличается выбор sticky-сессий от consistent hashing?",
@@ -13267,7 +13267,7 @@
   },
   {
     "id": 15013,
-    "topic": "Security",
+    "topic": "Сети",
     "level": "Middle",
     "category": "scenario",
     "q": "Защищает ли Base64 в HTTP Basic Authentication пароль от перехвата?",
@@ -13807,7 +13807,7 @@
   },
   {
     "id": 15040,
-    "topic": "Security",
+    "topic": "Linux",
     "level": "Middle",
     "category": "scenario",
     "q": "В каких цепочках фильтруют трафик самого Linux-хоста и транзитный трафик?",
