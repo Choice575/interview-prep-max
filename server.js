@@ -279,16 +279,32 @@ function createAppServer(options = {}) {
 
     const file = safeStaticPath(root, url.pathname);
     if (!file) { response.writeHead(403); return response.end(); }
-    fs.readFile(file, (error, body) => {
-      if (error) { response.writeHead(error.code === 'ENOENT' ? 404 : 500); return response.end(); }
-      response.writeHead(200, {
-        'Content-Type': contentTypes[path.extname(file)] || 'application/octet-stream',
-        'Content-Length': body.length,
+    // no-cache значит «переспроси», а не «не храни»: с ETag повторное открытие
+    // получает 304 без тела вместо ~3 МБ оболочки и датасетов (аудит A3.1).
+    fs.stat(file, (statError, stats) => {
+      if (statError || !stats.isFile()) { response.writeHead(statError && statError.code !== 'ENOENT' ? 500 : 404); return response.end(); }
+      const etag = 'W/"' + stats.size.toString(16) + '-' + Math.floor(stats.mtimeMs).toString(16) + '"';
+      const headers = {
         'Cache-Control': 'no-cache',
+        ETag: etag,
+        'Last-Modified': stats.mtime.toUTCString(),
         'X-Content-Type-Options': 'nosniff'
+      };
+      const candidates = String(request.headers['if-none-match'] || '').split(',').map(item => item.trim());
+      if (candidates.includes(etag) || candidates.includes('*')) {
+        response.writeHead(304, headers);
+        return response.end();
+      }
+      fs.readFile(file, (error, body) => {
+        if (error) { response.writeHead(error.code === 'ENOENT' ? 404 : 500); return response.end(); }
+        response.writeHead(200, {
+          ...headers,
+          'Content-Type': contentTypes[path.extname(file)] || 'application/octet-stream',
+          'Content-Length': body.length
+        });
+        if (request.method === 'HEAD') response.end();
+        else response.end(body);
       });
-      if (request.method === 'HEAD') response.end();
-      else response.end(body);
     });
   });
 }

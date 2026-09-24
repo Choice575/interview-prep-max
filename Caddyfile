@@ -6,7 +6,7 @@
 	# Caddy сам получает и продлевает сертификат Let's Encrypt по домену.
 	# HTTP автоматически редиректится на HTTPS — отдельный блок не нужен.
 
-	encode gzip
+	encode zstd gzip
 
 	header {
 		# PWA обязана работать в secure context, поэтому фиксируем HTTPS на год.

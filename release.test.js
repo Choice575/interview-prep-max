@@ -292,3 +292,31 @@ test('passes the release integrity verifier', () => {
   assert.ok(result.stdout.includes('Release ' + RELEASE_VERSION + ' integrity check passed'),
     'верификатор должен подтвердить текущую версию, got: ' + result.stdout);
 });
+
+test('datasets are served from the versioned cache and refreshed in the background', async () => {
+  const worker = loadServiceWorker();
+  const cachedBody = { ok: true, status: 200, fromCache: true };
+  worker.context.caches.match = async (request, options) => {
+    assert.equal(options.cacheName, worker.context.self.IPMAX_CACHE_NAME);
+    return request.url.endsWith('/tasks/flashcards.json') ? cachedBody : undefined;
+  };
+  const handler = worker.handlers.get('fetch');
+  let answered;
+  let background;
+  handler({
+    request: { method: 'GET', url: 'http://127.0.0.1/tasks/flashcards.json' },
+    respondWith: promise => { answered = promise; },
+    waitUntil: promise => { background = promise; }
+  });
+  assert.equal(await answered, cachedBody, 'cached dataset answers without waiting for the network');
+  await background;
+  assert.equal(worker.stored().length, 1, 'the background refresh updates the cache');
+
+  let fresh;
+  handler({
+    request: { method: 'GET', url: 'http://127.0.0.1/tasks/labs.json' },
+    respondWith: promise => { fresh = promise; }
+  });
+  assert.equal((await fresh).ok, true, 'a dataset missing from the cache comes from the network');
+  assert.equal(worker.stored().length, 2);
+});
