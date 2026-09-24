@@ -222,3 +222,44 @@ test('grade bands the blitz result', () => {
   assert.equal(Daily.grade(1, 5).band, 'low');
   assert.equal(Daily.grade(0, 5).band, 'low');
 });
+
+test('blitz follows the profile level, puts due questions first and prefers weak topics', () => {
+  const levels = ['Junior', 'Middle', 'Senior'];
+  const topicsList = ['Linux', 'Сети', 'Docker', 'Kubernetes', 'Terraform', 'Ansible'];
+  const questions = [];
+  let id = 1;
+  topicsList.forEach(topic => levels.forEach(level => {
+    for (let index = 0; index < 4; index++) questions.push({ id: id++, topic, level, options: ['a', 'b'], answer: 0 });
+  }));
+  const now = new Date(2026, 8, 24, 10).getTime();
+  const junior = Daily.selectQuestions({ questions, now, level: 'Junior' });
+  assert.deepEqual(junior.composition, Daily.COMPOSITIONS.Junior);
+  assert.equal(junior.questions.filter(question => question.level === 'Senior').length, 0);
+
+  const progress = {
+    70: { nextReviewAt: now - 5000, correct: 1, wrong: 0 },
+    3: { nextReviewAt: now - 90000, correct: 1, wrong: 0 },
+    5: { nextReviewAt: now + 90000, correct: 1, wrong: 0 }
+  };
+  // Все вопросы Terraform отвечены плохо — тема становится слабой.
+  questions.filter(question => question.topic === 'Terraform').forEach(question => { progress[question.id] = { correct: 0, wrong: 1 }; });
+  const set = Daily.selectQuestions({ questions, now, level: 'Middle', progress });
+  assert.deepEqual(set.questions.slice(0, 2).map(question => question.id), [3, 70]);
+  assert.equal(set.due, 2);
+  assert.equal(set.topics[0], 'Terraform');
+  assert.ok(set.questions.slice(2).some(question => question.topic === 'Terraform'));
+  assert.deepEqual(Daily.weakTopics(questions, progress), ['Terraform']);
+});
+
+test('the daily set is pinned at start and survives later progress', () => {
+  const now = new Date(2026, 8, 24, 10).getTime();
+  const pinned = Daily.pinQuestions(null, [5, 6, 7], now);
+  assert.deepEqual(pinned.questionIds, ['5', '6', '7']);
+  assert.deepEqual(Daily.normaliseState(pinned).questionIds, ['5', '6', '7']);
+  const questions = [5, 6, 7, 8].map(id => ({ id, topic: 'Linux', level: 'Junior', options: ['a', 'b'], answer: 0 }));
+  const set = Daily.selectQuestions({ questions, now, pinnedIds: pinned.questionIds });
+  assert.equal(set.pinned, true);
+  assert.deepEqual(set.questions.map(question => question.id), [5, 6, 7]);
+  const tomorrow = Daily.stateForDay(pinned, now + 86400000);
+  assert.equal(tomorrow.questionIds, undefined, 'на следующий день набор выбирается заново');
+});

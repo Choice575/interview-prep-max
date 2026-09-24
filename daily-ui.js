@@ -73,7 +73,7 @@
       + '<div class="daily-head">'
       + '<div><div class="daily-kicker">Ежедневный блиц</div>'
       + '<h3 class="daily-title">' + size + ' вопросов, ' + (done ? 'на сегодня готово' : 'около 5 минут') + '</h3>'
-      + '<p class="daily-sub">' + escapeHtml(compositionLabel(set.composition)) + '</p></div>'
+      + '<p class="daily-sub">' + escapeHtml(compositionLabel(set.composition)) + (set.due > 0 ? ' · ' + escapeHtml(String(set.due)) + ' к повторению' : '') + '</p></div>'
       + '<div class="daily-streak" role="img" aria-label="Серия дней подряд: ' + streak + '">'
       + '<span class="daily-streak-num">🔥 ' + streak + '</span>'
       + '<span class="daily-streak-lbl">' + (streak === 1 ? 'день' : 'дней') + ' подряд</span>'
@@ -84,7 +84,16 @@
       + '<span>Сброс через ' + countdown + '</span></div>'
       + topicChips
       + action
+      + reviewLine(state.reviewDue)
       + '</div>';
+  }
+
+  // Очередь SM-2 для карточек видна прямо на главной (аудит B4).
+  function reviewLine(value) {
+    const due = Number.isFinite(value) && value > 0 ? Math.round(value) : 0;
+    return '<div class="daily-review"><span>🔁 Карточки: ' + (due ? '<strong>' + due + '</strong> к повторению сегодня' : 'повторений на сегодня нет')
+      + ' и до 15 новых</span>'
+      + '<button type="button" class="btn btn-outline btn-sm" data-daily-action="flashcards">Повторить</button></div>';
   }
 
   /** Skill of the day: one Best Practices rule with the reason and the action. */
@@ -121,6 +130,7 @@
         button.addEventListener('click', () => {
           if (action === 'start') return run('startBlitz');
           if (action === 'review') return run('reviewMistakes');
+          if (action === 'flashcards') return run('openFlashcards');
           if (action === 'practices') return run('openPractices', button.getAttribute('data-daily-slug'));
           return undefined;
         });
@@ -132,8 +142,9 @@
       if (!target) return null;
       const now = run('now') || Date.now();
       const state = core.stateForDay(run('getState'), now);
-      const set = core.selectQuestions({ questions: run('getQuestions') || [], topics: run('getTopics') || [], now });
-      target.innerHTML = renderBlitzCard({ state, set, secondsUntilReset: core.secondsUntilReset(now) });
+      const set = core.selectQuestions({ questions: run('getQuestions') || [], topics: run('getTopics') || [], now,
+        progress: run('getProgress') || {}, level: run('getLevel'), pinnedIds: state.questionIds });
+      target.innerHTML = renderBlitzCard({ state, set, secondsUntilReset: core.secondsUntilReset(now), reviewDue: run('getReviewDue') });
       bind(target);
       return { state, set };
     }
@@ -155,5 +166,5 @@
     return { render, renderBlitz, renderSkill };
   }
 
-  return { escapeHtml, compositionLabel, renderBlitzCard, renderSkillCard, create };
+  return { escapeHtml, compositionLabel, renderBlitzCard, renderSkillCard, reviewLine, create };
 });

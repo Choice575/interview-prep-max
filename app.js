@@ -1534,8 +1534,11 @@ function renderAchievementsPage(){
 // набор вопросов на сегодня и по завершении закрывает день.
 function startDailyBlitz(){
   if(typeof IPMaxDaily==='undefined') return;
-  const set=IPMaxDaily.selectQuestions({questions:getAllQ(),topics:getAllTopics(),now:Date.now()});
+  const now=Date.now();
+  const state=IPMaxDaily.stateForDay(lsGet('daily_blitz',null),now);
+  const set=IPMaxDaily.selectQuestions({questions:getAllQ(),topics:getAllTopics(),now,progress:getQProg(),level:getOnboardingProfile()?.level,pinnedIds:state.questionIds});
   if(!set.questions.length){alert('Вопросы ещё не загружены.');return;}
+  if(!set.pinned) lsSet('daily_blitz',IPMaxDaily.pinQuestions(lsGet('daily_blitz',null),set.questions.map(question=>question.id),now));
   blitzState.questions=set.questions;
   nav('exam');
   // Строго после nav(): переход вызывает stopActiveSessions(), который гасит
@@ -1560,8 +1563,21 @@ function finishDailyBlitz(){
   lsSet('daily_blitz',IPMaxDaily.completeDay(lsGet('daily_blitz',null),Date.now()));
   updateAchievementsDot();
 }
+// Главная не загружает 2 МБ карточек, поэтому считаем очередь по сохранённому прогрессу:
+// карточки — это id от 1000000, а копии одного понятия делят один nextReviewAt.
+function countDueCardReviews(progress,now){
+  const stamps=new Set();
+  Object.entries(progress||{}).forEach(([id,record])=>{
+    if(Number(id)<1000000||!record||typeof record!=='object') return;
+    const at=Number(record.nextReviewAt);
+    if(at>0&&at<=now) stamps.add(at);
+  });
+  return stamps.size;
+}
 const dailyUI=typeof IPMaxDailyUI!=='undefined'?IPMaxDailyUI.create({
   now:()=>Date.now(),getQuestions:getAllQ,getTopics:getAllTopics,
+  getProgress:getQProg,getLevel:()=>getOnboardingProfile()?.level,
+  getReviewDue:()=>countDueCardReviews(getQProg(),Date.now()),openFlashcards:()=>nav('flashcards'),
   getState:()=>lsGet('daily_blitz',null),getBestPractices:()=>BEST_PRACTICES,
   startBlitz:startDailyBlitz,
   reviewMistakes:()=>{startMode('mistakes');},

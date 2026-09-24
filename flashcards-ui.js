@@ -12,7 +12,11 @@
     'Базы данных и очереди', 'Безопасность', 'Архитектура и надёжность',
     'Карьера и собеседования', 'MLOps'
   ];
-  const REVIEW_MODES = [['all', 'Все'], ['new', 'Новые'], ['learning', 'Изучаю'], ['known', 'Знаю'], ['due', 'К повторению']];
+  // «Сегодня» — очередь SM-2 по умолчанию (аудит B4): карточки, которым пора на повторение,
+  // и не больше NEW_PER_DAY новых за день. Поиск всегда идёт по всему набору.
+  const REVIEW_MODES = [['today', 'Сегодня'], ['all', 'Все'], ['new', 'Новые'], ['learning', 'Изучаю'], ['known', 'Знаю'], ['due', 'К повторению']];
+  const NEW_PER_DAY = 15;
+  const DEFAULT_MODE = 'today';
 
   function cardState(card, progress, now) {
     const record = hasOwn(progress, card && card.id) && progress[card.id] && typeof progress[card.id] === 'object'
@@ -40,18 +44,43 @@
       result = result.filter(card => [card && card.question, card && card.code, card && card.answer, card && card.collection, card && card.sourceTitle]
         .some(value => String(value || '').toLowerCase().includes(search)));
     }
-    if (mode === 'due') result = result.filter(card => isDue(card, progress, now));
+    if (mode === 'today' && !search) result = todayQueue(result, progress, now, settings.newPerDay);
+    else if (mode === 'due') result = result.filter(card => isDue(card, progress, now));
     else if (['new', 'learning', 'known'].includes(mode)) {
       result = result.filter(card => cardState(card, progress, now) === mode);
     }
     return result;
   }
 
+  function startOfDay(now) {
+    const date = new Date(now);
+    date.setHours(0, 0, 0, 0);
+    return date.getTime();
+  }
+
+  // Новая карточка «начата сегодня», если у неё одна попытка и она была сегодня.
+  function introducedToday(card, progress, dayStart) {
+    const record = hasOwn(progress, card && card.id) ? progress[card.id] : null;
+    if (!record || typeof record !== 'object') return false;
+    const attempts = (Number(record.correct) || 0) + (Number(record.wrong) || 0);
+    return Number(record.lastSeen) >= dayStart && attempts === 1;
+  }
+
+  function todayQueue(cards, progress, now, newPerDay) {
+    const limit = Number.isFinite(Number(newPerDay)) ? Math.max(0, Math.floor(Number(newPerDay))) : NEW_PER_DAY;
+    const dayStart = startOfDay(now);
+    const due = cards.filter(card => isDue(card, progress, now))
+      .sort((a, b) => Number(progress[a.id].nextReviewAt) - Number(progress[b.id].nextReviewAt));
+    const started = cards.filter(card => introducedToday(card, progress, dayStart)).length;
+    const fresh = cards.filter(card => cardState(card, progress, now) === 'new').slice(0, Math.max(0, limit - started));
+    return due.concat(fresh);
+  }
+
   function summarizeCards(cards, progress, now) {
     const list = Array.isArray(cards) ? cards : [];
     const records = progress && typeof progress === 'object' ? progress : {};
     const at = Number.isFinite(Number(now)) ? Number(now) : Date.now();
-    const summary = { total: list.length, new: 0, learning: 0, known: 0, due: 0 };
+    const summary = { total: list.length, new: 0, learning: 0, known: 0, due: 0, today: todayQueue(list, records, at).length };
     list.forEach(card => {
       summary[cardState(card, records, at)]++;
       if (isDue(card, records, at)) summary.due++;
@@ -101,7 +130,7 @@
     const progress = state.progress && typeof state.progress === 'object' ? state.progress : {};
     const now = Number.isFinite(Number(state.now)) ? Number(state.now) : Date.now();
     const collection = String(state.collection || 'all');
-    const mode = String(state.mode || 'all');
+    const mode = String(state.mode || DEFAULT_MODE);
     const search = String(state.search || '');
     const filtered = filterCards(cards, { collection, mode, search, progress, now });
     const index = filtered.length ? Math.max(0, Math.min(filtered.length - 1, Math.floor(Number(state.index) || 0))) : 0;
@@ -135,11 +164,13 @@
       '<p role="status" aria-live="polite">Найдено: <strong>' + filtered.length + '</strong> из ' + cards.length +
       ' · ' + escapeText(collection === 'all' ? 'Все категории' : collection) +
       ' · ' + escapeText((REVIEW_MODES.find(item => item[0] === mode) || REVIEW_MODES[0])[1]) + '</p>' +
-      (collection !== 'all' || mode !== 'all'
+      (search.trim() && mode === 'today' ? '<p class="flashcards-search-hint">Поиск идёт по всем карточкам набора, а не только по очереди на сегодня.</p>' : '') +
+      (collection !== 'all' || mode !== DEFAULT_MODE
         ? '<button type="button" class="btn btn-quiet" data-flashcards-action="reset-filters">Все категории и режимы</button>' : '') +
       '</div></div>';
 
     const stats = '<div class="flashcards-stats" aria-label="Прогресс по карточкам">' +
+      '<span><strong>' + summary.today + '</strong> на сегодня</span>' +
       '<span><strong>' + summary.total + '</strong> всего</span>' +
       '<span><strong>' + summary.new + '</strong> новых</span>' +
       '<span><strong>' + summary.learning + '</strong> изучаю</span>' +
@@ -147,7 +178,10 @@
       '<span><strong>' + summary.due + '</strong> к повторению</span></div>';
 
     if (!card) {
-      return deckSwitch + stats + controls + '<div class="empty-state"><div class="icon">✅</div><p>Для выбранных фильтров карточек нет.</p></div>';
+      const emptyText = mode === 'today' && !search.trim()
+        ? 'На сегодня всё повторено. Можно вернуться завтра или выбрать режим «Все».'
+        : 'Для выбранных фильтров карточек нет.';
+      return deckSwitch + stats + controls + '<div class="empty-state"><div class="icon">✅</div><p>' + emptyText + '</p></div>';
     }
 
     // Код и вывод команд хранятся отдельно от вопроса: склеенный в строку YAML
@@ -179,7 +213,7 @@
     const source = services || {};
     const env = environment || {};
     const doc = env.document || (typeof document !== 'undefined' ? document : null);
-    const state = { deck: 'study', collection: 'all', mode: 'all', search: '', revealed: false, index: 0 };
+    const state = { deck: 'study', collection: 'all', mode: DEFAULT_MODE, search: '', revealed: false, index: 0 };
     const run = (name, ...args) => typeof source[name] === 'function' ? source[name](...args) : undefined;
 
     function currentDecks() {
@@ -248,7 +282,7 @@
     }
     function setFilter(name, value) {
       if (name === 'collection') state.collection = String(value || 'all');
-      if (name === 'mode') state.mode = String(value || 'all');
+      if (name === 'mode') state.mode = String(value || DEFAULT_MODE);
       if (name === 'search') {
         state.search = String(value || '');
         if (state.search.trim()) state.collection = 'all';
@@ -259,7 +293,7 @@
     }
     function resetFilters() {
       state.collection = 'all';
-      state.mode = 'all';
+      state.mode = DEFAULT_MODE;
       state.index = 0;
       state.revealed = false;
       render();
@@ -324,5 +358,5 @@
     return out;
   }
 
-  return { cardState, isDue, filterCards, summarizeCards, normalizeDecks, renderPage, create, collapseConcepts };
+  return { cardState, isDue, filterCards, summarizeCards, todayQueue, normalizeDecks, renderPage, create, collapseConcepts, NEW_PER_DAY };
 });

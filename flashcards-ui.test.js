@@ -42,6 +42,10 @@ test('controller switches decks without mixing cards or progress', () => {
   }, { document: doc });
 
   controller.render();
+  // По умолчанию открыта очередь «Сегодня»: выученная и не просроченная карточка в неё не входит.
+  assert.match(host.innerHTML, /data-mode="today">Сегодня/);
+  assert.doesNotMatch(host.innerHTML, /Что делает pwd\?/);
+  controller.setFilter('mode', 'all');
   assert.match(host.innerHTML, /Что делает pwd\?/);
   assert.doesNotMatch(host.innerHTML, /Что такое inode\?/);
   controller.setDeck('video');
@@ -73,8 +77,24 @@ test('summarizes new, learning, known and due cards', () => {
   };
 
   assert.deepEqual(FlashcardsUI.summarizeCards(cards, progress, 100), {
-    total: 3, new: 1, learning: 1, known: 1, due: 1
+    total: 3, new: 1, learning: 1, known: 1, due: 1, today: 2
   });
+});
+
+test('today queue puts overdue cards first and limits new cards per day', () => {
+  const day = new Date(2026, 8, 24, 12).getTime();
+  const many = Array.from({ length: 30 }, (_, index) => ({ id: 1000100 + index, collection: 'Linux и Bash', question: 'Q' + index, answer: 'A' }));
+  const progress = {
+    1000100: { lastSeen: day - 5 * 86400000, nextReviewAt: day - 1000, correct: 2, wrong: 0, repetitions: 2 },
+    1000101: { lastSeen: day - 5 * 86400000, nextReviewAt: day - 90000, correct: 1, wrong: 1, repetitions: 1 },
+    1000102: { lastSeen: day - 3600000, nextReviewAt: day + 86400000, correct: 1, wrong: 0, repetitions: 1 },
+    1000103: { lastSeen: day - 7200000, nextReviewAt: day + 86400000, correct: 0, wrong: 1, repetitions: 0 }
+  };
+  const queue = FlashcardsUI.todayQueue(many, progress, day);
+  assert.deepEqual(queue.slice(0, 2).map(card => card.id), [1000101, 1000100], 'сначала самые просроченные');
+  assert.equal(queue.length, 2 + FlashcardsUI.NEW_PER_DAY - 2, 'две новые уже начаты сегодня');
+  assert.ok(queue.every(card => card.id !== 1000102 && card.id !== 1000103));
+  assert.equal(FlashcardsUI.filterCards(many, { mode: 'today', search: 'Q2', progress, now: day }).length, 11, 'поиск идёт по всему набору');
 });
 
 test('renders escaped card controls and collection choices without inline JavaScript', () => {
@@ -185,7 +205,7 @@ test('resetting search restrictions keeps the query and selected deck', () => {
   controller.setFilter('collection', 'Linux и Bash');
   assert.match(host.innerHTML, /Найдено: <strong>0<\/strong>/);
   controller.resetFilters();
-  assert.deepEqual(controller.getState(), { deck: 'video', collection: 'all', mode: 'all', search: 'inode', revealed: false, index: 0 });
+  assert.deepEqual(controller.getState(), { deck: 'video', collection: 'all', mode: 'today', search: 'inode', revealed: false, index: 0 });
   assert.match(host.innerHTML, /Что такое inode/);
   assert.doesNotMatch(host.innerHTML, /Все категории и режимы/);
 });

@@ -101,3 +101,23 @@ test('an exam answer moves the schedule of the same concept in flashcards', asyn
   expect(stored['1001245'].correct).toBeUndefined();
   expect(stored['286'].correct).toBe(3);
 });
+
+test('flashcards open the daily SRS queue and the home card counts due reviews', async ({page}) => {
+  await page.addInitScript(() => {
+    if(sessionStorage.getItem('today-seeded')) return;
+    sessionStorage.setItem('today-seeded','true');
+    const past = Date.now() - 60000;
+    localStorage.setItem('ipmax_qprog',JSON.stringify({
+      1000001:{correct:1,wrong:0,lastSeen:past-86400000,repetitions:1,interval:1,ease:2.5,nextReviewAt:past},
+      1000002:{correct:1,wrong:0,lastSeen:past-86400000,repetitions:1,interval:1,ease:2.5,nextReviewAt:past-1000}
+    }));
+  });
+  await page.goto('/');
+  await expect(page.locator('.daily-review')).toContainText('2 к повторению сегодня');
+  await page.locator('[data-daily-action="flashcards"]').click();
+  await expect(page.locator('[data-flashcards-action="mode"][data-mode="today"]')).toHaveClass(/active/);
+  await expect(page.locator('.flashcards-results')).toContainText('Найдено: 17 из 2089');
+  await expect(page.locator('.study-card')).toHaveAttribute('data-card-id','1000002');
+  await page.locator('[data-flashcards-filter="search"]').fill('Swfuse');
+  await expect(page.locator('.flashcards-results')).toContainText('Найдено: 54 из 2089');
+});
