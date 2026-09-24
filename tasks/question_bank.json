@@ -971,8 +971,11 @@
             "Ключ должен быть хешируемым",
             "Tuple зависит от своих элементов"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "python3 -c 'd = {}; d[[1, 2]] = 1'",
+            "python3 -c 'print(hash((1, 2)))'"
+          ],
+          "pitfall": "Кортеж подходит как ключ, только если все его элементы хешируемы: (1, [2]) вызовет TypeError. Собственный класс с изменяемыми полями и переопределённым __hash__ нарушит поиск в словаре после изменения поля.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_016",
@@ -989,8 +992,10 @@
             "Элементы вычисляются лениво",
             "Исчерпанный генератор не перематывается"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "python3 -c 'import sys; print(sys.getsizeof([x for x in range(10**6)]), sys.getsizeof(x for x in range(10**6)))'"
+          ],
+          "pitfall": "Генератор можно пройти только один раз: повторный цикл по нему ничего не вернёт. Вызов list(gen) снова загружает все данные в память и сводит выгоду на нет.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_017",
@@ -1007,8 +1012,11 @@
             "Вложенный list остаётся изменяемым",
             "Такой tuple не хешируем"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "python3 -c 't = ([1], 2); t[0].append(3); print(t)'",
+            "python3 -c 't = ([1], 2); t[0] += [3]'"
+          ],
+          "pitfall": "Выражение t[0] += [3] изменит список и тут же выбросит TypeError при попытке присвоить элемент кортежа. Неизменяемость кортежа относится к ссылкам, а не к объектам внутри.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_018",
@@ -1025,8 +1033,10 @@
             "Обёртка добавляет поведение",
             "wraps сохраняет метаданные"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "python3 -c 'import functools; help(functools.wraps)'"
+          ],
+          "pitfall": "Декоратор без functools.wraps подменяет __name__ и __doc__ функции, из-за чего путаются логи, трассировки и документация. Декоратор выполняется один раз при определении функции, а не при каждом вызове.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_019",
@@ -1043,8 +1053,12 @@
             "Stderr подключают отдельно",
             "Pipefail помогает увидеть ошибку"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "./deploy.sh 2>&1 | tee -a deploy.log",
+            "set -o pipefail",
+            "sudo tee /etc/app.conf >/dev/null <<< 'key=value'"
+          ],
+          "pitfall": "Без pipefail код возврата конвейера равен коду tee, поэтому ошибка deploy.sh останется незамеченной в CI. Конструкция sudo echo ... > файл не работает: перенаправление выполняет оболочка без прав root.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_055",
@@ -1602,8 +1616,12 @@
             "Реальное время: FIFO и RR",
             "RR использует квант времени"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "chrt -p <PID>",
+            "chrt -f -p 50 <PID>",
+            "ps -eo pid,cls,rtprio,comm | grep -v TS"
+          ],
+          "pitfall": "Процесс SCHED_FIFO с высоким приоритетом, ушедший в бесконечный цикл, может занять ядро CPU целиком. Лимит sched_rt_runtime_us оставляет обычным задачам немного времени, но отключать его ради «скорости» опасно.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_001",
@@ -1620,8 +1638,12 @@
             "Эксклюзивности не возникает",
             "Нужно учитывать потоки и NUMA"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "taskset -cp <PID>",
+            "taskset -cp 0-3 <PID>",
+            "grep Cpus_allowed_list /proc/<PID>/status"
+          ],
+          "pitfall": "taskset -p меняет маску только у указанного потока; для всех потоков процесса нужен ключ -a. Кроме того, cgroup cpuset может сузить разрешённый набор CPU независимо от taskset.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_004",
@@ -1638,8 +1660,12 @@
             "Procfs описывает процессы",
             "Sysfs отражает объекты ядра"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "ls /sys/class/net",
+            "cat /sys/class/net/eth0/speed",
+            "cat /proc/meminfo | head"
+          ],
+          "pitfall": "Запись в файлы /sys и /proc меняет параметры ядра сразу, но только до перезагрузки. Постоянные настройки задаются через sysctl.d, udev-правила или параметры модулей.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_054",
@@ -2234,8 +2260,12 @@
             "ARP работает в локальном сегменте",
             "IP назначения остаётся удалённым"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "ip route get 203.0.113.10",
+            "ip neigh show",
+            "arping -I eth0 192.168.1.1"
+          ],
+          "pitfall": "Частая ошибка — ожидать в ARP-кеше MAC удалённого хоста. Для другой подсети в кеше окажется MAC шлюза по умолчанию, а адрес получателя в IP-заголовке не меняется.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_008",
@@ -2252,8 +2282,11 @@
             "Сертификат выбирается до HTTP",
             "ECH меняет видимость имени"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "openssl s_client -connect 203.0.113.10:443 -servername app.example.com </dev/null | openssl x509 -noout -subject -ext subjectAltName",
+            "curl -v --resolve app.example.com:443:203.0.113.10 https://app.example.com"
+          ],
+          "pitfall": "Без -servername утилита openssl s_client не отправляет SNI, и сервер вернёт сертификат по умолчанию. Из-за этого легко ошибочно решить, что на сервере установлен не тот сертификат.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_009",
@@ -2270,8 +2303,12 @@
             "Search может добавлять суффиксы",
             "FQDN задаёт полное имя"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "dig server.example.org.",
+            "resolvectl query server",
+            "grep -E 'search|ndots' /etc/resolv.conf"
+          ],
+          "pitfall": "Имя без завершающей точки резолвер может дополнить доменами из search, поэтому запрос уйдёт на неожиданное имя. В зонных файлах BIND забытая точка превращает запись в имя с дописанным origin.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_010",
@@ -2288,8 +2325,12 @@
             "Резолвер выполняет поиск",
             "Кеш ограничивается TTL"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "dig +norecurse @ns1.example.org example.org SOA",
+            "dig @1.1.1.1 example.org",
+            "resolvectl query example.org"
+          ],
+          "pitfall": "Открытый рекурсивный резолвер в интернете используют для DNS-амплификации. Авторитативный сервер не должен выполнять рекурсию для чужих клиентов.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_011",
@@ -2306,8 +2347,11 @@
             "Поиск продолжается у следующего сервера",
             "Рекурсия скрывает цепочку от клиента"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "dig +trace example.org",
+            "dig +norecurse @a.root-servers.net example.org NS"
+          ],
+          "pitfall": "Ответ referral — не ошибка и не финальный ответ: в нём только NS-записи и glue для следующей зоны. Если glue отсутствует, резолверу нужен отдельный запрос за адресом NS-сервера.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_012",
@@ -2324,8 +2368,12 @@
             "Нужен защищённый канал",
             "Authorization нельзя раскрывать в логах"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "echo 'dXNlcjpwYXNz' | base64 -d",
+            "curl -v -u user:pass https://api.example.com/",
+            "tcpdump -A -i any port 80"
+          ],
+          "pitfall": "Base64 — кодирование, а не шифрование: заголовок Authorization декодируется одной командой. Basic Authentication допустима только поверх TLS.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_013",
@@ -2342,8 +2390,11 @@
             "Ресурсы можно хранить в базе",
             "Сессия и TCP-соединение различаются"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "curl -i https://api.example.com/orders/42",
+            "curl -i -H 'Authorization: Bearer <token>' https://api.example.com/orders"
+          ],
+          "pitfall": "Stateless не означает «без базы данных»: состояние ресурсов хранится на сервере, но каждый запрос несёт всё нужное для обработки. Серверная сессия, привязанная к одному экземпляру, ломает горизонтальное масштабирование.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_015",
@@ -2360,8 +2411,10 @@
             "Preflight проверяет разрешения",
             "Доступность не равна разрешению origin"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "curl -i -X OPTIONS https://api.example.com/items -H 'Origin: https://app.example.com' -H 'Access-Control-Request-Method: PUT'"
+          ],
+          "pitfall": "CORS проверяет браузер, а не сервер: curl не отправляет preflight и не читает заголовки Access-Control-*. Проверяйте ответ на OPTIONS с заголовком Origin, а не обычный GET.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_032",
@@ -2552,8 +2605,13 @@
             "OUTPUT: локальная отправка",
             "FORWARD: транзитный трафик"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "nft list ruleset",
+            "iptables -L INPUT -nv",
+            "iptables -L FORWARD -nv",
+            "sysctl net.ipv4.ip_forward"
+          ],
+          "pitfall": "Правило в INPUT не защищает контейнеры и ВМ за хостом: их трафик идёт через FORWARD. Docker добавляет свои цепочки, поэтому пользовательские правила для контейнеров кладут в DOCKER-USER.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_040",
@@ -2570,8 +2628,12 @@
             "Молчание неоднозначно",
             "Нужна прикладная проба и захват трафика"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "nc -u -vz host.example.com 53",
+            "tcpdump -ni any udp port 53",
+            "nmap -sU -p 53 host.example.com"
+          ],
+          "pitfall": "Для UDP тишина означает open|filtered: сервис мог не ответить на пустую пробу, а фаервол мог отбросить пакет. Надёжнее отправить запрос протокола (например, dig) и смотреть трафик через tcpdump.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_045",
@@ -2757,8 +2819,12 @@
             "Выигрывает длиннейший префикс",
             "Метрика сравнивает сопоставимые маршруты"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "ip route get 10.20.30.40",
+            "ip route show table all",
+            "ip rule show"
+          ],
+          "pitfall": "Longest prefix match сравнивает длину префикса раньше метрики: маршрут /24 победит /16 даже с худшей метрикой. При policy routing (ip rule) выбор начинается с таблицы, поэтому смотрите и её.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_014",
@@ -3277,8 +3343,12 @@
             "Содержимое томов не входит",
             "Dockerfile обеспечивает воспроизводимость"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "docker commit app app:snapshot",
+            "docker inspect -f '{{json .Mounts}}' app",
+            "docker diff app"
+          ],
+          "pitfall": "После docker commit легко решить, что образ содержит и данные базы, а они лежали в volume. Сначала проверьте Mounts и сделайте резервную копию тома отдельно.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_005",
@@ -3295,8 +3365,12 @@
             "Общий кеш может пострадать",
             "Multi-stage отделяет сборочную среду"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "docker history --no-trunc app:latest",
+            "docker buildx build --cache-to type=registry,ref=registry.example.com/app:cache --cache-from type=registry,ref=registry.example.com/app:cache .",
+            "docker image inspect -f '{{json .RootFS.Layers}}' app:latest"
+          ],
+          "pitfall": "Объединение всех инструкций в один слой (--squash или сплющивание образа) уменьшает число слоёв, но любое изменение кода заставляет заново скачивать весь слой, и общие базовые слои между образами перестают переиспользоваться.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_006",
@@ -3313,8 +3387,12 @@
             "Усиленная граница изоляции",
             "Есть затраты на виртуализацию"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "docker info --format '{{json .Runtimes}}'",
+            "docker run --rm --runtime kata-runtime alpine uname -r",
+            "kubectl get runtimeclass"
+          ],
+          "pitfall": "Kata Containers требует аппаратной виртуализации на узле: внутри облачной ВМ без вложенной виртуализации среда выполнения не запустится. Изоляция сильнее, но старт и память дороже.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_007",
@@ -3331,8 +3409,12 @@
             "Кеш требует контроля свежести",
             "CI должен показывать неполную проверку"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "trivy image --cache-dir .trivycache app:latest",
+            "trivy image --download-db-only --cache-dir .trivycache",
+            "trivy image --skip-db-update --cache-dir .trivycache app:latest"
+          ],
+          "pitfall": "Пропустить сканирование при ошибке загрузки базы, чтобы не блокировать pipeline, — значит тихо выпустить непроверенный образ. Кешируйте базу или держите зеркало и падайте, если свежей базы нет.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_035",
@@ -3349,8 +3431,12 @@
             "Удаление контейнера удаляет слой",
             "Долговечные данные выносят в тома"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "docker diff app",
+            "docker stop app && docker start app",
+            "docker rm app"
+          ],
+          "pitfall": "Writable layer переживает stop/start, но исчезает при docker rm и при пересоздании контейнера через compose up с новым образом. Данные, которые нужно сохранить, держите в volume.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_053",
@@ -3660,8 +3746,12 @@
             "Scheduler выбирает узел",
             "Kubelet организует запуск"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "kubectl get events --watch",
+            "kubectl get pod -o wide",
+            "kubectl describe pod <pod>"
+          ],
+          "pitfall": "Pod в статусе Pending без узла означает проблему планировщика (ресурсы, taints, affinity), а Pod с узлом, но в ContainerCreating — проблему kubelet, CNI, образа или тома. Смешивать эти этапы — частая ошибка диагностики.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_024",
@@ -3678,8 +3768,11 @@
             "Реплики представлены отдельными Pod",
             "Замена получает новый UID"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "kubectl get pod <pod> -o jsonpath='{.spec.nodeName}'",
+            "kubectl get pod <pod> -o jsonpath='{.spec.containers[*].name}'"
+          ],
+          "pitfall": "Pod — единица планирования: все его контейнеры всегда на одном узле и делят сетевое пространство. Если компонентам нужно масштабироваться отдельно, их выносят в разные Pod, а не в один.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_025",
@@ -3696,8 +3789,11 @@
             "Общая сеть и тома",
             "Нужна настройка жизненного цикла"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "kubectl get pod <pod> -o jsonpath='{.spec.containers[*].name}'",
+            "kubectl logs <pod> -c log-shipper"
+          ],
+          "pitfall": "Сайдкар разделяет ресурсы и жизненный цикл Pod: если он падает или не завершается, Job не закончится. В новых версиях Kubernetes такие контейнеры объявляют как init-контейнер с restartPolicy: Always.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_039",
@@ -3714,8 +3810,11 @@
             "Репликация не встроена",
             "Базе нужен собственный протокол"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "kubectl get pvc -l app=db",
+            "kubectl exec db-0 -- psql -c 'select * from pg_stat_replication'"
+          ],
+          "pitfall": "StatefulSet даёт стабильные имена и отдельный PVC каждой реплике, но данные не копирует. Три Pod без настроенной репликации базы — три независимые пустые базы.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_050",
@@ -3973,8 +4072,11 @@
             "RWOP ограничивает Pod",
             "Нужна поддержка CSI"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "kubectl get pvc data -o jsonpath='{.spec.accessModes}'",
+            "kubectl get pod -o wide --field-selector spec.nodeName=<node>"
+          ],
+          "pitfall": "ReadWriteOnce ограничивает подключение одним узлом, а не одним Pod: два Pod на том же узле могут писать в том одновременно. Для строгого «один Pod» есть ReadWriteOncePod.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_028",
@@ -3991,8 +4093,12 @@
             "Есть validate, mutate и generate",
             "Блокирование требует проверки влияния"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "kubectl get clusterpolicy",
+            "kubectl get policyreport -A",
+            "kubectl get validatingwebhookconfigurations"
+          ],
+          "pitfall": "Политика в режиме Enforce без предварительного Audit может заблокировать системные компоненты и обновления. Если вебхук Kyverno недоступен и failurePolicy: Fail, создание ресурсов в кластере остановится.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_051",
@@ -4009,8 +4115,11 @@
             "Ёмкость PV не суммируется",
             "Режим доступа влияет на совместное использование"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "kubectl get pvc data -o jsonpath='{.spec.volumeName}'",
+            "kubectl get pv -o custom-columns=NAME:.metadata.name,CLAIM:.spec.claimRef.name"
+          ],
+          "pitfall": "PVC связывается ровно с одним PV. После удаления PVC том с политикой Retain остаётся в статусе Released, и новый PVC к нему не привяжется, пока не очистить claimRef.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_058",
@@ -4027,8 +4136,11 @@
             "Нужна поддерживаемая архитектура",
             "Gateway API имеет явные разрешения"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "kubectl get ingress -A",
+            "kubectl describe ingress app -n web"
+          ],
+          "pitfall": "Ingress ссылается только на Service своего пространства имён. Обходной путь через Service типа ExternalName ведёт трафик мимо сетевых политик; для межпространственной маршрутизации есть Gateway API с ReferenceGrant.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_059",
@@ -4045,8 +4157,12 @@
             "Validation проверяет допустимость",
             "Нужна политика поведения при отказе"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "kubectl get mutatingwebhookconfigurations",
+            "kubectl get validatingwebhookconfigurations",
+            "kubectl apply --dry-run=server -f pod.yaml"
+          ],
+          "pitfall": "Mutating-вебхуки выполняются до validating, и порядок между несколькими mutating не гарантирован. Недоступный вебхук с failurePolicy: Fail блокирует создание ресурсов, поэтому исключайте из него kube-system.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_060",
@@ -4346,8 +4462,12 @@
             "Новый Pod использует новый шаблон",
             "Порядок обновления задаёт оператор"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "kubectl rollout status sts/db",
+            "kubectl get pod -l app=db -L controller-revision-hash",
+            "kubectl delete pod db-0"
+          ],
+          "pitfall": "При стратегии OnDelete команда kubectl rollout status может ждать бесконечно: новые Pod появляются только после ручного удаления старых. Удаляйте по одному и проверяйте готовность реплики.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_026",
@@ -4364,8 +4484,12 @@
             "Найти рабочую ревизию",
             "Не удалять метаданные вслепую"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "helm status app -n prod",
+            "helm history app -n prod",
+            "helm rollback app <REVISION> -n prod"
+          ],
+          "pitfall": "Удалять секрет релиза Helm вручную — крайняя мера: так легко потерять историю и сломать следующий upgrade. Сначала посмотрите helm history и откатитесь на последнюю ревизию в статусе deployed.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_033",
@@ -4382,8 +4506,12 @@
             "Определить владельца PKI",
             "Компоненты должны перечитать сертификаты"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "kubeadm certs check-expiration",
+            "kubeadm certs renew all",
+            "crictl ps | grep -E 'kube-apiserver|etcd'"
+          ],
+          "pitfall": "После kubeadm certs renew статические Pod control plane сами не перечитывают сертификаты — их нужно перезапустить. Также обновите admin.conf, иначе kubectl продолжит использовать просроченный клиентский сертификат.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_034",
@@ -4400,8 +4528,12 @@
             "Проверка API и дополнений",
             "Доступности нужен запас ресурсов"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "kubeadm upgrade plan",
+            "kubeadm upgrade apply v1.30.x",
+            "kubectl get nodes"
+          ],
+          "pitfall": "kubeadm не позволяет перепрыгнуть через minor-версию: обновляйтесь последовательно, сначала control plane, затем kubelet на узлах. Перед каждым шагом проверьте устаревшие API в манифестах.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_038",
@@ -4418,8 +4550,11 @@
             "Kubespray добавляет автоматизацию",
             "Эксплуатация остаётся у команды"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "ansible-playbook -i inventory/mycluster/hosts.yaml cluster.yml -b",
+            "kubeadm init --config kubeadm.yaml"
+          ],
+          "pitfall": "Kubespray внутри тоже использует kubeadm, но управляет им через Ansible-инвентарь. Ручные правки узлов в обход инвентаря будут перезаписаны при следующем запуске playbook.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_052",
@@ -4614,8 +4749,12 @@
             "Upstream нужен для синхронизации",
             "CI внешних изменений ограничивают"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "git remote add upstream https://github.com/org/project.git",
+            "git fetch upstream",
+            "git rebase upstream/main"
+          ],
+          "pitfall": "Без регулярной синхронизации с upstream ветка форка отстаёт, и pull request приходит с конфликтами. Не пушьте изменения в main своего форка — делайте отдельную ветку под каждый PR.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_030",
@@ -4632,8 +4771,12 @@
             "Указатель перемещается без merge-коммита",
             "no-ff сохраняет границу слияния"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "git merge --ff-only feature",
+            "git merge --no-ff feature",
+            "git log --graph --oneline"
+          ],
+          "pitfall": "При fast-forward не создаётся коммит слияния, и по истории не видно, какие коммиты пришли из ветки. Если нужна явная граница функции, используйте --no-ff; --ff-only же откажет, когда целевая ветка ушла вперёд.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_043",
@@ -4650,8 +4793,11 @@
             "extends переиспользует настройки",
             "Нужно проверять итоговую конфигурацию"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "glab ci lint",
+            "yq '.\".base\"' .gitlab-ci.yml"
+          ],
+          "pitfall": "Скрытое задание с точкой не запускается, но при extends его ключи сливаются по хешам, а массивы вроде script заменяются целиком. Для повторного использования фрагментов внутри script удобнее !reference.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_044",
@@ -4668,8 +4814,11 @@
             "Allow_failure задаёт обязательность",
             "Rules влияют на значение по умолчанию"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "glab ci lint",
+            "grep -n -A3 'when: manual' .gitlab-ci.yml"
+          ],
+          "pitfall": "Manual job в rules по умолчанию имеет allow_failure: false и блокирует pipeline до ручного запуска. Для деплоя это нужно явно, а необязательные ручные задания помечайте allow_failure: true.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_056",
@@ -4991,8 +5140,11 @@
             "hostvars и groups описывают inventory",
             "Факты об ОС — отдельные данные"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "ansible web01 -m debug -a 'var=hostvars[inventory_hostname]'",
+            "ansible all -m debug -a 'var=group_names'"
+          ],
+          "pitfall": "Нельзя называть свои переменные как magic variables (hostvars, groups, inventory_hostname): Ansible их перезапишет или запретит. Значение hostvars другого хоста содержит факты, только если они уже собраны в этом запуске.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_041",
@@ -5009,8 +5161,11 @@
             "Vars имеют более высокий приоритет",
             "Нужно учитывать полный порядок"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "ansible-playbook site.yml -e 'nginx_port=8080'",
+            "ansible-doc -t keyword vars"
+          ],
+          "pitfall": "Переменные из vars/main.yml перекрывают инвентарь и group_vars, поэтому пользователь роли не сможет их изменить без -e. Настройки для переопределения кладите в defaults/main.yml.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_057",
@@ -5259,8 +5414,12 @@
             "Модулям передают конфигурации явно",
             "State не изолируется автоматически"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "terraform providers",
+            "terraform plan",
+            "grep -rn 'configuration_aliases' modules/"
+          ],
+          "pitfall": "Модуль не должен сам объявлять provider с alias: передавайте провайдеры из корня через providers = { aws.dr = aws.dr }. Иначе удаление модуля ломает plan из-за ресурсов без провайдера.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_046",
@@ -5446,8 +5605,11 @@
             "EBS и instance store различаются",
             "Удаление задаёт DeleteOnTermination"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "aws ec2 describe-instances --instance-ids i-0abc --query 'Reservations[].Instances[].BlockDeviceMappings'",
+            "aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=i-0abc"
+          ],
+          "pitfall": "Корневой том по умолчанию удаляется при terminate (DeleteOnTermination=true), а подключённые позже тома — нет. Данные instance store теряются уже при stop, в отличие от EBS.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_020",
@@ -5464,8 +5626,12 @@
             "Соединения могут жить дольше TTL",
             "Миграции нужен переходный период"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "dig +noall +answer app.example.com",
+            "dig +noall +answer @8.8.8.8 app.example.com",
+            "aws route53 list-resource-record-sets --hosted-zone-id Z123 --query \"ResourceRecordSets[?Name=='app.example.com.']\""
+          ],
+          "pitfall": "Снижать TTL нужно заранее, за время не меньше старого TTL до переключения. Часть клиентов и JVM-приложений кеширует адрес дольше TTL, поэтому старый адрес держат живым после смены записи.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_021",
@@ -5483,8 +5649,11 @@
             "Разные обязанности эксплуатации",
             "Нужен план жизненного цикла"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "eksctl anywhere version",
+            "kubectl get nodes -o wide"
+          ],
+          "pitfall": "EKS Anywhere запускает кластер на вашей инфраструктуре: control plane, обновления и железо обслуживает ваша команда, а не AWS. Считать его «тем же управляемым EKS, только локально» ошибочно.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_022",
@@ -5501,8 +5670,12 @@
             "SDK обновляет их штатным механизмом",
             "Права и metadata требуют ограничения"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "TOKEN=$(curl -sX PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 60')",
+            "curl -s -H \"X-aws-ec2-metadata-token: $TOKEN\" http://169.254.169.254/latest/meta-data/iam/security-credentials/",
+            "aws sts get-caller-identity"
+          ],
+          "pitfall": "Оставленный IMDSv1 позволяет украсть временные ключи роли через SSRF в приложении. Требуйте IMDSv2 (HttpTokens=required) и ограничьте права роли минимумом.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_023",
@@ -5519,8 +5692,11 @@
             "NAT для этого пути не нужен",
             "IAM и политики продолжают действовать"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "aws ec2 describe-vpc-endpoints --filters Name=service-name,Values=com.amazonaws.eu-central-1.s3",
+            "aws ec2 describe-route-tables --route-table-ids rtb-0abc"
+          ],
+          "pitfall": "Gateway endpoint работает только для S3 и DynamoDB в том же регионе и требует привязки к таблицам маршрутов приватных подсетей. Политика бакета с aws:SourceVpce может случайно закрыть доступ из консоли.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_047",
@@ -5537,8 +5713,11 @@
             "Ограничивает identity-based разрешения",
             "Нужно учитывать остальные политики"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "aws iam get-role --role-name app --query 'Role.PermissionsBoundary'",
+            "aws iam simulate-principal-policy --policy-source-arn arn:aws:iam::123456789012:role/app --action-names s3:DeleteBucket"
+          ],
+          "pitfall": "Permissions boundary сама ничего не разрешает: итоговые права — пересечение boundary и политик роли. Добавив разрешение только в boundary, доступ не получить.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_048",
@@ -5555,8 +5734,12 @@
             "Старые машины не обновляются сами",
             "Refresh требует проверки доступности"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "aws autoscaling start-instance-refresh --auto-scaling-group-name app-asg",
+            "aws autoscaling describe-instance-refreshes --auto-scaling-group-name app-asg",
+            "aws ec2 describe-launch-template-versions --launch-template-name app --versions '$Latest'"
+          ],
+          "pitfall": "user data выполняется только при первом запуске экземпляра, поэтому новая версия Launch Template не трогает работающие ВМ. Если ASG ссылается на фиксированную версию шаблона, новые ВМ тоже получат старую.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_049",
@@ -5930,8 +6113,11 @@
             "Нужно оценить объём и кардинальность",
             "Удалённая история не восстановится настройкой"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "promtool tsdb analyze /prometheus",
+            "curl -s http://prometheus:9090/api/v1/status/tsdb"
+          ],
+          "pitfall": "Простое увеличение --storage.tsdb.retention.time на локальном диске не даёт надёжности: при потере узла пропадёт вся история. Для долгого хранения используйте remote_write в VictoriaMetrics или Thanos/Mimir с объектным хранилищем.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_036",
@@ -6184,8 +6370,11 @@
             "Права на объекты назначаются отдельно",
             "Роли могут объединять привилегии"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "psql -c '\\du'",
+            "psql -c 'CREATE ROLE app_read NOLOGIN; GRANT app_read TO alice;'"
+          ],
+          "pitfall": "Роль без LOGIN подключиться не может, даже если ей задан пароль, поэтому ошибка входа выглядит как «неверный пароль». Права групповой роли наследуются, только если у участника включён INHERIT.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_029",
@@ -6202,8 +6391,11 @@
             "Raft обеспечивает согласование",
             "Топики обслуживают брокеры"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "kafka-metadata-quorum.sh --bootstrap-server kafka:9092 describe --status",
+            "kafka-storage.sh info -c /etc/kafka/server.properties"
+          ],
+          "pitfall": "KRaft убирает ZooKeeper, но не кворум: число контроллеров должно быть нечётным, и потеря большинства останавливает изменения метаданных. Миграция с ZooKeeper выполняется отдельной процедурой, а не простой сменой конфигурации.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_031",
@@ -6220,8 +6412,12 @@
             "Replica копирует эту часть",
             "Число шардов влияет на накладные расходы"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "curl -s 'http://es:9200/_cat/shards?v'",
+            "curl -s 'http://es:9200/_cluster/health?pretty'",
+            "curl -s 'http://es:9200/_cluster/allocation/explain?pretty'"
+          ],
+          "pitfall": "Число primary-шардов задаётся при создании индекса и без reindex или shrink/split не меняется. Реплики на одном узле с primary не размещаются, поэтому одноузловой кластер с replicas: 1 всегда жёлтый.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_042",
@@ -6382,8 +6578,11 @@
             "Два писателя угрожают данным",
             "Fencing изолирует прежнего лидера"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "patronictl -c /etc/patroni.yml list",
+            "patronictl -c /etc/patroni.yml switchover"
+          ],
+          "pitfall": "Без fencing старый активный узел после сетевого разрыва продолжает принимать записи, и возникает split-brain. Переключение без STONITH или блокировки через DCS приводит к двум расходящимся копиям данных.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_027",
@@ -6400,8 +6599,12 @@
             "Range позволяет читать части",
             "Лимиты хранилища и CDN проверяют"
           ],
-          "commands": [],
-          "pitfall": null,
+          "commands": [
+            "curl -r 0-1023 -o part.bin https://files.example.com/big.iso",
+            "curl -I https://files.example.com/big.iso",
+            "aws s3 presign s3://bucket/big.iso --expires-in 600"
+          ],
+          "pitfall": "Чтение файла в память целиком перед отправкой приводит к OOM при нескольких параллельных загрузках. Отдавайте поток, поддерживайте Range-запросы или выдавайте подписанную ссылку на объектное хранилище.",
           "sourceRepository": "Swfuse/devops-interview",
           "sourceCommit": "6ac2d8620c87352c4c0f3c115e0352a1e6552ca4",
           "sourceQuestionId": "swfuse_037",
