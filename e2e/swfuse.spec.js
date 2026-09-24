@@ -54,7 +54,7 @@ test('search finds all 60 Swfuse cards after a category was selected and can cle
   await expect(page.locator('.study-card-meta')).toContainText('1 / 60');
   // Narrowing after search is intentional and its scope is visible.
   await network.click();
-  await expect(results).toContainText('Найдено: 8 из 2329');
+  await expect(results).toContainText('Найдено: 9 из 2329');
   await expect(results).toContainText('Сети и протоколы');
   await page.locator('[data-flashcards-action="mode"][data-mode="known"]').click();
   await expect(results).toContainText('Найдено: 0 из 2329');

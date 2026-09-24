@@ -1270,7 +1270,8 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Для тестов тема Python создана в 15.11.5; в банке категории Python нет, вопросы остаются в Linux и Bash."
     },
     {
       "id": "audit-p02-360",
@@ -2813,7 +2814,7 @@
       "current": "БД в Linux",
       "proposed": "БД",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001039",
@@ -2830,7 +2831,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p06-450",
@@ -2847,7 +2850,7 @@
       "current": "Docker",
       "proposed": "Docker",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001067",
@@ -2864,7 +2867,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p06-451",
@@ -2881,7 +2886,7 @@
       "current": "Ansible",
       "proposed": "Ansible",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001069",
@@ -2898,7 +2903,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p06-452",
@@ -2916,7 +2923,7 @@
       "current": "Terraform / Kubernetes / Yandex",
       "proposed": "по темам",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001095",
@@ -2938,7 +2945,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены. Карточки Yandex Cloud перенесены ещё в 15.11.5.",
+      "sources": []
     },
     {
       "id": "audit-p06-453",
@@ -3388,7 +3397,7 @@
       "current": "Kubernetes",
       "proposed": "Kubernetes",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001232",
@@ -3430,7 +3439,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p07-475",
@@ -3451,7 +3462,7 @@
       "current": "Docker",
       "proposed": "Docker",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001241",
@@ -3488,7 +3499,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p07-476",
@@ -3510,7 +3523,7 @@
       "current": "Terraform / Yandex / Ansible",
       "proposed": "по темам",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001238",
@@ -3552,7 +3565,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены. Карточки Yandex Cloud перенесены ещё в 15.11.5.",
+      "sources": []
     },
     {
       "id": "audit-p07-477",
@@ -3820,7 +3835,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Решение 15.11.5: учебные карточки Python остаются в общей группе Linux и скриптов."
     },
     {
       "id": "audit-p08-491",
@@ -3835,14 +3851,16 @@
       "current": "Yandex",
       "proposed": "Cloud",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001345",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в «Terraform и облака» в 15.11.5.",
+      "sources": []
     },
     {
       "id": "audit-p08-492",
@@ -4223,14 +4241,16 @@
       "current": "карьера в Сетях",
       "proposed": "Карьера",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_kts_040",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены. qb_kts_040 — в категории «Карьера и собеседования».",
+      "sources": []
     },
     {
       "id": "audit-p09-531",
@@ -4666,7 +4686,8 @@
       "proposed": "Карьера",
       "auditStatus": "☐",
       "implementationStatus": "pending",
-      "sourceChecks": []
+      "sourceChecks": [],
+      "resolution": "Для тестов нет темы «Карьера»; #14164 и #14165 с похожими вопросами лежат в System Design. Нужна новая тема или решение оставить."
     },
     {
       "id": "audit-p11-580",
@@ -4679,8 +4700,10 @@
       "current": "Kubernetes-сеть в Сетях",
       "proposed": "Kubernetes",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены. Карточки с тем же текстом вопроса перенесены вместе с тестами.",
+      "sources": []
     },
     {
       "id": "audit-p11-581",
@@ -4693,8 +4716,10 @@
       "current": "SPIFFE, Zero Trust",
       "proposed": "Безопасность",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p11-582",
@@ -4708,7 +4733,8 @@
       "proposed": "Архитектура, один вопрос",
       "auditStatus": "☐",
       "implementationStatus": "pending",
-      "sourceChecks": []
+      "sourceChecks": [],
+      "resolution": "В 15.11.15 #544 и #14060 перенесены в System Design; объединение дубля — шаг 13 (conceptId)."
     },
     {
       "id": "audit-p11-583",
@@ -5149,7 +5175,7 @@
       "current": "NetworkPolicy, overlay для Pod, потери между Pod, Istio, kube-proxy",
       "proposed": "Kubernetes",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002156",
@@ -5176,7 +5202,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p12-627",
@@ -5192,7 +5220,7 @@
       "current": "Zero Trust, SPIFFE",
       "proposed": "Безопасность",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002162",
@@ -5204,7 +5232,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p12-628",
@@ -5232,7 +5262,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "В 15.11.15 1002104 и 1002135 перенесены в «Архитектура и надёжность»; объединение дубля — шаг 13."
     },
     {
       "id": "audit-p12-629",
@@ -5815,7 +5846,7 @@
       "current": "Kubernetes в Сетях",
       "proposed": "Kubernetes",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002304",
@@ -5832,7 +5863,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p13-651",
@@ -6553,14 +6586,16 @@
       "current": "Docker",
       "proposed": "Linux (рядом с `qb_virt_*`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_dkx_007",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены. qb_dkx_007 — в категории Linux.",
+      "sources": []
     },
     {
       "id": "audit-p14-690",
@@ -6875,8 +6910,10 @@
       "current": "Docker",
       "proposed": "Облака (или оставить как пример реестра)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Оставлено в Docker как пример реестра, по варианту аудита.",
+      "sources": []
     },
     {
       "id": "audit-p15-717",
@@ -7248,7 +7285,7 @@
       "current": "Docker",
       "proposed": "Облака; Linux",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000370",
@@ -7260,7 +7297,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p16-743",
@@ -7869,8 +7908,10 @@
       "current": "CI/CD",
       "proposed": "Terraform",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p18-815",
@@ -7883,8 +7924,10 @@
       "current": "CI/CD",
       "proposed": "можно оставить; пример облачного деплоя",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Оставлено в CI/CD как пример облачного деплоя, по варианту аудита.",
+      "sources": []
     },
     {
       "id": "audit-p18-816",
@@ -8060,7 +8103,7 @@
       "current": "Git и CI/CD",
       "proposed": "Docker и реестры образов",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000629",
@@ -8072,7 +8115,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p19-833",
@@ -9703,8 +9748,10 @@
       "current": "Kubernetes",
       "proposed": "Облака или оставить как пример managed",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Оставлено в Kubernetes как пример managed-кластера, по варианту аудита.",
+      "sources": []
     },
     {
       "id": "audit-p23-944",
@@ -10190,7 +10237,7 @@
       "current": "Мониторинг",
       "proposed": "Linux (там уже есть такие вопросы — дубли)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_dbg_010",
@@ -10202,7 +10249,9 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены. qb_dbg_010 и qb_dbg_006 — в категории Linux; объединение с дублями — шаг 13 (conceptId).",
+      "sources": []
     },
     {
       "id": "audit-p26-997",
@@ -10217,14 +10266,16 @@
       "current": "Мониторинг",
       "proposed": "Базы данных или оставить как диагностику",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_dbg_005",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "qb_dbg_005 оставлен в диагностике, по варианту аудита.",
+      "sources": []
     },
     {
       "id": "audit-p26-998",
@@ -10566,7 +10617,8 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Карточка 1001456 перенесена в «Базы данных и очереди» в 15.11.15. Для тестов #14154–#14157 нет темы «Базы данных»: нужна новая тема в KNOWN_TOPICS и фильтрах теста."
     },
     {
       "id": "audit-p27-1024",
@@ -10582,7 +10634,7 @@
       "current": "Мониторинг",
       "proposed": "Git и CI/CD (GitOps)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001515",
@@ -10594,7 +10646,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p27-1025",
@@ -10680,7 +10734,8 @@
       "proposed": "Базы данных",
       "auditStatus": "☐",
       "implementationStatus": "pending",
-      "sourceChecks": []
+      "sourceChecks": [],
+      "resolution": "Нет темы «Базы данных» в KNOWN_TOPICS; все четыре кейса pg-* сейчас скрыты как заготовки (15.11.14)."
     },
     {
       "id": "audit-p28-1052",
@@ -10792,7 +10847,8 @@
       "proposed": "Базы данных",
       "auditStatus": "☐",
       "implementationStatus": "pending",
-      "sourceChecks": []
+      "sourceChecks": [],
+      "resolution": "Нет темы «Базы данных» в KNOWN_TOPICS — перенос ждёт решения о новой теме."
     },
     {
       "id": "audit-p30-1080",
@@ -10974,7 +11030,8 @@
       "proposed": "Linux / Базы данных",
       "auditStatus": "☐",
       "implementationStatus": "pending",
-      "sourceChecks": []
+      "sourceChecks": [],
+      "resolution": "Не перенесено намеренно: topic сценариев ts.json — ключ накопленной аналитики навыков (recordSkillEvent), а в курсах #1 и #9 уже размещены в Docker через SIMULATOR_OVERRIDES. Для #9 к тому же нет темы «Базы данных» в KNOWN_TOPICS."
     },
     {
       "id": "audit-p30-1093",
@@ -11850,8 +11907,10 @@
       "current": "Cloud",
       "proposed": "Terraform (дубль #10, #133)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p38-1213",
@@ -11864,8 +11923,10 @@
       "current": "Security",
       "proposed": "Linux / Сети (дубль `qb_net_009`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены. #15040 — Linux, #15013 — Сети; манифест Swfuse синхронизирован.",
+      "sources": []
     },
     {
       "id": "audit-p38-1214",
@@ -12087,7 +12148,7 @@
       "current": "6 задач Ansible в коллекции Terraform",
       "proposed": "Ansible",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001867",
@@ -12099,7 +12160,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p39-1235",
@@ -12409,7 +12472,7 @@
       "current": "Архитектура",
       "proposed": "Мониторинг (дубль `qb_obs_001`, тест #12010)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000132",
@@ -12421,7 +12484,9 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены.",
+      "sources": []
     },
     {
       "id": "audit-p41-1270",
@@ -12436,14 +12501,16 @@
       "current": "Архитектура",
       "proposed": "Карьера или «Основы»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000196",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Перенесено в 15.11.15; ID и прогресс сохранены. 2000196 — в «Карьера и собеседования».",
+      "sources": []
     },
     {
       "id": "audit-p41-1271",
