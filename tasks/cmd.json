@@ -112,12 +112,12 @@
     "task": "Найти какой процесс держит открытым файл /var/log/app.log",
     "opts": [
       "lsof /var/log/app.log",
-      "fuser -v /var/log/app.log",
+      "fuser -k /var/log/app.log",
       "ss -p /var/log/app.log",
       "find /proc -name app.log"
     ],
     "answer": 0,
-    "exp": "lsof filename покажет PID, имя процесса, пользователя"
+    "exp": "lsof filename покажет PID, имя процесса и пользователя. fuser -v тоже перечислит процессы, а fuser -k завершит их вместо поиска."
   },
   {
     "id": 11,
@@ -210,10 +210,10 @@
       "ansible-playbook site.yml --check --diff",
       "ansible-playbook site.yml --dry-run --verbose",
       "ansible-playbook site.yml --simulate --diff",
-      "ansible-playbook site.yml -C -D"
+      "ansible-playbook site.yml --check --step"
     ],
     "answer": 0,
-    "exp": "--check: не применять, --diff: показать diff. -C и -D краткие формы"
+    "exp": "--check: не применять изменения, --diff: показать diff файлов; -C и -D — их краткие формы. --step лишь спрашивает подтверждение перед каждой задачей, --dry-run и --simulate у ansible-playbook нет."
   },
   {
     "id": 19,
@@ -269,11 +269,11 @@
     "opts": [
       "docker save -o /tmp/myapp.tar myapp:v1.0",
       "docker export -o /tmp/myapp.tar myapp:v1.0",
-      "docker image save myapp:v1.0 > /tmp/myapp.tar",
+      "docker image inspect myapp:v1.0 > /tmp/myapp.tar",
       "docker commit myapp:v1.0 /tmp/myapp.tar"
     ],
     "answer": 0,
-    "exp": "docker save сохраняет образ (image) со всеми слоями и метаданными. docker export сохраняет файловую систему запущенного контейнера (без истории слоёв). -o задаёт выходной файл."
+    "exp": "docker save сохраняет образ (image) со всеми слоями и метаданными; docker image save … > file делает то же через stdout. docker export сохраняет файловую систему контейнера без истории слоёв, docker image inspect выводит JSON с метаданными, а не образ. -o задаёт выходной файл."
   },
   {
     "id": 24,
@@ -341,11 +341,11 @@
     "opts": [
       "docker cp myapp:/app/config.json .",
       "docker copy myapp:/app/config.json .",
-      "docker exec myapp cat /app/config.json > config.json",
+      "docker exec myapp cp /app/config.json .",
       "docker export myapp | tar -x app/config.json"
     ],
     "answer": 0,
-    "exp": "docker cp <container>:<path> <host_path> копирует файлы из контейнера на хост. Работает и в обратную сторону: docker cp ./file container:/path. Контейнер может быть остановлен."
+    "exp": "docker cp <container>:<path> <host_path> копирует файлы из контейнера на хост. Работает и в обратную сторону: docker cp ./file container:/path. Контейнер может быть остановлен. docker exec … cp копирует файл внутри контейнера, а не на хост."
   },
   {
     "id": 30,
@@ -425,11 +425,11 @@
     "opts": [
       "kubectl cp production/api-pod:/var/log/app.log ./app.log",
       "kubectl copy api-pod:/var/log/app.log ./app.log -n production",
-      "kubectl exec api-pod -n production -- cat /var/log/app.log > app.log",
+      "kubectl exec api-pod -n production -- cp /var/log/app.log ./app.log",
       "kubectl get file api-pod:/var/log/app.log -n production"
     ],
     "answer": 0,
-    "exp": "kubectl cp <namespace>/<pod>:<path> <local_path> копирует файл из pod. Формат: namespace/pod:path или pod:path с -n namespace. Требует tar в контейнере. Вариант с exec + cat может не передать бинарные файлы корректно."
+    "exp": "kubectl cp <namespace>/<pod>:<path> <local_path> копирует файл из pod. Формат: namespace/pod:path или pod:path с -n namespace. Требует tar в контейнере. kubectl exec … cp копирует файл внутри pod, а не на локальную машину; команд kubectl copy и kubectl get file нет."
   },
   {
     "id": 37,
