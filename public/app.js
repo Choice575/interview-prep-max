@@ -127,6 +127,13 @@ function getCustomQ(){return lsGet('custom',[]);}
 function getAllQ(){return [...BASE_QUESTIONS,...getCustomQ()];}
 function getMistakes(){return lsGet('mistakes',{});}
 function getQProg(){return lsGet('qprog',{});}
+// Область материала по профилю (аудит B6): уровни тестов и видимость MLOps.
+function getScopePrefs(){return typeof IPMaxProfileScope!=='undefined'?IPMaxProfileScope.normalizePrefs(lsGet('scope_prefs',{})):{showMlops:false,showSenior:null};}
+function getProfileScope(){
+  if(typeof IPMaxProfileScope==='undefined') return {levels:['Junior','Middle','Senior'],showMlops:true,hidesSenior:false,profileLevel:null};
+  return IPMaxProfileScope.scopeFor(getOnboardingProfile(),getScopePrefs());
+}
+function setScopePref(name,value){const prefs=getScopePrefs();prefs[name]=value;lsSet('scope_prefs',prefs);}
 const CORRECTED_TERRAFORM_ANSWER_IDS=new Set([9,11,14,18,26]);
 const CORRECTED_ANSWER_VERSION='15.10.1';
 function needsCorrectedAnswerReview(question,progress){
@@ -335,7 +342,7 @@ function configureCoachUI(){
 function getAllTopics(){const topics=new Set();getAllQ().forEach(q=>topics.add(q.topic));return [...topics].sort();}
 
 // ═══ STATE ═══
-let currentMode='all',currentView='standard',currentTopic='all',currentLevel='all',currentCategory='all';
+let currentMode='all',currentView='standard',currentTopic='all',currentLevel='profile',currentCategory='all';
 let timerSecs=0,timerInterval=null,timerDeadline=0;
 let activeQuestions=[],singleIdx=0;
 let streak=0;
@@ -420,7 +427,7 @@ function renderPageContent(page){
   if(page==='k8s') renderK8s();
   if(page==='ports') renderPorts();
   if(page==='tips') renderTips();
-  if(page==='exam'){resetQuestionRenderLimit();restoreExamControls();renderQuestions();}
+  if(page==='exam'){resetQuestionRenderLimit();restoreExamControls();syncLevelChips();renderScopeBars();renderQuestions();}
   if(page==='interview') renderInterviewPractice();
   if(page==='git') renderGit();
   if(page==='regex') renderRegex();
@@ -726,6 +733,11 @@ function setMode(m,el){resetCoachSelection();currentMode=m;resetQuestionRenderLi
 function setView(v,el){currentView=v;resetQuestionRenderLimit();setChip('view-chips',el);clearTInterval();renderQuestions();}
 function setTopic(t,el){resetCoachSelection();currentTopic=t;resetQuestionRenderLimit();setChip('topic-chips',el);renderQuestions();}
 function setLevel(l,el){resetCoachSelection();currentLevel=l;resetQuestionRenderLimit();setChip('level-chips',el);renderQuestions();}
+// Уровень меняется и программно (тема с главной, SRS), поэтому активный чип сверяем с состоянием.
+function syncLevelChips(){
+  const target=[...document.querySelectorAll('#level-chips .chip')].find(chip=>(chip.getAttribute('onclick')||'').includes("setLevel('"+currentLevel+"'"));
+  if(target) setChip('level-chips',target);
+}
 function setCategory(c,el){resetCoachSelection();currentCategory=c;resetQuestionRenderLimit();setChip('cat-chips',el);renderQuestions();}
 function setTimer(s,el){timerSecs=s;setChip('timer-chips',el);}
 function setChip(groupId,el){document.querySelectorAll('#'+groupId+' .chip').forEach(c=>{c.classList.remove('active');c.removeAttribute('aria-pressed');});if(el){el.classList.add('active');el.setAttribute('aria-pressed','true');}}
@@ -744,7 +756,7 @@ const examUI=requireExamUIModule().create({
   getQuestions:getAllQ,getQuestionProgress:getQProg,getMistakes,
   needsAnswerReview:needsCorrectedAnswerReview,
   getFilters:()=>({
-    coachQuestionIds,topic:currentTopic,level:currentLevel,category:currentCategory,mode:currentMode,
+    coachQuestionIds,topic:currentTopic,level:currentLevel,levels:getProfileScope().levels,category:currentCategory,mode:currentMode,
     search:document.getElementById('exam-search')?.value||'',coachSessionLimit
   }),
   getView:()=>currentView,getTimerSeconds:()=>timerSecs,
@@ -773,7 +785,7 @@ function renderQCard(q,sMode){return requireExamUI().renderQuestionCard(q,sMode)
 // «практических сценариев» с выдуманным выводом; прогресс скрытых карточек не удаляется.
 // Смысловые копии одного понятия (conceptId) видны одной карточкой, расписание у них общее.
 function collapseConceptCards(cards){return typeof IPMaxFlashcardsUI!=='undefined'&&IPMaxFlashcardsUI.collapseConcepts?IPMaxFlashcardsUI.collapseConcepts(cards):cards;}
-function visibleStudyCards(){return collapseConceptCards((FLASHCARDS_DATA?.cards||[]).filter(card=>!card.generated));}
+function visibleStudyCards(){const cards=collapseConceptCards((FLASHCARDS_DATA?.cards||[]).filter(card=>!card.generated));return typeof IPMaxProfileScope!=='undefined'?IPMaxProfileScope.filterCards(cards,getProfileScope()):cards;}
 function visibleVideoCards(){return collapseConceptCards(Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards:[]);}
 function requireFlashcardsUIModule(){if(typeof IPMaxFlashcardsUI==='undefined') throw new Error('Модуль учебных карточек не загружен.');return IPMaxFlashcardsUI;}
 const flashcardsUI=requireFlashcardsUIModule().create({
@@ -786,7 +798,30 @@ const flashcardsUI=requireFlashcardsUIModule().create({
   getProgress:getQProg,now:()=>Date.now(),
   recordAttempt:(card,outcome,deck)=>recordQuestionResult({id:card.id,topic:card.collection},{outcome,source:deck?.id==='video'?'video_flashcards':'flashcards',syncMistakes:false,history:true})
 });
-function renderFlashcards(){return flashcardsUI.render();}
+function renderScopeBars(){
+  const scope=getProfileScope();
+  const cards=document.getElementById('fc-scope-bar');
+  if(cards){
+    cards.replaceChildren();
+    const text=document.createElement('span');
+    text.textContent=scope.showMlops?'MLOps-карточки показаны.':'MLOps-карточки скрыты: их больше, чем по Linux, а в DevOps-собеседованиях они редки.';
+    const button=document.createElement('button');button.type='button';button.className='btn btn-quiet btn-sm';
+    button.textContent=scope.showMlops?'Скрыть MLOps':'Показать MLOps';
+    button.addEventListener('click',()=>{setScopePref('showMlops',!scope.showMlops);renderFlashcards();});
+    cards.append(text,button);
+  }
+  const exam=document.getElementById('exam-scope-bar');
+  if(exam){
+    exam.replaceChildren();
+    const text=document.createElement('span');
+    text.textContent='По профилю: '+scope.levels.join(', ')+(scope.hidesSenior?'. Senior-вопросы скрыты до уровня Middle.':'.');
+    const button=document.createElement('button');button.type='button';button.className='btn btn-quiet btn-sm';
+    button.textContent=scope.hidesSenior?'Показать Senior':'Скрыть Senior';
+    button.addEventListener('click',()=>{setScopePref('showSenior',scope.hidesSenior);renderScopeBars();resetQuestionRenderLimit();renderQuestions();});
+    exam.append(text,button);
+  }
+}
+function renderFlashcards(){renderScopeBars();return flashcardsUI.render();}
 
 function pick(qid,chosen,correct){
   const card=document.getElementById('qcard-'+qid);
@@ -1429,14 +1464,14 @@ function startCoachFocus(topic,trainerPage,plan){
   if(trainerPage){nav(trainerPage);return;}
   if(!getAllQ().some(q=>q.topic===topic)){alert('Для выбранной темы пока нет вопросов.');return;}
   coachSessionLimit=plan.sessionSize;
-  currentTopic=topic;currentLevel='all';currentCategory='all';currentMode='smart';currentView='standard';interviewMode=false;cameFromStudy=false;
+  currentTopic=topic;currentLevel='profile';currentCategory='all';currentMode='smart';currentView='standard';interviewMode=false;cameFromStudy=false;
   nav('exam');
 }
 function startCoachReviewMode(plan){
   if(!plan||!plan.dueCount){alert('На сегодня нет запланированных повторений.');return;}
   resetCoachSelection();
   coachSessionLimit=Math.min(plan.sessionSize,plan.dueCount);
-  currentTopic='all';currentLevel='all';currentCategory='all';currentMode='srs';currentView='standard';interviewMode=false;cameFromStudy=false;
+  currentTopic='all';currentLevel='profile';currentCategory='all';currentMode='srs';currentView='standard';interviewMode=false;cameFromStudy=false;
   nav('exam');
 }
 function startCoachControlMode(plan){
@@ -1629,7 +1664,7 @@ function startAnalyticsQuestions(questions){
   const ids=(Array.isArray(questions)?questions:[]).map(question=>question&&question.id).filter(id=>id!==undefined&&id!==null);
   if(!ids.length) return;
   resetCoachSelection();coachQuestionIds=ids;
-  currentTopic='all';currentLevel='all';currentCategory='all';currentMode='all';currentView='standard';interviewMode=false;cameFromStudy=false;
+  currentTopic='all';currentLevel='profile';currentCategory='all';currentMode='all';currentView='standard';interviewMode=false;cameFromStudy=false;
   nav('exam');
 }
 function renderAnalytics(){return requireAnalyticsUI().renderAnalytics();}
@@ -1840,7 +1875,7 @@ function startPracticeTraining(event){
   const topic=event.currentTarget.dataset.topic;
   const page=event.currentTarget.dataset.page;
   if(page!=='exam'){nav(page);return;}
-  currentTopic=topic;currentLevel='all';currentCategory='all';currentMode='all';currentView='standard';
+  currentTopic=topic;currentLevel='profile';currentCategory='all';currentMode='all';currentView='standard';
   nav('exam');
 }
 

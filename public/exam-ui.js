@@ -61,7 +61,11 @@
     }
 
     if (settings.topic && settings.topic !== 'all') result = result.filter(question => question && question.topic === settings.topic);
-    if (settings.level && settings.level !== 'all') result = result.filter(question => question && question.level === settings.level);
+    if (settings.level === 'profile') {
+      // Уровни по профилю (аудит B6): без списка уровней фильтр ничего не скрывает.
+      const levels = Array.isArray(settings.levels) ? settings.levels : null;
+      if (levels) result = result.filter(question => question && (!question.level || levels.includes(question.level)));
+    } else if (settings.level && settings.level !== 'all') result = result.filter(question => question && question.level === settings.level);
     if (settings.category && settings.category !== 'all') {
       result = result.filter(question => String(question && question.category || 'definition') === settings.category);
     }

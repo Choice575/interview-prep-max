@@ -50,22 +50,22 @@ test('search finds all visible Swfuse cards after a category was selected and ca
   await search.pressSequentially('Swfuse');
   await expect(search).toBeFocused();
   await expect(page.locator('[data-collection="all"]')).toHaveAttribute('aria-pressed', 'true');
-  await expect(results).toContainText('Найдено: 54 из 2089');
+  await expect(results).toContainText('Найдено: 54 из 1489');
   await expect(page.locator('.study-card-meta')).toContainText('1 / 54');
   // Narrowing after search is intentional and its scope is visible.
   await network.click();
-  await expect(results).toContainText('Найдено: 8 из 2089');
+  await expect(results).toContainText('Найдено: 8 из 1489');
   await expect(results).toContainText('Сети и протоколы');
   await page.locator('[data-flashcards-action="mode"][data-mode="known"]').click();
-  await expect(results).toContainText('Найдено: 0 из 2089');
+  await expect(results).toContainText('Найдено: 0 из 1489');
   await expect(results).toContainText('Знаю');
   await page.getByRole('button', { name: 'Все категории и режимы', exact: true }).click();
   await expect(search).toHaveValue('Swfuse');
   await expect(search).toBeFocused();
-  await expect(results).toContainText('Найдено: 54 из 2089');
+  await expect(results).toContainText('Найдено: 54 из 1489');
   await page.setViewportSize({ width: 375, height: 812 });
   await network.click();
   await page.getByRole('button', { name: 'Все категории и режимы', exact: true }).click();
-  await expect(results).toContainText('Найдено: 54 из 2089');
+  await expect(results).toContainText('Найдено: 54 из 1489');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

@@ -12,7 +12,7 @@ test.beforeEach(async ({page}) => {
 
 test('template practice deck is hidden without dropping its stored progress', async ({page}) => {
   await page.goto('/#/flashcards');
-  await expect(page.locator('[data-deck="study"] strong')).toHaveText('2089');
+  await expect(page.locator('[data-deck="study"] strong')).toHaveText('1489');
   await expect(page.locator('[data-deck="practice"]')).toHaveCount(0);
   await expect(page.locator('[data-deck="video"]')).toBeVisible();
   await page.locator('[data-flashcards-filter="search"]').fill('Дан вывод для');
@@ -116,10 +116,10 @@ test('flashcards open the daily SRS queue and the home card counts due reviews',
   await expect(page.locator('.daily-review')).toContainText('2 к повторению сегодня');
   await page.locator('[data-daily-action="flashcards"]').click();
   await expect(page.locator('[data-flashcards-action="mode"][data-mode="today"]')).toHaveClass(/active/);
-  await expect(page.locator('.flashcards-results')).toContainText('Найдено: 17 из 2089');
+  await expect(page.locator('.flashcards-results')).toContainText('Найдено: 17 из 1489');
   await expect(page.locator('.study-card')).toHaveAttribute('data-card-id','1000002');
   await page.locator('[data-flashcards-filter="search"]').fill('Swfuse');
-  await expect(page.locator('.flashcards-results')).toContainText('Найдено: 54 из 2089');
+  await expect(page.locator('.flashcards-results')).toContainText('Найдено: 54 из 1489');
 });
 
 test('subnet trainer generates a host-address task and checks the computed network', async ({page}) => {
@@ -135,4 +135,24 @@ test('subnet trainer generates a host-address task and checks the computed netwo
   await page.locator('#sp-g button', { hasText: 'Проверить' }).click();
   await expect(page.locator('#sp-badge-g')).toContainText('Верно');
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_subnet_prog') || '{}'))).toEqual({});
+});
+
+test('the profile hides MLOps cards and Senior questions until the user opts in', async ({page}) => {
+  await page.addInitScript(() => {
+    if(sessionStorage.getItem('scope-seeded')) return;
+    sessionStorage.setItem('scope-seeded','true');
+    localStorage.setItem('ipmax_onboarding',JSON.stringify({role:'DevOps',level:'Junior',completedAt:'2026-09-22T00:00:00Z'}));
+  });
+  await page.goto('/#/flashcards');
+  await expect(page.locator('[data-collection="MLOps"]')).toHaveCount(0);
+  await page.locator('#fc-scope-bar button').click();
+  await expect(page.locator('[data-collection="MLOps"]')).toHaveCount(1);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_scope_prefs')).showMlops)).toBe(true);
+
+  await page.goto('/#/exam');
+  await expect(page.locator('#level-chips .chip.active')).toHaveText('По профилю');
+  await expect(page.locator('#exam-scope-bar')).toContainText('Junior, Middle');
+  await expect(page.locator('#questions-container .tag', { hasText: 'Senior' })).toHaveCount(0);
+  await page.locator('#exam-scope-bar button').click();
+  await expect(page.locator('#exam-scope-bar')).toContainText('Junior, Middle, Senior');
 });

@@ -946,6 +946,8 @@ button.study-recommendation{cursor:pointer}.study-recommendation:hover{border-co
 .daily-bar-fill{height:100%;border-radius:3px;background:var(--primary);transition:width .4s}
 .daily-meta{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--text3);font-variant-numeric:tabular-nums;margin-bottom:14px}
 .daily-review{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;color:var(--text2)}
+.scope-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--text3);margin:4px 0 12px}
+.scope-bar:empty{display:none}
 .daily-topics{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
 .daily-topic{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border:1px solid var(--border);border-radius:20px;background:color-mix(in srgb,var(--bg) 40%,transparent);font-size:11px;font-weight:600;color:var(--text2)}
 .daily-topic b{color:var(--primary-h);font-size:10px}
