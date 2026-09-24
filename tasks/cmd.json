@@ -465,7 +465,7 @@
       "kubectl tunnel api-pod --local=9090 --remote=8080"
     ],
     "answer": 0,
-    "exp": "kubectl port-forward <resource> <local_port>:<remote_port>. Порядок: сначала локальный порт, потом порт в pod. Работает и для service/deployment. Создаёт туннель через API server — не для production нагрузки."
+    "exp": "kubectl port-forward <resource> <local_port>:<remote_port>. Порядок: сначала локальный порт, потом порт в pod. Работает и для service/deployment. Создаёт туннель через API server — не для нагрузки рабочей среды (production)."
   },
   {
     "id": 40,

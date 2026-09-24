@@ -2713,14 +2713,16 @@
       "current": "«вариант с `//` сломает sed»",
       "proposed": "с экранированными `\\/` работает",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001090",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Объяснение regex#7 и карточки 1001090 уточнено: / внутри шаблона совпадает с разделителем, и его пришлось бы экранировать.",
+      "sources": []
     },
     {
       "id": "audit-p06-446",
@@ -3013,7 +3015,7 @@
       "current": "артефакты перевода",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001114",
@@ -3030,7 +3032,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта. 1001165 — «устранение утечки (leak fix)», 1001122 — «нагрузочным тестом и откатом», 1001114 — «копию подтома с копированием при записи».",
+      "sources": []
     },
     {
       "id": "audit-p06-456",
@@ -3777,14 +3781,16 @@
       "current": "`-e trace=.`",
       "proposed": "C5",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001333",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10: схлопнутые многоточия восстановлены по исходным текстам; тест сверяет карточки с источниками.",
+      "sources": []
     },
     {
       "id": "audit-p08-490",
@@ -4441,8 +4447,10 @@
       "current": "«IKE согласует Безопасность Associations»",
       "proposed": "«Security Associations (SA)» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p10-556",
@@ -4581,8 +4589,10 @@
       "current": "«cluster-list/originator-id loop меры предотвращения повторного сбоя (prevention)»",
       "proposed": "«защита от петель через cluster-list и originator-id» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p11-575",
@@ -4937,14 +4947,16 @@
       "current": "«IKE согласует Безопасность Associations»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002212",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p12-620",
@@ -4959,14 +4971,16 @@
       "current": "«для рабочей среды (production) VPN»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002179",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p12-621",
@@ -5617,14 +5631,16 @@
       "current": "«loop меры предотвращения повторного сбоя (prevention)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002321",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p13-646",
@@ -6779,8 +6795,10 @@
       "current": "«без изменения состояния (read-only)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта. «Только для чтения» в вариантах #420 и #10007 сформулировано без абсолютного слова, чтобы не создать подсказку.",
+      "sources": []
     },
     {
       "id": "audit-p15-712",
@@ -6793,8 +6811,10 @@
       "current": "«с возможностью откат (rollback)»",
       "proposed": "«с возможностью отката»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p15-713",
@@ -7107,7 +7127,7 @@
       "current": "«`&& rm .`», «`FROM . AS builder`», «`--mount=type=secret,id=token .`» — схлопнутые многоточия",
       "proposed": "C5",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000337",
@@ -7124,7 +7144,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10: схлопнутые многоточия восстановлены по исходным текстам; тест сверяет карточки с источниками.",
+      "sources": []
     },
     {
       "id": "audit-p16-739",
@@ -7185,7 +7207,7 @@
       "current": "«без изменения состояния (read-only)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000394",
@@ -7202,7 +7224,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p16-742",
@@ -7515,14 +7539,16 @@
       "current": "«откатa» (латинская «a»)",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_ci_001",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p17-759",
@@ -7537,14 +7563,16 @@
       "current": "«воспроизводимого откат (rollback)»",
       "proposed": "«воспроизводимого отката»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000207",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p17-760",
@@ -7689,8 +7717,10 @@
       "current": "«Helm откат (rollback)», «команда откат при auto-sync недоступна»",
       "proposed": "`helm rollback`; «команда `argocd app rollback` при включённом auto-sync недоступна» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта. В объяснении #426 — `helm rollback` и `argocd app rollback`.",
+      "sources": []
     },
     {
       "id": "audit-p18-805",
@@ -7703,8 +7733,10 @@
       "current": "«укрепляют цепочка поставки программного обеспечения (software supply chain)»",
       "proposed": "«укрепляют цепочку поставки ПО»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p18-806",
@@ -7717,8 +7749,10 @@
       "current": "«для безопасного откат», «гарантированным откат (rollback)»",
       "proposed": "«отката», «гарантированным откатом»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p18-807",
@@ -7887,14 +7921,16 @@
       "current": "`git cherry-pick abc1234.def5678`; «`A.B` переносит…», «`A^.B`»",
       "proposed": "одна точка — неверный синтаксис; правильно `abc1234..def5678`, `A..B`, `A^..B` (последствие схлопывания точек, C5)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000639",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10: схлопнутые многоточия восстановлены по исходным текстам; тест сверяет карточки с источниками.",
+      "sources": []
     },
     {
       "id": "audit-p19-828",
@@ -7983,7 +8019,7 @@
       "current": "«Git откат (rollback) и production откат», «откат (rollback) плохого релиза»",
       "proposed": "«откат в Git и откат в продакшене», «откатить плохой релиз»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000591",
@@ -8000,7 +8036,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта. 1000591 — «откат в Git и откат в рабочей среде», 1000594 — «Как откатить плохой релиз за пять минут?».",
+      "sources": []
     },
     {
       "id": "audit-p19-832",
@@ -8353,14 +8391,16 @@
       "current": "«пересcheduling» (латиница), «сдерживание последствий (mitigation)», «меры предотвращения повторного сбоя (prevention)»",
       "proposed": "«перепланирование подов»; C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000218",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p20-864",
@@ -9044,7 +9084,7 @@
       "current": "«откатa» (латиница)",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_001",
@@ -9056,7 +9096,9 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p21-896",
@@ -9071,14 +9113,16 @@
       "current": "знаки ударения «томá», «метка́м», «мето́к»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_003",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта. Убраны знаки ударения в «тома», «меткам», «меток»; «по мета́м» исправлено на «по меткам».",
+      "sources": []
     },
     {
       "id": "audit-p21-897",
@@ -9309,14 +9353,16 @@
       "current": "«эксплуатация и диагностика неисправностей (troubleshooting)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_kts_043",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p22-916",
@@ -9549,8 +9595,10 @@
       "current": "неверный вариант «`kubectl rollout откат (rollback) deployment/myapp`»; в объяснении «Возможность откат (rollback)»",
       "proposed": "вариант `kubectl rollout rollback deployment/myapp` (такой подкоманды нет — хороший дистрактор); «возможность отката» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта. Отвлекающий вариант #381 — `kubectl rollout rollback deployment/myapp` (такой подкоманды нет).",
+      "sources": []
     },
     {
       "id": "audit-p23-937",
@@ -9895,14 +9943,16 @@
       "current": "«Как доказать работоспособность Helm откат (rollback)?»",
       "proposed": "«…`helm rollback`?» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000849",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p24-967",
@@ -10085,14 +10135,16 @@
       "current": "«Каждое правило без план действий»",
       "proposed": "«без плана действий» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_obs_007",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p26-995",
@@ -10377,8 +10429,10 @@
       "current": "«Real User Мониторинг (monitoring)»",
       "proposed": "«Real User Monitoring (RUM)» — перевод сломал название",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p27-1017",
@@ -10394,7 +10448,7 @@
       "current": "«По влияние на пользователей и систему (impact)», «отличается от постоянное исправление (fix)»",
       "proposed": "«по влиянию на пользователей», «от постоянного исправления» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001514",
@@ -10406,7 +10460,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p27-1018",
@@ -10447,8 +10503,10 @@
       "current": "«по total влияние на пользователей и систему (impact)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p27-1021",
@@ -11213,14 +11271,16 @@
       "current": "«become: yes tasks: .»",
       "proposed": "схлопнутое многоточие (C5)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000036",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10: схлопнутые многоточия восстановлены по исходным текстам; тест сверяет карточки с источниками.",
+      "sources": []
     },
     {
       "id": "audit-p32-1128",
@@ -11233,8 +11293,10 @@
       "current": "«как откату (rollback)»",
       "proposed": "«как откат» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p32-1129",
@@ -11341,14 +11403,16 @@
       "current": "«Безопасность group — это фильтр…»",
       "proposed": "«Группа безопасности (security group)…» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_cld_004",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p35-1157",
@@ -11556,8 +11620,10 @@
       "current": "«область воздействия сбоя (blast radius)» с неверным падежом («с правами… и область»)",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p36-1178",
@@ -11626,8 +11692,10 @@
       "current": "«по lifecycle, ownership, permissions и область воздействия сбоя (blast radius)», «увеличивает… область воздействия сбоя» — сломан падеж",
       "proposed": "«…и радиусу поражения (blast radius)» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта. Сохранён принятый в корпусе термин «область воздействия сбоя» в нужном падеже.",
+      "sources": []
     },
     {
       "id": "audit-p37-1192",
@@ -11710,8 +11778,10 @@
       "current": "«в цепочка поставки программного обеспечения (software supply chain)»",
       "proposed": "«в цепочке поставки ПО» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p38-1209",
@@ -11724,8 +11794,10 @@
       "current": "«они попадают в рабочей среде (production)»",
       "proposed": "«они попадают в продакшен» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p38-1210",
@@ -12031,7 +12103,7 @@
       "current": "«`package: name: . state`», «`# .`» — схлопнутые многоточия",
       "proposed": "C5",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001870",
@@ -12043,7 +12115,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10: схлопнутые многоточия восстановлены по исходным текстам; тест сверяет карточки с источниками.",
+      "sources": []
     },
     {
       "id": "audit-p39-1236",
@@ -12058,14 +12132,16 @@
       "current": "«разделяй state по окружениям и область воздействия сбоя»",
       "proposed": "«…и по радиусу поражения» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001844",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p39-1237",
@@ -12208,14 +12284,16 @@
       "current": "«по total влияние на пользователей и систему (impact)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_kts_031",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p41-1266",
@@ -12230,14 +12308,16 @@
       "current": "«Pod Безопасность Standards», «без изменения состояния (read-only) rootfs», «RBAC с принцип минимальных привилегий (least privilege)»",
       "proposed": "«Pod Security Standards», «rootfs только для чтения», «RBAC с наименьшими привилегиями» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000174",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p41-1267",
@@ -12255,7 +12335,7 @@
       "current": "«без изменения состояния (read-only)», «автоматического откат (rollback)», «план отката (rollback)ом», «диагностика неисправностей (troubleshooting)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000147",
@@ -12277,7 +12357,9 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.10 вычитанной заменой в банке, тестах, карточках, видео и манифесте Swfuse; скрипт перевода больше не заменяет слово рядом с английским термином или командой, а проверка --check и тест запрещают возврат артефакта.",
+      "sources": []
     },
     {
       "id": "audit-p41-1268",

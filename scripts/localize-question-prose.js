@@ -44,7 +44,14 @@ term('rollback', 'rollback', {
   'про rollback':'про откат',
   'rollback':'откат'
 });
-term('read-only', 'read-only', {'read-only командами':'командами только для чтения','read-only':'без изменения состояния'});
+// «Без изменения состояния» подходило только к проверкам и искажало признак
+// объекта: read-only rootfs — файловая система только для чтения (аудит C3).
+term('read-only', 'read-only', {
+  'read-only командами':'командами только для чтения',
+  'минимальным read-only способом':'минимальным способом, не меняющим состояние{term}',
+  'проверить гипотезы read-only':'проверить гипотезы, не меняя состояние{term}',
+  'read-only':'только для чтения'
+});
 term('prevention', 'prevention', {'оформить prevention':'предусмотреть меры предотвращения повторного сбоя','prevention':'меры предотвращения повторного сбоя'});
 term('mitigation', 'mitigation', {
   'минимальный mitigation':'минимальную меру сдерживания последствий',
@@ -106,6 +113,17 @@ const byPhrase = new Map(rules.map(rule => [rule.from, rule]));
 const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const phrases = [...byPhrase.keys()].sort((a,b) => b.length-a.length).map(escape).join('|');
 const matcher = new RegExp('(?<![A-Za-z0-9_./-])(?:'+phrases+')(?![A-Za-z0-9_/=-]|\\.[A-Za-z0-9_])', 'g');
+// Соседнее английское слово без собственного правила означает, что фраза —
+// часть термина или команды (helm rollback, security group, Real User
+// Monitoring, leak fix): такие места оставляем как есть, иначе замена ломает и
+// смысл, и грамматику (аудит C3). Защищённый фрагмент рядом считается тем же.
+const phraseWords = new Set([...byPhrase.keys()].flatMap(phrase => phrase.toLowerCase().split(' ')));
+function insideForeignTerm(text, start, end) {
+  const before = text.slice(0, start).match(/(?:^|\s)([A-Za-z][\w/-]*(?:\.[\w/-]+)*|\uE000\d+\uE001) $/);
+  const after = text.slice(end).match(/^ ([A-Za-z][\w./-]*|\uE000\d+\uE001)/);
+  const foreign = match => match && !phraseWords.has(match[1].toLowerCase());
+  return foreign(before) || foreign(after);
+}
 // Protect fenced/inline code, quoted diagnostics, URLs, key/value output and
 // command sections. Cyrillic quoted prose remains editable.
 const protectedPattern = /```[\s\S]*?```|`[^`]*`|"[^"\n]*"|'[^'\n]*'|https?:\/\/[^\s]+|\([A-Za-z][A-Za-z /-]*\)|\b[A-Za-z_][\w.-]*\s*=\s*[^\s;,]+|\b(?:[a-z]\w*_\w*|changed|failed|ok|name|notify|become|rc|msg|condition)\s*:\s*[A-Za-z0-9_./-]+|Команды: [\s\S]*?(?= Важно:|$)/g;
@@ -123,7 +141,8 @@ function translate(text, seen = new Set()) {
     saved.push(value);
     return '\uE000'+(saved.length-1)+'\uE001';
   });
-  const edited = masked.replace(matcher, phrase => {
+  const edited = masked.replace(matcher, (phrase, offset, source) => {
+    if (insideForeignTerm(source, offset, offset + phrase.length)) return phrase;
     const rule = byPhrase.get(phrase);
     const label = seen.has(rule.key) || !rule.english ? '' : ' ('+rule.english+')';
     seen.add(rule.key);
