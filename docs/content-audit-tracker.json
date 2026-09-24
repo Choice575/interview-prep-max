@@ -428,14 +428,16 @@
       "current": "Senior",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_fs_004",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p01-324",
@@ -450,14 +452,16 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_proc_009",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p01-325",
@@ -472,14 +476,16 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_fs_002",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p01-326",
@@ -494,14 +500,16 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_bash_005",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p01-327",
@@ -516,14 +524,16 @@
       "current": "Middle",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_002",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p01-328",
@@ -538,14 +548,16 @@
       "current": "Middle",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_bash_002",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p01-329",
@@ -560,14 +572,16 @@
       "current": "Middle",
       "proposed": "Senior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_proc_003",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p01-330",
@@ -1136,7 +1150,7 @@
       "current": "Middle",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_lx_002",
@@ -1148,7 +1162,9 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p02-355",
@@ -1164,7 +1180,7 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_lx_005",
@@ -1176,7 +1192,9 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p02-356",
@@ -1191,14 +1209,16 @@
       "current": "Middle",
       "proposed": "Senior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_001",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p02-357",
@@ -1213,14 +1233,16 @@
       "current": "Middle",
       "proposed": "Senior или удалить",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_srd_002",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Уровень поднят до Senior (вариант аудита).",
+      "sources": []
     },
     {
       "id": "audit-p02-358",
@@ -1236,7 +1258,7 @@
       "current": "Junior / Middle",
       "proposed": "один уровень",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_srd_001",
@@ -1248,7 +1270,9 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Оба вопроса приведены к уровню Middle.",
+      "sources": []
     },
     {
       "id": "audit-p02-359",
@@ -1952,8 +1976,10 @@
       "current": "варианты ≤ 3 слов из другой области",
       "proposed": "удалить (есть #161, 162, 167, 184) или переписать",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p04-403",
@@ -3006,7 +3032,7 @@
       "current": "ответ в одно слово",
       "proposed": "оставить как короткие или объединить",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001098",
@@ -3023,7 +3049,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Оставлены как короткие карточки: краткий ответ допустим для базового факта, по варианту аудита.",
+      "sources": []
     },
     {
       "id": "audit-p06-455",
@@ -3609,7 +3637,7 @@
       "current": "узкоспециальные",
       "proposed": "тег «глубокое погружение»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001168",
@@ -3641,7 +3669,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "В 15.11.21 карточки получили метку «Глубокое погружение».",
+      "sources": []
     },
     {
       "id": "audit-p07-478",
@@ -3743,7 +3773,7 @@
       "current": "«Память»; одна строка",
       "proposed": "переписать",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001358",
@@ -3755,7 +3785,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p08-488",
@@ -4225,14 +4257,16 @@
       "current": "Middle",
       "proposed": "Junior (классический первый вопрос)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_net_003",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p09-528",
@@ -4247,14 +4281,16 @@
       "current": "Middle",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_008",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p09-529",
@@ -4269,14 +4305,16 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_ntr_008",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p09-530",
@@ -4491,8 +4529,10 @@
       "current": "неверные варианты из чужой области: DNS-записи «users, VLAN, filesystem», коды HTTP «UDP/TCP/QUIC», reverse proxy «RAID, systemd», балансировщик «inode, logs», nmap «inode, systemd», ping «Terraform state»",
       "proposed": "переписать варианты в пределах темы (например, для reverse proxy: forward proxy, NAT-шлюз, L4-балансировщик без терминации)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p10-554",
@@ -4505,8 +4545,10 @@
       "current": "короткие варианты, ответ очевиден (`::1`, SYN-ACK, 4-tuple, tcpdump, порты 80/443)",
       "proposed": "переписать или объединить с полноценными вопросами",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p10-555",
@@ -4549,8 +4591,10 @@
       "current": "Senior (порты HTTP и HTTPS; в объяснении — «базовый факт»)",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p10-558",
@@ -4563,8 +4607,10 @@
       "current": "Senior",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p10-559",
@@ -4577,8 +4623,10 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p10-560",
@@ -4591,8 +4639,10 @@
       "current": "Middle",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p10-561",
@@ -4605,8 +4655,10 @@
       "current": "Senior",
       "proposed": "Middle — встречаются на DevOps-собеседованиях",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p10-562",
@@ -4619,8 +4671,10 @@
       "current": "Senior",
       "proposed": "тег «глубокое погружение»; #230 дублирует Linux #526",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "В 15.11.21 тесты получили метку «Глубокое погружение».",
+      "sources": []
     },
     {
       "id": "audit-p10-563",
@@ -4798,8 +4852,10 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p11-584",
@@ -4812,8 +4868,10 @@
       "current": "Senior",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p11-585",
@@ -4826,8 +4884,10 @@
       "current": "Middle",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p11-586",
@@ -4840,8 +4900,10 @@
       "current": "Senior",
       "proposed": "тег «глубокое погружение» — задачи сетевого инженера оператора",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "В 15.11.21 тесты получили метку «Глубокое погружение».",
+      "sources": []
     },
     {
       "id": "audit-p11-587",
@@ -5202,7 +5264,7 @@
       "current": "«Сниффинг и анализ пакетов», «По 4-tuple», «TCP three-way handshake»",
       "proposed": "переписать как короткие вопросы с сутью или объединить",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002133",
@@ -5219,7 +5281,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p12-626",
@@ -5356,7 +5420,7 @@
       "current": "BGP, OSPF-зоны, MPLS, XDP, DPDK, MPTCP, Segment Routing, QoS, RPKI, GENEVE, EVPN",
       "proposed": "тег «глубокое погружение»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002080",
@@ -5438,7 +5502,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "В 15.11.21 карточки получили метку «Глубокое погружение».",
+      "sources": []
     },
     {
       "id": "audit-p12-630",
@@ -5876,7 +5942,7 @@
       "current": "«80 и 443», «L3», «7», «IPv6 loopback»",
       "proposed": "оставить как короткие или удалить",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002306",
@@ -5898,7 +5964,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Оставлены как короткие карточки; варианты исходных тестов переписаны в 15.11.21.",
+      "sources": []
     },
     {
       "id": "audit-p13-650",
@@ -5960,7 +6028,7 @@
       "current": "EVPN, TSN, XDP, iBGP, QoS, RTBH, SR-IOV, P4, RDMA, LACP",
       "proposed": "тег «глубокое погружение»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002298",
@@ -6022,7 +6090,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "В 15.11.21 карточки получили метку «Глубокое погружение».",
+      "sources": []
     },
     {
       "id": "audit-p13-652",
@@ -6645,14 +6715,16 @@
       "current": "Senior (best practices Dockerfile)",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_dkx_009",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p14-689",
@@ -6965,8 +7037,10 @@
       "current": "Senior",
       "proposed": "Middle (запуск без root, OOMKilled, host и bridge, секреты в BuildKit, образ Python, `docker events`, distroless)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p15-715",
@@ -6979,8 +7053,10 @@
       "current": "Middle",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p15-716",
@@ -7769,14 +7845,16 @@
       "current": "Middle",
       "proposed": "Junior; дубль `qb_gitp_001` (Junior) — объединить",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_git_001",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Уровень qb_git_001 — Junior; объединение с qb_gitp_001 — в шаге дублей.",
+      "sources": []
     },
     {
       "id": "audit-p17-762",
@@ -7967,8 +8045,10 @@
       "current": "неверные варианты «цвет окружения в интерфейсе», «расширение файла в artifacts», «изменения записывают в upstream без аутентификации»",
       "proposed": "правдоподобные варианты из GitLab и Git",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p18-811",
@@ -7981,8 +8061,10 @@
       "current": "Senior",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p18-812",
@@ -7995,8 +8077,10 @@
       "current": "Senior",
       "proposed": "Junior; дубль #418",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Уровень #14073 — Junior; объединение с #418 — в шаге дублей.",
+      "sources": []
     },
     {
       "id": "audit-p18-813",
@@ -8009,8 +8093,10 @@
       "current": "Senior",
       "proposed": "Middle (reusable workflow, SAST и DAST, откат, Jenkins Shared Library, feature flags)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p18-814",
@@ -9339,14 +9425,16 @@
       "current": "Middle",
       "proposed": "Junior — самый частый вводный вопрос",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_002",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p21-898",
@@ -9588,7 +9676,7 @@
       "current": "Senior",
       "proposed": "Middle — частые вопросы уровня Middle (видео: QoS в 5 из 8 собеседований)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_kts_010",
@@ -9600,7 +9688,9 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p22-917",
@@ -9893,8 +9983,10 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p23-943",
@@ -10403,14 +10495,16 @@
       "current": "Junior (с нативными гистограммами)",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_obs_005",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p26-996",
@@ -10775,8 +10869,10 @@
       "current": "Senior",
       "proposed": "Junior (в банке `qb_obs_001` — Junior)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p27-1022",
@@ -10789,8 +10885,10 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p27-1023",
@@ -11338,8 +11436,10 @@
       "current": "короткие варианты из чужих областей (`--fork`/`--destroy`/`--dns`; «Содержимое Vault / Логи Terraform / Список DNS»; «Сетевой балансировщик / Система контейнеров»)",
       "proposed": "переписать варианты в пределах Ansible",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p31-1106",
@@ -11352,8 +11452,10 @@
       "current": "длинные неверные варианты из чужих областей (kernel threads, SQL, Ethernet, DNS SRV, kernel driver для SSH, `--compile`)",
       "proposed": "C4, вторая форма тривиальности",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p31-1107",
@@ -11366,8 +11468,10 @@
       "current": "Middle",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p31-1108",
@@ -11380,8 +11484,10 @@
       "current": "Senior",
       "proposed": "Junior (в банке `qb_swf_041` — Junior)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p31-1109",
@@ -11394,8 +11500,10 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p31-1110",
@@ -11636,8 +11744,10 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p32-1131",
@@ -11650,8 +11760,10 @@
       "current": "Senior",
       "proposed": "тег «глубокое погружение»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "В 15.11.21 тесты получили метку «Глубокое погружение».",
+      "sources": []
     },
     {
       "id": "audit-p32-1132",
@@ -11743,7 +11855,7 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_tf_008",
@@ -11755,7 +11867,9 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p35-1158",
@@ -11770,14 +11884,16 @@
       "current": "Middle",
       "proposed": "тег «глубокое погружение»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_022",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "В 15.11.21 qb_swf_022 получил метку «Глубокое погружение» через манифест Swfuse.",
+      "sources": []
     },
     {
       "id": "audit-p35-1159",
@@ -11921,8 +12037,10 @@
       "current": "«TF_LOG» против «terraform --journal», «DEBUG=1», «SYSLOG=on»; Senior",
       "proposed": "правдоподобные варианты (`TF_LOG_PATH`, `-verbose`, `TF_CLI_ARGS`); Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p36-1177",
@@ -11951,8 +12069,10 @@
       "current": "Senior",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p36-1179",
@@ -11965,8 +12085,10 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p36-1180",
@@ -11979,8 +12101,10 @@
       "current": "Middle",
       "proposed": "Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p36-1181",
@@ -12037,8 +12161,10 @@
       "current": "Senior",
       "proposed": "Middle (#483 «как Terraform определяет порядок операций» — Junior)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p37-1194",
@@ -12139,8 +12265,10 @@
       "current": "копии банка `qb_swf_*` с нелепыми неверными вариантами («передавать пароль AWS Console в HTTP-заголовке», «добавить публичный IP в каждую запись объекта S3», «Base64 передаёт пароль через отдельный DNS-запрос»)",
       "proposed": "правдоподобные варианты (C4, вторая форма тривиальности)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p38-1212",
@@ -12185,8 +12313,10 @@
       "current": "Senior",
       "proposed": "Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.21: уровень изменён по аудиту; неверные варианты из чужих областей заменены правдоподобными из той же темы.",
+      "sources": []
     },
     {
       "id": "audit-p38-1215",

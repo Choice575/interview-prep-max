@@ -1,5 +1,12 @@
 # Changelog
 
+## v15.11.21 (2026-09-24)
+
+- Уточнены уровни сложности 76 вопросов теста и 25 вопросов банка: базовые вопросы о портах, traceroute, SemVer, SLI/SLO/SLA, Ansible --check и импорте Terraform стали Junior, частые вопросы о QoS, PDB, NetworkPolicy, Terragrunt и lifecycle — Middle.
+- Метка «Глубокое погружение» появилась в карточках и банке вопросов и отмечает узкоспециальные темы: BGP, MPLS, EVPN, SR-IOV, DPDK, XDP, RDMA, TSN, P4, Mitogen, Event-Driven Ansible, EKS Anywhere и другие. Импорт Swfuse сохраняет метку.
+- В 61 вопросе теста неверные варианты из чужих областей («пароль AWS Console в HTTP-заголовке», «цвет окружения», RAID для reverse proxy, варианты из одного слова) заменены правдоподобными вариантами из той же темы. Позиции правильных ответов сохранены, доля вопросов, где правильный вариант самый длинный, снизилась до 485 из 921.
+- ID и прогресс сохранены.
+
 ## v15.11.20 (2026-09-24)
 
 - Исправлены все 88 неточностей аудита в Linux, сетях, Docker, Git и CI/CD, Kubernetes, мониторинге, Terraform, Ansible и базах данных. Среди них: зомби и SIGCHLD, поиск задач в D, иноды через du --inodes, sticky bit, SIGKILL и блокировки, TIME_WAIT у инициатора закрытия, DoH по HTTP/3, подпись в SSH, 307/308, CGNAT, keepalive, ADD --checksum, BuildKit, WORKDIR, Node 22 и npm --omit=dev, хуки Git, reset --hard, QoS, init-контейнеры, DNS подов, CSI, nftables в kube-proxy, subPath, ReadWriteOncePod, --record, операторы affinity, RED и очереди, Redis allkeys-lru, use_lockfile в S3, terraform apply -refresh-only, уровни изоляции, KRaft.

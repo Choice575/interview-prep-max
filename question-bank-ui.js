@@ -106,6 +106,7 @@
         + ' aria-controls="qbank-answer-' + escapeHtml(q.id) + '">'
         + '<span class="qbank-level qbank-level-' + escapeHtml(String(q.level).toLowerCase()) + '">'
         + escapeHtml(q.level) + '</span>'
+        + (q.depth === 'deep' ? '<span class="tag tag-deep">Глубокое погружение</span>' : '')
         + '<span class="qbank-question-text">' + escapeHtml(q.q) + '</span>'
         + '<span class="qbank-chevron" aria-hidden="true">' + (open ? '−' : '+') + '</span>'
         + '</button>'

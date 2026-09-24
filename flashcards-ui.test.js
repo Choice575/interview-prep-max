@@ -198,3 +198,10 @@ test('shows card code as an escaped multi-line block and finds cards by it', () 
   const plain = FlashcardsUI.renderPage({ decks, deck: 'study', progress: {}, now: 100 });
   assert.doesNotMatch(plain, /study-card-code/);
 });
+
+test('marks deep-dive cards with a badge', () => {
+  const deep = [{ id: 1002080, collection: 'Сети и протоколы', question: 'Как работает BGP?', answer: 'Протокол.', depth: 'deep' }];
+  const markup = FlashcardsUI.renderPage({ decks: [{ id: 'study', label: 'Учебная программа', cards: deep }], deck: 'study', progress: {}, now: 100 });
+  assert.match(markup, /tag-deep">Глубокое погружение</);
+  assert.doesNotMatch(FlashcardsUI.renderPage({ decks, deck: 'study', progress: {}, now: 100 }), /tag-deep/);
+});

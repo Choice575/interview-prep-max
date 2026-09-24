@@ -38,7 +38,8 @@ function buildImport(input) {
     assert.ok(Number.isInteger(answer) && answer >= 0 && answer < 4);
     [options[answer], options[record.answerIndex]] = [options[record.answerIndex], options[answer]];
     const bankQuestion = {
-      id: record.bankId, level: record.level, q: record.q, answer: record.answer,
+      // Метка «глубокое погружение» (аудит C9) живёт в манифесте, иначе импорт её сотрёт.
+      id: record.bankId, level: record.level, ...(record.depth ? { depth: record.depth } : {}), q: record.q, answer: record.answer,
       keyPoints: record.keyPoints, commands: record.commands, pitfall: record.pitfall, ...source
     };
     const existingBank = data.bank.categories.flatMap(item => item.questions);
@@ -46,7 +47,7 @@ function buildImport(input) {
     upsert(existingBank, bankQuestion, 'q');
     upsert(category.questions, bankQuestion, 'q');
     upsert(data.exam, {
-      id: record.examId, topic: record.topic, level: record.level, category: record.category,
+      id: record.examId, topic: record.topic, level: record.level, category: record.category, ...(record.depth ? { depth: record.depth } : {}),
       q: record.q, options, answer, explanation: record.cardAnswer || record.answer, ...source
     }, 'q');
     upsert(data.flashcards.cards, {
