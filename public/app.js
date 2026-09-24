@@ -367,6 +367,9 @@ const PAGE_TITLES={home:'Сегодня',interview:'Ответы вслух',cat
   cmd:'Command Builder',code:'Code Reviewer',
   ansible:'Ansible Playbook',dockerfile:'Dockerfile',k8s:'K8s YAML',ports:'Порты TCP',labs:'Debugging',
   git:'Git-тренажёр',regex:'Regex-тренажёр',tips:'Советы',incidents:'Разбор инцидентов'};
+// Страницы без своего пункта меню подсвечивают раздел, из которого открыты (аудит B9).
+const NAV_PARENT={chapter:'catalog',subnet:'trainers',ts:'trainers',incidents:'trainers',cmd:'trainers',labs:'trainers',code:'trainers',
+  ansible:'trainers',dockerfile:'trainers',k8s:'trainers',ports:'trainers',git:'trainers',regex:'trainers'};
 function nav(page){
   const request=++navigationRequest;
   stopActiveSessions();
@@ -379,9 +382,10 @@ function nav(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i=>{i.classList.remove('active');i.removeAttribute('aria-current');});
   const pg=document.getElementById('page-'+page);
-  const sb=document.querySelector('[data-page="'+page+'"]');
+  const own=document.querySelector('.sb-item[data-page="'+page+'"]');
+  const sb=own||document.querySelector('.sb-item[data-page="'+(NAV_PARENT[page]||page)+'"]');
   if(pg) pg.classList.add('active');
-  if(sb){sb.classList.add('active');sb.setAttribute('aria-current','page');}
+  if(sb){sb.classList.add('active');sb.setAttribute('aria-current',own?'page':'true');}
   document.getElementById('page-title').textContent=PAGE_TITLES[page]||page;
   closeSidebar();
   syncHashWithPage(page);

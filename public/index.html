@@ -25,25 +25,27 @@
   <div class="sb-nav">
     <button type="button" class="sb-item active" onclick="nav('home')" data-page="home"><span class="icon">🏠</span>Сегодня</button>
 
-    <div class="sb-section">Учёба</div>
+    <!-- Четыре режима работы вместо тематических разделов (аудит B9):
+         по названию группы понятно, что делать, а не где лежит материал. -->
+    <div class="sb-section">Учиться</div>
     <button type="button" class="sb-item" onclick="nav('study')" data-page="study"><span class="icon">🎓</span>Учебный план</button>
     <button type="button" class="sb-item" onclick="nav('catalog')" data-page="catalog"><span class="icon">📚</span>Курсы</button>
+    <button type="button" class="sb-item" onclick="nav('practices')" data-page="practices"><span class="icon">✦</span>Best Practices</button>
+    <button type="button" class="sb-item" onclick="nav('tips')" data-page="tips"><span class="icon">💡</span>Советы</button>
+
+    <div class="sb-section">Повторять</div>
     <button type="button" class="sb-item" onclick="nav('flashcards')" data-page="flashcards"><span class="icon">🧠</span>Карточки<span class="sb-count" id="sb-flashcards-count"></span></button>
-
-    <div class="sb-section">Практика</div>
-    <button type="button" class="sb-item" onclick="nav('exam')" data-page="exam"><span class="icon">📝</span>Вопросы с вариантами</button>
     <button type="button" class="sb-item" onclick="nav('qbank')" data-page="qbank"><span class="icon">🗂️</span>Банк вопросов</button>
-    <button type="button" class="sb-item" onclick="nav('trainers')" data-page="trainers"><span class="icon">🎯</span>Тренажёры<span class="sb-count" id="sb-trainers-count"></span></button>
-    <button type="button" class="sb-item" onclick="nav('interview')" data-page="interview"><span class="icon">🎤</span>Ответы вслух</button>
-    <button type="button" class="sb-item" onclick="nav('external')" data-page="external"><span class="icon">🧪</span>DevOps-полигон</button>
 
-    <div class="sb-section">Прогресс</div>
+    <div class="sb-section">Проверять</div>
+    <button type="button" class="sb-item" onclick="nav('exam')" data-page="exam"><span class="icon">📝</span>Вопросы с вариантами</button>
     <button type="button" class="sb-item" onclick="nav('analytics')" data-page="analytics"><span class="icon">📊</span>Аналитика</button>
     <button type="button" class="sb-item" onclick="nav('achievements')" data-page="achievements"><span class="icon">🏅</span>Достижения<span class="sb-dot" id="sb-ach-dot" hidden></span></button>
 
-    <div class="sb-section">Справочник</div>
-    <button type="button" class="sb-item" onclick="nav('practices')" data-page="practices"><span class="icon">✦</span>Best Practices</button>
-    <button type="button" class="sb-item" onclick="nav('tips')" data-page="tips"><span class="icon">💡</span>Советы</button>
+    <div class="sb-section">Практиковать</div>
+    <button type="button" class="sb-item" onclick="nav('trainers')" data-page="trainers"><span class="icon">🎯</span>Тренажёры<span class="sb-count" id="sb-trainers-count"></span></button>
+    <button type="button" class="sb-item" onclick="nav('interview')" data-page="interview"><span class="icon">🎤</span>Ответы вслух</button>
+    <button type="button" class="sb-item" onclick="nav('external')" data-page="external"><span class="icon">🧪</span>DevOps-полигон</button>
     <input type="file" id="import-inp" accept=".json" style="display:none" onchange="importProgress(this)">
   </div>
   <div class="sb-bottom">

@@ -189,3 +189,11 @@ test('spoken answers include bank questions, a two-minute timer and a key-point 
   await page.locator('#ip-reveal-btn').click();
   await expect(page.locator('#ip-reference')).toContainText('Эталонный ответ');
 });
+
+test('sidebar groups sections by activity and highlights the parent of hidden pages', async ({page}) => {
+  await page.goto('/#/home');
+  await expect(page.locator('#sidebar .sb-nav .sb-section')).toHaveText(['Учиться', 'Повторять', 'Проверять', 'Практиковать']);
+  await page.goto('/#/subnet');
+  await expect(page.locator('.sb-item[data-page="trainers"]')).toHaveClass(/active/);
+  await expect(page.locator('.sb-item[data-page="trainers"]')).toHaveAttribute('aria-current', 'true');
+});
