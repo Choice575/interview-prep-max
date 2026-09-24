@@ -4,14 +4,14 @@
     "type": "yaml",
     "topic": "Docker",
     "title": "Почини Docker Compose — неверный отступ",
-    "scenario": "docker-compose up падает с ошибкой: 'services.web.ports must be a list'",
-    "code": "version: '3'\nservices:\n  web:\n    image: nginx:alpine\n    ports:\n      - \"80:80\"\n  db:\n  image: postgres:15\n    environment:\n      POSTGRES_PASSWORD: secret",
-    "bug": "У сервиса db неправильный отступ: image должен быть с отступом 4 пробела под db, а не на уровне db.",
+    "scenario": "docker compose up падает с ошибкой разбора YAML: «mapping values are not allowed here» в строке с environment",
+    "code": "services:\n  web:\n    image: nginx:alpine\n    ports:\n      - \"80:80\"\n  db:\n  image: postgres:15\n    environment:\n      POSTGRES_PASSWORD: secret",
+    "bug": "У сервиса db неправильный отступ: image стоит на уровне db, поэтому db остаётся пустым, а environment с бо́льшим отступом после скалярного значения ломает разбор YAML. image должен быть с отступом 4 пробела под db. Ключ version в Compose v2 не нужен и игнорируется.",
     "fix": "db:\n    image: postgres:15",
     "question": "В чём ошибка в docker-compose.yml?",
     "opts": [
       "Неверный отступ у image: db — должно быть на 2 пробела правее",
-      "version: '3' устарел — список в ports появился только со схемы 3.8",
+      "Не хватает ключа version верхнего уровня — без него compose не читает файл",
       "Значение \"80:80\" в кавычках compose читает как строку, а не как порт",
       "environment у db задан словарём, а compose ждёт список строк KEY=VAL"
     ],

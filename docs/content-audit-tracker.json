@@ -6978,13 +6978,17 @@
       "current": "ошибка «services.web.ports must be a list», а ответ — «неверный отступ у `image: db`»",
       "proposed": "ответ не соответствует сообщению: ошибка про `ports` у сервиса `web` (значение задано строкой, а не списком). Сам YAML на карточке потерян (склеен в строку)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000347",
           "file": "tasks/flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "В 15.11.16 сообщение в labs#1 и карточке 1000347 заменено реальной ошибкой разбора YAML (проверено PyYAML); из примера убран устаревший version, команда — docker compose.",
+      "sources": [
+        "https://docs.docker.com/reference/compose-file/version-and-name/"
       ]
     },
     {
@@ -10124,13 +10128,18 @@
       "current": "«Loki + Promtail», «Opsgenie» в списке инструментов",
       "proposed": "Promtail заменён Grafana Alloy; Opsgenie прекращает работу в апреле 2027 (C9)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000087",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "В 15.11.16 добавлены пометки о статусе: Promtail выведен из эксплуатации 2 марта 2026 года (замена — Grafana Alloy), доступ к Opsgenie заканчивается 5 апреля 2027 года.",
+      "sources": [
+        "https://grafana.com/docs/loki/latest/send-data/promtail/",
+        "https://www.atlassian.com/software/opsgenie/migration"
       ]
     },
     {
@@ -10146,13 +10155,18 @@
       "current": "«On-call интеграция в PagerDuty/Opsgenie»",
       "proposed": "то же",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000165",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "В 15.11.16 добавлены пометки о статусе: Promtail выведен из эксплуатации 2 марта 2026 года (замена — Grafana Alloy), доступ к Opsgenie заканчивается 5 апреля 2027 года.",
+      "sources": [
+        "https://grafana.com/docs/loki/latest/send-data/promtail/",
+        "https://www.atlassian.com/software/opsgenie/migration"
       ]
     },
     {
