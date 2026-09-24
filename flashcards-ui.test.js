@@ -205,7 +205,7 @@ test('resetting search restrictions keeps the query and selected deck', () => {
   controller.setFilter('collection', 'Linux и Bash');
   assert.match(host.innerHTML, /Найдено: <strong>0<\/strong>/);
   controller.resetFilters();
-  assert.deepEqual(controller.getState(), { deck: 'video', collection: 'all', mode: 'today', search: 'inode', revealed: false, index: 0 });
+  assert.deepEqual(controller.getState(), { deck: 'video', collection: 'all', mode: 'today', search: 'inode', revealed: false, index: 0, recalled: [] });
   assert.match(host.innerHTML, /Что такое inode/);
   assert.doesNotMatch(host.innerHTML, /Все категории и режимы/);
 });
@@ -241,4 +241,20 @@ test('copies of one concept collapse into one card and video repeats are counted
   assert.equal(cards[0].interviewCount, undefined, 'исходные карточки не меняются');
   const markup = FlashcardsUI.renderPage({ cards: collapsed, collection: 'all' });
   assert.match(markup, /Встречалось в 2 собеседованиях/);
+});
+
+test('long answers become two or three recall points that suggest a rating', () => {
+  const bankCard = { id: 1, collection: 'Ansible', question: 'Q', answer: 'Без агента; YAML вместо кода; Широкий охват. Команды: ansible --version. Важно: дрейф.' };
+  assert.deepEqual(FlashcardsUI.recallPoints(bankCard), ['Без агента', 'YAML вместо кода', 'Широкий охват']);
+  const long = { id: 2, collection: 'Linux и Bash', question: 'Q', answer: 'Первое предложение объясняет механизм подробно. Второе предложение показывает команду проверки. Третье предложение описывает частую ошибку новичков. Четвёртое уточняет исключения и связанные настройки ядра.' + ' Ещё подробности.'.repeat(4) };
+  assert.equal(FlashcardsUI.recallPoints(long).length, 3);
+  assert.deepEqual(FlashcardsUI.recallPoints({ answer: 'Короткий ответ.' }), []);
+  assert.equal(FlashcardsUI.suggestedOutcome(3, 3), 'pass');
+  assert.equal(FlashcardsUI.suggestedOutcome(1, 3), 'partial');
+  assert.equal(FlashcardsUI.suggestedOutcome(0, 3), 'fail');
+  const markup = FlashcardsUI.renderPage({ cards: [bankCard], mode: 'all', revealed: true, recalled: [0, 1] });
+  assert.match(markup, /Что вы вспомнили\?/);
+  assert.match(markup, /data-flashcards-recall="2"/);
+  assert.match(markup, /Вспомнили 2 из 3/);
+  assert.match(markup, /rate-suggested" data-flashcards-action="rate" data-outcome="partial"/);
 });
