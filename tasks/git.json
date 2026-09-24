@@ -88,12 +88,12 @@
     "task": "Временно сохранить текущие изменения с описанием 'WIP: fix auth bug'",
     "opts": [
       "git stash push -m 'WIP: fix auth bug'",
-      "git stash save 'WIP: fix auth bug'",
-      "git stash -m 'WIP: fix auth bug'",
-      "git stash --message 'WIP: fix auth bug'"
+      "git stash apply --index 'WIP: fix auth bug'",
+      "git commit -am 'WIP: fix auth bug'",
+      "git stash branch 'WIP: fix auth bug'"
     ],
     "answer": 0,
-    "exp": "git stash push -m 'message' — современный синтаксис. git stash save 'message' — устаревший, но тоже работает. -m задаёт описание для stash@{0}."
+    "exp": "git stash push -m 'message' сохраняет изменения с описанием в stash@{0}; устаревшая форма git stash save 'message' делает то же. git stash apply восстанавливает сохранённые изменения, git stash branch создаёт ветку из stash, а git commit -am фиксирует изменения в истории вместо временного сохранения."
   },
   {
     "id": 9,
@@ -136,12 +136,12 @@
     "task": "Узнать кто и в каком коммите изменил строку 42 файла src/auth.py",
     "opts": [
       "git blame -L 42,42 src/auth.py",
-      "git log -L 42,42:src/auth.py",
+      "git log -n 1 src/auth.py",
       "git show HEAD:src/auth.py | sed -n '42p'",
       "git diff HEAD~1 src/auth.py | grep -n 42"
     ],
     "answer": 0,
-    "exp": "git blame -L 42,42 file показывает автора, хэш коммита и дату для строки 42. git log -L тоже работает, но показывает историю изменений строки."
+    "exp": "git blame -L 42,42 file показывает автора, хэш коммита и дату для строки 42. Историю изменений этой строки даёт git log -L 42,42:file. git log -n 1 file покажет последний коммит, затронувший файл, но не обязательно строку 42."
   },
   {
     "id": 13,
@@ -196,12 +196,12 @@
     "task": "Создать аннотированный тег v2.0.0 с сообщением 'Release 2.0.0'",
     "opts": [
       "git tag -a v2.0.0 -m 'Release 2.0.0'",
-      "git tag v2.0.0 -m 'Release 2.0.0'",
+      "git tag v2.0.0 'Release 2.0.0'",
       "git tag --annotate v2.0.0 'Release 2.0.0'",
       "git tag -s v2.0.0 -m 'Release 2.0.0'"
     ],
     "answer": 0,
-    "exp": "git tag -a создаёт аннотированный тег с метаданными (автор, дата, сообщение). Без -a создаётся lightweight тег. -s создаёт подписанный тег (GPG). Аннотированные теги предпочтительны для релизов."
+    "exp": "git tag -a создаёт аннотированный тег с метаданными (автор, дата, сообщение); -m без -a тоже создаёт аннотированный тег. Без -a и -m создаётся lightweight тег, а второй аргумент git tag трактуется как коммит, на который указывает тег, поэтому 'Release 2.0.0' вызовет ошибку. -s создаёт подписанный тег и требует ключа GPG. Аннотированные теги предпочтительны для релизов."
   },
   {
     "id": 18,
