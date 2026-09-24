@@ -521,7 +521,7 @@
         "Bad permissions. Try chmod 600 ~/.ssh/prod_key",
         "Permission denied (publickey).",
         "$ ls -l ~/.ssh/prod_key",
-        "-rw-r--r-- 1 mikhail mikhail 3381 Jul 20 12:00 /home/mikhail/.ssh/prod_key"
+        "-rw-r--r-- 1 user user 3381 Jul 20 12:00 /home/user/.ssh/prod_key"
       ],
       "task": "Объясни причину отказа SSH и безопасное исправление.",
       "expectedActions": [

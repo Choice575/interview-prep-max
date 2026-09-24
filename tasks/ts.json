@@ -149,7 +149,14 @@
       },
       "reboot": {
         "obs": "Перезагрузка не поможет исправить баг в коде. Проблема вернётся.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "start",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "wrong_check": {
         "obs": "htop показывает ресурсы, но не объясняет 502. Нужны логи.",
@@ -230,7 +237,14 @@
       },
       "delete_logs": {
         "obs": "Удаление логов не поможет — проблема в heap size.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "journalctl_check",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       }
     }
   },
@@ -333,7 +347,14 @@
       },
       "rm_all_logs": {
         "obs": "ОПАСНО: Вы удалили системные и security логи. Невозможно расследовать инциденты.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "start",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "reboot_bad": {
         "obs": "После перезагрузки диск снова заполнится — причина не устранена.",
@@ -403,7 +424,14 @@
       },
       "kill_process": {
         "obs": "Убийство процесса освободит блоки, но сервис упадёт. Лучше truncate.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "find_file",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "mv_file": {
         "obs": "mv в той же ФС не освобождает блоки немедленно.",
@@ -517,7 +545,14 @@
       },
       "chmod_644": {
         "obs": "chmod 644 (rw-r--r--) тоже решит проблему, но откроет конфиг всем пользователям; безопаснее группа сервиса и 640.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "check_perms",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "restart_failed": {
         "obs": "Перезапуск не поможет — причина не устранена. Нужна диагностика.",
@@ -554,7 +589,14 @@
       },
       "chmod_777": {
         "obs": "777 — грубое нарушение безопасности. Для конфигов с паролями это критично.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "journal_check",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "chown_root": {
         "obs": "root уже владелец. Проблема в том, что сервис запускается не от root.",
@@ -580,7 +622,14 @@
       },
       "add_to_root": {
         "obs": "Добавление в группу root — избыточные привилегии.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "check_perms",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       }
     }
   },
@@ -694,7 +743,14 @@
       },
       "delete_dynamo": {
         "obs": "Удалять DynamoDB запись напрямую — опасно. Используйте terraform force-unlock.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "start",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "delete_lockfile": {
         "obs": "Файл .terraform.tfstate.lock.info бывает только у локального бэкенда; здесь lock в DynamoDB. С Terraform 1.11 S3-бэкенд блокирует и сам (use_lockfile = true), а DynamoDB для блокировок объявлен устаревшим.",
@@ -731,15 +787,36 @@
       },
       "guess_id": {
         "obs": "Lock ID — UUID, угадать невозможно.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "check_active",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "wrong_delete": {
         "obs": "Удаление .terraform не снимает lock.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "get_lock_id",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "wrong_backend": {
         "obs": "Смена backend потребует migrate-state и не решит проблему.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "get_lock_id",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       }
     }
   },
@@ -853,7 +930,14 @@
       },
       "kill_all": {
         "obs": "kill -9 -1 убьёт ВСЕ процессы включая systemd. Это катастрофа.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "start",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "iotop_check": {
         "obs": "iotop показывает нормальный I/O. Проблема в CPU. top покажет что именно.",
@@ -901,11 +985,25 @@
       },
       "add_swap2": {
         "obs": "Swap не поможет при CPU GC thrashing. Нужно исправить heap size.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "jstack_check",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "update_jvm": {
         "obs": "Обновление JVM займёт время и вряд ли поможет при утечке памяти.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "jstack_check",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       }
     }
   },
@@ -1051,7 +1149,14 @@
       },
       "recreate_vms": {
         "obs": "Пересоздание ВМ займёт часы и не нужно. Просто обновите known_hosts.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "ssh_test",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       }
     }
   },
@@ -1209,11 +1314,25 @@
       },
       "wrong_probe": {
         "obs": "livenessProbe не поможет при OOMKilled — это системное завершение процесса ядром Linux из-за нехватки памяти.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "describe_pod",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "restart_node": {
         "obs": "Перезапуск node не решит проблему недостаточного memory limit. Pod снова получит OOMKilled.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "check_logs",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "remove_limits": {
         "obs": "Отсутствие лимитов опасно — pod может потребить всю память node и вызвать OOMKill других pods.",
@@ -1415,7 +1534,14 @@
       },
       "wrong_tags": {
         "obs": "Теги pipeline и runner должны совпадать, но здесь проблема в аутентификации, не в тегах.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "start_runner",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       }
     }
   },
@@ -1523,7 +1649,14 @@
       },
       "restart_redis": {
         "obs": "Перезапуск Redis без persistence (RDB/AOF) приведёт к потере ВСЕХ данных. Категорически опасно.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "start",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "check_logs": {
         "obs": "Логи Redis: '# Accepted client connection'. Мало информации. INFO memory даст больше.",
@@ -1560,7 +1693,14 @@
       },
       "flush_all": {
         "obs": "FLUSHALL удалил все данные из Redis. Приложение получит nil на все запросы до прогрева кэша. Катастрофа без решения первопричины.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "check_memory",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "wrong_restart": {
         "obs": "CONFIG SET применяется немедленно без перезапуска. Перезапуск сбросит значение если конфиг-файл не обновлён.",
@@ -1773,7 +1913,14 @@
       },
       "host_network": {
         "obs": "--network=host обходит изоляцию Docker сети. Это небезопасно и не решает корневую проблему для остальных контейнеров.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "check_ip_forward",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       }
     }
   },
@@ -1971,7 +2118,14 @@
       },
       "wrong_policy": {
         "obs": "imagePullPolicy: Never заставит Kubernetes искать образ локально — на worker node образа нет. Pod не запустится.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "check_secret",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "restart_without_secret": {
         "obs": "Rollout restart без imagePullSecrets снова получит ошибку авторизации.",
@@ -1986,7 +2140,14 @@
       },
       "wrong_annotation": {
         "obs": "imagePullSecrets — это поле spec, не annotation. Аннотация не повлияет на pull credentials.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "create_secret",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       }
     }
   },
@@ -2129,7 +2290,14 @@
       },
       "reboot_server": {
         "obs": "Перезагрузка прервёт все операции и может повредить данные PostgreSQL. Причина не устранена.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "start",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "lsof_device": {
         "obs": "lsof | grep sda показывает много процессов, но не ранжирует по I/O активности. iotop нагляднее.",
@@ -2166,7 +2334,14 @@
       },
       "kill_postgres": {
         "obs": "Убийство PostgreSQL kill -9 вызовет crash recovery при следующем запуске и прервёт все транзакции. Катастрофа.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "iotop_check",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "pg_stat": {
         "obs": "pg_stat_activity показывает активный COPY FROM запрос — массовый импорт. Источник I/O найден.",
@@ -2192,7 +2367,14 @@
       },
       "sync_off": {
         "obs": "synchronous_commit=off снижает I/O но при сбое можно потерять последние транзакции. Не подходит для production данных.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "lsof_process",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       },
       "ionice_fix": {
         "obs": "ionice снижает приоритет, но не устраняет причину аномального WAL generation. Другие процессы будут тормозить.",
@@ -2207,7 +2389,14 @@
       },
       "dirty_ratio": {
         "obs": "vm.dirty_ratio увеличивает буферизацию записи, но при PostgreSQL с fsync это не даёт эффекта — Postgres управляет fsync сам.",
-        "choices": []
+        "choices": [
+          {
+            "text": "↩ Вернуться к предыдущему шагу",
+            "next": "lsof_process",
+            "pts": 0,
+            "ok": false
+          }
+        ]
       }
     }
   }

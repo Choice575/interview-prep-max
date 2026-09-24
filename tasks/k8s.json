@@ -29,7 +29,7 @@
   },
   {
     "id": 3,
-    "title": "ConfigMap: строка вместо файла",
+    "title": "Пароль в ConfigMap",
     "code": "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: app-config\ndata:\n  config.yaml: |\n    server:\n      port: 8080\n      host: 0.0.0.0\n  DB_PASSWORD: supersecret",
     "bug": "Пароль БД в открытом виде в ConfigMap! ConfigMap — не для секретов. Любой с доступом к namespace видит пароль.",
     "fix": "Использовать Secret вместо ConfigMap:\napiVersion: v1\nkind: Secret\nmetadata:\n  name: db-credentials\ntype: Opaque\nstringData:\n  DB_PASSWORD: supersecret",

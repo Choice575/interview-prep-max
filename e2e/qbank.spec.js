@@ -38,7 +38,7 @@ test('открывается по прямой ссылке и показыва�
   const categories = Number(await page.locator('#qbank-category-count').textContent());
   const questions = Number(await page.locator('#qbank-question-count').textContent());
   expect(categories).toBe(11);
-  expect(questions).toBe(331);
+  expect(questions).toBe(333);
 
   // Помимо 11 категорий есть общий список «Все вопросы».
   await expect(page.locator('#qbank-tabs [role="tab"]')).toHaveCount(categories + 1);
@@ -110,7 +110,7 @@ test('поиск сужает список, а пустой результат �
 
   // Сброс поиска возвращает полный список.
   await page.locator('#qbank-search').fill('');
-  await expect.poll(() => page.locator('#qbank-panel .qbank-item').count()).toBe(331);
+  await expect.poll(() => page.locator('#qbank-panel .qbank-item').count()).toBe(333);
 });
 
 test('фильтр по уровню оставляет только вопросы этого уровня', async ({ page }) => {
@@ -150,7 +150,7 @@ test('старые категории сохраняют контекст, по�
   });
   await page.goto('/#/qbank');
   await expect(page.locator('#qbank-tab-kubernetes')).toHaveAttribute('aria-selected', 'true');
-  await expect(page.locator('#qbank-panel .qbank-item')).toHaveCount(55);
+  await expect(page.locator('#qbank-panel .qbank-item')).toHaveCount(56);
   const search = page.locator('#qbank-search');
   await search.pressSequentially('Swfuse');
   await expect(search).toBeFocused();

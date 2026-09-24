@@ -321,7 +321,7 @@
       "docker system prune"
     ],
     "answer": 0,
-    "exp": "docker system prune -a удаляет: остановленные контейнеры, неиспользуемые сети, dangling образы И все образа без контейнеров (-a). Без -a удаляет только dangling (без тега) образы. Также удаляет build cache."
+    "exp": "docker system prune -a удаляет: остановленные контейнеры, неиспользуемые сети, dangling образы И все образы без контейнеров (-a). Без -a удаляет только dangling (без тега) образы. Также удаляет build cache."
   },
   {
     "id": 28,
@@ -465,7 +465,7 @@
       "kubectl tunnel api-pod --local=9090 --remote=8080"
     ],
     "answer": 0,
-    "exp": "kubectl port-forward <resource> <local_port>:<remote_port>. Порядок: сначала локальный порт, потом порт в pod. Работает и для service/deployment. Создаёт туннель через API server — не для нагрузки рабочей среды (production)."
+    "exp": "kubectl port-forward <resource> <local_port>:<remote_port>. Порядок: сначала локальный порт, потом порт в pod. Работает и для service/deployment. Создаёт туннель через API server — для отладки, а не для рабочей нагрузки."
   },
   {
     "id": 40,
