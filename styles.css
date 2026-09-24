@@ -457,6 +457,7 @@ button.study-recommendation{cursor:pointer}.study-recommendation:hover{border-co
 .study-weekly-test>.study-actions{padding:0 18px 18px}
 .study-evidence{font-family:ui-monospace,'Cascadia Code','Source Code Pro',Menlo,Consolas,monospace;font-size:12px;white-space:pre-wrap;background:#0d1117;color:#e6edf3;border:1px solid var(--border);border-radius:8px;padding:12px;line-height:1.6;overflow-x:auto}
 [data-theme="light"] .study-evidence{background:#f6f8fa;color:#24292f}
+.study-card-code{margin:0 0 14px}
 .study-case-actions,.study-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 
 /* Home page */

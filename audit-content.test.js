@@ -33,13 +33,17 @@ test('study flashcards copied from exam questions start with the keyed answer, n
   const mismatches = [];
   cards.forEach(card => {
     (byQuestion.get(card.question.trim()) || []).forEach(question => {
-      const answer = normalize(card.answer);
+      // С 15.11.18 верный вариант лежит в shortAnswer, а answer — только объяснение (аудит C5).
+      const answer = normalize(card.shortAnswer || card.answer);
       if (answer.startsWith(normalize(question.options[question.answer]))) return;
       const distractor = question.options.findIndex((option, index) => index !== question.answer && answer.startsWith(normalize(option)));
       if (distractor !== -1) mismatches.push(`${card.id} ← #${question.id}`);
     });
   });
   assert.deepEqual(mismatches, []);
+  const doubled = cards.filter(card => card.shortAnswer && card.answer.trim().startsWith(card.shortAnswer.trim()));
+  assert.deepEqual(doubled.map(card => card.id), [], 'объяснение не должно повторять краткий ответ');
+  assert.ok(cards.filter(card => card.shortAnswer).length >= 800);
 });
 
 test('explanation-vs-key gate flags a shuffled Terraform key and only reviewed IDs pass today', () => {
@@ -138,17 +142,26 @@ test('template and rubric flashcards and empty senior cases are flagged as gener
   assert.equal(cases.filter(item => item.generated).length, 17);
 });
 
-test('practice cards built from bug-hunt trainers stay in sync with their source tasks', () => {
-  const flat = text => String(text).replace(/\s+/g, ' ').trim();
+test('practice cards keep trainer and lab code as a multi-line block in sync with their sources', () => {
   const cards = require('./tasks/flashcards.json').cards.filter(card => card.question.startsWith('[Практика] '));
-  const sources = ['ansible_pb', 'code', 'k8s', 'dockerfile'].flatMap(file => require(`./tasks/${file}.json`));
-  let linked = 0;
+  const trainers = ['ansible_pb', 'code', 'k8s', 'dockerfile'].flatMap(file => require(`./tasks/${file}.json`));
+  const labs = require('./tasks/labs.json');
   for (const card of cards) {
-    const task = sources.find(item => card.question.startsWith(`[Практика] ${flat(item.code)} — `));
-    if (!task) continue;
-    linked++;
-    assert.equal(card.question, `[Практика] ${flat(task.code)} — ${task.task || task.title}`, `${card.id}`);
-    assert.equal(card.answer, `${task.opts[task.answer]}. ${flat(task.fix)}`, `${card.id}`);
+    assert.ok(card.code, `${card.id}: нет code`);
+    const task = trainers.find(item => item.code === card.code) || labs.find(item => item.code === card.code);
+    assert.ok(task, `${card.id}: код не совпадает ни с одним заданием`);
+    const question = task.scenario ? `[Практика] ${task.scenario} — ${task.question}` : `[Практика] ${task.task || task.title}`;
+    assert.equal(card.question, question, `${card.id}`);
+    assert.equal(card.answer, `${task.opts[task.answer]}. ${task.fix}`, `${card.id}`);
   }
-  assert.ok(linked >= 42, `связанных карточек ${linked}`);
+  assert.equal(cards.length, 60);
+});
+
+test('incident cards separate the scenario from the step and carry the command output', () => {
+  const cards = require('./tasks/flashcards.json').cards.filter(card => card.question.startsWith('[Инцидент: '));
+  const incidents = require('./tasks/incidents.json');
+  assert.equal(cards.length, 44);
+  for (const card of cards) assert.match(card.question, / Сейчас: .+\. — /, `${card.id}`);
+  const withEvidence = incidents.flatMap(item => item.phases).filter(phase => phase.evidence).length;
+  assert.equal(cards.filter(card => card.code && card.code.startsWith('$ ')).length, withEvidence);
 });

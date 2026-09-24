@@ -189,3 +189,12 @@ test('resetting search restrictions keeps the query and selected deck', () => {
   assert.match(host.innerHTML, /Что такое inode/);
   assert.doesNotMatch(host.innerHTML, /Все категории и режимы/);
 });
+
+test('shows card code as an escaped multi-line block and finds cards by it', () => {
+  const practice = [{ id: 1000343, collection: 'Docker и реестры образов', question: '[Практика] Найдите ошибку', code: 'FROM python:3.11-slim\nCOPY . .\n<script>', answer: 'Порядок слоёв.' }];
+  const markup = FlashcardsUI.renderPage({ decks: [{ id: 'study', label: 'Учебная программа', cards: practice }], deck: 'study', progress: {}, now: 100 });
+  assert.match(markup, /<pre class="study-evidence study-card-code"[^>]*>FROM python:3\.11-slim\nCOPY \. \.\n&lt;script&gt;<\/pre>/);
+  assert.equal(FlashcardsUI.filterCards(practice, { search: 'copy . .' }).length, 1);
+  const plain = FlashcardsUI.renderPage({ decks, deck: 'study', progress: {}, now: 100 });
+  assert.doesNotMatch(plain, /study-card-code/);
+});
