@@ -14,6 +14,8 @@ function upsert(list, item, textField) {
   if (list.some(existing => existing.id !== item.id && normalize(existing[textField]) === normalize(item[textField]))) {
     throw new Error(`Duplicate question: ${item.id}`);
   }
+  // conceptId выдаёт scripts/assign-concepts.js; импорт не должен его стирать.
+  if (index >= 0 && list[index].conceptId && !item.conceptId) item = { ...item, conceptId: list[index].conceptId };
   if (index < 0) list.push(item);
   else list[index] = item;
 }

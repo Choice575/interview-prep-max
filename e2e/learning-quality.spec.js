@@ -12,7 +12,7 @@ test.beforeEach(async ({page}) => {
 
 test('template practice deck is hidden without dropping its stored progress', async ({page}) => {
   await page.goto('/#/flashcards');
-  await expect(page.locator('[data-deck="study"] strong')).toHaveText('2330');
+  await expect(page.locator('[data-deck="study"] strong')).toHaveText('2089');
   await expect(page.locator('[data-deck="practice"]')).toHaveCount(0);
   await expect(page.locator('[data-deck="video"]')).toBeVisible();
   await page.locator('[data-flashcards-filter="search"]').fill('Дан вывод для');
@@ -84,4 +84,20 @@ test('failed recovery backup keeps the original record and the unsaved answer in
   await expect(page.locator('#evidence-error')).toBeVisible();
   await expect(page.locator('#evidence-text')).toHaveValue('Этот ответ должен остаться в форме.');
   expect(await page.evaluate(() => localStorage.getItem('external_tasks_completed'))).toBe('{keep-original');
+});
+
+test('an exam answer moves the schedule of the same concept in flashcards', async ({page}) => {
+  await page.addInitScript(() => {
+    if(sessionStorage.getItem('concept-seeded')) return;
+    sessionStorage.setItem('concept-seeded','true');
+    localStorage.setItem('ipmax_qprog',JSON.stringify({286:{correct:3,wrong:0,lastSeen:Date.now()-1000,repetitions:3,interval:8,ease:2.7,nextReviewAt:Date.now()+8*86400000}}));
+  });
+  await page.goto('/#/flashcards');
+  await page.locator('[data-flashcards-action="mode"][data-mode="known"]').click();
+  await expect(page.locator('.study-card')).toHaveAttribute('data-card-id','1001245');
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_qprog')));
+  expect(stored['1001245'].repetitions).toBe(3);
+  expect(stored['1001245'].nextReviewAt).toBe(stored['286'].nextReviewAt);
+  expect(stored['1001245'].correct).toBeUndefined();
+  expect(stored['286'].correct).toBe(3);
 });

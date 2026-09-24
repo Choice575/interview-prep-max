@@ -109,6 +109,71 @@
 
   function isSkillEvent(value) { return !!normaliseEvent(value, Date.now()); }
 
+  // Один вопрос живёт в тесте, банке и карточках под разными id (аудит B3). Общий
+  // conceptId связывает копии, а расписание SM-2 у них одно: ответ в любом режиме
+  // переносит интервал на все копии. Счётчики correct/wrong остаются у каждой копии.
+  const SCHEDULE_FIELDS = ['ease', 'interval', 'repetitions', 'nextReviewAt', 'lastSeen'];
+
+  function buildConceptIndex(lists) {
+    const members = new Map();
+    const conceptOf = new Map();
+    (Array.isArray(lists) ? lists : []).forEach(list => (Array.isArray(list) ? list : []).forEach(item => {
+      if (!item || typeof item.conceptId !== 'string' || !item.conceptId || item.id === undefined || item.id === null) return;
+      const id = String(item.id);
+      if (!/^\d+$/.test(id)) return;
+      conceptOf.set(id, item.conceptId);
+      if (!members.has(item.conceptId)) members.set(item.conceptId, []);
+      if (!members.get(item.conceptId).includes(id)) members.get(item.conceptId).push(id);
+    }));
+    return {
+      size: members.size,
+      siblings(id) {
+        const concept = conceptOf.get(String(id));
+        return concept ? members.get(concept).filter(member => member !== String(id)) : [];
+      },
+      groups() { return [...members.values()].filter(group => group.length > 1); }
+    };
+  }
+
+  function scheduleOf(record) {
+    const out = {};
+    SCHEDULE_FIELDS.forEach(key => { if (Number.isFinite(record[key])) out[key] = record[key]; });
+    return out;
+  }
+
+  function shareConceptSchedule(progress, questionId, siblingIds) {
+    const source = progress && progress[questionId];
+    if (!source || typeof source !== 'object' || !Array.isArray(siblingIds) || !siblingIds.length) return progress;
+    const next = cloneProgress(progress);
+    const schedule = scheduleOf(source);
+    siblingIds.forEach(id => {
+      const current = next[id] && typeof next[id] === 'object' ? next[id] : {};
+      next[id] = { ...current, ...schedule };
+    });
+    return next;
+  }
+
+  // Разовое выравнивание накопленного прогресса: у копий понятия берём расписание
+  // самой свежей записи. Повторный вызов ничего не меняет.
+  function alignConceptProgress(progress, index) {
+    let next = progress;
+    let changed = 0;
+    if (!progress || typeof progress !== 'object' || !index || typeof index.groups !== 'function') return { progress, changed };
+    index.groups().forEach(group => {
+      const seen = group.filter(id => progress[id] && Number.isFinite(progress[id].lastSeen) && progress[id].lastSeen > 0);
+      if (!seen.length) return;
+      const latest = seen.reduce((best, id) => progress[id].lastSeen > progress[best].lastSeen ? id : best, seen[0]);
+      const schedule = scheduleOf(progress[latest]);
+      const stale = group.filter(id => id !== latest && Object.keys(schedule).some(key => (progress[id] || {})[key] !== schedule[key]));
+      if (!stale.length) return;
+      if (next === progress) next = cloneProgress(progress);
+      stale.forEach(id => { next[id] = { ...(next[id] || {}), ...schedule }; });
+      changed += stale.length;
+    });
+    return { progress: next, changed };
+  }
+
   return { recordQuestionAttempt, appendSkillEvent, isSkillEvent, scoreFor, EVENT_LIMIT,
-    pruneDailyCounters, dailyNeedsPruning, DAILY_RETENTION_DAYS };
+    pruneDailyCounters, dailyNeedsPruning, DAILY_RETENTION_DAYS,
+    buildConceptIndex, shareConceptSchedule, alignConceptProgress };
 });

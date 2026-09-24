@@ -16,7 +16,7 @@ test('finds Swfuse additions in all three modes, reveals answers and preserves e
   await page.locator('[data-page="flashcards"]').click();
   const search = page.locator('[data-flashcards-filter="search"]');
   await search.fill('Swfuse');
-  await expect(page.locator('.study-card-meta')).toContainText('1 / 60');
+  await expect(page.locator('.study-card-meta')).toContainText('1 / 54');
   await expect(page.locator('.study-card-source a')).toHaveAttribute('href', source);
   await search.fill('Kata Containers');
   await page.locator('[data-flashcards-action="reveal"]').click();
@@ -37,7 +37,7 @@ test('finds Swfuse additions in all three modes, reveals answers and preserves e
   expect(progress['15007'].correct).toBe(1);
 });
 
-test('search finds all 60 Swfuse cards after a category was selected and can clear review restrictions', async ({ page }) => {
+test('search finds all visible Swfuse cards after a category was selected and can clear review restrictions', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('ipmax_onboarding_complete', 'true');
     localStorage.setItem('ipmax_onboarding', JSON.stringify({ role: 'SRE', level: 'Middle', completedAt: '2026-09-21T00:00:00Z' }));
@@ -50,22 +50,22 @@ test('search finds all 60 Swfuse cards after a category was selected and can cle
   await search.pressSequentially('Swfuse');
   await expect(search).toBeFocused();
   await expect(page.locator('[data-collection="all"]')).toHaveAttribute('aria-pressed', 'true');
-  await expect(results).toContainText('Найдено: 60 из 2330');
-  await expect(page.locator('.study-card-meta')).toContainText('1 / 60');
+  await expect(results).toContainText('Найдено: 54 из 2089');
+  await expect(page.locator('.study-card-meta')).toContainText('1 / 54');
   // Narrowing after search is intentional and its scope is visible.
   await network.click();
-  await expect(results).toContainText('Найдено: 9 из 2330');
+  await expect(results).toContainText('Найдено: 8 из 2089');
   await expect(results).toContainText('Сети и протоколы');
   await page.locator('[data-flashcards-action="mode"][data-mode="known"]').click();
-  await expect(results).toContainText('Найдено: 0 из 2330');
+  await expect(results).toContainText('Найдено: 0 из 2089');
   await expect(results).toContainText('Знаю');
   await page.getByRole('button', { name: 'Все категории и режимы', exact: true }).click();
   await expect(search).toHaveValue('Swfuse');
   await expect(search).toBeFocused();
-  await expect(results).toContainText('Найдено: 60 из 2330');
+  await expect(results).toContainText('Найдено: 54 из 2089');
   await page.setViewportSize({ width: 375, height: 812 });
   await network.click();
   await page.getByRole('button', { name: 'Все категории и режимы', exact: true }).click();
-  await expect(results).toContainText('Найдено: 60 из 2330');
+  await expect(results).toContainText('Найдено: 54 из 2089');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

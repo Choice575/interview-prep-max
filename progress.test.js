@@ -88,3 +88,39 @@ test('daily pruning reports whether anything changed', () => {
   assert.equal(progress.dailyNeedsPruning({ ...clean, '2020-01-01': 1 }, now, 30), true);
   assert.equal(progress.dailyNeedsPruning(null, now, 30), false);
 });
+
+test('copies of one concept share the SM-2 schedule but keep their own counters', () => {
+  const index = progress.buildConceptIndex([
+    [{ id: 286, conceptId: 'c0001' }, { id: 7, conceptId: 'c0002' }],
+    [{ id: 1001245, conceptId: 'c0001' }, { id: 1000009 }],
+    [{ id: 2000001, conceptId: 'c0001' }, { id: 'qb_lx_001', conceptId: 'c0001' }]
+  ]);
+  assert.deepEqual(index.siblings(286), ['1001245', '2000001']);
+  assert.deepEqual(index.siblings(1000009), []);
+  const start = { 1001245: { correct: 4, wrong: 1, repetitions: 5, interval: 30, ease: 2.8, lastSeen: 1, nextReviewAt: 2 } };
+  const attempt = progress.recordQuestionAttempt(start, 286, { outcome: 'fail', now: 1000 });
+  const shared = progress.shareConceptSchedule(attempt.progress, '286', index.siblings(286));
+  assert.equal(shared[1001245].repetitions, 0);
+  assert.equal(shared[1001245].nextReviewAt, shared[286].nextReviewAt);
+  assert.equal(shared[1001245].correct, 4, 'счётчики копии не перезаписываются');
+  assert.equal(shared[2000001].interval, 1);
+  assert.equal(start[1001245].repetitions, 5, 'исходный объект не меняется');
+});
+
+test('alignment copies the freshest schedule to stale concept copies once', () => {
+  const index = progress.buildConceptIndex([[{ id: 1, conceptId: 'c1' }, { id: 2, conceptId: 'c1' }, { id: 3, conceptId: 'c1' }, { id: 4 }]]);
+  const input = {
+    1: { lastSeen: 10, repetitions: 1, interval: 1, ease: 2.5, nextReviewAt: 20, correct: 1 },
+    2: { lastSeen: 50, repetitions: 3, interval: 8, ease: 2.7, nextReviewAt: 90, correct: 3 },
+    4: { lastSeen: 70, repetitions: 1 }
+  };
+  const first = progress.alignConceptProgress(input, index);
+  assert.equal(first.changed, 2);
+  assert.equal(first.progress[1].repetitions, 3);
+  assert.equal(first.progress[1].correct, 1);
+  assert.equal(first.progress[3].nextReviewAt, 90);
+  assert.equal(first.progress[4].repetitions, 1);
+  const second = progress.alignConceptProgress(first.progress, index);
+  assert.equal(second.changed, 0);
+  assert.equal(second.progress, first.progress);
+});

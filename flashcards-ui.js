@@ -169,7 +169,7 @@
       : '<button type="button" class="btn btn-primary" data-flashcards-action="reveal">Показать ответ</button>';
 
     return deckSwitch + stats + controls + '<article class="study-card" data-card-id="' + escapeText(card.id) + '">' +
-      '<div class="study-card-meta"><span>' + escapeText(card.collection) + (card.depth === 'deep' ? ' <span class="tag tag-deep">Глубокое погружение</span>' : '') + '</span><span>' + (index + 1) + ' / ' + filtered.length + '</span></div>' +
+      '<div class="study-card-meta"><span>' + escapeText(card.collection) + (card.depth === 'deep' ? ' <span class="tag tag-deep">Глубокое погружение</span>' : '') + (Number(card.interviewCount) > 1 ? ' <span class="tag tag-freq">Встречалось в ' + Number(card.interviewCount) + ' собеседованиях</span>' : '') + '</span><span>' + (index + 1) + ' / ' + filtered.length + '</span></div>' +
       '<h2>' + escapeText(card.question) + '</h2>' + code + source + answer +
       '<div class="study-card-nav"><button type="button" class="btn btn-quiet" data-flashcards-action="prev"' + (index === 0 ? ' disabled' : '') + '>← Предыдущая</button>' +
       '<button type="button" class="btn btn-quiet" data-flashcards-action="next"' + (index >= filtered.length - 1 ? ' disabled' : '') + '>Следующая →</button></div></article>';
@@ -302,5 +302,27 @@
     return { render, reveal, rate, next: () => move(1), prev: () => move(-1), setFilter, resetFilters, setDeck, getState: () => ({ ...state }) };
   }
 
-  return { cardState, isDue, filterCards, summarizeCards, normalizeDecks, renderPage, create };
+  // Копии одного понятия (conceptId, аудит B3 и C6) показываются одной карточкой; прогресс у копий общий.
+  // Для видеоколоды считаем, в скольких разных собеседованиях встречался вопрос (аудит B11).
+  function collapseConcepts(cards) {
+    const list = Array.isArray(cards) ? cards : [];
+    const videos = new Map();
+    list.forEach(card => {
+      if (!card || !card.conceptId || !card.videoId) return;
+      if (!videos.has(card.conceptId)) videos.set(card.conceptId, new Set());
+      videos.get(card.conceptId).add(card.videoId);
+    });
+    const seen = new Set();
+    const out = [];
+    list.forEach(card => {
+      if (!card || !card.conceptId) { out.push(card); return; }
+      if (seen.has(card.conceptId)) return;
+      seen.add(card.conceptId);
+      const count = videos.has(card.conceptId) ? videos.get(card.conceptId).size : 0;
+      out.push(count > 1 ? { ...card, interviewCount: count } : card);
+    });
+    return out;
+  }
+
+  return { cardState, isDue, filterCards, summarizeCards, normalizeDecks, renderPage, create, collapseConcepts };
 });

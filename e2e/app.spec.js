@@ -135,20 +135,20 @@ test('keeps curriculum and video flashcards as separate visible decks', async ({
   await page.locator('[data-page="flashcards"]').click();
 
   await expect(page.locator('#page-flashcards')).toHaveClass(/active/);
-  await expect(page.locator('#sb-flashcards-count')).toHaveText('2659');
+  await expect(page.locator('#sb-flashcards-count')).toHaveText('2366');
   const studyDeck = page.locator('[data-flashcards-action="deck"][data-deck="study"]');
   const videoDeck = page.locator('[data-flashcards-action="deck"][data-deck="video"]');
   await expect(studyDeck).toContainText('Учебная программа');
-  await expect(studyDeck.locator('strong')).toHaveText('2330');
+  await expect(studyDeck.locator('strong')).toHaveText('2089');
   await expect(videoDeck).toContainText('Собеседования из видео');
-  await expect(videoDeck.locator('strong')).toHaveText('329');
+  await expect(videoDeck.locator('strong')).toHaveText('277');
   await expect(page.locator('.study-card').first()).toHaveAttribute('data-card-id', '1000001');
 
   await videoDeck.click();
   await expect(videoDeck).toHaveClass(/active/);
   await expect(page.locator('.study-card').first()).toHaveAttribute('data-card-id', '2000001');
   await expect(page.locator('.study-card-source a')).toHaveAttribute('href', /vkvideo\.ru/);
-  await expect(page.locator('.flashcards-stats')).toContainText('329 всего');
+  await expect(page.locator('.flashcards-stats')).toContainText('277 всего');
 
   await studyDeck.click();
   await expect(page.locator('.study-card').first()).toHaveAttribute('data-card-id', '1000001');
@@ -1136,7 +1136,7 @@ test('flat flashcard categories preserve progress, filter independently and keep
   await page.locator('[data-page="flashcards"]').click();
   const categories = page.getByRole('group', { name: 'Категории карточек' });
   await expect(categories.getByRole('button')).toHaveCount(15);
-  const linux = categories.getByRole('button', { name: 'Linux и Bash 363', exact: true });
+  const linux = categories.getByRole('button', { name: 'Linux и Bash 330', exact: true });
   await linux.click();
   await expect(linux).toHaveAttribute('aria-pressed', 'true');
   await expect(linux).toBeFocused();
@@ -1148,20 +1148,20 @@ test('flat flashcard categories preserve progress, filter independently and keep
   await expect(search).toHaveValue('несуществующий вопрос');
   await expect(search).toBeFocused();
   await expect(page.locator('#flashcards-host .empty-state')).toBeVisible();
-  await expect(linux.locator('strong')).toHaveText('363');
+  await expect(linux.locator('strong')).toHaveText('330');
   await search.fill('');
   await page.locator('[data-flashcards-action="mode"][data-mode="all"]').click();
-  await categories.getByRole('button', { name: 'Docker и реестры образов 123', exact: true }).click();
+  await categories.getByRole('button', { name: 'Docker и реестры образов 106', exact: true }).click();
   await expect(page.locator('.study-card-meta')).toContainText('Docker и реестры образов');
-  await expect(page.locator('.study-card-meta')).toContainText('1 / 123');
+  await expect(page.locator('.study-card-meta')).toContainText('1 / 106');
   await page.locator('[data-flashcards-action="deck"][data-deck="video"]').click();
   await expect(categories.getByRole('button')).toHaveCount(13);
-  await expect(categories.getByRole('button', { name: 'Все категории 329', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(categories.getByRole('button', { name: 'Все категории 277', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.study-card')).toHaveAttribute('data-card-id', '2000001');
   expect((await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_qprog'))))['1000984'].repetitions).toBe(2);
 
   await page.setViewportSize({ width: 375, height: 812 });
-  await categories.getByRole('button', { name: 'Docker и реестры образов 22', exact: true }).click();
-  await expect(page.locator('.study-card-meta')).toContainText('1 / 22');
+  await categories.getByRole('button', { name: 'Docker и реестры образов 17', exact: true }).click();
+  await expect(page.locator('.study-card-meta')).toContainText('1 / 17');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

@@ -205,3 +205,20 @@ test('marks deep-dive cards with a badge', () => {
   assert.match(markup, /tag-deep">Глубокое погружение</);
   assert.doesNotMatch(FlashcardsUI.renderPage({ decks, deck: 'study', progress: {}, now: 100 }), /tag-deep/);
 });
+
+test('copies of one concept collapse into one card and video repeats are counted', () => {
+  const cards = [
+    { id: 2000001, conceptId: 'c1', videoId: 'a', collection: 'Kubernetes', question: 'Q1', answer: 'A' },
+    { id: 2000002, collection: 'Kubernetes', question: 'Q2', answer: 'A' },
+    { id: 2000003, conceptId: 'c1', videoId: 'b', collection: 'Kubernetes', question: 'Q1 again', answer: 'A' },
+    { id: 2000004, conceptId: 'c1', videoId: 'b', collection: 'Kubernetes', question: 'Q1 once more', answer: 'A' },
+    { id: 2000005, conceptId: 'c2', videoId: 'a', collection: 'Kubernetes', question: 'Q3', answer: 'A' }
+  ];
+  const collapsed = FlashcardsUI.collapseConcepts(cards);
+  assert.deepEqual(collapsed.map(card => card.id), [2000001, 2000002, 2000005]);
+  assert.equal(collapsed[0].interviewCount, 2);
+  assert.equal(collapsed[2].interviewCount, undefined);
+  assert.equal(cards[0].interviewCount, undefined, 'исходные карточки не меняются');
+  const markup = FlashcardsUI.renderPage({ cards: collapsed, collection: 'all' });
+  assert.match(markup, /Встречалось в 2 собеседованиях/);
+});
