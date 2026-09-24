@@ -2153,8 +2153,21 @@
       "current": "английские связки",
       "proposed": "перевести связки, термины оставить",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Связки в вариантах и объяснениях Linux #286–290, #307, #308, #310, #317, #318 переведены, термины и команды сохранены. Позиции ответов сохранены, quality gate пройден.",
+      "linkedIds": [
+        "286",
+        "287",
+        "288",
+        "289",
+        "290",
+        "307",
+        "308",
+        "310",
+        "317",
+        "318"
+      ]
     },
     {
       "id": "audit-p05-417",
@@ -4616,8 +4629,34 @@
       "current": "английские связки («изучая source MAC и выбирая выход по таблице destination MAC»)",
       "proposed": "перевести связки",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Переведены связки в вопросах «Сети» #62–89 («запоминает MAC-адрес отправителя…» и др.). Позиции ответов сохранены, quality gate пройден.",
+      "linkedIds": [
+        "62",
+        "64",
+        "65",
+        "66",
+        "67",
+        "69",
+        "71",
+        "72",
+        "74",
+        "75",
+        "76",
+        "77",
+        "78",
+        "79",
+        "80",
+        "81",
+        "82",
+        "83",
+        "84",
+        "85",
+        "87",
+        "88",
+        "89"
+      ]
     },
     {
       "id": "audit-p10-557",
@@ -4786,8 +4825,12 @@
       "current": "объяснение начинается целым предложением на английском",
       "proposed": "перевести",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Объяснение #312 полностью переписано по-русски. Позиции ответов сохранены, quality gate пройден.",
+      "linkedIds": [
+        "312"
+      ]
     },
     {
       "id": "audit-p11-577",
@@ -4800,8 +4843,20 @@
       "current": "английские связки («rate-limits ICMP replies к себе», «exposure»)",
       "proposed": "перевести связки",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Связки в #293–295, #305, #312, #313, #323, #324, #327 переведены («ограничивает ICMP-ответы от себя», «доступность»). Позиции ответов сохранены, quality gate пройден.",
+      "linkedIds": [
+        "293",
+        "294",
+        "295",
+        "305",
+        "312",
+        "313",
+        "323",
+        "324",
+        "327"
+      ]
     },
     {
       "id": "audit-p11-578",
@@ -5191,7 +5246,7 @@
       "current": "английские связки («Next-hop gateway для matching traffic»)",
       "proposed": "перевести, как уже сделано в 1002080–1002084",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002085",
@@ -5218,6 +5273,27 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Карточки сети синхронизированы с переведёнными тестами (1002085, 1002102, 1002103, 1002131, 1002134 и др.); дополнительно переведены тесты #292, #531–540, #552, #555, #558, #568 и их карточки. Позиции ответов сохранены, quality gate пройден.",
+      "linkedIds": [
+        "1002085",
+        "1002102",
+        "1002103",
+        "1002131",
+        "1002134",
+        "1002349",
+        "1002155",
+        "1002179",
+        "1002149",
+        "1002321",
+        "1002208",
+        "1002191",
+        "1002107",
+        "1002161",
+        "1002187",
+        "1002164",
+        "1002110",
+        "1002108"
       ]
     },
     {
@@ -5932,7 +6008,7 @@
       "current": "английские связки",
       "proposed": "перевести",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002294",
@@ -5969,6 +6045,16 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
+      ],
+      "resolution": "Карточки 1002294, 1002296, 1002299, 1002303, 1002305, 1002309, 1002312 получили переведённые ответы через синхронизацию с тестами. Позиции ответов сохранены, quality gate пройден.",
+      "linkedIds": [
+        "1002294",
+        "1002296",
+        "1002299",
+        "1002303",
+        "1002305",
+        "1002309",
+        "1002312"
       ]
     },
     {
@@ -7094,8 +7180,21 @@
       "current": "варианты по 90–120 символов с английскими связками",
       "proposed": "сократить и перевести связки",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Варианты Docker #10001–10010 сокращены до 70–100 символов и переведены вместе с объяснениями. Позиции ответов сохранены, quality gate пройден.",
+      "linkedIds": [
+        "10001",
+        "10002",
+        "10003",
+        "10004",
+        "10005",
+        "10006",
+        "10007",
+        "10008",
+        "10009",
+        "10010"
+      ]
     },
     {
       "id": "audit-p15-714",
@@ -8115,8 +8214,21 @@
       "current": "почти целиком английские связки («Delivery держит release deployable; Deployment автоматически ships passing changes»)",
       "proposed": "перевести, как в #421–#450",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "CI/CD #411–420 переведены по образцу #421–450. Позиции ответов сохранены, quality gate пройден.",
+      "linkedIds": [
+        "411",
+        "412",
+        "413",
+        "414",
+        "415",
+        "416",
+        "417",
+        "418",
+        "419",
+        "420"
+      ]
     },
     {
       "id": "audit-p18-810",
@@ -10091,8 +10203,21 @@
       "current": "варианты с английскими связками («co-scheduled containers с общей сетью», «Session-bound local TCP forwarding»); у #10011–#11010 варианты по 100–120 символов",
       "proposed": "перевести связки, сократить",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Kubernetes #371–410 и Kubernetes-вопросы #10011–11010 переведены; варианты #10011–11010 сокращены. Позиции ответов сохранены, quality gate пройден.",
+      "linkedIds": [
+        "371",
+        "410",
+        "10011",
+        "10012",
+        "10013",
+        "10014",
+        "10015",
+        "10040",
+        "11001",
+        "11010"
+      ]
     },
     {
       "id": "audit-p23-942",
@@ -10955,8 +11080,13 @@
       "current": "«Мониторинг (monitoring)»; «код завершения (exit code)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "В #12001 и #12009 убраны дубли «Мониторинг (monitoring)» и «код завершения (exit code)», связки переведены. Позиции ответов сохранены, quality gate пройден.",
+      "linkedIds": [
+        "12001",
+        "12009"
+      ]
     },
     {
       "id": "audit-p27-1019",
@@ -12305,8 +12435,17 @@
       "current": "варианты длиной 100–130 символов с английскими связками («Workspaces подходят для variants одного config; separate roots — для access/backend isolation»)",
       "proposed": "сократить, перевести связки",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Terraform #281–490 переведены; длинные варианты сокращены, где это не создавало подсказки по длине. Позиции ответов сохранены, quality gate пройден.",
+      "linkedIds": [
+        "281",
+        "302",
+        "436",
+        "451",
+        "458",
+        "490"
+      ]
     },
     {
       "id": "audit-p37-1193",
