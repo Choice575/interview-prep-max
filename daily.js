@@ -9,6 +9,16 @@
   const BLITZ_SIZE = 5;
   // Mirrors a real screening round: one warm-up, two core, two deep questions.
   const BLITZ_COMPOSITION = ['Junior', 'Middle', 'Middle', 'Senior', 'Senior'];
+  // Уровень блица берётся из профиля (аудит B2): начинающему не нужны два Senior-вопроса из пяти.
+  const COMPOSITIONS = {
+    Junior: ['Junior', 'Junior', 'Junior', 'Middle', 'Middle'],
+    Middle: ['Junior', 'Middle', 'Middle', 'Middle', 'Senior'],
+    Senior: BLITZ_COMPOSITION
+  };
+  // Сколько мест в блице отдаётся вопросам, которым по SM-2 пора на повторение.
+  const DUE_SLOTS = 2;
+  const WEAK_MIN_ATTEMPTS = 3;
+  const WEAK_THRESHOLD = 0.6;
   const TOPIC_ROTATION_SIZE = 5;
   const DAY_MS = 86400000;
 
@@ -80,17 +90,63 @@
    * rotated topics of the day, then any level as a fallback so a thin dataset
    * still yields a full set.
    */
+  /** Темы, где верных ответов меньше WEAK_THRESHOLD при достаточном числе попыток; самые слабые первыми. */
+  function weakTopics(questions, progress) {
+    const records = asObject(progress);
+    const totals = new Map();
+    asArray(questions).forEach(question => {
+      const record = asObject(records[question && question.id]);
+      const correct = count(record.correct);
+      const attempts = correct + count(record.wrong);
+      if (!attempts || !question.topic) return;
+      const entry = totals.get(question.topic) || { correct: 0, attempts: 0 };
+      entry.correct += correct;
+      entry.attempts += attempts;
+      totals.set(question.topic, entry);
+    });
+    return [...totals.entries()]
+      .filter(([, entry]) => entry.attempts >= WEAK_MIN_ATTEMPTS && entry.correct / entry.attempts < WEAK_THRESHOLD)
+      .sort((left, right) => left[1].correct / left[1].attempts - right[1].correct / right[1].attempts || left[0].localeCompare(right[0]))
+      .map(([topic]) => topic);
+  }
+
   function selectQuestions(input) {
     const state = asObject(input);
     const key = typeof state.dateKey === 'string' && state.dateKey ? state.dateKey : dateKey(state.now);
     const pool = asArray(state.questions).filter(hasOptions);
     const size = Number.isInteger(state.size) && state.size > 0 ? state.size : BLITZ_SIZE;
-    const composition = asArray(state.composition).length ? asArray(state.composition) : BLITZ_COMPOSITION;
-    const topics = topicsForDay(state.topics && state.topics.length ? state.topics : pool.map(question => question.topic), key);
+    const composition = asArray(state.composition).length ? asArray(state.composition)
+      : COMPOSITIONS[state.level] || BLITZ_COMPOSITION;
+    const progress = asObject(state.progress);
+    const weak = weakTopics(pool, progress);
+    const rotated = topicsForDay(state.topics && state.topics.length ? state.topics : pool.map(question => question.topic), key);
+    const topics = [...new Set(weak.concat(rotated))].slice(0, TOPIC_ROTATION_SIZE);
     const topicSet = new Set(topics);
     const ordered = seededOrder(pool, key);
     const used = new Set();
     const selected = [];
+
+    // Набор дня закрепляется при первом старте: иначе после ответа вопрос
+    // перестаёт быть «к повторению», и пятёрка меняется посреди дня.
+    const pinned = asArray(state.pinnedIds).map(String);
+    if (pinned.length) {
+      const byId = new Map(pool.map(question => [String(question.id), question]));
+      const found = pinned.map(id => byId.get(id)).filter(Boolean);
+      if (found.length === pinned.length) {
+        return { dateKey: key, topics, questions: found.slice(0, size), composition: composition.slice(0, size), pinned: true };
+      }
+    }
+
+    const now = Number.isFinite(state.now) ? state.now : Date.now();
+    const due = pool.filter(question => {
+      const record = asObject(progress[question.id]);
+      return Number(record.nextReviewAt) > 0 && Number(record.nextReviewAt) <= now;
+    }).sort((left, right) => Number(progress[left.id].nextReviewAt) - Number(progress[right.id].nextReviewAt)
+      || String(left.id).localeCompare(String(right.id), 'en', { numeric: true }));
+    due.slice(0, Math.min(DUE_SLOTS, size)).forEach(question => {
+      used.add(String(question.id));
+      selected.push(question);
+    });
 
     const take = predicate => {
       const found = ordered.find(question => !used.has(String(question.id)) && predicate(question));
@@ -103,7 +159,8 @@
     // Each slot claims its own topic first. Without this, every slot scans the
     // same seeded order and the whole blitz collapses into one topic, which
     // contradicts the five topics advertised on the card.
-    composition.slice(0, size).forEach((level, slot) => {
+    composition.slice(selected.length, size).forEach((level, index) => {
+      const slot = index;
       const preferred = topics.length ? topics[slot % topics.length] : null;
       if (preferred && take(question => question.level === level && question.topic === preferred)) return;
       if (take(question => question.level === level && topicSet.has(question.topic))) return;
@@ -112,7 +169,7 @@
       take(() => true);
     });
     while (selected.length < size && take(() => true)) { /* fill from whatever is left */ }
-    return { dateKey: key, topics, questions: selected.slice(0, size), composition: composition.slice(0, size) };
+    return { dateKey: key, topics, questions: selected.slice(0, size), composition: composition.slice(0, size), due: Math.min(due.length, DUE_SLOTS, size) };
   }
 
   function normaliseState(value) {
@@ -127,8 +184,16 @@
       bestStreak: Math.round(count(state.bestStreak)),
       completedCount: Math.round(count(state.completedCount)),
       lastCompletedKey: isValidKey(state.lastCompletedKey) ? state.lastCompletedKey : null,
-      seenAchievements: asArray(state.seenAchievements).map(String)
+      seenAchievements: asArray(state.seenAchievements).map(String),
+      ...(key && asArray(state.questionIds).length
+        ? { questionIds: asArray(state.questionIds).slice(0, BLITZ_SIZE).map(String) } : {})
     };
+  }
+
+  function pinQuestions(value, ids, now) {
+    const state = stateForDay(value, now);
+    const list = asArray(ids).slice(0, BLITZ_SIZE).map(String);
+    return list.length ? { ...state, questionIds: list } : state;
   }
 
   /**
@@ -142,8 +207,10 @@
     if (state.dateKey === key) return { ...state, dateKey: key };
     const yesterday = dateKey((Number.isFinite(now) ? now : Date.now()) - DAY_MS);
     const keepsStreak = state.lastCompletedKey === key || state.lastCompletedKey === yesterday;
+    const { questionIds, ...rest } = state;
+    void questionIds;
     return {
-      ...state,
+      ...rest,
       dateKey: key,
       answered: 0,
       correct: 0,
@@ -240,9 +307,9 @@
   }
 
   return {
-    BLITZ_SIZE, BLITZ_COMPOSITION, TOPIC_ROTATION_SIZE,
-    dateKey, hash, topicsForDay, selectQuestions,
-    normaliseState, stateForDay, recordAnswer, completeDay,
+    BLITZ_SIZE, BLITZ_COMPOSITION, COMPOSITIONS, TOPIC_ROTATION_SIZE,
+    dateKey, hash, topicsForDay, weakTopics, selectQuestions,
+    normaliseState, stateForDay, recordAnswer, completeDay, pinQuestions,
     secondsUntilReset, formatCountdown, skillOfTheDay, grade
   };
 });

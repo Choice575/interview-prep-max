@@ -169,3 +169,10 @@ test('create tolerates missing host elements', () => {
   assert.equal(instance.renderBlitz(), null);
   assert.equal(instance.renderSkill(), null);
 });
+
+test('blitz card shows the flashcard review queue with a shortcut', () => {
+  const html = ui.reviewLine(7);
+  assert.match(html, /<strong>7<\/strong> к повторению сегодня/);
+  assert.match(html, /data-daily-action="flashcards"/);
+  assert.match(ui.reviewLine(0), /повторений на сегодня нет/);
+});
