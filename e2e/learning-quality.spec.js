@@ -197,3 +197,20 @@ test('sidebar groups sections by activity and highlights the parent of hidden pa
   await expect(page.locator('.sb-item[data-page="trainers"]')).toHaveClass(/active/);
   await expect(page.locator('.sb-item[data-page="trainers"]')).toHaveAttribute('aria-current', 'true');
 });
+
+test('analytics shows closed profile topics and exports today\'s mistakes as markdown', async ({page}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('ipmax_stats', JSON.stringify({ total: 1, correct: 0 }));
+    localStorage.setItem('ipmax_qprog', JSON.stringify({ 1: { correct: 0, wrong: 1, lastSeen: Date.now() } }));
+    localStorage.setItem('ipmax_mistakes', JSON.stringify({ 1: 1 }));
+  });
+  await page.goto('/#/analytics');
+  await expect(page.locator('[data-topic-readiness]')).toContainText(/Тем Middle-профиля закрыто на ≥80%: 0 из \d+/);
+  const button = page.locator('[data-analytics-action="export-mistakes"]');
+  await expect(button).toHaveText('⬇ Ошибки дня в Markdown (1)');
+  const [download] = await Promise.all([page.waitForEvent('download'), button.click()]);
+  expect(download.suggestedFilename()).toMatch(/^mistakes-\d{4}-\d{2}-\d{2}\.md$/);
+  const text = require('node:fs').readFileSync(await download.path(), 'utf8');
+  expect(text).toContain('## Terraform');
+  expect(text).toContain('**Что такое Terraform?** (#1, Junior)');
+});

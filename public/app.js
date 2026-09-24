@@ -1659,10 +1659,17 @@ function updateTrainersCount(){
 const analyticsUI=typeof IPMaxAnalyticsUI!=='undefined'?IPMaxAnalyticsUI.create({
   get:(key,fallback)=>lsGet(key,fallback),getQuestionProgress:getQProg,getQuestions:getAllQ,getMistakes,getTopics:getAllTopics,
   escape:esc,tagMap:requireExamUIModule().TOPIC_CLASSES,localDateKey:timestamp=>IPMaxDate.localDateKey(timestamp),
+  getProfileLevel:()=>getProfileScope().profileLevel,saveText:downloadText,
   startExam:()=>nav('exam'),startDiagnostic,
   startQuestion:question=>startAnalyticsQuestions([question]),
   startQuestions:startAnalyticsQuestions
 }):null;
+// Сохраняет текст файлом: экспорт ошибок дня для журнала learning/ (аудит B10).
+function downloadText(name,text){
+  const url=URL.createObjectURL(new Blob([text],{type:'text/markdown;charset=utf-8'}));
+  const link=document.createElement('a');link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
 function requireAnalyticsUI(){if(!analyticsUI) throw new Error('Модуль аналитики не загружен.');return analyticsUI;}
 function startAnalyticsQuestions(questions){
   const ids=(Array.isArray(questions)?questions:[]).map(question=>question&&question.id).filter(id=>id!==undefined&&id!==null);
