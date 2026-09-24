@@ -11451,8 +11451,21 @@
       "current": "неверные ключи ответа",
       "proposed": "C1",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Ключи #9, #11, #14, #18, #26 исправлены в 15.10.1. В 15.11.8 исправлены пять учебных карточек, скопированных с неверных ключей (1001907, 1002047, 1002053, 1002067, 1002072), добавлены сверка «тест → карточка» и постоянная проверка объяснения против отмеченного варианта в question-quality.js; 23 срабатывания эвристики вычитаны и внесены в baseline.",
+      "linkedIds": [
+        "1001907",
+        "1002047",
+        "1002053",
+        "1002067",
+        "1002072"
+      ],
+      "sources": [
+        "https://developer.hashicorp.com/terraform/language/state",
+        "https://developer.hashicorp.com/terraform/language/backend",
+        "https://developer.hashicorp.com/terraform/language/modules"
+      ]
     },
     {
       "id": "audit-p36-1176",

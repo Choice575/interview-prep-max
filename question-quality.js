@@ -125,8 +125,36 @@ function analyzeQuestions(questions) {
     byRule,
     byTopic,
     byLevel,
-    issues
+    issues,
+    explanationMismatches: findExplanationMismatches(questions)
   };
+}
+
+// C1 аудита: скрипт перестановки вариантов однажды не пересчитал answer, и
+// ключ указал на отвлекающий вариант. Объяснение при этом осталось верным,
+// поэтому подозрительно, когда с ним заметно больше слов делит неверный вариант.
+// Эвристика лексическая: вручную проверенные срабатывания перечислены в
+// baseline (reviewedExplanationMismatch), новое срабатывание гейт не пропускает.
+function explanationStems(text) {
+  return new Set(String(text || '')
+    .toLowerCase()
+    .replace(/[^a-zа-яё0-9_]+/gi, ' ')
+    .split(' ')
+    .filter(word => word.length >= 4)
+    .map(word => word.slice(0, Math.max(4, Math.min(6, word.length - 2)))));
+}
+
+function findExplanationMismatches(questions) {
+  const mismatches = [];
+  questions.forEach(question => {
+    if (!question.explanation || !Array.isArray(question.options) || !Number.isInteger(question.answer)) return;
+    const explanation = explanationStems(question.explanation);
+    const scores = question.options.map(option => [...explanationStems(option)].filter(stem => explanation.has(stem)).length);
+    const correct = scores[question.answer];
+    const best = Math.max(...scores.filter((_, index) => index !== question.answer));
+    if (best >= 3 && best >= correct + 2) mismatches.push({ id: question.id, scores });
+  });
+  return mismatches;
 }
 
 function rebalanceAnswers(questions) {
@@ -143,14 +171,17 @@ function rebalanceAnswers(questions) {
   });
 }
 
-function makeBaseline(report) {
+function makeBaseline(report, previous = {}) {
   return {
     schemaVersion: 1,
     questionCount: report.questionCount,
     answerPositions: report.positions,
     issueBudget: report.byRule,
     topics: report.byTopic,
-    levels: report.byLevel
+    levels: report.byLevel,
+    // Список не пополняется автоматически: каждое новое срабатывание нужно
+    // сверить с источником и только потом внести сюда вручную.
+    reviewedExplanationMismatch: previous.reviewedExplanationMismatch || []
   };
 }
 
@@ -163,6 +194,12 @@ function compareToBaseline(report, baseline) {
     const actual = report.byRule[rule] || 0;
     const budget = baseline.issueBudget?.[rule] || 0;
     if (actual > budget) failures.push(`${rule}: ${actual}, допустимо ${budget}`);
+  });
+  const reviewed = new Set(baseline.reviewedExplanationMismatch || []);
+  (report.explanationMismatches || []).forEach(item => {
+    if (!reviewed.has(item.id)) {
+      failures.push(`explanation-mismatch id=${item.id}: объяснение ближе к неверному варианту (совпадения ${item.scores.join('/')}), проверьте ключ`);
+    }
   });
   const usedPositions = report.positions.slice(0, 4);
   if (Math.max(...usedPositions) - Math.min(...usedPositions) > 1) {
@@ -240,7 +277,8 @@ function runCli(args = process.argv.slice(2)) {
 
   const report = analyzeQuestions(questions);
   if (args.includes('--write-baseline')) {
-    fs.writeFileSync(BASELINE_FILE, JSON.stringify(makeBaseline(report), null, 2) + '\n');
+    const previous = fs.existsSync(BASELINE_FILE) ? JSON.parse(fs.readFileSync(BASELINE_FILE, 'utf8')) : {};
+    fs.writeFileSync(BASELINE_FILE, JSON.stringify(makeBaseline(report, previous), null, 2) + '\n');
     console.log('Baseline обновлён: question-quality-baseline.json');
   }
   printReport(report);
@@ -285,6 +323,7 @@ module.exports = {
   analyzeTrainers,
   cleanOption,
   compareToBaseline,
+  findExplanationMismatches,
   makeBaseline,
   rebalanceAnswers,
   TRAINER_FILES
