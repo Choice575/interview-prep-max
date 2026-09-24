@@ -66,3 +66,23 @@ test('baseline comparison rejects regressions and unbalanced positions', () => {
   const skewed = { ...balanced, positions: [4, 0, 0, 0] };
   assert.match(compareToBaseline(skewed, baseline).join('\n'), /несбалансированы/);
 });
+
+test('detects a trailing-punctuation cue and hedges used only in distractors', () => {
+  const report = analyzeQuestions([
+    question({ options: ['Проверяет конфигурацию.', 'Удаляет state', 'Запускает apply', 'Форматирует HCL'] }),
+    question({ id: 2, q: 'Что делает plan?', options: ['Строит план изменений', 'Обычно удаляет ресурсы', 'Форматирует файлы', 'Показывает state'] }),
+    question({ id: 3, q: 'Что делает fmt?', options: ['Форматирует файлы.', 'Удаляет state.', 'Запускает apply.', 'Показывает state.'] }),
+    question({ id: 4, q: 'Что делает show?', options: ['Показывает state', 'Как правило удаления ресурсов', 'Форматирует файлы', 'Строит план'] })
+  ]);
+  assert.deepEqual(report.issues.filter(issue => issue.rule === 'punctuation-cue').map(issue => issue.id), [1]);
+  assert.deepEqual(report.issues.filter(issue => issue.rule === 'hedge-distractor').map(issue => issue.id), [2]);
+});
+
+test('longest-correct share can only go down against the baseline', () => {
+  const longest = question({ options: ['Проверяет конфигурацию модуля', 'Удаляет state', 'Запускает apply', 'Форматирует HCL'] });
+  const shorter = question({ id: 2, q: 'Что делает plan?', options: ['Строит план', 'Удаляет все ресурсы', 'Форматирует файлы', 'Показывает state'], answer: 0 });
+  const report = analyzeQuestions([longest, shorter]);
+  assert.equal(report.longestCorrect, 1);
+  const baseline = { ...makeBaseline(report), maxLongestCorrect: 0 };
+  assert.match(compareToBaseline(report, baseline).join('\n'), /самый длинный в 1 вопросах, допустимо 0/);
+});

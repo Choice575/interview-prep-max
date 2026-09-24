@@ -16,6 +16,10 @@ const ABSOLUTE_WORDS = [
   'всегда', 'никогда', 'только', 'полностью', 'невозможно',
   'исключительно', 'любой', 'никак'
 ];
+// Смягчения, которые в тестах ставили только в неверные варианты (аудит C4):
+// верный вариант звучал уверенно, а «обычно» выдавало отвлекающий.
+// «Как правило» не включено: в вариантах это чаще существительное («правило удаления»).
+const HEDGE_WORDS = ['обычно', 'в основном', 'чаще всего'];
 const STOP_WORDS = new Set([
   'какой', 'какая', 'какие', 'каким', 'какую', 'когда', 'который', 'между',
   'почему', 'после', 'перед', 'помощью', 'такое', 'такой', 'также', 'через',
@@ -27,7 +31,9 @@ const RULE_LABELS = {
   'length-cue': 'правильный ответ заметно длиннее отвлекающих',
   'question-echo': 'правильный ответ повторяет уникальные слова вопроса',
   'absolute-distractor': 'абсолютная формулировка встречается только в отвлекающем варианте',
-  'duplicate-question': 'точный дубликат формулировки вопроса'
+  'duplicate-question': 'точный дубликат формулировки вопроса',
+  'punctuation-cue': 'только правильный вариант отличается концевой пунктуацией',
+  'hedge-distractor': 'смягчающее слово («обычно») есть только в отвлекающих вариантах'
 };
 
 function cleanOption(text) {
@@ -56,6 +62,16 @@ function containsAbsolute(text) {
   return ABSOLUTE_WORDS.some(word => normalized.includes(` ${word} `));
 }
 
+function containsHedge(text) {
+  const normalized = ` ${normalizeText(text)} `;
+  return HEDGE_WORDS.some(word => normalized.includes(` ${word} `));
+}
+
+function endingMark(text) {
+  const match = cleanOption(text).match(/[.!?;:…]$/);
+  return match ? match[0] : '';
+}
+
 function addIssue(issues, rule, question, detail) {
   issues.push({
     rule,
@@ -70,6 +86,7 @@ function analyzeQuestions(questions) {
   const issues = [];
   const positions = [0, 0, 0, 0];
   const duplicates = new Map();
+  let longestCorrect = 0;
 
   questions.forEach(question => {
     if (!Array.isArray(question.options) || !Number.isInteger(question.answer)) return;
@@ -96,6 +113,21 @@ function analyzeQuestions(questions) {
     if (!containsAbsolute(correct) && distractors.some(containsAbsolute)) {
       addIssue(issues, 'absolute-distractor', question, 'абсолютное слово есть только в неверном варианте');
     }
+
+    const marks = options.map(endingMark);
+    const otherMarks = new Set(marks.filter((_, index) => index !== question.answer));
+    if (otherMarks.size === 1 && !otherMarks.has(marks[question.answer])) {
+      addIssue(issues, 'punctuation-cue', question, `«${marks[question.answer] || 'без знака'}» только у правильного варианта`);
+    }
+
+    if (!containsHedge(correct) && distractors.some(containsHedge)) {
+      addIssue(issues, 'hedge-distractor', question, 'смягчение есть только в неверном варианте');
+    }
+
+    // Метрика B5: правильный вариант строго самый длинный. Перевес бывает
+    // всего несколько процентов, поэтому length-cue такие случаи не ловит.
+    const longest = Math.max(...options.map(option => option.length));
+    if (correct.length === longest && options.filter(option => option.length === longest).length === 1) longestCorrect++;
 
     const normalizedQuestion = normalizeText(question.q);
     if (!duplicates.has(normalizedQuestion)) duplicates.set(normalizedQuestion, []);
@@ -125,6 +157,7 @@ function analyzeQuestions(questions) {
     byRule,
     byTopic,
     byLevel,
+    longestCorrect,
     issues,
     explanationMismatches: findExplanationMismatches(questions)
   };
@@ -179,6 +212,8 @@ function makeBaseline(report, previous = {}) {
     issueBudget: report.byRule,
     topics: report.byTopic,
     levels: report.byLevel,
+    // Потолок, а не цель: доля должна снижаться партиями правки (цель 25–30%).
+    maxLongestCorrect: report.longestCorrect,
     // Список не пополняется автоматически: каждое новое срабатывание нужно
     // сверить с источником и только потом внести сюда вручную.
     reviewedExplanationMismatch: previous.reviewedExplanationMismatch || []
@@ -195,6 +230,9 @@ function compareToBaseline(report, baseline) {
     const budget = baseline.issueBudget?.[rule] || 0;
     if (actual > budget) failures.push(`${rule}: ${actual}, допустимо ${budget}`);
   });
+  if (Number.isInteger(baseline.maxLongestCorrect) && report.longestCorrect > baseline.maxLongestCorrect) {
+    failures.push(`правильный вариант самый длинный в ${report.longestCorrect} вопросах, допустимо ${baseline.maxLongestCorrect}`);
+  }
   const reviewed = new Set(baseline.reviewedExplanationMismatch || []);
   (report.explanationMismatches || []).forEach(item => {
     if (!reviewed.has(item.id)) {
@@ -211,6 +249,8 @@ function compareToBaseline(report, baseline) {
 function printReport(report) {
   console.log(`Question quality: ${report.questionCount} вопросов`);
   console.log(`Позиции A/B/C/D: ${report.positions.slice(0, 4).join(' / ')}`);
+  const share = report.questionCount ? (100 * report.longestCorrect / report.questionCount).toFixed(1) : '0.0';
+  console.log(`Правильный вариант самый длинный: ${report.longestCorrect} (${share}%)`);
   Object.entries(RULE_LABELS).forEach(([rule, label]) => {
     console.log(`  ${rule}: ${report.byRule[rule]} — ${label}`);
   });

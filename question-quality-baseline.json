@@ -2,19 +2,22 @@
   "schemaVersion": 1,
   "questionCount": 921,
   "answerPositions": [
-    231,
     230,
     230,
-    230
+    230,
+    231
   ],
   "issueBudget": {
     "length-cue": 0,
     "question-echo": 0,
     "absolute-distractor": 0,
-    "duplicate-question": 0
+    "duplicate-question": 0,
+    "punctuation-cue": 0,
+    "hedge-distractor": 0
   },
   "topics": {},
   "levels": {},
+  "maxLongestCorrect": 516,
   "reviewedExplanationMismatch": [
     284,
     314,
