@@ -1,5 +1,10 @@
 # Changelog
 
+## v15.11.23 (2026-09-24)
+
+- У 58 вопросов банка из подборки Swfuse появились команды для проверки на практике и раздел «Частая ошибка»: chrt и taskset, ip route get и ip neigh, openssl s_client -servername, dig +trace, nft list ruleset, docker diff и buildx-кеш, trivy --cache-dir, kubectl events, helm history и rollback, kubeadm certs и upgrade plan, promtool tsdb analyze, IMDSv2, instance refresh, patronictl, \du, kafka-metadata-quorum, _cat/shards и другие.
+- ID, позиции ответов и прогресс сохранены.
+
 ## v15.11.22 (2026-09-24)
 
 - В деревьях диагностики у 27 тупиковых шагов появился переход «Вернуться к предыдущему шагу»: неверный путь больше не завершает сценарий, и до решения можно дойти.

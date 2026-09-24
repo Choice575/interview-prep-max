@@ -1394,13 +1394,20 @@
       "current": "нет команд",
       "proposed": "`tee -a`, `pipefail`; `chrt -p`; `taskset -cp`; `ls /sys/class/net`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_055",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "В манифест Swfuse добавлены команды проверки и раздел частых ошибок для qb_swf_001, qb_swf_004, qb_swf_054, qb_swf_055; банк пересобран через scripts/import-swfuse.js, ID и позиции ответов не менялись.",
+      "linkedIds": [
+        "qb_swf_001",
+        "qb_swf_004",
+        "qb_swf_054",
+        "qb_swf_055"
       ]
     },
     {
@@ -4479,13 +4486,27 @@
       "current": "нет команд и ошибок",
       "proposed": "`ip route get`, `ip neigh`; `openssl s_client -servername`; `dig +trace`; `resolvectl query`; `nft list ruleset`; `nc -u`, `tcpdump udp`; `ip route show table all`, `ip rule`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_008",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "В манифест Swfuse добавлены команды проверки и раздел частых ошибок для qb_swf_008, qb_swf_009, qb_swf_010, qb_swf_011, qb_swf_012, qb_swf_013, qb_swf_014, qb_swf_015, qb_swf_032, qb_swf_040, qb_swf_045; банк пересобран через scripts/import-swfuse.js, ID и позиции ответов не менялись.",
+      "linkedIds": [
+        "qb_swf_008",
+        "qb_swf_009",
+        "qb_swf_010",
+        "qb_swf_011",
+        "qb_swf_012",
+        "qb_swf_013",
+        "qb_swf_014",
+        "qb_swf_015",
+        "qb_swf_032",
+        "qb_swf_040",
+        "qb_swf_045"
       ]
     },
     {
@@ -6805,13 +6826,21 @@
       "current": "нет команд и раздела ошибок",
       "proposed": "`docker commit`, `docker inspect -f '{{.Mounts}}'`; `docker buildx build --cache-to`; `docker info --format '{{.Runtimes}}'`; `trivy image --cache-dir`; `docker diff`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_005",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "В манифест Swfuse добавлены команды проверки и раздел частых ошибок для qb_swf_005, qb_swf_006, qb_swf_007, qb_swf_035, qb_swf_053; банк пересобран через scripts/import-swfuse.js, ID и позиции ответов не менялись.",
+      "linkedIds": [
+        "qb_swf_005",
+        "qb_swf_006",
+        "qb_swf_007",
+        "qb_swf_035",
+        "qb_swf_053"
       ]
     },
     {
@@ -7979,13 +8008,20 @@
       "current": "нет команд и раздела ошибок",
       "proposed": "`git remote add upstream`; `git merge --ff-only`, `--no-ff`; `extends: .base`; `allow_failure: false` у manual-job деплоя",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_030",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "В манифест Swfuse добавлены команды проверки и раздел частых ошибок для qb_swf_030, qb_swf_043, qb_swf_044, qb_swf_056; банк пересобран через scripts/import-swfuse.js, ID и позиции ответов не менялись.",
+      "linkedIds": [
+        "qb_swf_030",
+        "qb_swf_043",
+        "qb_swf_044",
+        "qb_swf_056"
       ]
     },
     {
@@ -9569,13 +9605,20 @@
       "current": "нет команд и раздела ошибок",
       "proposed": "`kubectl get events --watch`, `kubectl get pod -o wide`; `kubectl get pod -o jsonpath='{.spec.containers[*].name}'`; `kubectl get pvc -l app=db`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_024",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "В манифест Swfuse добавлены команды проверки и раздел частых ошибок для qb_swf_024, qb_swf_025, qb_swf_039, qb_swf_050; банк пересобран через scripts/import-swfuse.js, ID и позиции ответов не менялись.",
+      "linkedIds": [
+        "qb_swf_024",
+        "qb_swf_025",
+        "qb_swf_039",
+        "qb_swf_050"
       ]
     },
     {
@@ -9935,13 +9978,26 @@
       "current": "нет команд и раздела ошибок (10 вопросов)",
       "proposed": "`kubectl delete pod db-0`; `helm status`, `helm history`, `helm rollback`; `kubeadm certs check-expiration`, `kubeadm certs renew all`; `kubeadm upgrade plan`; `kubectl get validatingwebhookconfigurations`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_026",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "В манифест Swfuse добавлены команды проверки и раздел частых ошибок для qb_swf_026, qb_swf_028, qb_swf_033, qb_swf_034, qb_swf_038, qb_swf_051, qb_swf_052, qb_swf_058, qb_swf_059, qb_swf_060; банк пересобран через scripts/import-swfuse.js, ID и позиции ответов не менялись.",
+      "linkedIds": [
+        "qb_swf_026",
+        "qb_swf_028",
+        "qb_swf_033",
+        "qb_swf_034",
+        "qb_swf_038",
+        "qb_swf_051",
+        "qb_swf_052",
+        "qb_swf_058",
+        "qb_swf_059",
+        "qb_swf_060"
       ]
     },
     {
@@ -10729,13 +10785,17 @@
       "current": "нет команд",
       "proposed": "`remote_write` в VictoriaMetrics или Thanos/Mimir; `promtool tsdb analyze`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_036",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "В манифест Swfuse добавлены команды проверки и раздел частых ошибок для qb_swf_036; банк пересобран через scripts/import-swfuse.js, ID и позиции ответов не менялись.",
+      "linkedIds": [
+        "qb_swf_036"
       ]
     },
     {
@@ -11657,7 +11717,7 @@
       "current": "нет команд и раздела ошибок",
       "proposed": "`ansible -m debug -a 'var=hostvars[inventory_hostname]'`; `ansible-playbook -e` для проверки приоритета",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_041",
@@ -11669,6 +11729,11 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "В манифест Swfuse добавлены команды проверки и раздел частых ошибок для qb_swf_041, qb_swf_057; банк пересобран через scripts/import-swfuse.js, ID и позиции ответов не менялись.",
+      "linkedIds": [
+        "qb_swf_041",
+        "qb_swf_057"
       ]
     },
     {
@@ -12072,13 +12137,24 @@
       "current": "нет команд и раздела ошибок (8 вопросов)",
       "proposed": "`aws ec2 describe-instances --query '…BlockDeviceMappings'`; `dig +noall +answer`; `curl http://169.254.169.254/latest/meta-data/iam/` (с IMDSv2-токеном); `aws autoscaling start-instance-refresh`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_020",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "В манифест Swfuse добавлены команды проверки и раздел частых ошибок для qb_swf_020, qb_swf_021, qb_swf_022, qb_swf_023, qb_swf_046, qb_swf_047, qb_swf_048, qb_swf_049; банк пересобран через scripts/import-swfuse.js, ID и позиции ответов не менялись.",
+      "linkedIds": [
+        "qb_swf_020",
+        "qb_swf_021",
+        "qb_swf_022",
+        "qb_swf_023",
+        "qb_swf_046",
+        "qb_swf_047",
+        "qb_swf_048",
+        "qb_swf_049"
       ]
     },
     {
@@ -13195,13 +13271,21 @@
       "current": "нет команд и раздела ошибок",
       "proposed": "`patronictl list` / STONITH; `\\du` в psql; `kafka-metadata-quorum.sh describe --status`; `curl -r 0-1023`; `GET _cat/shards?v`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_swf_027",
           "file": "tasks/question_bank.json",
           "exists": true
         }
+      ],
+      "resolution": "В манифест Swfuse добавлены команды проверки и раздел частых ошибок для qb_swf_027, qb_swf_029, qb_swf_031, qb_swf_037, qb_swf_042; банк пересобран через scripts/import-swfuse.js, ID и позиции ответов не менялись.",
+      "linkedIds": [
+        "qb_swf_027",
+        "qb_swf_029",
+        "qb_swf_031",
+        "qb_swf_037",
+        "qb_swf_042"
       ]
     }
   ]
