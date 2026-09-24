@@ -1463,7 +1463,7 @@
       "context": "Учебный production-инцидент недели 18: Kubernetes networking, Ingress и Gateway API. Нужно сохранить evidence, ограничить impact и восстановить проверяемое состояние.",
       "evidence": [
         "HTTPRoute Accepted=True, но ResolvedRefs=False для backendRef.",
-        "Service существует, EndpointSlice пуст из-за несовпадения labels.",
+        "backendRef указывает port 8080, а Service api слушает 80; EndpointSlice заполнен, поды готовы.",
         "Прямой запрос к Pod успешен, через Gateway API приходит 502.",
         "Старый Ingress на ingress-nginx всё ещё работает, но controller EOL."
       ],
@@ -1477,7 +1477,7 @@
         "Подтвердить полный поток и документировать миграцию с Ingress."
       ],
       "commonMistakes": [
-        "Менять Gateway до проверки пустых endpoints.",
+        "Менять Gateway до чтения условий HTTPRoute.",
         "Считать Accepted=True доказательством доступного backend.",
         "Строить новую production-схему на ingress-nginx после EOL.",
         "Не проверить результат исходным сигналом.",

@@ -1,5 +1,12 @@
 # Changelog
 
+## v15.11.20 (2026-09-24)
+
+- Исправлены все 88 неточностей аудита в Linux, сетях, Docker, Git и CI/CD, Kubernetes, мониторинге, Terraform, Ansible и базах данных. Среди них: зомби и SIGCHLD, поиск задач в D, иноды через du --inodes, sticky bit, SIGKILL и блокировки, TIME_WAIT у инициатора закрытия, DoH по HTTP/3, подпись в SSH, 307/308, CGNAT, keepalive, ADD --checksum, BuildKit, WORKDIR, Node 22 и npm --omit=dev, хуки Git, reset --hard, QoS, init-контейнеры, DNS подов, CSI, nftables в kube-proxy, subPath, ReadWriteOncePod, --record, операторы affinity, RED и очереди, Redis allkeys-lru, use_lockfile в S3, terraform apply -refresh-only, уровни изоляции, KRaft.
+- Деревья диагностики больше не советуют chown сервису на его конфиг, jstack для GC, ssh-keyscan без сверки отпечатка и устаревшие регистрационные токены runner; учтены разреженный файл после обнуления и параметры PostgreSQL 14+.
+- Задания тренажёра Kubernetes о livenessProbe, Service без selector, лимитах и разовой задаче исправлены вместе с карточками.
+- ID, позиции ответов и прогресс сохранены.
+
 ## v15.11.19 (2026-09-24)
 
 - В тестах появились темы «Базы данных» и «Карьера» с разделами лучших практик. Вопросы о метриках PostgreSQL, PgBouncer, WAL и долгих запросах перенесены из мониторинга, вопросы о собеседованиях и развитии — из System Design и сетей. Кейсы и инцидент о PostgreSQL отнесены к базам данных.

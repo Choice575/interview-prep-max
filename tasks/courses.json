@@ -3217,7 +3217,7 @@
         {
           "id": "ch_ansible_extra_1",
           "type": "simulator",
-          "title": "Симулятор: Ansible UNREACHABLE после ротации SSH ключей",
+          "title": "Симулятор: Ansible UNREACHABLE после пересоздания ВМ",
           "source": {
             "dataset": "ts.json",
             "id": 6

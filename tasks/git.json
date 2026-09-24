@@ -117,7 +117,7 @@
       "git branch --worktree hotfix/critical ../hotfix"
     ],
     "answer": 0,
-    "exp": "git worktree add <path> <branch> создаёт дополнительную рабочую директорию с указанной веткой. Это позволяет работать над несколькими ветками одновременно без clone."
+    "exp": "git worktree add <path> <branch> создаёт дополнительную рабочую директорию с указанной существующей веткой; для новой ветки — git worktree add -b hotfix/critical ../hotfix. Это позволяет работать над несколькими ветками одновременно без clone."
   },
   {
     "id": 11,

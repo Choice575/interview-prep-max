@@ -122,7 +122,7 @@
         ]
       },
       "fix_oom": {
-        "obs": "РЕШЕНО: Найдена корневая причина (OOM), heap увеличен. Nginx теперь отдаёт 200 OK.",
+        "obs": "Сервис восстановлен: heap увеличен, Nginx отдаёт 200 OK. Но OOM — симптом: если причина в утечке, больший -Xmx лишь отсрочит падение, поэтому нужен heap dump, как в дереве GC thrashing.",
         "choices": []
       },
       "restart_nginx": {
@@ -314,7 +314,7 @@
             "ok": false
           },
           {
-            "text": "kill $(lsof /var/log/app/debug.log | awk NR>1{print $2})",
+            "text": "kill $(lsof /var/log/app/debug.log | awk 'NR>1{print $2}')",
             "next": "kill_process",
             "pts": 10,
             "ok": false
@@ -328,7 +328,7 @@
         ]
       },
       "truncate_file": {
-        "obs": "РЕШЕНО: Файл обнулён, 22GB освободились немедленно. Процесс продолжил запись. Настроить logrotate!",
+        "obs": "РЕШЕНО: Файл обнулён, 22GB освободились немедленно. Если процесс пишет без O_APPEND, он продолжит с прежнего смещения, и файл станет разреженным с прежним видимым размером — место проверяйте по du, а не ls. Настроить logrotate!",
         "choices": []
       },
       "rm_all_logs": {
@@ -486,7 +486,7 @@
         "obs": "ls -la: -rw------- root root config.yaml. Сервис запускается от пользователя myapp. Что сделать?",
         "choices": [
           {
-            "text": "chown myapp:myapp /etc/myservice/config.yaml",
+            "text": "chown root:myapp /etc/myservice/config.yaml && chmod 640 /etc/myservice/config.yaml",
             "next": "fix_chown",
             "pts": 30,
             "ok": true
@@ -512,11 +512,11 @@
         ]
       },
       "fix_chown": {
-        "obs": "РЕШЕНО: chown myapp:myapp дал права. systemctl start myservice — сервис запущен!",
+        "obs": "РЕШЕНО: root:myapp и 640 — сервис читает конфиг, но не может его менять. systemctl start myservice — сервис запущен!",
         "choices": []
       },
       "chmod_644": {
-        "obs": "chmod 644 (rw-r--r--) тоже решит проблему, но менее безопасно чем изменение владельца.",
+        "obs": "chmod 644 (rw-r--r--) тоже решит проблему, но откроет конфиг всем пользователям; безопаснее группа сервиса и 640.",
         "choices": []
       },
       "restart_failed": {
@@ -697,7 +697,7 @@
         "choices": []
       },
       "delete_lockfile": {
-        "obs": "При DynamoDB backend нет lockfile на диске. Lock в DynamoDB.",
+        "obs": "Файл .terraform.tfstate.lock.info бывает только у локального бэкенда; здесь lock в DynamoDB. С Terraform 1.11 S3-бэкенд блокирует и сам (use_lockfile = true), а DynamoDB для блокировок объявлен устаревшим.",
         "choices": [
           {
             "text": "Получить Lock ID из сообщения",
@@ -782,7 +782,7 @@
         "obs": "top: java PID 1234 использует 380% CPU (4 ядра). Следующий шаг?",
         "choices": [
           {
-            "text": "jstack 1234 — получить thread dump для анализа",
+            "text": "jstat -gcutil 1234 1000 — посмотреть долю времени в GC",
             "next": "jstack_check",
             "pts": 30,
             "ok": true
@@ -808,7 +808,7 @@
         ]
       },
       "jstack_check": {
-        "obs": "jstack: сотни потоков в состоянии GC waiting. Это GC thrashing. Что делать?",
+        "obs": "jstat -gcutil: время в GC около 95%, old gen заполнен на 99% и после полной сборки почти не освобождается. Это GC thrashing. Что делать?",
         "choices": [
           {
             "text": "Увеличить heap (-Xmx), собрать heap dump для анализа утечки",
@@ -870,7 +870,7 @@
         "obs": "Сервис убит, нагрузка спала. Но при рестарте повторится.",
         "choices": [
           {
-            "text": "jstack при следующем инциденте",
+            "text": "jstat -gcutil при следующем инциденте",
             "next": "jstack_check",
             "pts": 15,
             "ok": true
@@ -881,7 +881,7 @@
         "obs": "Логи: GC overhead limit exceeded. Подтверждает GC проблему.",
         "choices": [
           {
-            "text": "jstack для thread dump",
+            "text": "jstat -gcutil для статистики GC",
             "next": "jstack_check",
             "pts": 20,
             "ok": true
@@ -892,7 +892,7 @@
         "obs": "Рестарт временно помог, но без анализа причины проблема повторится.",
         "choices": [
           {
-            "text": "jstack при следующем инциденте",
+            "text": "jstat -gcutil при следующем инциденте",
             "next": "jstack_check",
             "pts": 15,
             "ok": true
@@ -911,9 +911,9 @@
   },
   {
     "id": 6,
-    "title": "Ansible UNREACHABLE после ротации SSH ключей",
+    "title": "Ansible UNREACHABLE после пересоздания ВМ",
     "topic": "Ansible",
-    "context": "После ротации SSH ключей все хосты UNREACHABLE в Ansible.",
+    "context": "После пересоздания ВМ из нового образа все хосты UNREACHABLE в Ansible.",
     "nodes": {
       "start": {
         "obs": "Все хосты UNREACHABLE. Первый шаг?",
@@ -948,7 +948,7 @@
         "obs": "SSH: WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED. Что произошло?",
         "choices": [
           {
-            "text": "Ключ хоста изменился, known_hosts устарел. ssh-keyscan для обновления.",
+            "text": "Ключ хоста изменился вместе с ВМ, known_hosts устарел. Сверить новый отпечаток по доверенному каналу и обновить known_hosts.",
             "next": "fix_known_hosts",
             "pts": 30,
             "ok": true
@@ -974,7 +974,7 @@
         ]
       },
       "fix_known_hosts": {
-        "obs": "ssh-keyscan -H hostname >> ~/.ssh/known_hosts обновил ключи. Ansible работает?",
+        "obs": "Отпечаток сверен с ssh-keygen -lf на консоли ВМ, запись обновлена: ssh-keygen -R hostname && ssh-keyscan -H hostname >> ~/.ssh/known_hosts. Ansible работает?",
         "choices": [
           {
             "text": "ansible all -m ping — проверить",
@@ -983,7 +983,7 @@
             "ok": true
           },
           {
-            "text": "Добавить ssh-keyscan в pipeline перед Ansible",
+            "text": "Раздавать ключи хостов из доверенного источника (cloud-init, SSH CA), а не ssh-keyscan в pipeline",
             "next": "ansible_success",
             "pts": 25,
             "ok": true
@@ -998,7 +998,7 @@
         "obs": "-vvv показывает Host key verification failed. Причина найдена.",
         "choices": [
           {
-            "text": "Обновить known_hosts через ssh-keyscan",
+            "text": "Сверить новый ключ хоста и обновить known_hosts",
             "next": "fix_known_hosts",
             "pts": 20,
             "ok": true
@@ -1028,7 +1028,7 @@
         ]
       },
       "remove_known_hosts": {
-        "obs": "ssh-keygen -R удалит старый ключ, но SSH запросит подтверждение нового. ssh-keyscan лучше.",
+        "obs": "ssh-keygen -R удалит старый ключ, но SSH запросит подтверждение нового. ssh-keyscan без сверки отпечатка так же уязвим к подмене — ключ сверяют по доверенному каналу.",
         "choices": [
           {
             "text": "ansible all -m ping",
@@ -1296,7 +1296,7 @@
         "obs": "gitlab-runner стартовал, но задачи всё ещё pending. Проверяем журнал: 'ERROR: Checking for jobs... forbidden  runner=abc123'. Что это значит?",
         "choices": [
           {
-            "text": "Токен регистрации мог устареть. gitlab-runner verify && gitlab-runner register",
+            "text": "Токен runner'а отозван: создать runner в интерфейсе GitLab и зарегистрировать его токеном аутентификации glrt-…",
             "next": "reregister_runner",
             "pts": 25,
             "ok": true
@@ -1322,7 +1322,7 @@
         ]
       },
       "reregister_runner": {
-        "obs": "РЕШЕНО: Токен runner'а был отозван при ротации. После перерегистрации с новым токеном (gitlab-runner register) задачи начали выполняться. Настройте мониторинг статуса runner.",
+        "obs": "РЕШЕНО: Токен runner'а был отозван при ротации. После создания runner в интерфейсе и регистрации токеном аутентификации glrt-… (регистрационные токены устарели) задачи начали выполняться. Настройте мониторинг статуса runner.",
         "choices": []
       },
       "retry_pipeline": {
@@ -1362,7 +1362,7 @@
         "obs": "gitlab-runner run показывает ошибки: токен отклонён GitLab. Нужна перерегистрация.",
         "choices": [
           {
-            "text": "gitlab-runner register с новым токеном",
+            "text": "gitlab-runner register с новым токеном аутентификации glrt-…",
             "next": "reregister_runner",
             "pts": 15,
             "ok": true
@@ -1373,7 +1373,7 @@
         "obs": "journalctl показывает: 'FATAL: Service exited with error code. forbidden token'. Токен отозван.",
         "choices": [
           {
-            "text": "gitlab-runner register с новым токеном",
+            "text": "gitlab-runner register с новым токеном аутентификации glrt-…",
             "next": "reregister_runner",
             "pts": 15,
             "ok": true
@@ -1395,7 +1395,7 @@
         "obs": "Сеть работает, GitLab доступен. Проблема в авторизации runner (токен).",
         "choices": [
           {
-            "text": "gitlab-runner register с новым токеном",
+            "text": "gitlab-runner register с новым токеном аутентификации glrt-…",
             "next": "reregister_runner",
             "pts": 15,
             "ok": true
@@ -1406,7 +1406,7 @@
         "obs": "Удаление и пересоздание runner — рабочий вариант, но нужно обновить токен в конфигурации.",
         "choices": [
           {
-            "text": "gitlab-runner register с новым токеном",
+            "text": "gitlab-runner register с новым токеном аутентификации glrt-…",
             "next": "reregister_runner",
             "pts": 15,
             "ok": true
@@ -1851,7 +1851,7 @@
             "ok": true
           },
           {
-            "text": "kubectl create secret generic regcred --from-file=.dockerconfigjson=/root/.docker/config.json",
+            "text": "kubectl create secret generic regcred --type=kubernetes.io/dockerconfigjson --from-file=.dockerconfigjson=/root/.docker/config.json",
             "next": "create_secret_file",
             "pts": 20,
             "ok": false
@@ -1948,7 +1948,7 @@
         ]
       },
       "create_secret_file": {
-        "obs": "Создание secret из config.json тоже работает, но нужно привязать его к deployment через imagePullSecrets.",
+        "obs": "Secret из config.json работает только с --type=kubernetes.io/dockerconfigjson (иначе тип Opaque не подойдёт для imagePullSecrets) и не оставляет пароль в истории shell. Теперь нужно привязать его через imagePullSecrets у deployment или ServiceAccount.",
         "choices": [
           {
             "text": "Добавить imagePullSecrets в deployment",
@@ -2084,10 +2084,10 @@
         ]
       },
       "lsof_process": {
-        "obs": "lsof -p 4521: активно пишет в /var/lib/postgresql/pg_wal/*.wal. WAL файлы генерируются с огромной скоростью — запущен массовый импорт данных без checkpoint throttling. Что делать?",
+        "obs": "lsof -p 4521: активно пишет в каталог pg_wal (файлы WAL без расширения). WAL генерируется с огромной скоростью — запущен массовый импорт данных, checkpoint идут непрерывно. Что делать?",
         "choices": [
           {
-            "text": "Найти и остановить импорт. ALTER SYSTEM SET checkpoint_completion_target='0.9'; SELECT pg_reload_conf();",
+            "text": "Найти и остановить импорт; загружать частями и на время импорта увеличить max_wal_size (ALTER SYSTEM SET max_wal_size='8GB'; SELECT pg_reload_conf();)",
             "next": "fix_postgres",
             "pts": 25,
             "ok": true
@@ -2113,7 +2113,7 @@
         ]
       },
       "fix_postgres": {
-        "obs": "РЕШЕНО: Массовый импорт остановлен, WAL generation снизился. checkpoint_completion_target=0.9 распределяет checkpoint I/O равномернее. iowait упал до 5%. Рекомендуется: pg_bulkload для импорта, мониторинг WAL generation.",
+        "obs": "РЕШЕНО: Массовый импорт остановлен, WAL generation снизился. Больший max_wal_size сокращает частоту checkpoint (checkpoint_completion_target с PostgreSQL 14 и так 0.9). iowait упал до 5%. Рекомендуется: pg_bulkload для импорта, мониторинг WAL generation.",
         "choices": []
       },
       "df_check": {
@@ -2172,7 +2172,7 @@
         "obs": "pg_stat_activity показывает активный COPY FROM запрос — массовый импорт. Источник I/O найден.",
         "choices": [
           {
-            "text": "Остановить импорт и настроить checkpoint_completion_target",
+            "text": "Остановить импорт и увеличить max_wal_size на время загрузки",
             "next": "fix_postgres",
             "pts": 15,
             "ok": true

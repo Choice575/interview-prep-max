@@ -169,7 +169,7 @@
     "scenario": "Приложение не может писать временные файлы. df -h показывает 45% использования. Но ошибка остаётся.",
     "code": "$ df -h\nFilesystem  Size  Used Avail Use% Mounted on\n/dev/sda1   100G   45G   55G  45% /\n\n$ df -i\nFilesystem  Inodes IUsed IFree IUse% Mounted on\n/dev/sda1   655360 655360     0  100% /\n\n$ touch /tmp/test\ntouch: cannot touch '/tmp/test': No space left on device",
     "bug": "Место на диске есть (45%), но ЗАКОНЧИЛИСЬ INODE'ы (100%). Каждый файл требует inode, и они исчерпаны — новые файлы создать невозможно.",
-    "fix": "Найти директорию с миллионами мелких файлов: for d in /*; do echo \"$(find $d -type f | wc -l) $d\"; done | sort -rn. Удалить ненужные (обычно сессии PHP, кэш).",
+    "fix": "Найти каталоги с наибольшим числом инодов в пределах этой ФС: du --inodes -x / | sort -n | tail -20. Удалить ненужные мелкие файлы (обычно сессии PHP, кэш).",
     "question": "Почему нельзя создать файл при 45% свободного места?",
     "opts": [
       "Закончились inode'ы (100%) — максимум файлов достигнут",
