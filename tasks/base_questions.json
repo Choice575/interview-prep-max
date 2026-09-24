@@ -296,7 +296,7 @@
       "Они разделяют state, но используют общий root module и связанные backend-настройки"
     ],
     "answer": 3,
-    "explanation": "CLI workspaces разделяют экземпляры state, но конфигурация и многие параметры жизненного цикла остаются общими. Для окружений с разными правами, владельцами и область воздействия сбоя (blast radius) часто яснее отдельные root modules и backend.",
+    "explanation": "CLI workspaces разделяют экземпляры state, но конфигурация и многие параметры жизненного цикла остаются общими. Для окружений с разными правами, владельцами и областью воздействия сбоя (blast radius) часто яснее отдельные root modules и backend.",
     "id": 20
   },
   {
@@ -2285,13 +2285,13 @@
     "category": "scenario",
     "q": "Как организовать state для multi-account инфраструктуры?",
     "options": [
-      "Разделить state по границам доступа и область воздействия сбоя (blast radius)",
+      "Разделить state по границам доступа и области воздействия сбоя (blast radius)",
       "Объединить аккаунты в state для общего механизма locking",
       "Менять credentials у одного workspace перед каждым apply",
       "Копировать локальный state между аккаунтами вручную"
     ],
     "answer": 0,
-    "explanation": "Границы state выбирают по правам доступа, жизненному циклу и область воздействия сбоя (blast radius). Для каждого state отдельно настраивают backend, блокировку и минимально необходимые права.",
+    "explanation": "Границы state выбирают по правам доступа, жизненному циклу и области воздействия сбоя (blast radius). Для каждого state отдельно настраивают backend, блокировку и минимально необходимые права.",
     "id": 153
   },
   {
@@ -3356,7 +3356,7 @@
       "Конфиденциальность, целостность и аутентификацию"
     ],
     "answer": 3,
-    "explanation": "ESP может обеспечивать конфиденциальность, целостность и аутентификацию, а AH — целостность и аутентификацию без шифрования полезной нагрузки. IKE согласует Безопасность Associations и ключи. IPsec поддерживает transport и tunnel mode.",
+    "explanation": "ESP может обеспечивать конфиденциальность, целостность и аутентификацию, а AH — целостность и аутентификацию без шифрования полезной нагрузки. IKE согласует Security Associations (SA) и ключи. IPsec поддерживает transport и tunnel mode.",
     "id": 224
   },
   {
@@ -5262,7 +5262,7 @@
       "Файл переносится в named volume, а lowerdir помечается writable"
     ],
     "answer": 2,
-    "explanation": "Lower layers образа остаются без изменения состояния (read-only). При первой записи overlay2 делает copy_up всего файла из lowerdir в container upperdir и изменяет уже верхнюю копию; последующие writes идут туда же. Для большого файла даже небольшое первое изменение может добавить latency, потому что copy_up работает на уровне целого файла."
+    "explanation": "Lower layers образа остаются только для чтения (read-only). При первой записи overlay2 делает copy_up всего файла из lowerdir в container upperdir и изменяет уже верхнюю копию; последующие writes идут туда же. Для большого файла даже небольшое первое изменение может добавить latency, потому что copy_up работает на уровне целого файла."
   },
   {
     "id": 352,
@@ -5277,7 +5277,7 @@
       "--user 1001 --read-only --cap-drop=ALL --security-opt no-new-privileges"
     ],
     "answer": 3,
-    "explanation": "Defense in depth начинает с non-root user, без изменения состояния (read-only) root filesystem, удаления capabilities и запрета получения новых privileges. Нужные write paths дают через tmpfs/volumes, а отдельные capabilities возвращают точечно. Правильный Docker flag — --security-opt no-new-privileges[=true]; default или более строгий seccomp profile оставляют включённым."
+    "explanation": "Defense in depth начинает с non-root user, корневая файловая система только для чтения (read-only root filesystem), удаления capabilities и запрета получения новых privileges. Нужные write paths дают через tmpfs/volumes, а отдельные capabilities возвращают точечно. Правильный Docker flag — --security-opt no-new-privileges[=true]; default или более строгий seccomp profile оставляют включённым."
   },
   {
     "id": 353,
@@ -5409,7 +5409,7 @@
       "Поток событий Docker objects с фильтрами по type, action и времени",
       "Историю изменений Dockerfile и diff инструкций между builds",
       "Per-process CPU и memory samples для running containers",
-      "Версии daemon configuration с возможностью откат (rollback)"
+      "Версии daemon configuration с возможностью отката (rollback)"
     ],
     "answer": 0,
     "explanation": "docker events получает real-time events от daemon для containers, images, networks, volumes и других object types. --filter, --since и --until ограничивают поток. Это не долговечный audit log: при запросе истории daemon возвращает не более последних 256 событий, поэтому для аудита consumer должен сохранять их во внешней системе."
@@ -5707,12 +5707,12 @@
     "q": "Какая команда откатывает Deployment на предыдущую revision?",
     "options": [
       "kubectl rollout undo deployment/myapp",
-      "kubectl rollout откат (rollback) deployment/myapp",
+      "kubectl rollout rollback deployment/myapp",
       "kubectl deploy undo myapp --previous",
       "kubectl apply revision deployment/myapp"
     ],
     "answer": 0,
-    "explanation": "kubectl rollout undo deployment/myapp возвращает Pod template к предыдущей revision; --to-revision=N выбирает конкретную. kubectl rollout history показывает доступную history. Возможность откат (rollback) зависит от сохранённых ReplicaSets, число которых ограничивает spec.revisionHistoryLimit."
+    "explanation": "kubectl rollout undo deployment/myapp возвращает Pod template к предыдущей revision; --to-revision=N выбирает конкретную. kubectl rollout history показывает доступную history. Возможность отката (rollback) зависит от сохранённых ReplicaSets, число которых ограничивает spec.revisionHistoryLimit."
   },
   {
     "id": 382,
@@ -5772,7 +5772,7 @@
       "API server переключается на SQL store до восстановления snapshot"
     ],
     "answer": 0,
-    "explanation": "etcd commit-ит consensus updates после подтверждения majority: floor(n/2)+1 members. При потере quorum он не делает progress, а Kubernetes API operations, которым нужны согласованные reads или writes, сбоят; API server не становится простым без изменения состояния (read-only) store. Уже запущенные workloads могут продолжить на nodes, но управление desired state деградирует."
+    "explanation": "etcd commit-ит consensus updates после подтверждения majority: floor(n/2)+1 members. При потере quorum он не делает progress, а Kubernetes API operations, которым нужны согласованные reads или writes, сбоят; API server не становится простым хранилищем только для чтения (read-only store). Уже запущенные workloads могут продолжить на nodes, но управление desired state деградирует."
   },
   {
     "id": 386,
@@ -5813,7 +5813,7 @@
     "options": [
       "Перенести Pod на node с большей RAM, оставив прежний cgroup limit",
       "Включить swap и считать memory profile несущественным для анализа",
-      "Сбросить restart count и повторять Pod до другого код завершения (exit code)",
+      "Сбросить restart count и повторять Pod до другого кода завершения (exit code)",
       "Сверить lastState, limit, metrics и app profile для leak или peak"
     ],
     "answer": 3,
@@ -6267,7 +6267,7 @@
       "Стратегии имеют одну traffic model и различаются YAML syntax"
     ],
     "answer": 1,
-    "explanation": "Blue-Green держит old/new environments и переключает router, поэтому откат (rollback) быстрый, но parallel capacity и state synchronization могут стоить дорого. Canary постепенно увеличивает exposure новой version, требуя измеримых success criteria, traffic segmentation и automation. Обе стратегии нуждаются в backward-compatible data/schema change для безопасного откат."
+    "explanation": "Blue-Green держит old/new environments и переключает router, поэтому откат (rollback) быстрый, но parallel capacity и state synchronization могут стоить дорого. Canary постепенно увеличивает exposure новой version, требуя измеримых success criteria, traffic segmentation и automation. Обе стратегии нуждаются в backward-compatible data/schema change для безопасного отката."
   },
   {
     "id": 419,
@@ -6291,7 +6291,7 @@
     "category": "definition",
     "q": "Каков security trade-off traditional DinD в CI?",
     "options": [
-      "Использует host daemon с без изменения состояния (read-only) доступом к Docker socket",
+      "Использует host daemon с доступом к Docker socket в режиме чтения (read-only)",
       "Запускает containers в VM, изолированной от runner kernel",
       "Подписывает images во вложенном registry без privileges",
       "Nested daemon обычно требует privileged container, ослабляя isolation"
@@ -6387,7 +6387,7 @@
       "Повторять deployment того же артефакта до успешного smoke test, не меняя версию и состояние зависимостей"
     ],
     "answer": 1,
-    "explanation": "Rollback должен быть заранее проверяемой операцией: Helm откат (rollback), kubectl rollout undo или возврат желаемого состояния в Git. При Argo CD с automated sync выполняют Git revert и синхронизацию; команда откат при auto-sync недоступна."
+    "explanation": "Rollback должен быть заранее проверяемой операцией: `helm rollback`, kubectl rollout undo или возврат желаемого состояния в Git. При Argo CD с automated sync выполняют Git revert и синхронизацию; команда `argocd app rollback` при включённом auto-sync недоступна."
   },
   {
     "id": 427,
@@ -6709,7 +6709,7 @@
     "topic": "CI/CD",
     "level": "Senior",
     "category": "definition",
-    "q": "Какие controls укрепляют цепочка поставки программного обеспечения (software supply chain) в CI/CD?",
+    "q": "Какие controls укрепляют цепочку поставки программного обеспечения (software supply chain) в CI/CD?",
     "options": [
       "Сканирование CVE финального image без фиксации build inputs, identity builder и источника зависимостей",
       "TLS между runner и registry без проверки third-party actions, package signatures и provenance artifacts",
@@ -6728,7 +6728,7 @@
     "options": [
       "Версионировать Flyway/Liquibase migrations, применять expand-contract один раз и координировать с совместимым приложением",
       "Запускать migration в init container каждой replica: параллельные executions обеспечат атомарность с rollout controller",
-      "Считать reverse SQL гарантированным откат (rollback) данных и запускать его при каждом неуспешном readiness probe",
+      "Считать reverse SQL гарантированным откатом (rollback) данных и запускать его при каждом неуспешном readiness probe",
       "Менять schema после переключения всех replicas, не сохраняя совместимость старого и нового application code"
     ],
     "answer": 0,
@@ -7146,7 +7146,7 @@
     "category": "tradeoff",
     "q": "Как выбрать границы Terraform state?",
     "options": [
-      "Делить по lifecycle, ownership, permissions и область воздействия сбоя (blast radius); monolith проще, split добавляет interfaces и coordination",
+      "Делить по lifecycle, ownership, permissions и области воздействия сбоя (blast radius); monolith проще, split добавляет interfaces и coordination",
       "Хранить production в одном state независимо от размера, поскольку backend lock устраняет team contention и risk",
       "Создать state на каждый resource, чтобы provider API failures не влияли на соседние objects и plans",
       "Разделить по provider regions: remote_state автоматически синхронизирует dependencies и применяет changes по DAG"
@@ -7212,7 +7212,7 @@
       "Назначить регион каждому CLI workspace: Terraform автоматически переключит provider и изолирует зависимости"
     ],
     "answer": 0,
-    "explanation": "Конфигурации провайдеров связываются статически: aliases объявляют в root module и явно передают через providers. Один module block с for_each не умеет динамически выбирать alias для каждого элемента, поэтому часто используют явные вызовы или отдельные root configurations; state разделяют по область воздействия сбоя (blast radius) и операционным границам."
+    "explanation": "Конфигурации провайдеров связываются статически: aliases объявляют в root module и явно передают через providers. Один module block с for_each не умеет динамически выбирать alias для каждого элемента, поэтому часто используют явные вызовы или отдельные root configurations; state разделяют по области воздействия сбоя (blast radius) и операционным границам."
   },
   {
     "id": 482,
@@ -7553,7 +7553,7 @@
       "Увеличить swap до размера RAM: OOM killer перестанет выбирать процессы с anonymous memory"
     ],
     "answer": 2,
-    "explanation": "Сначала различают global и memcg OOM по journalctl -k или dmesg и cgroup memory.events, затем смотрят memory.current/peak, limits, PSI, RSS/anonymous/file usage и логи runtime. Исправление может быть leak исправление (fix), корректный limit/request, снижение concurrency или capacity. oom_score_adj меняет выбор жертвы, а overcommit и swap имеют trade-offs и не заменяют диагностику."
+    "explanation": "Сначала различают global и memcg OOM по journalctl -k или dmesg и cgroup memory.events, затем смотрят memory.current/peak, limits, PSI, RSS/anonymous/file usage и логи runtime. Исправление — устранение утечки (leak fix), корректный limit/request, снижение concurrency или capacity. oom_score_adj меняет выбор жертвы, а overcommit и swap имеют trade-offs и не заменяют диагностику."
   },
   {
     "id": 504,
@@ -7615,7 +7615,7 @@
       "Выключить SYN cookies и увеличить keepalive time: accept queue освободится без влияния на failure detection"
     ],
     "answer": 2,
-    "explanation": "Универсального sysctl-рецепта нет. Сначала смотрят ss -s, nstat, softnet, listen queue, retransmits, drops, CPU и memory. Затем согласуют application listen backlog с somaxconn, при необходимости SYN backlog, buffer ceilings или local port range. Изменения версионируют в /etc/sysctl.d, применяют поэтапно и проверяют нагрузочным тестом и откат (rollback).",
+    "explanation": "Универсального sysctl-рецепта нет. Сначала смотрят ss -s, nstat, softnet, listen queue, retransmits, drops, CPU и memory. Затем согласуют application listen backlog с somaxconn, при необходимости SYN backlog, buffer ceilings или local port range. Изменения версионируют в /etc/sysctl.d, применяют поэтапно и проверяют нагрузочным тестом и откатом (rollback).",
     "depth": "deep"
   },
   {
@@ -7787,7 +7787,7 @@
       "LVM thin snapshot требует заранее фиксированный COW volume, тогда как legacy LVM snapshot растёт динамически"
     ],
     "answer": 1,
-    "explanation": "Снимок btrfs бывает доступным для записи или только для чтения и представляет копирование при записи (CoW) конкретного подтома; вложенные подтома не включаются рекурсивно. send/receive передаёт полные и инкрементальные снимки. Классическим снимкам LVM нужно место для изменённых блоков, а тонкие снимки LVM тоже выделяют блоки динамически, поэтому простое сравнение некорректно. Снимок, согласованный лишь на уровне сбоя, не гарантирует согласованность приложения без предварительного сброса данных.",
+    "explanation": "Снимок btrfs бывает доступным для записи или только для чтения и представляет собой копию конкретного подтома с копированием при записи (CoW); вложенные подтома не включаются рекурсивно. send/receive передаёт полные и инкрементальные снимки. Классическим снимкам LVM нужно место для изменённых блоков, а тонкие снимки LVM тоже выделяют блоки динамически, поэтому простое сравнение некорректно. Снимок, согласованный лишь на уровне сбоя, не гарантирует согласованность приложения без предварительного сброса данных.",
     "depth": "deep"
   },
   {
@@ -8002,7 +8002,7 @@
       "Route, полученный по iBGP, обычно не анонсируется другому iBGP peer; mesh, RR или confederation решают scaling"
     ],
     "answer": 3,
-    "explanation": "Все BGP sessions используют TCP/179. Чтобы предотвратить loops внутри AS, обычный iBGP speaker не пересылает iBGP-learned route другому iBGP peer, поэтому без дополнительного механизма нужен N(N-1)/2 mesh. Route reflector меняет propagation model с cluster-list/originator-id loop меры предотвращения повторного сбоя (prevention); confederations дают другой компромисс. Next-hop reachability обычно обеспечивает IGP."
+    "explanation": "Все BGP sessions используют TCP/179. Чтобы предотвратить loops внутри AS, обычный iBGP speaker не пересылает iBGP-learned route другому iBGP peer, поэтому без дополнительного механизма нужен N(N-1)/2 mesh. Route reflector меняет propagation model с cluster-list/originator-id для предотвращения петель (loop prevention); confederations дают другой компромисс. Next-hop reachability обычно обеспечивает IGP."
   },
   {
     "id": 533,
@@ -8039,7 +8039,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Как выбирать между WireGuard и IPsec/IKEv2 для рабочей среды (production) VPN?",
+    "q": "Как выбирать между WireGuard и IPsec/IKEv2 для VPN в рабочей среде (production)?",
     "options": [
       "WireGuard выбирать по умолчанию: fixed algorithms гарантируют совместимость с legacy appliance и enterprise PKI",
       "IPsec быстрее: IKE negotiation переносит data plane encryption в NIC независимо от hardware offload",
@@ -9271,7 +9271,7 @@
     "q": "Что даёт Docker named volume?",
     "options": [
       "Управляемое Docker storage, которое монтируется в container и живёт независимо от его удаления до удаления volume",
-      "Копию без изменения состояния (read-only) image layer, которую daemon переносит в registry при каждом изменении файла приложением",
+      "Копию неизменяемого слоя образа (read-only image layer), которую daemon переносит в registry при каждом изменении файла приложением",
       "Memory limit cgroup, измеренный в байтах и разделяемый между containers одного Compose service",
       "Overlay network segment с собственным DNS, где volume name используется как alias container endpoint"
     ],
@@ -9321,7 +9321,7 @@
       "Filesystem changes build steps образуют immutable content layers; container добавляет свой writable layer сверху"
     ],
     "answer": 3,
-    "explanation": "Image manifest ссылается на content-addressed filesystem layers, которые могут кэшироваться и разделяться. Build instructions, меняющие filesystem, формируют соответствующие diffs; metadata instructions не обязаны добавлять filesystem layer, хотя остаются в config/history. Container использует без изменения состояния (read-only) image layers и отдельный writable layer.",
+    "explanation": "Image manifest ссылается на content-addressed filesystem layers, которые могут кэшироваться и разделяться. Build instructions, меняющие filesystem, формируют соответствующие diffs; metadata instructions не обязаны добавлять filesystem layer, хотя остаются в config/history. Container использует слои образа только для чтения (read-only image layers) и отдельный writable layer.",
     "id": 10010
   },
   {
@@ -9693,10 +9693,10 @@
       "Changed task уведомляет handler, он ставится в очередь и обычно выполняется в контрольной точке один раз по имени",
       "Каждая task запускает все handlers своей роли до проверки changed status и вычисления условия `when`",
       "Handler выполняется на controller при чтении inventory и изменяет variables для последующих plays",
-      "Failed task автоматически вызывает handler как откату (rollback), даже если задача не содержит директиву `notify`"
+      "Failed task автоматически вызывает handler как откат (rollback), даже если задача не содержит директиву `notify`"
     ],
     "answer": 0,
-    "explanation": "Handler уведомляется через `notify`, обычно когда task имеет статус changed. Уведомления дедуплицируются по handler, а выполнение происходит после соответствующей секции tasks; `meta: flush_handlers` запускает очередь раньше. Handler не является автоматическим откат (rollback) и при аварийном завершении host может не выполниться.",
+    "explanation": "Handler уведомляется через `notify`, обычно когда task имеет статус changed. Уведомления дедуплицируются по handler, а выполнение происходит после соответствующей секции tasks; `meta: flush_handlers` запускает очередь раньше. Handler не является автоматическим откатом (rollback) и при аварийном завершении host может не выполниться.",
     "id": 10035
   },
   {
@@ -9855,7 +9855,7 @@
     "category": "definition",
     "q": "Какую практику описывает Continuous Integration?",
     "options": [
-      "Release собирают на рабочей станции перед квартальным окном и проверяют отдельным ручным контрольный список (checklist)",
+      "Release собирают на рабочей станции перед квартальным окном и проверяют отдельным ручным контрольным списком (checklist)",
       "Source code архивируют после каждой версии, а integration выполняют при подготовке production migration",
       "Images публикуют в registry по расписанию, даже если source и automated checks не изменялись",
       "Небольшие изменения часто объединяют в общей ветке и быстро проверяют автоматической сборкой и tests"
@@ -10678,7 +10678,7 @@
     "topic": "Security",
     "level": "Senior",
     "category": "definition",
-    "q": "Что повышает доверие к происхождению артефакта в цепочка поставки программного обеспечения (software supply chain)?",
+    "q": "Что повышает доверие к происхождению артефакта в цепочке поставки программного обеспечения (software supply chain)?",
     "options": [
       "Сборка на ноутбуке разработчика с загрузкой артефакта под его личной учётной записью",
       "Публикация хеша в журнале pipeline без связи с исходным кодом и параметрами сборки",
@@ -10697,7 +10697,7 @@
     "options": [
       "Проверять форматирование файлов и считать успешный lint подтверждением безопасной конфигурации",
       "Проводить ручной аудит после deployment, когда фактические права и сеть уже применены",
-      "Заменить анализ IaC сканированием контейнерных образов, потому что они попадают в рабочей среде (production)",
+      "Заменить анализ IaC сканированием контейнерных образов, потому что они попадают в рабочую среду (production)",
       "Сканировать pull request и план, применять policy-as-code и документировать исключения"
     ],
     "answer": 3,
@@ -10978,7 +10978,7 @@
     "topic": "Monitoring",
     "level": "Middle",
     "category": "definition",
-    "q": "Чем synthetic monitoring отличается от Real User Мониторинг (monitoring)?",
+    "q": "Чем synthetic monitoring отличается от Real User Monitoring (RUM)?",
     "options": [
       "Анализирует серверные логи после запросов и восстанавливает пользовательские сессии по идентификаторам",
       "Собирает телеметрию браузеров реальных посетителей и повторяет их распределение устройств и сетей",
@@ -12816,7 +12816,7 @@
       "Pg_stat_activity хранит полную историю за месяц"
     ],
     "answer": 2,
-    "explanation": "Для текущих запросов используют pg_stat_activity и рассчитывают now()-query_start, отдельно учитывая state и wait_event. Для накопленной статистики применяют pg_stat_statements, где видны calls, total_exec_time, mean_exec_time и строки; «самый долгий» можно искать по max времени в логах или по total влияние на пользователей и систему (impact) в агрегате. Важно отличать один редкий долгий запрос от частого запроса, который суммарно съедает больше ресурсов, и связывать результат с планом и блокировками.",
+    "explanation": "Для текущих запросов используют pg_stat_activity и рассчитывают now()-query_start, отдельно учитывая state и wait_event. Для накопленной статистики применяют pg_stat_statements, где видны calls, total_exec_time, mean_exec_time и строки; «самый долгий» можно искать по max времени в логах или по суммарному времени (total) в агрегате. Важно отличать один редкий долгий запрос от частого запроса, который суммарно съедает больше ресурсов, и связывать результат с планом и блокировками.",
     "id": 14157,
     "sourceVideoId": "M1tXCebcOBE",
     "sourceTime": "37:40"
@@ -13003,7 +13003,7 @@
       "Разбирать системы и проверять trade-off практикой."
     ],
     "answer": 3,
-    "explanation": "Начинать стоит не с запоминания названий книг, а с разбора реальных систем: требования, ограничения, failure domains, хранение, очереди, consistency, observability и стоимость. Полезно читать классические материалы по distributed systems и software architecture, затем проверять идеи маленькими лабораториями и разбор инцидента (postmortem). На собеседовании важно уметь уточнить нагрузку, предложить несколько вариантов и объяснить trade-off, а не воспроизвести один шаблон архитектуры.",
+    "explanation": "Начинать стоит не с запоминания названий книг, а с разбора реальных систем: требования, ограничения, failure domains, хранение, очереди, consistency, observability и стоимость. Полезно читать классические материалы по distributed systems и software architecture, затем проверять идеи маленькими лабораториями и разбором инцидентов (postmortem). На собеседовании важно уметь уточнить нагрузку, предложить несколько вариантов и объяснить trade-off, а не воспроизвести один шаблон архитектуры.",
     "id": 14168,
     "sourceVideoId": "M1tXCebcOBE",
     "sourceTime": "65:25"

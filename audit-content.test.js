@@ -84,3 +84,33 @@ test('Ansible trainers describe lineinfile and when braces as verified on ansibl
   assert.doesNotMatch(braces.bug + braces.opts[braces.answer], /deprecated/);
   assert.match(braces.bug, /Template delimiters are not supported in expressions/);
 });
+
+test('trainer-derived study cards keep source punctuation and never point at invisible options', () => {
+  const cards = require('./tasks/flashcards.json').cards;
+  const byQuestion = new Map(cards.map(card => [card.question.trim(), card]));
+  let linked = 0;
+  for (const file of ['regex', 'cmd', 'git']) {
+    for (const task of require(`./tasks/${file}.json`)) {
+      const card = byQuestion.get(task.task.trim());
+      if (!card) continue;
+      linked++;
+      const option = task.opts[task.answer];
+      // Вариант, оканчивающийся точкой (build context «.»), не получает вторую точку.
+      const expected = option.endsWith(' .') ? `${option} ${task.exp}` : `${option}. ${task.exp}`;
+      assert.equal(card.answer, expected, `${file}#${task.id} → ${card.id}`);
+      assert.doesNotMatch(task.exp, /(Перв|Втор|Трет|Четв[её]рт|Последн)[а-яё]* вариант|\((перв|втор|трет|четв[её]рт)ый\)/i, `${file}#${task.id}`);
+    }
+  }
+  assert.ok(linked >= 78, `связанных карточек ${linked}`);
+
+  const restored = new Map([
+    [1000639, 'git cherry-pick A..B'], [1000676, 'HEAD..origin/main'], [1000666, '../hotfix'],
+    [1001118, '-e trace=...'], [1001128, 'ip link set ... netns'], [1001130, '2>&1 | ...'],
+    [1001060, 'EXPLAIN ANALYZE ...'], [1001058, "since...'"], [1001333, 'trace=...'], [1001575, '"5.."']
+  ]);
+  const byId = new Map(cards.map(card => [card.id, card]));
+  for (const [id, literal] of restored) {
+    const card = byId.get(id);
+    assert.ok(`${card.question} ${card.answer}`.includes(literal), `${id}: ${literal}`);
+  }
+});

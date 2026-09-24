@@ -41,3 +41,27 @@ test('all committed question datasets already have the reviewed wording applied'
     }
   }
 });
+
+test('wording leaves English terms and commands intact when a phrase is part of them', () => {
+  const text = 'Используйте Helm rollback, Security group и Real User Monitoring; leak fix; deploy=1 FAILED; rollback revision=41 SUCCESS. Команда работает в режиме read-only.';
+  const result = translate(text);
+  for (const literal of ['Helm rollback', 'Security group', 'Real User Monitoring', 'leak fix', 'rollback revision=41']) assert.ok(result.includes(literal), literal);
+  assert.ok(result.includes('только для чтения (read-only)'), result);
+  assert.ok(!result.includes('без изменения состояния'), result);
+});
+
+test('audited translation artifacts do not return to the question datasets', () => {
+  const artifacts = [
+    'без изменения состояния (read-only)', 'Безопасность group', 'Безопасность gate', 'Безопасность Associations',
+    'Pod Безопасность', 'Real User Мониторинг', 'Helm откат', 'rollout откат', 'total влияние на пользователей',
+    'leak исправление', 'loop меры предотвращения', 'audit диагностические данные', 'откат revision=',
+    'по область воздействия', 'для безопасного откат.', 'команда откат при', 'без план действий',
+    'к влияние на пользователей', 'по диагностические данные', 'в проверка основной', 'цепочка поставки программного обеспечения (software supply chain)» и',
+    'укрепляют цепочка', 'в цепочка поставки', 'гарантированным откат (', 'автоматическим откат (', 'лабораториями и разбор инцидента',
+    'Blameless разбор инцидента', 'контрольный список (checklist)» и какой', 'ручным контрольный список', 'откатa', 'неactionable', 'пересcheduling', 'сетeвая'
+  ];
+  for (const file of ['./tasks/base_questions.json', './tasks/question_bank.json', './tasks/flashcards.json', './tasks/video_flashcards.json', './scripts/imports/swfuse.json']) {
+    const text = JSON.stringify(require(file));
+    for (const artifact of artifacts) assert.ok(!text.includes(artifact), `${file}: ${artifact}`);
+  }
+});

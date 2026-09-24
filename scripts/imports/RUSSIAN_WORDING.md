@@ -22,3 +22,10 @@ translation of every English phrase in the corpus.
 During the Ansible handler rewrite, an overly broad statement that handlers never
 execute in check mode was corrected: behavior depends on module support. Reference:
 https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_checkmode.html
+
+Since 15.11.10 a phrase is left untouched when an English word without its own
+rule, or a protected fragment (code, `key=value` output), stands right next to
+it: `helm rollback`, `security group`, `Real User Monitoring`, `leak fix` and
+`rollback revision=41` are terms or commands, not prose. `read-only` becomes
+«только для чтения»; in diagnostic steps the reviewed phrases say «не меняя
+состояние». Reverted artifacts are listed in `russian-wording.test.js`.
