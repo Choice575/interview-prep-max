@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const ui = require('./trainers-ui.js');
+const ui = require('./public/trainers-ui.js');
 
 const TOTALS = {
   ts: 12, labs: 15, code: 15, subnet: 10, ports: 50,

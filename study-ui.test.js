@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const StudyUI = require('./study-ui');
+const StudyUI = require('./public/study-ui');
 
 test('renderTutorButton: учебный день получает доступную кнопку без контекста в DOM', () => {
   const html = StudyUI.renderTutorButton('study');

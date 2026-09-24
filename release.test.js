@@ -39,9 +39,9 @@ function loadServiceWorker(cacheKeys = [], options = {}) {
       addEventListener: (name, handler) => handlers.set(name, handler),
       skipWaiting: async () => {}
     },
-    importScripts: file => {
-      assert.equal(file, './version.js');
-      vm.runInContext(read('version.js'), context, { filename: 'version.js' });
+    importScripts: (...files) => {
+      assert.deepEqual(files, ['./version.js', './asset-manifest.js']);
+      files.forEach(file => vm.runInContext(read('public/' + file.slice(2)), context, { filename: file.slice(2) }));
     },
     caches: {
       keys: async () => cacheKeys,
@@ -53,7 +53,7 @@ function loadServiceWorker(cacheKeys = [], options = {}) {
     URL,
     Response
   });
-  vm.runInContext(read('sw.js'), context, { filename: 'sw.js' });
+  vm.runInContext(read('public/sw.js'), context, { filename: 'sw.js' });
 
   return {
     context,
@@ -89,7 +89,7 @@ function request(server, pathname) {
 // Версию читаем из единственного источника правды, а не дублируем строкой:
 // иначе каждый релиз роняет тесты, которые к самому релизу отношения не имеют.
 const RELEASE_VERSION = (() => {
-  const source = fs.readFileSync(path.join(__dirname, 'version.js'), 'utf8');
+  const source = fs.readFileSync(path.join(__dirname, 'public', 'version.js'), 'utf8');
   const match = source.match(/self\.IPMAX_VERSION\s*=\s*'(\d+\.\d+\.\d+)'/);
   assert.ok(match, 'version.js должен содержать semver IPMAX_VERSION');
   return match[1];
@@ -100,14 +100,14 @@ test('publishes AI Tutor 1.0 from release 14.5.0 onward with a fresh offline cac
   assert.ok(major > 14 || (major === 14 && minor >= 5));
   const context = { self: {} };
   vm.createContext(context);
-  vm.runInContext(read('version.js'), context, { filename: 'version.js' });
+  vm.runInContext(read('public/version.js'), context, { filename: 'version.js' });
   assert.equal(context.self.IPMAX_CACHE_NAME, 'ipmax-v' + RELEASE_VERSION);
 });
 
 test('publishes separate video flashcards from release 15.2.0 onward', async () => {
   const [major, minor] = RELEASE_VERSION.split('.').map(Number);
   assert.ok(major > 15 || (major === 15 && minor >= 2), 'video flashcards require release >= 15.2.0');
-  const video = JSON.parse(read('tasks/video_flashcards.json'));
+  const video = JSON.parse(read('public/tasks/video_flashcards.json'));
   assert.equal(video.cards.length, 329);
   assert.equal(video.cards[0].id, 2000001);
   assert.equal(video.cards.at(-1).id, 2000329);
@@ -184,16 +184,14 @@ test('serves every release bootstrap file without HTTP caching', async () => {
   const server = createAppServer();
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   try {
-    // Каждый файл из offline-shell обязан реально отдаваться сервером.
-    // publicFiles в server.js — allowlist: забытый там модуль отвечает 403,
-    // страница молча теряет скрипт, а атомарный addAll роняет установку SW.
-    const shell = fs.readFileSync(path.join(root, 'sw.js'), 'utf8')
-      .match(/const SHELL_ASSETS = \[([\s\S]*?)\];/)[1];
-    const localScripts = [...shell.matchAll(/'\.\/([\w-]+\.js)'/g)].map(match => '/' + match[1]);
-    assert.ok(localScripts.length > 20, 'ожидался полный список shell-скриптов');
-    for (const file of ['/version.js', '/sw.js', ...localScripts]) {
+    // Каждый файл из манифеста обязан реально отдаваться сервером: иначе
+    // атомарный addAll в sw.js роняет установку офлайн-оболочки.
+    const assets = require('./public/asset-manifest.js');
+    const localScripts = assets.scripts.concat(assets.shell).filter(file => file !== './').map(file => file.slice(1));
+    assert.ok(localScripts.length > 20, 'ожидался полный список shell-ресурсов');
+    for (const file of ['/sw.js', ...localScripts]) {
       const response = await request(server, file);
-      assert.equal(response.status, 200, file + ' должен отдаваться, а не 403');
+      assert.equal(response.status, 200, file + ' должен отдаваться');
       assert.equal(response.headers['cache-control'], 'no-cache', file);
     }
     assert.match((await request(server, '/version.js')).body,

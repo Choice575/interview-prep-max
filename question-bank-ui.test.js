@@ -3,9 +3,9 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
 
-const ui = require('./question-bank-ui.js');
+const ui = require('./public/question-bank-ui.js');
 
-const BANK = JSON.parse(fs.readFileSync(path.join(__dirname, 'tasks', 'question_bank.json'), 'utf8'));
+const BANK = JSON.parse(fs.readFileSync(path.join(__dirname, 'public', 'tasks', 'question_bank.json'), 'utf8'));
 
 const dataset = {
   categories: [

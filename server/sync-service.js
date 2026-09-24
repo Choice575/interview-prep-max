@@ -1,11 +1,11 @@
 const fs = require('node:fs');
 const fsp = require('node:fs/promises');
 const path = require('node:path');
-const Merge = require('../sync-merge.js');
-const ProgressIO = require('../progress-io.js');
-const Storage = require('../storage.js');
-const AICoach = require('../ai-coach.js');
-const InterviewPractice = require('../interview-practice-ui.js');
+const Merge = require('../public/sync-merge.js');
+const ProgressIO = require('../public/progress-io.js');
+const Storage = require('../public/storage.js');
+const AICoach = require('../public/ai-coach.js');
+const InterviewPractice = require('../public/interview-practice-ui.js');
 // Разбор и сравнение токена — в общем модуле: две копии этой логики
 // неизбежно разъехались бы.
 const { safeEqual, extractBearer } = require('./auth.js');

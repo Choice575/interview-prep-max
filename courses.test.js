@@ -6,7 +6,7 @@ const path = require('path');
 const { buildCourses, checkResolvable, COURSE_PLAN, SIMULATOR_OVERRIDES } = require('./scripts/generate-courses.js');
 
 const root = __dirname;
-const readTask = (name) => JSON.parse(fs.readFileSync(path.join(root, 'tasks', name), 'utf8'));
+const readTask = (name) => JSON.parse(fs.readFileSync(path.join(root, 'public', 'tasks', name), 'utf8'));
 const doc = readTask('courses.json');
 
 const CHAPTER_TYPES = ['lesson', 'test', 'lab', 'simulator'];

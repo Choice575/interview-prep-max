@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 
-const outputDir = path.join(__dirname, '..', 'assets');
+const outputDir = path.join(__dirname, '..', 'public', 'assets');
 
 function crc32(buffer) {
   let value = 0xffffffff;

@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const progress = require('./progress.js');
-const coach = require('./coach.js');
+const progress = require('./public/progress.js');
+const coach = require('./public/coach.js');
 
 test('turns a failed diagnostic into an SRS item and a coach focus', () => {
   const now = Date.UTC(2026, 6, 21);

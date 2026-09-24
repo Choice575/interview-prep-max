@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const {create} = require('./data-loader.js');
+const {create} = require('./public/data-loader.js');
 
 test('loads only requested datasets and shares concurrent requests', async () => {
   const calls=[]; const published=[];

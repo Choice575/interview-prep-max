@@ -31,7 +31,7 @@ test('wording keeps answer index, IDs, source URLs and executable command arrays
 });
 
 test('all committed question datasets already have the reviewed wording applied', () => {
-  for (const file of ['./tasks/base_questions.json','./tasks/question_bank.json','./tasks/flashcards.json','./tasks/video_flashcards.json','./scripts/imports/swfuse.json']) {
+  for (const file of ['./public/tasks/base_questions.json','./public/tasks/question_bank.json','./public/tasks/flashcards.json','./public/tasks/video_flashcards.json','./scripts/imports/swfuse.json']) {
     const data = require(file);
     const records = Array.isArray(data) ? data : data.cards || data.questions || data.categories.flatMap(c=>c.questions);
     for (const record of records) {
@@ -60,7 +60,7 @@ test('audited translation artifacts do not return to the question datasets', () 
     'укрепляют цепочка', 'в цепочка поставки', 'гарантированным откат (', 'автоматическим откат (', 'лабораториями и разбор инцидента',
     'Blameless разбор инцидента', 'контрольный список (checklist)» и какой', 'ручным контрольный список', 'откатa', 'неactionable', 'пересcheduling', 'сетeвая'
   ];
-  for (const file of ['./tasks/base_questions.json', './tasks/question_bank.json', './tasks/flashcards.json', './tasks/video_flashcards.json', './scripts/imports/swfuse.json']) {
+  for (const file of ['./public/tasks/base_questions.json', './public/tasks/question_bank.json', './public/tasks/flashcards.json', './public/tasks/video_flashcards.json', './scripts/imports/swfuse.json']) {
     const text = JSON.stringify(require(file));
     for (const artifact of artifacts) assert.ok(!text.includes(artifact), `${file}: ${artifact}`);
   }

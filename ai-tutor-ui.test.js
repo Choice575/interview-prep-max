@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const UI = require('./ai-tutor-ui.js');
+const UI = require('./public/ai-tutor-ui.js');
 
 const hostile = '<img src=x onerror="alert(1)">';
 

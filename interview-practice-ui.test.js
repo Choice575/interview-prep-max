@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const IP = require('./interview-practice-ui.js');
+const IP = require('./public/interview-practice-ui.js');
 
 const data = {
   star: [

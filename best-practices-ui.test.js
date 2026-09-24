@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const BP = require('./best-practices-ui.js');
+const BP = require('./public/best-practices-ui.js');
 
 const dataset = {
   updated: '2026-07-29',

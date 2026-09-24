@@ -1,7 +1,7 @@
 const fs=require('node:fs');
 const path=require('node:path');
 const root=path.resolve(__dirname,'..');
-const source=fs.readFileSync(path.join(root,'version.js'),'utf8');
+const source=fs.readFileSync(path.join(root, 'public', 'version.js'),'utf8');
 const match=source.match(/^self\.IPMAX_VERSION = '(\d+\.\d+\.\d+)';$/m);
 if(!match)throw new Error('Invalid release version');
 const tag='v'+match[1];

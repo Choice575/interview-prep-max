@@ -2,8 +2,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const root = path.join(__dirname, '..');
-const mapPath = path.join(root, 'tasks', 'study_map.json');
-const testsPath = path.join(root, 'tasks', 'study_tests.json');
+const mapPath = path.join(root, 'public', 'tasks', 'study_map.json');
+const testsPath = path.join(root, 'public', 'tasks', 'study_tests.json');
 
 // Each tuple is: title, skill, command/check, observed output, primary risk, safe first action.
 const weeks = {

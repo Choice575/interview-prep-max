@@ -21,7 +21,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const TASKS_DIR = path.join(ROOT, 'tasks');
+const TASKS_DIR = path.join(ROOT, 'public', 'tasks');
 const OUTPUT = path.join(TASKS_DIR, 'courses.json');
 const SCHEMA_VERSION = '0.1.0-draft';
 

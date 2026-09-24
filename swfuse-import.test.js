@@ -2,12 +2,12 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const manifest = require('./scripts/imports/swfuse.json');
 const { buildImport } = require('./scripts/import-swfuse');
-const BankUI = require('./question-bank-ui');
-const ExamUI = require('./exam-ui');
-const CardsUI = require('./flashcards-ui');
+const BankUI = require('./public/question-bank-ui');
+const ExamUI = require('./public/exam-ui');
+const CardsUI = require('./public/flashcards-ui');
 const input = {
-  bank: require('./tasks/question_bank.json'), exam: require('./tasks/base_questions.json'),
-  flashcards: require('./tasks/flashcards.json')
+  bank: require('./public/tasks/question_bank.json'), exam: require('./public/tasks/base_questions.json'),
+  flashcards: require('./public/tasks/flashcards.json')
 };
 const bankQuestions = input.bank.categories.flatMap(category => category.questions);
 
@@ -61,7 +61,7 @@ test('import rejects unrelated ID collisions and duplicate prompts before overwr
 test('source search exposes additions without mixing video cards', () => {
   assert.equal(ExamUI.filterQuestions(input.exam, { search: 'SWFUSE' }).length, 60);
   assert.equal(CardsUI.filterCards(input.flashcards.cards, { search: 'Swfuse' }).length, 60);
-  assert.equal(CardsUI.filterCards(require('./tasks/video_flashcards.json').cards, { search: 'Swfuse' }).length, 0);
+  assert.equal(CardsUI.filterCards(require('./public/tasks/video_flashcards.json').cards, { search: 'Swfuse' }).length, 0);
   assert.equal(input.bank.categories.flatMap(category => BankUI.filterQuestions(category, 'Swfuse', 'all')).length, 60);
 });
 

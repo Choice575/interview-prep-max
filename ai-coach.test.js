@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const AICoach = require('./ai-coach.js');
+const AICoach = require('./public/ai-coach.js');
 
 test('builds a privacy-safe aggregate from a control session', () => {
   const payload = AICoach.buildReviewPayload({

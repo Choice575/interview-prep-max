@@ -4,11 +4,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 
-const file = path.join(__dirname, 'tasks', 'flashcards.json');
+const file = path.join(__dirname, 'public', 'tasks', 'flashcards.json');
 const data = JSON.parse(fs.readFileSync(file, 'utf8'));
-const videoFile = path.join(__dirname, 'tasks', 'video_flashcards.json');
-const questionBankFile = path.join(__dirname, 'tasks', 'question_bank.json');
-const examFile = path.join(__dirname, 'tasks', 'base_questions.json');
+const videoFile = path.join(__dirname, 'public', 'tasks', 'video_flashcards.json');
+const questionBankFile = path.join(__dirname, 'public', 'tasks', 'question_bank.json');
+const examFile = path.join(__dirname, 'public', 'tasks', 'base_questions.json');
 const normalized = value => String(value || '').trim().toLowerCase().replace(/[^a-zа-яё0-9]+/g, ' ').trim();
 
 test('ships the complete themed flashcard corpus with stable ids', () => {

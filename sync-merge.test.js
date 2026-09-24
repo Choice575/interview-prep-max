@@ -1,8 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const Merge = require('./sync-merge.js');
-const Storage = require('./storage.js');
-const ProgressIO = require('./progress-io.js');
+const Merge = require('./public/sync-merge.js');
+const Storage = require('./public/storage.js');
+const ProgressIO = require('./public/progress-io.js');
 
 // Ключи, которые принадлежат устройству и не уезжают в снимок.
 const SERVICE_KEYS = ['storage_schema', 'curriculum_version', 'progress_backup', 'sync_token', 'sync_meta', 'admin_token', 'polygon_token'];

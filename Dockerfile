@@ -13,18 +13,12 @@ WORKDIR /app
 RUN mkdir -p /data && chown -R node:node /data
 
 COPY --chown=node:node package.json ./
-COPY --chown=node:node version.js data-loader.js date.js storage.js progress.js coach.js ai-coach.js progress-io.js ./
-COPY --chown=node:node sync-merge.js sync-client.js sync-ui.js ./
-COPY --chown=node:node ai-settings-client.js ai-settings-ui.js ./
-COPY --chown=node:node offline-ui.js sources-ui.js best-practices-ui.js catalog-ui.js chapter-ui.js ai-tutor.js ai-tutor-ui.js router.js ./
-COPY --chown=node:node gamification.js gamification-ui.js daily.js daily-ui.js trainers-ui.js subnet.js ./
-COPY --chown=node:node answer-ui.js question-bank-ui.js external-tasks-ui.js polygon-ui.js interview-practice-ui.js analytics-ui.js home-ui.js ./
-COPY --chown=node:node exam-ui.js flashcards-ui.js study-ui.js coach-ui.js app.js ./
-COPY --chown=node:node index.html styles.css sw.js interview-prep-max.webmanifest ./
+# Всё, что видит браузер, лежит в public/ (аудит A4.1): новый модуль попадает
+# в образ без правки этого файла. Сервер берёт из public/ и общие модули
+# (синк, AI), поэтому отдельного списка файлов здесь нет.
+COPY --chown=node:node public/ ./public/
 COPY --chown=node:node server.js ./
 COPY --chown=node:node server/ ./server/
-COPY --chown=node:node tasks/ ./tasks/
-COPY --chown=node:node assets/ ./assets/
 
 USER node
 

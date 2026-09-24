@@ -9,7 +9,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const tasks = require('./tasks/regex.json');
+const tasks = require('./public/tasks/regex.json');
 
 function runOption(command, check) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ipmax-regex-'));

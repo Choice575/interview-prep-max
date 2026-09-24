@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const Subnet = require('./subnet.js');
+const Subnet = require('./public/subnet.js');
 
 test('calculates an ordinary subnet from a host address', () => {
   assert.deepEqual(Subnet.calcSubnet('192.168.1.130', 26), {
@@ -44,7 +44,7 @@ test('generated problems use host addresses inside private ranges', () => {
 });
 
 test('static subnet tasks give a host address, not the network itself', () => {
-  const tasks = require('./tasks/subnet.json');
+  const tasks = require('./public/tasks/subnet.json');
   for (const task of tasks) {
     const answer = Subnet.calcSubnet(task.ip, task.prefix);
     assert.ok(answer, task.ip);

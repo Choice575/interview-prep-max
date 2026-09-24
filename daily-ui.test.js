@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const ui = require('./daily-ui.js');
-const core = require('./daily.js');
+const ui = require('./public/daily-ui.js');
+const core = require('./public/daily.js');
 
 const NOW = new Date(2026, 7, 4, 14, 0, 0).getTime();
 

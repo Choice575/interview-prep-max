@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const root = __dirname;
-const data = JSON.parse(fs.readFileSync(path.join(root, 'tasks', 'external_tasks.json'), 'utf8'));
+const data = JSON.parse(fs.readFileSync(path.join(root, 'public', 'tasks', 'external_tasks.json'), 'utf8'));
 
 test('has schema version and update date', () => {
   assert.equal(data.schemaVersion, 1);

@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const ExamUI = require('./exam-ui.js');
+const ExamUI = require('./public/exam-ui.js');
 
 const questions = [
   { id: 1, topic: 'Linux', level: 'Junior', category: 'definition', q: 'Что делает pwd?', options: ['Печатает каталог', 'Меняет каталог'], answer: 0 },

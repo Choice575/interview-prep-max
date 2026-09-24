@@ -22,7 +22,8 @@ class DeploymentTests(unittest.TestCase):
         project = self.root / 'project'
         (project / 'scripts').mkdir(parents=True)
         (project / '.env').write_text('not-a-real-secret')
-        (project / 'version.js').write_text("self.IPMAX_VERSION = '15.5.0';\n")
+        (project / 'public').mkdir()
+        (project / 'public/version.js').write_text("self.IPMAX_VERSION = '15.5.0';\n")
         self.env = dict(os.environ, TEST_ROOT=str(self.root), TEST_MODE='success')
         script = (SOURCE / 'deploy-production.sh').read_text()
         script = script.replace('project=/home/ipmax/interview-prep-max', 'project="$TEST_ROOT/project"')
@@ -83,7 +84,13 @@ esac
                 self.assertNotIn('git checkout', log)
 
     def test_accepts_version_file_with_windows_line_endings(self):
-        (self.root / 'project/version.js').write_bytes(b"self.IPMAX_VERSION = '15.5.0';\r\n")
+        (self.root / 'project/public/version.js').write_bytes(b"self.IPMAX_VERSION = '15.5.0';\r\n")
+        result, _ = self.run_deploy()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_reads_legacy_root_version_file(self):
+        (self.root / 'project/public/version.js').unlink()
+        (self.root / 'project/version.js').write_text("self.IPMAX_VERSION = '15.5.0';\n")
         result, _ = self.run_deploy()
         self.assertEqual(result.returncode, 0, result.stderr)
 

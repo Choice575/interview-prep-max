@@ -3,9 +3,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 
-const ui = require('./chapter-ui.js');
+const ui = require('./public/chapter-ui.js');
 
-const readTask = (name) => JSON.parse(fs.readFileSync(path.join(__dirname, 'tasks', name), 'utf8'));
+const readTask = (name) => JSON.parse(fs.readFileSync(path.join(__dirname, 'public', 'tasks', name), 'utf8'));
 
 const doc = readTask('courses.json');
 const datasets = {

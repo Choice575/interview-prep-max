@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const Daily = require('./daily.js');
+const Daily = require('./public/daily.js');
 
 function buildQuestions(count) {
   const topics = ['Linux', 'Docker', 'Kubernetes', 'Сети', 'Terraform', 'Ansible', 'CI/CD'];

@@ -1,6 +1,6 @@
 // Связывает копии одного вопроса в тестах, банке и карточках общим conceptId (аудит B3, C6).
 // Копией считается совпадение формулировки после нормализации регистра, пунктуации и пробелов,
-// а смысловые копии перечислены вручную в tasks/concept-links.json.
+// а смысловые копии перечислены вручную в scripts/concept-links.json.
 // Уже выданные conceptId сохраняются, новые группы получают следующий номер.
 // Запуск: node scripts/assign-concepts.js [--check]
 const fs = require('node:fs');
@@ -8,12 +8,12 @@ const path = require('node:path');
 
 const ROOT = path.resolve(__dirname, '..');
 const FILES = {
-  exam: 'tasks/base_questions.json',
-  bank: 'tasks/question_bank.json',
-  study: 'tasks/flashcards.json',
-  video: 'tasks/video_flashcards.json'
+  exam: 'public/tasks/base_questions.json',
+  bank: 'public/tasks/question_bank.json',
+  study: 'public/tasks/flashcards.json',
+  video: 'public/tasks/video_flashcards.json'
 };
-const LINKS_FILE = 'tasks/concept-links.json';
+const LINKS_FILE = 'scripts/concept-links.json';
 
 const normalize = text => String(text || '').toLowerCase().replace(/ё/g, 'е').replace(/[^a-zа-я0-9]+/g, ' ').trim();
 

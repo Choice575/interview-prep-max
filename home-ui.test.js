@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const HomeUI = require('./home-ui.js');
+const HomeUI = require('./public/home-ui.js');
 
 class FakeElement {
   constructor(tagName, owner) {

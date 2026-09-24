@@ -150,7 +150,7 @@ const rules = {
 export default [
   {
     // Browser-side application code: globals declared via script tags.
-    files: ['app.js', 'sw.js', 'version.js'],
+    files: ['public/app.js', 'public/sw.js', 'public/version.js'],
     languageOptions: {
       ecmaVersion: 2023,
       sourceType: 'script',
@@ -177,15 +177,10 @@ export default [
     rules
   },
   {
-    // UMD modules: work in both the browser and Node.
-    files: [
-      'coach.js', 'coach-ui.js', 'ai-coach.js', 'storage.js', 'data-loader.js', 'progress.js', 'progress-io.js',
-      'answer-ui.js', 'date.js', 'home-ui.js', 'exam-ui.js', 'flashcards-ui.js', 'study-ui.js', 'analytics-ui.js', 'offline-ui.js',
-      'sources-ui.js', 'best-practices-ui.js', 'catalog-ui.js', 'chapter-ui.js', 'ai-tutor.js', 'ai-tutor-ui.js', 'router.js', 'question-bank-ui.js', 'external-tasks-ui.js', 'polygon-ui.js', 'interview-practice-ui.js', 'study-curriculum-rules.js', 'question-quality.js',
-      'gamification.js', 'gamification-ui.js', 'daily.js', 'daily-ui.js', 'trainers-ui.js', 'subnet.js',
-      'sync-merge.js', 'sync-client.js', 'sync-ui.js',
-      'ai-settings-client.js', 'ai-settings-ui.js'
-    ],
+    // UMD modules: work in both the browser and Node. Every other script in
+    // public/ is one, so a new module is linted without editing this list.
+    files: ['public/**/*.js', 'study-curriculum-rules.js', 'question-quality.js'],
+    ignores: ['public/app.js', 'public/sw.js', 'public/version.js'],
     languageOptions: {
       ecmaVersion: 2023,
       sourceType: 'script',

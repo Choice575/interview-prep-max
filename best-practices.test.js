@@ -4,8 +4,8 @@ const fs = require('fs');
 const path = require('path');
 
 const root = __dirname;
-const data = JSON.parse(fs.readFileSync(path.join(root, 'tasks', 'best_practices.json'), 'utf8'));
-const questions = JSON.parse(fs.readFileSync(path.join(root, 'tasks', 'base_questions.json'), 'utf8'));
+const data = JSON.parse(fs.readFileSync(path.join(root, 'public', 'tasks', 'best_practices.json'), 'utf8'));
+const questions = JSON.parse(fs.readFileSync(path.join(root, 'public', 'tasks', 'base_questions.json'), 'utf8'));
 
 test('covers every exam topic plus Git and Regex', () => {
   const expected = new Set([...questions.map(question => question.topic), 'Git', 'Regex']);
@@ -33,9 +33,9 @@ test('provides complete and unique practice cards for every topic', () => {
 });
 
 test('app exposes an accessible topic tablist and loads the dataset offline', () => {
-  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-  const worker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  const app = fs.readFileSync(path.join(root, 'public', 'app.js'), 'utf8');
+  const html = fs.readFileSync(path.join(root, 'public', 'index.html'), 'utf8');
+  const worker = fs.readFileSync(path.join(root, 'public', 'asset-manifest.js'), 'utf8');
   assert.match(app, /best_practices:\s*'tasks\/best_practices\.json'/);
   assert.match(html, /id="practice-tabs"[^>]*role="tablist"/);
   assert.match(html, /id="practice-panel"[^>]*role="tabpanel"/);

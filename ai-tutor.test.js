@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const Tutor = require('./ai-tutor.js');
+const Tutor = require('./public/ai-tutor.js');
 
 const long = (text, count) => text.repeat(count);
 

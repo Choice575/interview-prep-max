@@ -34,8 +34,8 @@ class FakeDocument {
 }
 
 function loadUI() {
-  delete require.cache[require.resolve('./ai-settings-ui.js')];
-  return require('./ai-settings-ui.js');
+  delete require.cache[require.resolve('./public/ai-settings-ui.js')];
+  return require('./public/ai-settings-ui.js');
 }
 
 const SETTINGS = {

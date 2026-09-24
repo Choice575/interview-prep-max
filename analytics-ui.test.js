@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const AnalyticsUI = require('./analytics-ui.js');
+const AnalyticsUI = require('./public/analytics-ui.js');
 
 test('calculates readiness and grade scores from answered questions', () => {
   const questions = [

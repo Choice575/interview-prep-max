@@ -5,11 +5,12 @@ const http = require('http');
 const path = require('path');
 
 const root = __dirname;
+const publicRoot = path.join(root, 'public');
 const server = http.createServer((request, response) => {
   let name = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
   if (name === '/') name = '/index.html';
-  const file = path.resolve(root, '.' + name);
-  if (!file.startsWith(root + path.sep)) { response.writeHead(403); return response.end(); }
+  const file = path.resolve(publicRoot, '.' + name);
+  if (!file.startsWith(publicRoot + path.sep)) { response.writeHead(403); return response.end(); }
   fs.readFile(file, (error, body) => {
     if (error) { response.writeHead(error.code === 'ENOENT' ? 404 : 500); return response.end(); }
     response.writeHead(200); response.end(body);
@@ -17,7 +18,7 @@ const server = http.createServer((request, response) => {
 });
 
 test('wires diagnostic history and AI retest callbacks into the coach UI', () => {
-  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  const app = fs.readFileSync(path.join(root, 'public', 'app.js'), 'utf8');
   assert.match(app, /function saveCoachAIReview\(/);
   assert.match(app, /function startCoachRetestMode\(/);
   assert.match(app, /saveAiReview:saveCoachAIReview/);
@@ -27,8 +28,8 @@ test('wires diagnostic history and AI retest callbacks into the coach UI', () =>
 });
 
 test('wires written and optional dictated interview answers into bounded AI history', () => {
-  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const app = fs.readFileSync(path.join(root, 'public', 'app.js'), 'utf8');
+  const html = fs.readFileSync(path.join(root, 'public', 'index.html'), 'utf8');
 
   assert.match(html, /id="ip-answer"[^>]*maxlength="6000"/);
   assert.match(html, /id="ip-ai-evaluate-btn"/);
@@ -44,7 +45,7 @@ test('wires written and optional dictated interview answers into bounded AI hist
   assert.match(app, /normaliseInterviewHistoryEntry:IPMaxInterviewPracticeUI\.normaliseInterviewHistoryEntry/);
   assert.match(app, /interviewHistoryLimit:IPMaxInterviewPracticeUI\.INTERVIEW_HISTORY_LIMIT/);
 
-  const styles = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
+  const styles = fs.readFileSync(path.join(root, 'public', 'styles.css'), 'utf8');
   assert.match(styles, /\.ip-answer-panel[,{]/);
   assert.match(styles, /\.ip-privacy-note\{/);
   assert.match(styles, /\.ip-ai-dimensions\{/);
@@ -55,14 +56,10 @@ test('wires written and optional dictated interview answers into bounded AI hist
 });
 
 test('registers AI Tutor modules across the complete no-bundler PWA fan-out', () => {
-  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-  const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
-  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-  const serverSource = fs.readFileSync(path.join(root, 'server.js'), 'utf8');
-  const dockerfile = fs.readFileSync(path.join(root, 'Dockerfile'), 'utf8');
+  const html = fs.readFileSync(path.join(root, 'public', 'index.html'), 'utf8');
+  const sw = fs.readFileSync(path.join(root, 'public', 'asset-manifest.js'), 'utf8');
+  const app = fs.readFileSync(path.join(root, 'public', 'app.js'), 'utf8');
   const eslint = fs.readFileSync(path.join(root, 'eslint.config.mjs'), 'utf8');
-  const verifier = fs.readFileSync(path.join(root, 'verify-release.js'), 'utf8');
-  const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
 
   assert.ok(html.indexOf('./ai-tutor.js') > html.indexOf('./chapter-ui.js'));
   assert.ok(html.indexOf('./ai-tutor-ui.js') > html.indexOf('./ai-tutor.js'));
@@ -70,24 +67,20 @@ test('registers AI Tutor modules across the complete no-bundler PWA fan-out', ()
   ['./ai-tutor.js', './ai-tutor-ui.js'].forEach(asset => {
     assert.match(sw, new RegExp(asset.replace(/[./-]/g, '\\$&')));
     assert.match(app, new RegExp(asset.replace(/[./-]/g, '\\$&')));
-    assert.match(verifier, new RegExp(asset.replace(/[./-]/g, '\\$&')));
+    // Сервер, Dockerfile и ESLint берут весь public/, поэтому достаточно файла на месте.
+    assert.ok(fs.existsSync(path.join(root, 'public', asset.slice(2))), asset);
   });
-  assert.match(serverSource, /'ai-tutor\.js'/);
-  assert.match(serverSource, /'ai-tutor-ui\.js'/);
-  assert.match(dockerfile, /ai-tutor\.js/);
-  assert.match(dockerfile, /ai-tutor-ui\.js/);
-  assert.match(eslint, /'ai-tutor\.js'/);
-  assert.match(eslint, /'ai-tutor-ui\.js'/);
   assert.match(eslint, /IPMaxAITutor/);
   assert.match(eslint, /IPMaxAITutorUI/);
-  assert.match(pkg.scripts.test, /ai-tutor\.test\.js/);
-  assert.match(pkg.scripts.test, /ai-tutor-ui\.test\.js/);
+  // npm test находит тесты по маске **/*.test.js, отдельного списка нет.
+  assert.ok(fs.existsSync(path.join(root, 'ai-tutor.test.js')));
+  assert.ok(fs.existsSync(path.join(root, 'ai-tutor-ui.test.js')));
 });
 
 test('wires context-aware AI Tutor buttons into the course chapter and current study day', () => {
-  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-  const chapterUi = fs.readFileSync(path.join(root, 'chapter-ui.js'), 'utf8');
-  const studyUi = fs.readFileSync(path.join(root, 'study-ui.js'), 'utf8');
+  const app = fs.readFileSync(path.join(root, 'public', 'app.js'), 'utf8');
+  const chapterUi = fs.readFileSync(path.join(root, 'public', 'chapter-ui.js'), 'utf8');
+  const studyUi = fs.readFileSync(path.join(root, 'public', 'study-ui.js'), 'utf8');
 
   assert.match(app, /function openAITutor\(/);
   assert.match(app, /async function submitAITutor\(/);
@@ -109,7 +102,7 @@ test('wires context-aware AI Tutor buttons into the course chapter and current s
 });
 
 test('styles AI Tutor for accessible touch targets, long output and compact viewports', () => {
-  const styles = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
+  const styles = fs.readFileSync(path.join(root, 'public', 'styles.css'), 'utf8');
   assert.match(styles, /\.tutor-open-btn[^{]*\{[^}]*min-height:44px/s);
   assert.match(styles, /\.tutor-modal-head \.btn-icon[^{]*\{[^}]*min-width:44px[^}]*min-height:44px/s);
   assert.match(styles, /\.tutor-modal[^{]*\{[^}]*max-width:[^;}]+[^}]*max-height:[^;}]+[^}]*overflow-y:auto/s);

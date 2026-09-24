@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const progress = require('./progress.js');
+const progress = require('./public/progress.js');
 
 test('uses one SRS schedule for pass, partial, and fail', () => {
   const now = Date.UTC(2026, 6, 21);
