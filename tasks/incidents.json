@@ -95,7 +95,7 @@
   {
     "id": "inc-db-connection",
     "title": "PostgreSQL: too many clients",
-    "topic": "Linux",
+    "topic": "Базы данных",
     "level": "Middle",
     "context": "03:00. Приложение начало отвечать ошибкой FATAL: sorry, too many clients already. PostgreSQL не принимает новые подключения, нагрузка на CPU базы при этом низкая.",
     "impact": "Полная недоступность записи заказов в течение 40 минут",

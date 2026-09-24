@@ -4691,9 +4691,10 @@
       "current": "карьера в Сетях",
       "proposed": "Карьера",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [],
-      "resolution": "Для тестов нет темы «Карьера»; #14164 и #14165 с похожими вопросами лежат в System Design. Нужна новая тема или решение оставить."
+      "resolution": "В 15.11.19 создана тема тестов «Карьера»; #14166 и близкие #14164, #14165 перенесены в неё.",
+      "sources": []
     },
     {
       "id": "audit-p11-580",
@@ -10672,7 +10673,7 @@
       "current": "Мониторинг",
       "proposed": "Базы данных",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001456",
@@ -10680,7 +10681,8 @@
           "exists": true
         }
       ],
-      "resolution": "Карточка 1001456 перенесена в «Базы данных и очереди» в 15.11.15. Для тестов #14154–#14157 нет темы «Базы данных»: нужна новая тема в KNOWN_TOPICS и фильтрах теста."
+      "resolution": "В 15.11.19 создана тема тестов «Базы данных»; #14154–#14157 перенесены в неё, карточка 1001456 перенесена в 15.11.15.",
+      "sources": []
     },
     {
       "id": "audit-p27-1024",
@@ -10797,9 +10799,10 @@
       "current": "неверная тема",
       "proposed": "Базы данных",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [],
-      "resolution": "Нет темы «Базы данных» в KNOWN_TOPICS; все четыре кейса pg-* сейчас скрыты как заготовки (15.11.14)."
+      "resolution": "В 15.11.19 кейсы pg-* переведены в тему «Базы данных» (связанные вопросы — эта тема и прежние).",
+      "sources": []
     },
     {
       "id": "audit-p28-1052",
@@ -10912,9 +10915,10 @@
       "current": "тема Linux",
       "proposed": "Базы данных",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [],
-      "resolution": "Нет темы «Базы данных» в KNOWN_TOPICS — перенос ждёт решения о новой теме."
+      "resolution": "В 15.11.19 inc-db-connection переведён в тему «Базы данных».",
+      "sources": []
     },
     {
       "id": "audit-p30-1080",

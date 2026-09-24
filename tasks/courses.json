@@ -3457,7 +3457,7 @@
           "week": 15,
           "day": 5,
           "level": "Middle",
-          "topic": "Linux",
+          "topic": "Базы данных",
           "minutes": 30,
           "source": {
             "dataset": "senior_cases.json",
@@ -3638,7 +3638,7 @@
           "week": 16,
           "day": 5,
           "level": "Middle+",
-          "topic": "Monitoring",
+          "topic": "Базы данных",
           "minutes": 30,
           "source": {
             "dataset": "senior_cases.json",
@@ -6027,7 +6027,7 @@
           "week": 27,
           "day": 5,
           "level": "Senior-track",
-          "topic": "Monitoring",
+          "topic": "Базы данных",
           "minutes": 30,
           "source": {
             "dataset": "senior_cases.json",
@@ -6208,7 +6208,7 @@
           "week": 28,
           "day": 5,
           "level": "Senior-track",
-          "topic": "Monitoring",
+          "topic": "Базы данных",
           "minutes": 30,
           "source": {
             "dataset": "senior_cases.json",

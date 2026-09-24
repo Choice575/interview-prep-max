@@ -186,7 +186,7 @@ test('serves the complete app shell and personal-coach modules', async () => {
     const questionData = JSON.parse(questions);
     assert.equal(questionData.length, 921);
     assert.equal(new Set(questionData.map(question => question.id)).size, questionData.length);
-    assert.equal(JSON.parse(practices).topics.length, 14);
+    assert.equal(JSON.parse(practices).topics.length, 16);
     const labelledControls = [
       'cq-topic', 'cq-level', 'cq-category', 'cq-q', 'cq-a', 'cq-b', 'cq-c', 'cq-d', 'cq-ans', 'cq-exp',
       'onb-role', 'onb-level', 'onb-date'

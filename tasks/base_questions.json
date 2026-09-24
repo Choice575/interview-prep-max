@@ -12754,7 +12754,7 @@
     "sourceTime": "34:20"
   },
   {
-    "topic": "Monitoring",
+    "topic": "Базы данных",
     "level": "Middle",
     "category": "definition",
     "q": "Какие PostgreSQL-метрики важны для эксплуатации?",
@@ -12771,7 +12771,7 @@
     "sourceTime": "34:38"
   },
   {
-    "topic": "Monitoring",
+    "topic": "Базы данных",
     "level": "Middle",
     "category": "tradeoff",
     "q": "Зачем нужен connection pooler вроде PgBouncer и какие риски он добавляет?",
@@ -12788,7 +12788,7 @@
     "sourceTime": "35:30"
   },
   {
-    "topic": "Monitoring",
+    "topic": "Базы данных",
     "level": "Senior",
     "category": "scenario",
     "q": "Почему незакоммиченная транзакция может раздувать WAL и мешать логической репликации?",
@@ -12805,7 +12805,7 @@
     "sourceTime": "36:20"
   },
   {
-    "topic": "Monitoring",
+    "topic": "Базы данных",
     "level": "Middle",
     "category": "output",
     "q": "Как находить самые долгие запросы в PostgreSQL?",
@@ -12924,7 +12924,7 @@
     "sourceTime": "45:00"
   },
   {
-    "topic": "System Design",
+    "topic": "Карьера",
     "level": "Middle",
     "category": "definition",
     "q": "Что обычно спрашивают на собеседованиях DevOps и почему набор вопросов различается?",
@@ -12941,7 +12941,7 @@
     "sourceTime": "59:40"
   },
   {
-    "topic": "System Design",
+    "topic": "Карьера",
     "level": "Middle",
     "category": "tradeoff",
     "q": "Заменит ли искусственный интеллект DevOps-инженера?",
@@ -12958,7 +12958,7 @@
     "sourceTime": "60:45"
   },
   {
-    "topic": "Сети",
+    "topic": "Карьера",
     "level": "Junior",
     "category": "definition",
     "q": "Куда развиваться сетевому инженеру, если он хочет усилить DevOps-профиль?",
