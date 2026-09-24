@@ -527,7 +527,7 @@ test('exports a versioned progress backup through the extracted module', async (
   // Сверяем с version.js, а не с константой: иначе каждый релиз ломает тест,
   // который проверяет экспорт прогресса, а не номер версии.
   expect(backup.version).toBe(
-    require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'version.js'), 'utf8')
+    require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'public', 'version.js'), 'utf8')
       .match(/self\.IPMAX_VERSION\s*=\s*'(\d+\.\d+\.\d+)'/)[1]
   );
   expect(backup.qprog['1']).toEqual({ correct: 2, wrong: 1 });

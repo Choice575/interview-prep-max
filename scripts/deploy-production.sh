@@ -67,11 +67,7 @@ trap rollback ERR
 trap 'false' HUP INT TERM
 changes=$(git diff --name-only "$previous" "$target")
 git checkout --detach "$target"
-# С 15.11.31 браузерные файлы лежат в public/; корневой version.js — ссылка
-# для копии этого скрипта, установленной до переноса.
-version_file=public/version.js
-[[ -f $version_file ]] || version_file=version.js
-version=$(tr -d '\r' < "$version_file" | sed -n "s/^self.IPMAX_VERSION = '\([0-9][0-9.]*\)';$/\1/p")
+version=$(tr -d '\r' < public/version.js | sed -n "s/^self.IPMAX_VERSION = '\([0-9][0-9.]*\)';$/\1/p")
 [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
 # Build while the previous container keeps serving traffic. The legacy builder
 # is used for this VPS's documented network restriction until BuildKit is fixed.
