@@ -1,5 +1,12 @@
 # Changelog
 
+## v15.11.24 (2026-09-24)
+
+- В тестах убраны английские связки: Linux, Сети (включая BGP, VXLAN, DNSSEC, QoS, TLS, MPLS), Docker, CI/CD, Kubernetes, Terraform и Мониторинг — около 200 вопросов. Термины и команды остались как есть, обычные слова переведены: «кеш», «маршрут», «шлюз», «бэкенд», «откат», «блокировка» вместо cache, route, gateway, backend, rollback, lock.
+- Длинные варианты Docker, Kubernetes и Terraform сокращены. Правильный вариант теперь самый длинный в 475 вопросах из 921, раньше — в 485.
+- Карточки, собранные из этих тестов, получили те же переводы.
+- ID, позиции ответов и прогресс сохранены.
+
 ## v15.11.23 (2026-09-24)
 
 - У 58 вопросов банка из подборки Swfuse появились команды для проверки на практике и раздел «Частая ошибка»: chrt и taskset, ip route get и ip neigh, openssl s_client -servername, dig +trace, nft list ruleset, docker diff и buildx-кеш, trivy --cache-dir, kubectl events, helm history и rollback, kubeadm certs и upgrade plan, promtool tsdb analyze, IMDSv2, instance refresh, patronictl, \du, kafka-metadata-quorum, _cat/shards и другие.
