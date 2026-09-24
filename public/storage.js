@@ -13,6 +13,8 @@
     study_progress: 'ipmax_study_progress', study_position: 'ipmax_study_position', study_answers: 'ipmax_study_answers',
     chapter_position: 'ipmax_chapter_position',
     qbank_category: 'ipmax_qbank_category',
+    // Что показывать под профиль: MLOps и Senior (аудит B6). Настройка устройства.
+    scope_prefs: 'ipmax_scope_prefs',
     study_weekly_results: 'ipmax_study_weekly_results',
     senior_case_prog: 'ipmax_senior_case_prog', onboarding: 'ipmax_onboarding', onboarding_complete: 'ipmax_onboarding_complete',
     skill_events: 'ipmax_skill_events', coach_journal: 'ipmax_coach_journal', coach_control: 'ipmax_coach_control',

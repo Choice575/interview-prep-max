@@ -135,11 +135,11 @@ test('keeps curriculum and video flashcards as separate visible decks', async ({
   await page.locator('[data-page="flashcards"]').click();
 
   await expect(page.locator('#page-flashcards')).toHaveClass(/active/);
-  await expect(page.locator('#sb-flashcards-count')).toHaveText('2366');
+  await expect(page.locator('#sb-flashcards-count')).toHaveText('1766');
   const studyDeck = page.locator('[data-flashcards-action="deck"][data-deck="study"]');
   const videoDeck = page.locator('[data-flashcards-action="deck"][data-deck="video"]');
   await expect(studyDeck).toContainText('Учебная программа');
-  await expect(studyDeck.locator('strong')).toHaveText('2089');
+  await expect(studyDeck.locator('strong')).toHaveText('1489');
   await expect(videoDeck).toContainText('Собеседования из видео');
   await expect(videoDeck.locator('strong')).toHaveText('277');
   await expect(page.locator('.study-card').first()).toHaveAttribute('data-card-id', '1000001');
@@ -640,7 +640,7 @@ test('defers exam cards and renders the full list in batches', async ({ page }) 
   await expect(page.locator('#questions-container .q-card')).toHaveCount(0);
   await page.locator('[data-page="exam"]').click();
   await expect(page.locator('#questions-container .q-card')).toHaveCount(12);
-  await expect(page.locator('#questions-load-more')).toContainText('12/928');
+  await expect(page.locator('#questions-load-more')).toContainText('12/940');
   await page.locator('#questions-load-more button').click();
   await expect(page.locator('#questions-container .q-card')).toHaveCount(24);
 });
@@ -1135,7 +1135,7 @@ test('flat flashcard categories preserve progress, filter independently and keep
   await page.goto('/');
   await page.locator('[data-page="flashcards"]').click();
   const categories = page.getByRole('group', { name: 'Категории карточек' });
-  await expect(categories.getByRole('button')).toHaveCount(15);
+  await expect(categories.getByRole('button')).toHaveCount(14);
   const linux = categories.getByRole('button', { name: 'Linux и Bash 330', exact: true });
   await linux.click();
   await expect(linux).toHaveAttribute('aria-pressed', 'true');

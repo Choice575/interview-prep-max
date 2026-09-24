@@ -65,6 +65,7 @@
     study_program: 'lastWriteWins',
     chapter_position: 'lastWriteWins',
     qbank_category: 'lastWriteWins',
+    scope_prefs: 'lastWriteWins',
     onboarding: 'lastWriteWins',
     onboarding_complete: 'lastWriteWins',
     theme: 'lastWriteWins',

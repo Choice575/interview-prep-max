@@ -17,6 +17,7 @@
     study_program: 'выбранная программа',
     chapter_position: 'позиция в справочнике',
     qbank_category: 'категория банка вопросов',
+    scope_prefs: 'видимость MLOps и Senior',
     onboarding: 'цель подготовки',
     onboarding_complete: 'состояние онбординга',
     diagnostic_result: 'результат диагностики',
