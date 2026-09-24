@@ -2127,8 +2127,20 @@
       "current": "верный с точкой, телеграфный стиль, «обычно» в неверных",
       "proposed": "переписать варианты (C4)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Для 12 вопросов Linux переписаны все варианты в сопоставимом стиле без точки только у правильного ответа, телеграфного сокращения и абсолютных слов-подсказок. Уточнены формулировки вопросов 14151 и 14152; ID и позиции верных ответов сохранены. Проверка качества не выявляет новых подсказок.",
+      "sources": [
+        "https://man7.org/linux/man-pages/man5/passwd.5.html",
+        "https://man7.org/linux/man-pages/man7/signal.7.html",
+        "https://man7.org/linux/man-pages/man5/proc_loadavg.5.html",
+        "https://man7.org/linux/man-pages/man2/waitpid.2.html",
+        "https://man7.org/linux/man-pages/man5/proc_stat.5.html",
+        "https://docs.kernel.org/kernel-hacking/hacking.html",
+        "https://docs.kernel.org/admin-guide/sysctl/vm.html",
+        "https://man7.org/linux/man-pages/man5/proc_pid_smaps.5.html"
+      ],
+      "linkedIds": [14140, 14141, 14142, 14144, 14145, 14146, 14147, 14148, 14149, 14150, 14151, 14152]
     },
     {
       "id": "audit-p05-418",
