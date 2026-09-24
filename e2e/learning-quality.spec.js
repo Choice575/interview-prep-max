@@ -10,21 +10,16 @@ test.beforeEach(async ({page}) => {
   });
 });
 
-test('practice is a separate deck and retains previous card progress when rated', async ({page}) => {
+test('template practice deck is hidden without dropping its stored progress', async ({page}) => {
   await page.goto('/#/flashcards');
   await expect(page.locator('[data-deck="study"] strong')).toHaveText('2329');
-  const practice = page.locator('[data-deck="practice"]');
-  await expect(practice).toContainText('Практические сценарии');
-  await expect(practice.locator('strong')).toHaveText('90');
-  await practice.click();
-  await expect(page.locator('.study-card')).toHaveAttribute('data-card-id','1000046');
-  await page.locator('[data-flashcards-action="reveal"]').click();
-  await page.locator('[data-outcome="pass"]').click();
-  const result = await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_qprog'))['1000046']);
-  expect(result.correct).toBe(3);
-  expect(result.lastSeen).toBeGreaterThan(42);
-  await page.reload();
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_qprog'))['1000046'].correct)).toBe(3);
+  await expect(page.locator('[data-deck="practice"]')).toHaveCount(0);
+  await expect(page.locator('[data-deck="video"]')).toBeVisible();
+  await page.locator('[data-flashcards-filter="search"]').fill('Дан вывод для');
+  await expect(page.locator('.study-card')).toHaveCount(0);
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('ipmax_qprog'))['1000046']);
+  expect(stored.correct).toBe(2);
+  expect(stored.repetitions).toBe(2);
 });
 
 test('reviewed answers show a concise version and keyboard-accessible details on mobile', async ({page}) => {

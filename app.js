@@ -751,17 +751,17 @@ function updateQuestionProgressSummary(){return requireExamUI().updateProgressSu
 function renderQCard(q,sMode){return requireExamUI().renderQuestionCard(q,sMode);}
 
 // Шаблонные карточки (generated) не показываются: у сотен из них один и тот же
-// ответ, а недельные — рубрика вместо ответа (аудит C2). Колода практических
-// сценариев остаётся как есть; прогресс скрытых карточек не удаляется.
-function visibleStudyCards(){return (FLASHCARDS_DATA?.cards||[]).filter(card=>card.practice||!card.generated);}
+// ответ, а недельные — рубрика вместо ответа (аудит C2). Это касается и 90
+// «практических сценариев» с выдуманным выводом; прогресс скрытых карточек не удаляется.
+function visibleStudyCards(){return (FLASHCARDS_DATA?.cards||[]).filter(card=>!card.generated);}
 function requireFlashcardsUIModule(){if(typeof IPMaxFlashcardsUI==='undefined') throw new Error('Модуль учебных карточек не загружен.');return IPMaxFlashcardsUI;}
 const flashcardsUI=requireFlashcardsUIModule().create({
   getCards:visibleStudyCards,
   getDecks:()=>[
-    {id:'study',label:'Учебная программа',description:'Вопросы по DevOps и MLOps, включая Swfuse/devops-interview. Задания на разбор вывода команд вынесены в практические сценарии.',cards:visibleStudyCards().filter(card=>!card.practice)},
+    {id:'study',label:'Учебная программа',description:'Вопросы по DevOps и MLOps, включая Swfuse/devops-interview.',cards:visibleStudyCards().filter(card=>!card.practice)},
     {id:'video',label:'Собеседования из видео',description:(Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards.length:0)+' реальных вопросов из '+(Array.isArray(VIDEO_FLASHCARDS_DATA?.sources)?VIDEO_FLASHCARDS_DATA.sources.length:0)+' видео с техническими собеседованиями.',cards:Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards:[]},
-    {id:'practice',label:'Практические сценарии',description:'Разбор вывода команд: объясните результат, границы проверки и следующий шаг. Прежний прогресс этих заданий сохранён.',cards:(FLASHCARDS_DATA?.cards||[]).filter(card=>card.practice)}
-  ],
+    {id:'practice',label:'Практические сценарии',description:'Разбор вывода команд: объясните результат, границы проверки и следующий шаг. Прежний прогресс этих заданий сохранён.',cards:visibleStudyCards().filter(card=>card.practice)}
+  ].filter(deck=>deck.id==='study'||deck.cards.length),
   getProgress:getQProg,now:()=>Date.now(),
   recordAttempt:(card,outcome,deck)=>recordQuestionResult({id:card.id,topic:card.collection},{outcome,source:deck?.id==='video'?'video_flashcards':'flashcards',syncMistakes:false,history:true})
 });

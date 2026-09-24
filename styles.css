@@ -237,6 +237,10 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans
 [data-theme="light"] .tag-sec{background:#fef2f2;color:#dc2626}
 .tag-sysd{background:#0f2a1e;color:#6ee7b7}
 [data-theme="light"] .tag-sysd{background:#ecfdf5;color:#047857}
+.tag-db{background:#2a1f0a;color:#fdba74}
+[data-theme="light"] .tag-db{background:#fff7ed;color:#9a3412}
+.tag-car{background:#2e1065;color:#d8b4fe}
+[data-theme="light"] .tag-car{background:#faf5ff;color:#6b21a8}
 /* Analytics new */
 
 .analytics-three{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:16px}

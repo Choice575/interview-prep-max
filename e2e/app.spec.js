@@ -135,7 +135,7 @@ test('keeps curriculum and video flashcards as separate visible decks', async ({
   await page.locator('[data-page="flashcards"]').click();
 
   await expect(page.locator('#page-flashcards')).toHaveClass(/active/);
-  await expect(page.locator('#sb-flashcards-count')).toHaveText('2748');
+  await expect(page.locator('#sb-flashcards-count')).toHaveText('2658');
   const studyDeck = page.locator('[data-flashcards-action="deck"][data-deck="study"]');
   const videoDeck = page.locator('[data-flashcards-action="deck"][data-deck="video"]');
   await expect(studyDeck).toContainText('Учебная программа');
@@ -693,7 +693,7 @@ test('shows Best Practices for every topic and opens the related trainer', async
   await page.goto('/');
   await page.locator('[data-page="practices"]').click();
   await expect(page.locator('#page-practices')).toHaveClass(/active/);
-  await expect(page.getByRole('tab')).toHaveCount(14);
+  await expect(page.getByRole('tab')).toHaveCount(16);
   await expect(page.locator('.practice-card')).toHaveCount(5);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
 
