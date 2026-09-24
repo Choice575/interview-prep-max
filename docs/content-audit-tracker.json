@@ -2141,8 +2141,15 @@
       "current": "«без изменения состояния (read-only)»",
       "proposed": "«только для чтения» (C3)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Заменена калька read-only в вопросе 10028 и объяснении 518; технический смысл сохранён.",
+      "sources": [],
+      "linkedIds": [
+        10028,
+        518,
+        1001114
+      ]
     },
     {
       "id": "audit-p05-419",
@@ -2155,8 +2162,18 @@
       "current": "«сигналы не доставляются»",
       "proposed": "откладываются до выхода из ожидания; TASK_KILLABLE",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Убрано категоричное утверждение, что сигналы не доставляются задачам в состоянии D; добавлена оговорка о TASK_KILLABLE.",
+      "sources": [
+        "https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html",
+        "https://docs.kernel.org/scheduler/completion.html"
+      ],
+      "linkedIds": [
+        14056,
+        39,
+        1001216
+      ]
     },
     {
       "id": "audit-p05-420",
@@ -2169,8 +2186,17 @@
       "current": "«MemoryMax обрывает через OOM»; Senior",
       "proposed": "сначала освобождение памяти, потом OOM; Middle",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Разделены мягкое давление MemoryHigh и жёсткий предел MemoryMax с OOM после неудачного освобождения памяти; уровень Middle.",
+      "sources": [
+        "https://docs.kernel.org/admin-guide/cgroup-v2.html",
+        "https://github.com/systemd/systemd/blob/main/man/systemd.resource-control.xml"
+      ],
+      "linkedIds": [
+        14057,
+        1001289
+      ]
     },
     {
       "id": "audit-p05-421",
@@ -2183,8 +2209,16 @@
       "current": "размытое определение softirq",
       "proposed": "как `qb_kts_024`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Описание softirq согласовано с исправленным вопросом qb_kts_024: это отложенная работа ядра, а не сигнал процессу.",
+      "sources": [
+        "https://docs.kernel.org/5.17/kernel-hacking/locking.html"
+      ],
+      "linkedIds": [
+        14150,
+        "qb_kts_024"
+      ]
     },
     {
       "id": "audit-p05-422",
@@ -2197,8 +2231,24 @@
       "current": "Yandex Cloud в Linux",
       "proposed": "Cloud",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Шесть вопросов об облачных сервисах перенесены из Linux в Cloud без изменения ID и ключей.",
+      "sources": [],
+      "linkedIds": [
+        10036,
+        10037,
+        10038,
+        10039,
+        10041,
+        10042,
+        1001206,
+        1001175,
+        1001345,
+        1001112,
+        1001204,
+        1001153
+      ]
     },
     {
       "id": "audit-p05-423",
@@ -2211,8 +2261,21 @@
       "current": "Python в Linux",
       "proposed": "Python",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Четыре вопроса Python из импорта Swfuse перенесены в отдельную тему тестов; манифест импорта сохраняет классификацию. Добавлены пять практических рекомендаций Python, учебная колода остаётся в широкой группе Linux и скриптов.",
+      "sources": [
+        "https://docs.python.org/3.11/tutorial/venv.html",
+        "https://docs.python.org/3/library/subprocess.html",
+        "https://docs.python.org/3/tutorial/classes.html",
+        "https://docs.python.org/3.11/tutorial/inputoutput.html"
+      ],
+      "linkedIds": [
+        15016,
+        15017,
+        15018,
+        15019
+      ]
     },
     {
       "id": "audit-p05-424",
@@ -2225,8 +2288,13 @@
       "current": "«Безопасность group»",
       "proposed": "«Группа безопасности»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлена русская формулировка «группа безопасности» в отвлекающем варианте.",
+      "sources": [],
+      "linkedIds": [
+        10039
+      ]
     },
     {
       "id": "audit-p05-425",
@@ -2239,8 +2307,14 @@
       "current": "Senior",
       "proposed": "Middle, Junior",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Вопрос 330 отнесён к Middle, вопрос 10028 — к Junior.",
+      "sources": [],
+      "linkedIds": [
+        330,
+        10028
+      ]
     },
     {
       "id": "audit-p05-426",

@@ -228,9 +228,11 @@ body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans
 [data-theme="light"] .tag-cicd{background:#fff7ed;color:#c2410c}
 .tag-mon{background:#1e1b4b;color:#c7d2fe}
 .tag-cloud{background:#0c1b3d;color:#93c5fd}
+.tag-py{background:#27304a;color:#facc15}
 .tag-sec{background:#3b0a0a;color:#fca5a5}
 [data-theme="light"] .tag-mon{background:#eef2ff;color:#4338ca}
 [data-theme="light"] .tag-cloud{background:#eff6ff;color:#1d4ed8}
+[data-theme="light"] .tag-py{background:#fef9c3;color:#854d0e}
 [data-theme="light"] .tag-sec{background:#fef2f2;color:#dc2626}
 .tag-sysd{background:#0f2a1e;color:#6ee7b7}
 [data-theme="light"] .tag-sysd{background:#ecfdf5;color:#047857}
