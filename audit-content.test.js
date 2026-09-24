@@ -137,3 +137,18 @@ test('template and rubric flashcards and empty senior cases are flagged as gener
   assert.ok(empty.every(item => item.generated === true));
   assert.equal(cases.filter(item => item.generated).length, 17);
 });
+
+test('practice cards built from bug-hunt trainers stay in sync with their source tasks', () => {
+  const flat = text => String(text).replace(/\s+/g, ' ').trim();
+  const cards = require('./tasks/flashcards.json').cards.filter(card => card.question.startsWith('[Практика] '));
+  const sources = ['ansible_pb', 'code', 'k8s', 'dockerfile'].flatMap(file => require(`./tasks/${file}.json`));
+  let linked = 0;
+  for (const card of cards) {
+    const task = sources.find(item => card.question.startsWith(`[Практика] ${flat(item.code)} — `));
+    if (!task) continue;
+    linked++;
+    assert.equal(card.question, `[Практика] ${flat(task.code)} — ${task.task || task.title}`, `${card.id}`);
+    assert.equal(card.answer, `${task.opts[task.answer]}. ${flat(task.fix)}`, `${card.id}`);
+  }
+  assert.ok(linked >= 42, `связанных карточек ${linked}`);
+});

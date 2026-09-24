@@ -3955,14 +3955,16 @@
       "current": "«Ограничения: только исходящие сессии»; в ответе «соединение возможно только изнутри наружу»",
       "proposed": "противоречит `qb_ntr_007`, который прямо называет это утверждение неверным: DNAT (проброс порта) принимает входящие; правильно «без правила DNAT входящее соединение некуда направить»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_net_007",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17.",
+      "sources": []
     },
     {
       "id": "audit-p09-518",
@@ -3977,14 +3979,16 @@
       "current": "«возникает классический **чёрный ход**»",
       "proposed": "«чёрная дыра» (PMTUD black hole), как в ключевых пунктах того же вопроса",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_ntr_008",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17.",
+      "sources": []
     },
     {
       "id": "audit-p09-519",
@@ -4889,14 +4893,16 @@
       "current": "«Ограничения: только исходящие сессии»; conntrack «без внятных ошибок»",
       "proposed": "см. пакет 9",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002194",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17.",
+      "sources": []
     },
     {
       "id": "audit-p12-616",
@@ -6332,14 +6338,16 @@
       "current": "«изнутри достаточно… послать себе сигнал через `kill -TERM 1`»",
       "proposed": "в PID namespace сигналы к PID 1 без обработчика игнорируются: проверено `unshare -fp`, после `kill -TERM 1` и даже `kill -KILL 1` процесс жив; с `trap … TERM` — завершается. Правильно: «`kill -TERM 1` сработает, только если приложение обрабатывает SIGTERM; надёжно — `exit` из главного процесса или `docker stop` снаружи». Тот же факт верно изложен в `qb_boot_004`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_dkx_008",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17.",
+      "sources": []
     },
     {
       "id": "audit-p14-679",
@@ -6354,14 +6362,16 @@
       "current": "«Без какой инструкции контейнер не запустится?» — «без CMD или ENTRYPOINT запустится, но сразу завершится»",
       "proposed": "если ни CMD, ни ENTRYPOINT нет ни в образе, ни в базовом, `docker run` отказывает с ошибкой «no command specified» — контейнер не стартует; обязательная инструкция Dockerfile — `FROM`. «Сразу завершится» — это другой случай: команда есть, но не держит процесс на переднем плане",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000027",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17.",
+      "sources": []
     },
     {
       "id": "audit-p14-680",
@@ -6956,14 +6966,16 @@
       "current": "«исправленный» Dockerfile добавляет `HEALTHCHECK … CMD curl -f http://localhost:5000/health`; ошибкой названо «EXPOSE без /tcp»",
       "proposed": "в образах `python:*-slim` нет `curl`, поэтому такая проверка всегда будет `unhealthy`; нужно ставить `curl` или проверять через `python -c \"import urllib.request…\"`. «EXPOSE без /tcp» — не ошибка (TCP по умолчанию), как и в тренажёре `dockerfile#10`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000343",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17. Карточка 1000343 пересобрана из dockerfile#10: без curl в HEALTHCHECK и без претензии к EXPOSE.",
+      "sources": []
     },
     {
       "id": "audit-p16-731",
@@ -7004,14 +7016,16 @@
       "current": "«`kill -TERM 1` или `exit` завершают контейнер»",
       "proposed": "см. пакет 14",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000421",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17.",
+      "sources": []
     },
     {
       "id": "audit-p16-733",
@@ -7467,7 +7481,7 @@
       "current": "`gitlab-ci-lint`",
       "proposed": "такой команды нет; проверка — через CI Lint в интерфейсе, API `POST /projects/:id/ci/lint` или `glab ci lint`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_ci_001",
@@ -7479,7 +7493,9 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17.",
+      "sources": []
     },
     {
       "id": "audit-p17-754",
@@ -7495,7 +7511,7 @@
       "current": "`gitlab-runner exec docker job-name`",
       "proposed": "команда объявлена устаревшей в 15.x и удалена из GitLab Runner; локально — сторонний `gitlab-ci-local` или проверка в ветке",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_ci_001",
@@ -7507,7 +7523,9 @@
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17.",
+      "sources": []
     },
     {
       "id": "audit-p17-755",
@@ -8280,14 +8298,16 @@
       "current": "«DaemonSet: поды планируются DaemonSet-контроллером напрямую… минуя scheduler»",
       "proposed": "так было до Kubernetes 1.12; с 1.17 (ScheduleDaemonSetPods, GA) поды DaemonSet планирует обычный scheduler через nodeAffinity. Без scheduler обходятся static pods и поды с заданным `nodeName` — правильный ответ",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000037",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17.",
+      "sources": []
     },
     {
       "id": "audit-p20-857",
@@ -8896,14 +8916,16 @@
       "current": "«Менять нельзя главное: образ большинства контейнеров…» и тут же «а также образ в некоторых сценариях»",
       "proposed": "поле `spec.containers[*].image` (и у init-контейнеров) у работающего пода менять можно всегда — kubelet перезапустит контейнер; список изменяемых полей: образы, `activeDeadlineSeconds`, добавление tolerations, `terminationGracePeriodSeconds`; ресурсы — через подресурс `resize`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_012",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17.",
+      "sources": []
     },
     {
       "id": "audit-p21-885",
@@ -9798,14 +9820,16 @@
       "current": "«latest без `imagePullPolicy: Always` — нода кэширует старый образ»",
       "proposed": "для тега `:latest` по умолчанию и так `Always`; настоящие проблемы — невоспроизводимость и отсутствие выката при том же теге. Кроме того, у `template` нет `metadata.labels` — API отклонит такой Deployment",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000753",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17. Карточка 1000753 пересобрана из исправленного k8s#6.",
+      "sources": []
     },
     {
       "id": "audit-p24-958",
@@ -9820,14 +9844,16 @@
       "current": "«нужно явно задать `maxUnavailable: 0`… Гарантирует что все 3 пода всегда доступны»",
       "proposed": "при 3 репликах значение по умолчанию 25% округляется вниз до 0 — все поды и так остаются доступны; явное `maxUnavailable: 0` полезно как защита от изменения числа реплик",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000752",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17. Карточка 1000752 пересобрана из исправленного k8s#8.",
+      "sources": []
     },
     {
       "id": "audit-p24-959",
@@ -10410,8 +10436,10 @@
       "current": "верный «Connections, locks, WAL, lag, latency», неверные — «Cache hit ratio и latency запросов», «Размер таблиц и скорость их роста»",
       "proposed": "неверные варианты тоже важные метрики, а объяснение само называет cache hit ratio; вопрос двусмысленный — неверные варианты заменить на действительно бесполезные для эксплуатации",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.17. Неверные варианты заменены на бесполезные для эксплуатации.",
+      "sources": []
     },
     {
       "id": "audit-p27-1013",
@@ -10719,8 +10747,10 @@
       "current": "«Pod StatefulSet смонтировал новый пустой том вместо прежнего PVC», и тут же «CSI events показывают failed attachment», PV в zone-a, узел в zone-b",
       "proposed": "противоречие: под StatefulSet всегда получает тот же PVC; при зональном PV в другой зоне он останется в Pending с конфликтом node affinity тома, а не смонтирует пустой том. Пустые данные возможны при `emptyDir`, `hostPath`, local PV или удалённом PVC — выбрать одну причину и привести evidence к ней",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.17. Причина одна: StatefulSet потерял volumeClaimTemplates при миграции чарта и использовал emptyDir.",
+      "sources": []
     },
     {
       "id": "audit-p28-1050",
@@ -10790,8 +10820,10 @@
       "current": "коллега вручную добавил правило в security group, а `terraform plan` показывает `description = \"managed by terraform\" -> \"temp access\" # forces replacement`",
       "proposed": "ручное добавление правила не меняет `description`, а в AWS описание группы после создания вообще нельзя изменить. Для такого drift plan показал бы изменение на месте с удалением ручного правила (`~ ingress`), и главный риск — молча удалить доступ подрядчику. Привести вывод plan к истории (или историю к выводу — изменили `description` в коде)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.17. В истории инцидента в коде меняют description, поэтому plan и требует пересоздания; ремедиация — вернуть description и описать ручное правило.",
+      "sources": []
     },
     {
       "id": "audit-p29-1064",
@@ -10875,8 +10907,10 @@
       "current": "при `net.ipv4.ip_forward = 0` ping из контейнера даёт «connect: Network is unreachable»",
       "proposed": "при выключенном форвардинге у контейнера есть маршрут через docker0, пакеты просто теряются на хосте — ping молча не получает ответов (100% потерь). «Network is unreachable» означает отсутствие маршрута внутри контейнера (например, `--network none`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.17. Узел ping_test: 100% потерь при наличии маршрута.",
+      "sources": []
     },
     {
       "id": "audit-p30-1081",
@@ -10889,8 +10923,10 @@
       "current": "«Docker при рестарте… но ip_forward=0 блокирует» — вариант помечен как неверный",
       "proposed": "dockerd при старте сам включает `ip_forward` (параметр `--ip-forward` по умолчанию `true`), поэтому перезапуск Docker как раз вернёт форвардинг. Интереснее вопрос, кто его выключил: файл в `/etc/sysctl.d/` или профиль харденинга — это и есть корневая причина",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.17. Узел restart_docker: dockerd включает ip_forward сам, корневая причина — кто его выключил; настройка сохраняется в /etc/sysctl.d/.",
+      "sources": []
     },
     {
       "id": "audit-p30-1082",
@@ -10903,8 +10939,10 @@
       "current": "`describe`: OOMKilled, код 137; `logs --previous`: «FATAL: OutOfMemoryError — heap space exhausted»",
       "proposed": "противоречие: при OOMKilled ядро убивает процесс сигналом KILL, и приложение не успевает ничего записать (так и сказано в `inc-oom-container`); OutOfMemoryError Java — ошибка внутри JVM с другим кодом выхода. Оставить одну причину",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.17. Логи обрываются без ошибки: процесс убит SIGKILL.",
+      "sources": []
     },
     {
       "id": "audit-p30-1083",
@@ -11274,14 +11312,16 @@
       "current": "«Без regexp строка добавляется при каждом запуске — дубликаты»",
       "proposed": "модуль идемпотентен и без `regexp` (C8.1)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000026",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.9 (ansible_pb, lineinfile).",
+      "sources": []
     },
     {
       "id": "audit-p32-1124",
@@ -11296,14 +11336,16 @@
       "current": "«Символ | конфликтует с YAML-синтаксисом»",
       "proposed": "команда с `|` без кавычек выполнилась (C8.1)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000027",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17. Карточка 1000027 пересобрана из ansible_pb#8.",
+      "sources": []
     },
     {
       "id": "audit-p32-1125",
@@ -11318,14 +11360,16 @@
       "current": "«with_items устарело — заменить на loop»",
       "proposed": "работает без предупреждений; правильный совет — передать список прямо в `name:` (одна транзакция apt). Тест #246 это подтверждает",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000034",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17. Карточка 1000034 пересобрана из ansible_pb#5.",
+      "sources": []
     },
     {
       "id": "audit-p32-1126",
@@ -12017,14 +12061,16 @@
       "current": "«`default = \"3\"` — строка вместо числа для `type = number`» как причина «Invalid value for input variable»",
       "proposed": "Terraform сам приводит строку `\"3\"` к числу: `var.replicas + 1` дал `4` без ошибок. Для примера нужна неприводимая строка (`\"three\"`) — тогда ошибка настоящая",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001879",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17. Проверено на Terraform 1.9.8: строка \"3\" приводится к числу; labs#4 и карточка 1001879 используют неприводимое \"three\" и настоящее сообщение об ошибке.",
+      "sources": []
     },
     {
       "id": "audit-p39-1229",
@@ -12039,14 +12085,16 @@
       "current": "«set_fact в handler недоступен в задачах того же play»",
       "proposed": "факт доступен после `flush_handlers` (C8.1)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001872",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17. Карточка 1001872 пересобрана из code#14.",
+      "sources": []
     },
     {
       "id": "audit-p39-1230",
@@ -12084,7 +12132,7 @@
       "current": "вывод plan с изменением `description` не соответствует истории про ручное правило",
       "proposed": "см. пакет 29",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001859",
@@ -12096,7 +12144,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17. История инцидента приведена к выводу plan: в коде поменяли description группы; карточки 1001859–1001862 пересобраны из фаз.",
+      "sources": []
     },
     {
       "id": "audit-p39-1232",
@@ -12351,14 +12401,16 @@
       "current": "`… WHERE state=active …` — без кавычек PostgreSQL ищет столбец `active` и падает с ошибкой «column \\\"active\\\" does not exist»",
       "proposed": "`WHERE state = 'active'`; во втором запросе полезно вывести и `max_exec_time`, раз по нему идёт сортировка",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_kts_031",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.17.",
+      "sources": []
     },
     {
       "id": "audit-p41-1265",
