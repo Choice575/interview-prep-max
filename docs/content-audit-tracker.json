@@ -1965,8 +1965,10 @@
       "current": "верный длиннее всех >10%",
       "proposed": "выровнять",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.12: в 22 из 23 вопросов удлинён самый правдоподобный неверный вариант, и правильный больше не самый длинный (#181 уже был выровнен). Правильные варианты и позиции не менялись. В #33, #38, #44 варианты из чужой области заменены правдоподобными. Доля вопросов, где правильный вариант строго самый длинный, стала метрикой с потолком в baseline (516 из 921).",
+      "sources": []
     },
     {
       "id": "audit-p04-404",
@@ -4647,8 +4649,10 @@
       "current": "блок 14128–14169: верный вариант с точкой, неверные с «обычно»",
       "proposed": "C4",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.12: в блоке 14128–14169 у правильных вариантов убрана концевая точка (25 вопросов), «обычно» и «в основном» убраны из неверных вариантов без абсолютных слов. В question-quality.js добавлены правила punctuation-cue и hedge-distractor с нулевым бюджетом.",
+      "sources": []
     },
     {
       "id": "audit-p11-579",
@@ -6781,8 +6785,10 @@
       "current": "блок 14128–14169: верный с точкой, «обычно» в неверных",
       "proposed": "C4",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.12: в блоке 14128–14169 у правильных вариантов убрана концевая точка (25 вопросов), «обычно» и «в основном» убраны из неверных вариантов без абсолютных слов. В question-quality.js добавлены правила punctuation-cue и hedge-distractor с нулевым бюджетом.",
+      "sources": []
     },
     {
       "id": "audit-p15-711",
@@ -9611,8 +9617,10 @@
       "current": "блок 14128–14169: верный вариант оканчивается точкой («рестарт.», «ресурса.», «priority.»), в неверных — «обычно» (#14136 «Burstable обычно защищён сильнее Guaranteed»)",
       "proposed": "C4",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.12: в блоке 14128–14169 у правильных вариантов убрана концевая точка (25 вопросов), «обычно» и «в основном» убраны из неверных вариантов без абсолютных слов. В question-quality.js добавлены правила punctuation-cue и hedge-distractor с нулевым бюджетом.",
+      "sources": []
     },
     {
       "id": "audit-p23-938",
@@ -10489,8 +10497,10 @@
       "current": "блок 14128–14169: верный вариант с точкой",
       "proposed": "C4",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.12: в блоке 14128–14169 у правильных вариантов убрана концевая точка (25 вопросов), «обычно» и «в основном» убраны из неверных вариантов без абсолютных слов. В question-quality.js добавлены правила punctuation-cue и hedge-distractor с нулевым бюджетом.",
+      "sources": []
     },
     {
       "id": "audit-p27-1020",
