@@ -38,7 +38,7 @@ test('открывается по прямой ссылке и показыва�
   const categories = Number(await page.locator('#qbank-category-count').textContent());
   const questions = Number(await page.locator('#qbank-question-count').textContent());
   expect(categories).toBe(12);
-  expect(questions).toBe(333);
+  expect(questions).toBe(336);
 
   // Помимо 11 категорий есть общий список «Все вопросы».
   await expect(page.locator('#qbank-tabs [role="tab"]')).toHaveCount(categories + 1);
@@ -110,7 +110,7 @@ test('поиск сужает список, а пустой результат �
 
   // Сброс поиска возвращает полный список.
   await page.locator('#qbank-search').fill('');
-  await expect.poll(() => page.locator('#qbank-panel .qbank-item').count()).toBe(333);
+  await expect.poll(() => page.locator('#qbank-panel .qbank-item').count()).toBe(336);
 });
 
 test('фильтр по уровню оставляет только вопросы этого уровня', async ({ page }) => {
