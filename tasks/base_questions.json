@@ -7445,7 +7445,7 @@
     "topic": "Linux",
     "level": "Senior",
     "category": "definition",
-    "q": "Когда CPU pinning оправдан в рабочей среде (production)?",
+    "q": "Когда CPU pinning оправдан в продакшене (production)?",
     "options": [
       "При высокой CPU utilization: taskset увеличивает число доступных cores сверх лимита physical host",
       "Для multithreaded service: affinity балансирует IRQ, memory и threads по NUMA nodes",
@@ -7469,7 +7469,7 @@
       "Режим выбирает block device при mount, и приложение не увидит различий после power loss"
     ],
     "answer": 0,
-    "explanation": "data=ordered — типичный default: metadata журналируются, а связанные data blocks уходят до их commit. data=journal журналирует и данные, но отключает delayed allocation и O_DIRECT. data=writeback не сохраняет такое упорядочение и после crash может показать stale data. В рабочей среде (production) выбор подтверждают durability-требованиями и тестами; barriers без доказанной защиты cache не отключают.",
+    "explanation": "data=ordered — типичный default: metadata журналируются, а связанные data blocks уходят до их commit. data=journal журналирует и данные, но отключает delayed allocation и O_DIRECT. data=writeback не сохраняет такое упорядочение и после crash может показать stale data. В продакшене (production) выбор подтверждают durability-требованиями и тестами; barriers без доказанной защиты cache не отключают.",
     "depth": "deep"
   },
   {
@@ -7975,7 +7975,7 @@
     "topic": "Linux",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Какие компромиссы учитывать при использовании swap в рабочей среде (production)?",
+    "q": "Какие компромиссы учитывать при использовании swap в продакшене (production)?",
     "options": [
       "Swap отключают: его наличие заставляет kernel выгрузить anonymous pages до использования page cache",
       "Swap может пережить transient pressure, но ухудшить tail latency; решение учитывает workload, cgroups, encryption и metrics",
@@ -8053,7 +8053,7 @@
     "topic": "Сети",
     "level": "Senior",
     "category": "tradeoff",
-    "q": "Как выбирать между WireGuard и IPsec/IKEv2 для VPN в рабочей среде (production)?",
+    "q": "Как выбирать между WireGuard и IPsec/IKEv2 для VPN в продакшене (production)?",
     "options": [
       "WireGuard выбирать по умолчанию: fixed algorithms гарантируют совместимость с legacy appliance и enterprise PKI",
       "IPsec быстрее: IKE negotiation переносит data plane encryption в NIC независимо от hardware offload",
@@ -8663,7 +8663,7 @@
     "q": "Что должен проверять полноценный Molecule scenario для Ansible role?",
     "options": [
       "Scenario сравнивает YAML с JSON Schema, а состояние instance после converge не участвует в результате теста",
-      "Scenario запускает роль на inventory из рабочей среды (production) и откатывает каждый changed task через автоматически созданный handler",
+      "Scenario запускает роль на inventory из продакшена (production) и откатывает каждый changed task через автоматически созданный handler",
       "Scenario создаёт instances, выполняет converge, проверяет idempotence и assertions, затем очищает ресурсы",
       "Scenario измеряет длительность tasks, а роль считается корректной, если второй запуск быстрее первого на заданный процент"
     ],
@@ -8907,7 +8907,7 @@
     "category": "definition",
     "q": "Что проверяют Molecule idempotence и ansible-lint, а чего они не доказывают?",
     "options": [
-      "Idempotence проверяет YAML formatting, lint повторно запускает role и доказывает отсутствие изменений в рабочей среде (production)",
+      "Idempotence проверяет YAML formatting, lint повторно запускает role и доказывает отсутствие изменений в продакшене (production)",
       "Idempotence сравнивает package versions, lint выполняет integration tests на matrix поддерживаемых distributions",
       "Idempotence ищет changed при повторном converge, lint применяет static rules; итоговое состояние проверяет verify",
       "Idempotence откатывает role после failure, lint исправляет risky tasks и гарантирует совместимость collections"
@@ -9436,7 +9436,7 @@
     "options": [
       "Редкие объединения feature branches перед release с ручной сборкой, чтобы CI не выполнялся на промежуточных commits",
       "Частое объединение небольших изменений с автоматическими build/checks, быстро выявляющими integration defects",
-      "Автоматический rollout каждого успешного commit в рабочей среде (production) без approval, feature flags и progressive delivery",
+      "Автоматический rollout каждого успешного commit в продакшене (production) без approval, feature flags и progressive delivery",
       "Хранение release artifacts в registry и восстановление production из backup при падении post-deploy checks"
     ],
     "answer": 1,
@@ -9451,7 +9451,7 @@
     "options": [
       "Сохранение исходников в Git перед запуском CI pipeline",
       "Запуск unit tests после изменения application code",
-      "Решение о выпуске прошедшего pipeline изменения в рабочей среде (production)",
+      "Решение о выпуске прошедшего pipeline изменения в продакшене (production)",
       "Создание build artifact в воспроизводимом environment"
     ],
     "answer": 2,
@@ -10544,7 +10544,7 @@
     "category": "scenario",
     "q": "Как снизить риск при миграции приложения с AWS на другого облачного провайдера?",
     "options": [
-      "Сначала заменить адреса сервисов в рабочей среде (production), затем выяснять различия API по ошибкам",
+      "Сначала заменить адреса сервисов в продакшене (production), затем выяснять различия API по ошибкам",
       "Перенести виртуальные машины, а зависимости managed-сервисов изучить во время cutover",
       "Перестроить pipeline, оставив перенос данных, IAM и наблюдаемость на период после запуска",
       "Инвентаризировать зависимости, проверить аналоги, перенести и сверить данные, отрепетировать откат"
@@ -10622,7 +10622,7 @@
       "Риски и проверки безопасности встроены в разработку и CI/CD с быстрым feedback для команды",
       "Безопасность проверяется отдельной командой перед релизом после завершения разработки",
       "Pipeline обновляет пароли по расписанию, а архитектурные риски разбираются после инцидентов",
-      "Пентест запускается для рабочей среды (production), а зависимости и IaC исключаются из процесса проверки"
+      "Пентест запускается для продакшена (production), а зависимости и IaC исключаются из процесса проверки"
     ],
     "answer": 0,
     "explanation": "DevSecOps объединяет предотвращение, автоматические проверки и понятную ответственность на всём жизненном цикле. Инструменты дополняют threat modeling, review, управление исключениями и реакцию на находки.",
@@ -10726,7 +10726,7 @@
     "options": [
       "Проверять форматирование файлов и считать успешный lint подтверждением безопасной конфигурации",
       "Проводить ручной аудит после deployment, когда фактические права и сеть уже применены",
-      "Заменить анализ IaC сканированием контейнерных образов, потому что они попадают в рабочую среду (production)",
+      "Заменить анализ IaC сканированием контейнерных образов, потому что они попадают в продакшен (production)",
       "Сканировать pull request и план, применять policy-as-code и документировать исключения"
     ],
     "answer": 3,
@@ -11388,7 +11388,7 @@
       "Контейнер работает, но проверка готовности пока не пропускает на него запросы",
       "Образ контейнера не удалось получить из хранилища из-за ошибки доступа",
       "Под не получил узел для размещения из-за нехватки свободных ресурсов",
-      "Контейнер многократно падает, и служба увеличивает паузу между перезапусками"
+      "Контейнер многократно падает, и kubelet увеличивает паузу между перезапусками"
     ],
     "answer": 3,
     "explanation": "CrashLoopBackOff — цикл падений с растущей задержкой. Причину ищут в журнале предыдущего запуска контейнера."
@@ -12743,7 +12743,7 @@
       "Linux не освобождает page cache при нехватке памяти без вызова drop_caches"
     ],
     "answer": 0,
-    "explanation": "Для записи изменённых буферов на устройства используют sync: он инициирует сброс dirty pages, после чего можно проверять состояние I/O. Команда echo 3 > /proc/sys/vm/drop_caches очищает page cache, dentries и inode cache, но не является обычным способом «освободить память» и не заменяет sync. В рабочей среде (production) это может вызвать резкий рост I/O и ухудшить latency. Сначала измеряют давление на память и кэш, а не очищают его профилактически.",
+    "explanation": "Для записи изменённых буферов на устройства используют sync: он инициирует сброс dirty pages, после чего можно проверять состояние I/O. Команда echo 3 > /proc/sys/vm/drop_caches очищает page cache, dentries и inode cache, но не является обычным способом «освободить память» и не заменяет sync. В продакшене (production) это может вызвать резкий рост I/O и ухудшить latency. Сначала измеряют давление на память и кэш, а не очищают его профилактически.",
     "id": 14151,
     "sourceVideoId": "M1tXCebcOBE",
     "sourceTime": "31:52"

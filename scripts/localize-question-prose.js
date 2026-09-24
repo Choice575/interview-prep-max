@@ -77,12 +77,13 @@ term('production-like', 'production-like', {
 term('production', 'production', {
   'в production-ключе':'с учётом промышленной эксплуатации',
   'production-риск':'риск для рабочей среды',
-  'production-среде':'рабочей среде',
-  'production-среду':'рабочую среду',
-  'production-среды':'рабочей среды',
-  'для production':'для рабочей среды',
-  'в production':'в рабочей среде',
-  'из production':'из рабочей среды'
+  // «Рабочая среда (production)» звучало канцелярски (аудит C3): пишем «продакшен».
+  'production-среде':'продакшене',
+  'production-среду':'продакшен',
+  'production-среды':'продакшена',
+  'для production':'для продакшена',
+  'в production':'в продакшене',
+  'из production':'из продакшена'
 });
 term('capstone', 'capstone', {'Production capstone':'Итоговый проект для промышленной эксплуатации','Capstone v1':'Итоговый проект, версия 1','capstone':'итоговый проект'});
 term('game-day', 'game day', {'Game day':'Учебная отработка аварии','game day':'учебная отработка аварии'});

@@ -1416,14 +1416,16 @@
       "current": "две темы в одном вопросе",
       "proposed": "разделить",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_lx_009",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "В 15.11.22 вопрос разделён: qb_lx_009 — метки времени файла, новый qb_lx_011 — разделы man и системные вызовы.",
+      "sources": []
     },
     {
       "id": "audit-p02-368",
@@ -1462,8 +1464,10 @@
       "current": "«Инод это…»",
       "proposed": "«Инод — это…»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p03-377",
@@ -3003,7 +3007,7 @@
       "current": "заголовок вместо вопроса; капс",
       "proposed": "переписать",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000987",
@@ -3015,7 +3019,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p06-454",
@@ -3326,14 +3332,16 @@
       "current": "«не для рабочей среды (production) нагрузки»",
       "proposed": "«не для рабочей нагрузки»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001277",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p07-470",
@@ -3348,14 +3356,16 @@
       "current": "«образа»",
       "proposed": "«образы»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001300",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p07-471",
@@ -3418,14 +3428,16 @@
       "current": "«`+` не совпадёт с нулём»",
       "proposed": "в BRE `+` — символ, в GNU sed работает `\\+`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001302",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p07-474",
@@ -3933,14 +3945,16 @@
       "current": "«process_check.sh» без контекста",
       "proposed": "добавить описание задачи или убрать",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001337",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p08-493",
@@ -4487,14 +4501,16 @@
       "current": "«ассиметричные»",
       "proposed": "«асимметричные»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_ntr_005",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p09-541",
@@ -4509,14 +4525,16 @@
       "current": "команды-заглушки (`ip route`, `dig`, `tcpdump`)",
       "proposed": "убрать",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_kts_040",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p10-553",
@@ -4731,8 +4749,10 @@
       "current": "«для рабочей среды (production) VPN»",
       "proposed": "«для рабочего VPN»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p11-576",
@@ -5192,14 +5212,16 @@
       "current": "«а он равен сутки»",
       "proposed": "«а он равен суткам»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002097",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p12-623",
@@ -5854,7 +5876,7 @@
       "current": "заголовок вместо вопроса («Сети — TCP keepalive»)",
       "proposed": "«Почему TCP-сессии рвутся после N минут простоя?», «Как отличить реальные потери от ограничения ICMP в mtr?»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1002337",
@@ -5866,7 +5888,9 @@
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "В 15.11.22 десять карточек из подсказок получили вопросы вместо заголовков.",
+      "sources": []
     },
     {
       "id": "audit-p13-648",
@@ -6399,8 +6423,10 @@
       "current": "Ошибки",
       "proposed": "Неточности",
       "auditStatus": "Главное",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Строка итоговой сводки пакета 13, импортированная как находка; отдельного действия не требует — её пункты разнесены по другим находкам.",
+      "sources": []
     },
     {
       "id": "audit-p13-665",
@@ -6413,8 +6439,10 @@
       "current": "2",
       "proposed": "8",
       "auditStatus": "8 групп дублей; пробелы: DHCP, внешний IP, IPv6, прокси, VPN, HTTP/2–3, CDN",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Строка итоговой сводки пакета 13, импортированная как находка; отдельного действия не требует — её пункты разнесены по другим находкам.",
+      "sources": []
     },
     {
       "id": "audit-p13-666",
@@ -6427,8 +6455,10 @@
       "current": "0",
       "proposed": "2",
       "auditStatus": "2 не в той коллекции",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Строка итоговой сводки пакета 13, импортированная как находка; отдельного действия не требует — её пункты разнесены по другим находкам.",
+      "sources": []
     },
     {
       "id": "audit-p13-667",
@@ -6441,8 +6471,10 @@
       "current": "0",
       "proposed": "—",
       "auditStatus": "13 тривиальных, самый длинный верен в 71 из 138, ~21 узкоспециальный, 14 не в той категории",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Строка итоговой сводки пакета 13, импортированная как находка; отдельного действия не требует — её пункты разнесены по другим находкам.",
+      "sources": []
     },
     {
       "id": "audit-p13-668",
@@ -6455,8 +6487,10 @@
       "current": "0 новых (1 из банка)",
       "proposed": "3 новых + ~5 из банка",
       "auditStatus": "~12 не в той коллекции, ~28 узкоспециальных",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Строка итоговой сводки пакета 13, импортированная как находка; отдельного действия не требует — её пункты разнесены по другим находкам.",
+      "sources": []
     },
     {
       "id": "audit-p14-678",
@@ -6621,14 +6655,16 @@
       "current": "«сложно диагностика неисправностей (troubleshooting); нужен дистрибутив с distroless или alpine»",
       "proposed": "«сложно диагностировать; для отладки удобнее distroless с debug-тегом или alpine»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000084",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p14-685",
@@ -6644,7 +6680,7 @@
       "current": "«рабочей среды (production)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000028",
@@ -6656,7 +6692,9 @@
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p14-686",
@@ -6671,14 +6709,16 @@
       "current": "пример `golang:1.20`",
       "proposed": "актуальная версия или без номера",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000083",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p14-687",
@@ -6693,14 +6733,16 @@
       "current": "«сетeвая» — латинская «e» внутри русского слова (единственное такое место во всех данных)",
       "proposed": "«сетевая»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000236",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p14-688",
@@ -7823,14 +7865,16 @@
       "current": "«в рабочей среде (production)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000114",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p17-761",
@@ -8003,8 +8047,10 @@
       "current": "«ручным контрольный список (checklist)»",
       "proposed": "«по ручному чек-листу»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p18-808",
@@ -8017,8 +8063,10 @@
       "current": "«без изменения состояния (read-only)»; «код завершения (exit code)»; «влияние… (impact)»; «(production)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p18-809",
@@ -8687,14 +8735,16 @@
       "current": "«и диагностика неисправностей (troubleshooting)»",
       "proposed": "«и порядок диагностики»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000224",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p20-865",
@@ -8709,14 +8759,16 @@
       "current": "«Для рабочей среды (production)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "2000173",
           "file": "tasks/video_flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p20-866",
@@ -9305,14 +9357,16 @@
       "current": "«простейший отбор узлов по мета́м»",
       "proposed": "«по меткам»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_010",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p21-893",
@@ -9327,14 +9381,16 @@
       "current": "«svc.ns.svc.cluster.local»",
       "proposed": "«service.ns.svc.cluster.local»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_016",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p21-894",
@@ -9349,14 +9405,16 @@
       "current": "«перехватывает трафик подмена iptables в поде»",
       "proposed": "«перехватывает трафик через правила iptables в поде»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_021",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p21-895",
@@ -9629,14 +9687,16 @@
       "current": "в одном вопросе две темы: apiVersion и headless-сервис",
       "proposed": "разделить",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_k8s_024",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "В 15.11.22 вопрос разделён: qb_k8s_024 — apiVersion, новый qb_k8s_025 — headless-сервис.",
+      "sources": []
     },
     {
       "id": "audit-p22-915",
@@ -9927,8 +9987,10 @@
       "current": "«Один провал один пробы удаляет Pod»",
       "proposed": "«Один провал любой пробы удаляет Pod»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p23-939",
@@ -9941,8 +10003,10 @@
       "current": "«служба увеличивает паузу между перезапусками»",
       "proposed": "«kubelet увеличивает паузу»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p23-940",
@@ -9955,8 +10019,10 @@
       "current": "«без изменения состояния (read-only)»; «другого код завершения (exit code)»; «(mitigation)», «(root cause)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p23-941",
@@ -10219,14 +10285,16 @@
       "current": "заголовок «ConfigMap: строка вместо файла», а ответ — про пароль в ConfigMap",
       "proposed": "«Пароль в ConfigMap»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000754",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p24-965",
@@ -10241,14 +10309,16 @@
       "current": "«для рабочей среды (production)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1000752",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p24-966",
@@ -10757,14 +10827,16 @@
       "current": "«в одном стойке»",
       "proposed": "«в одной стойке»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "1001451",
           "file": "tasks/flashcards.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p27-1016",
@@ -11061,8 +11133,10 @@
       "current": "в выводе путь `/home/mikhail/…`",
       "proposed": "нейтральное имя пользователя (`/home/user/…`)",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p29-1063",
@@ -11123,8 +11197,10 @@
       "current": "«а он равен сутки»",
       "proposed": "«равен суткам»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p29-1067",
@@ -11137,8 +11213,10 @@
       "current": "«в одном стойке»",
       "proposed": "«в одной стойке»",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p29-1068",
@@ -11374,8 +11452,10 @@
       "current": "27 узлов-тупиков без продолжения (неверный путь заканчивается без возврата), в #3 тупиком стал даже рабочий вариант `chmod 644`",
       "proposed": "добавить в тупиках переход «вернуться к предыдущему шагу» — учебная цель в том, чтобы дойти до решения",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "В 15.11.22 у 27 узлов-тупиков появился переход «Вернуться к предыдущему шагу».",
+      "sources": []
     },
     {
       "id": "audit-p31-1103",
@@ -11730,8 +11810,10 @@
       "current": "«(production)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p32-1130",
@@ -12251,8 +12333,10 @@
       "current": "«(production)»; «диагностические данные (evidence)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p38-1211",
@@ -12845,14 +12929,16 @@
       "current": "«в рабочей среде (production)»",
       "proposed": "C3",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
+      "implementationStatus": "done",
       "sourceChecks": [
         {
           "id": "qb_kts_039",
           "file": "tasks/question_bank.json",
           "exists": true
         }
-      ]
+      ],
+      "resolution": "Исправлено в 15.11.22 (стиль, опечатки, «(production)» → «продакшен»).",
+      "sources": []
     },
     {
       "id": "audit-p41-1269",
