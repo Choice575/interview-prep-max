@@ -1636,38 +1636,41 @@ function renderAnalytics(){return requireAnalyticsUI().renderAnalytics();}
 function renderReadinessHome(){return requireAnalyticsUI().renderReadinessHome();}
 // ═══ SUBNET ═══
 let subnetDone={};
-function calcSubnet(ip,prefix){
-  const p=ip.split('.').map(Number);const ipN=(p[0]<<24|p[1]<<16|p[2]<<8|p[3])>>>0;
-  const mask=prefix===0?0:(0xFFFFFFFF<<(32-prefix))>>>0;const net=(ipN&mask)>>>0;const bc=(net|(~mask>>>0))>>>0;
-  const first=(net+1)>>>0,last=(bc-1)>>>0;const hosts=prefix>=31?(prefix===31?2:1):Math.pow(2,32-prefix)-2;
-  function n2ip(n){return [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');}
-  return{network:n2ip(net),broadcast:n2ip(bc),first:n2ip(first),last:n2ip(last),hosts:hosts,mask:n2ip(mask)};
+// Расчёт подсети живёт в subnet.js (там же тесты для /31 и /32, аудит A5).
+function calcSubnet(ip,prefix){return IPMaxSubnet.calcSubnet(ip,prefix);}
+// Случайная задача с адресом хоста (аудит C8.3): её прогресс не хранится, результат идёт в статистику тренажёра.
+let subnetGenerated=null;
+function subnetProblem(idx){return idx==='g'?subnetGenerated:SUBNET_PROBLEMS[idx];}
+function subnetIdArg(idx){return idx==='g'?"'g'":String(idx);}
+function renderSubnetProblem(prob,idx,done){
+  const ans=calcSubnet(prob.ip,prob.prefix);
+  const fieldLabels={network:'Адрес сети',broadcast:'Broadcast',first:'Первый хост',last:'Последний хост',mask:'Маска подсети'};
+  return '<div class="subnet-problem" id="sp-'+idx+'"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div class="subnet-ip">'+esc(prob.ip)+'/'+esc(prob.prefix)+'</div><span style="font-size:12px;color:var(--text3)">'+esc(prob.desc)+'</span><span id="sp-badge-'+idx+'" style="margin-left:auto">'+(done?'<span style="color:var(--green);font-weight:700">✅ Верно!</span>':'')+'</span></div><div class="subnet-inputs">'+
+    ['network','broadcast','first','last','mask'].map(f=>'<div class="subnet-input-group"><label for="si-'+idx+'-'+f+'">'+fieldLabels[f]+'</label><input class="subnet-input'+(done?' ok':'')+'" id="si-'+idx+'-'+f+'" placeholder="x.x.x.x" value="'+(done?ans[f]:'')+'" '+(done?'readonly':'')+' ></div>').join('')+
+    '<div class="subnet-input-group"><label for="si-'+idx+'-hosts">Кол-во хостов</label><input class="subnet-input'+(done?' ok':'')+'" id="si-'+idx+'-hosts" placeholder="число" value="'+(done?ans.hosts:'')+'" '+(done?'readonly':'')+' ></div></div>'+
+    '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="checkSubnet('+subnetIdArg(idx)+')" '+(done?'disabled':'')+'>Проверить</button><button class="btn btn-outline btn-sm" onclick="showSubnetAns('+subnetIdArg(idx)+')">Показать ответ</button></div>'+
+    '<div class="subnet-result" id="sr-'+idx+'"></div></div>';
 }
 function renderSubnet(){
   subnetDone=lsGet('subnet_prog',{});const cont=document.getElementById('subnet-container');
-  const fieldLabels={network:'Адрес сети',broadcast:'Broadcast',first:'Первый хост',last:'Последний хост',mask:'Маска подсети'};
-  cont.innerHTML=SUBNET_PROBLEMS.map((prob,idx)=>{const ans=calcSubnet(prob.ip,prob.prefix);const done=subnetDone[idx];
-    return '<div class="subnet-problem" id="sp-'+idx+'"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div class="subnet-ip">'+prob.ip+'/'+prob.prefix+'</div><span style="font-size:12px;color:var(--text3)">'+prob.desc+'</span><span id="sp-badge-'+idx+'" style="margin-left:auto">'+(done?'<span style="color:var(--green);font-weight:700">✅ Верно!</span>':'')+'</span></div><div class="subnet-inputs">'+
-    ['network','broadcast','first','last','mask'].map(f=>'<div class="subnet-input-group"><label>'+fieldLabels[f]+'</label><input class="subnet-input'+(done?' ok':'')+'" id="si-'+idx+'-'+f+'" placeholder="x.x.x.x" value="'+(done?ans[f]:'')+'" '+(done?'readonly':'')+' ></div>').join('')+
-    '<div class="subnet-input-group"><label>Кол-во хостов</label><input class="subnet-input'+(done?' ok':'')+'" id="si-'+idx+'-hosts" placeholder="число" value="'+(done?ans.hosts:'')+'" '+(done?'readonly':'')+' ></div></div>'+
-    '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="checkSubnet('+idx+')" '+(done?'disabled':'')+'>Проверить</button><button class="btn btn-outline btn-sm" onclick="showSubnetAns('+idx+')">Показать ответ</button></div>'+
-    '<div class="subnet-result" id="sr-'+idx+'"></div></div>';
-  }).join('');updateSubnetProg();
+  const generator='<div class="card subnet-generator" style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:'+(subnetGenerated?'12px':'0')+'"><b>🎲 Случайная задача</b><span style="font-size:12px;color:var(--text3)">адрес хоста в частной сети, маска от /16 до /30</span><button type="button" class="btn btn-outline btn-sm" style="margin-left:auto" data-subnet-action="generate">'+(subnetGenerated?'Другая задача':'Сгенерировать')+'</button></div>'+(subnetGenerated?renderSubnetProblem(subnetGenerated,'g',false):'')+'</div>';
+  cont.innerHTML=generator+SUBNET_PROBLEMS.map((prob,idx)=>renderSubnetProblem(prob,idx,!!subnetDone[idx])).join('');cont.querySelector('[data-subnet-action="generate"]')?.addEventListener('click',newSubnetProblem);updateSubnetProg();
 }
+function newSubnetProblem(){subnetGenerated=IPMaxSubnet.generateProblem();renderSubnet();document.getElementById('si-g-network')?.focus();}
 function checkSubnet(idx){
-  const prob=SUBNET_PROBLEMS[idx];const ans=calcSubnet(prob.ip,prob.prefix);const fields=['network','broadcast','first','last','mask'];let allOk=true;
+  const prob=subnetProblem(idx);if(!prob) return;const ans=calcSubnet(prob.ip,prob.prefix);const fields=['network','broadcast','first','last','mask'];let allOk=true;
   fields.forEach(f=>{const el=document.getElementById('si-'+idx+'-'+f);if(!el) return;const ok=el.value.trim()===ans[f];el.classList.toggle('ok',ok);el.classList.toggle('err',!ok);if(!ok)allOk=false;});
   const he=document.getElementById('si-'+idx+'-hosts');if(he){const ok=parseInt(he.value)===ans.hosts;he.classList.toggle('ok',ok);he.classList.toggle('err',!ok);if(!ok)allOk=false;}
+  if(idx==='g'){recordTrainerResult('subnet','Сети',allOk);if(allOk)document.getElementById('sp-badge-g').innerHTML='<span style="color:var(--green);font-weight:700">✅ Верно!</span>';return;}
   if(allOk){subnetDone[idx]=1;lsSet('subnet_prog',subnetDone);recordTrainerResult('subnet','Сети',true);document.getElementById('sp-badge-'+idx).innerHTML='<span style="color:var(--green);font-weight:700">✅ Верно!</span>';updateSubnetProg();}
 }
 function showSubnetAns(idx){
   const el=document.getElementById('sr-'+idx);if(!el)return;
   if(el.style.display==='block'){el.style.display='none';return;}
-  const prob=SUBNET_PROBLEMS[idx];const ans=calcSubnet(prob.ip,prob.prefix);
-  const p=prob.ip.split('.').map(Number);const ipN=(p[0]<<24|p[1]<<16|p[2]<<8|p[3])>>>0;
-  const mask=prob.prefix===0?0:(0xFFFFFFFF<<(32-prob.prefix))>>>0;const bits=32-prob.prefix;
-  const hosts=prob.prefix>=31?(prob.prefix===31?2:1):Math.pow(2,bits)-2;
-  el.innerHTML='<div style="margin-bottom:10px"><b>📐 Пошаговый расчёт '+prob.ip+'/'+prob.prefix+'</b></div><div style="font-size:12px;line-height:2;color:var(--text2)"><b>1. Маска:</b> /'+prob.prefix+' → '+prob.prefix+' бит = 1, остальные '+bits+' = 0<br>&nbsp;&nbsp;&nbsp;Двоичная: '+mask.toString(2).padStart(32,'0').replace(/(.{8})/g,'$1 ')+'<br>&nbsp;&nbsp;&nbsp;Десятичная: <b style="color:var(--primary-h)">'+ans.mask+'</b><br><b>2. IP:</b> '+ipN.toString(2).padStart(32,'0').replace(/(.{8})/g,'$1 ')+'<br><b>3. Сеть:</b> <b style="color:var(--green)">'+ans.network+'</b><br><b>4. Broadcast:</b> <b style="color:var(--red)">'+ans.broadcast+'</b><br><b>5-6. Хосты:</b> '+ans.first+' – '+ans.last+'<br><b>7. Всего:</b> 2<sup>'+bits+'</sup>-2 = <b style="color:var(--yellow)">'+hosts+'</b></div>';
+  const prob=subnetProblem(idx);if(!prob)return;const ans=calcSubnet(prob.ip,prob.prefix);
+  const ipN=IPMaxSubnet.toNumber(prob.ip);const mask=IPMaxSubnet.toNumber(ans.mask);const bits=32-prob.prefix;
+  const hostsFormula=prob.prefix===32?'1 адрес (/32)':prob.prefix===31?'2 адреса без broadcast (/31, RFC 3021)':'2<sup>'+bits+'</sup>-2';
+  el.innerHTML='<div style="margin-bottom:10px"><b>📐 Пошаговый расчёт '+esc(prob.ip)+'/'+esc(prob.prefix)+'</b></div><div style="font-size:12px;line-height:2;color:var(--text2)"><b>1. Маска:</b> /'+prob.prefix+' → '+prob.prefix+' бит = 1, остальные '+bits+' = 0<br>&nbsp;&nbsp;&nbsp;Двоичная: '+mask.toString(2).padStart(32,'0').replace(/(.{8})/g,'$1 ')+'<br>&nbsp;&nbsp;&nbsp;Десятичная: <b style="color:var(--primary-h)">'+ans.mask+'</b><br><b>2. IP:</b> '+ipN.toString(2).padStart(32,'0').replace(/(.{8})/g,'$1 ')+'<br><b>3. Сеть (IP AND маска):</b> <b style="color:var(--green)">'+ans.network+'</b><br><b>4. Broadcast (все биты хоста = 1):</b> <b style="color:var(--red)">'+ans.broadcast+'</b><br><b>5-6. Хосты:</b> '+ans.first+' – '+ans.last+'<br><b>7. Всего:</b> '+hostsFormula+' = <b style="color:var(--yellow)">'+ans.hosts+'</b></div>';
   el.style.display='block';
 }
 function updateSubnetProg(){const done=Object.keys(subnetDone).length;document.getElementById('subnet-progress-fill').style.width=(done/SUBNET_PROBLEMS.length*100)+'%';document.getElementById('subnet-score-display').textContent=done+' / '+SUBNET_PROBLEMS.length;}
