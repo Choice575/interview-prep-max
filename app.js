@@ -72,7 +72,7 @@ const dataLoader=IPMaxDataLoader.create({files:DATA_FILES,fetch:(url,options)=>f
     }
     if(key==='flashcards'||key==='video_flashcards'){
       const count=document.getElementById('sb-flashcards-count');
-      if(count)count.textContent=(FLASHCARDS_DATA?.cards?.length||0)+(VIDEO_FLASHCARDS_DATA?.cards?.length||0);
+      if(count)count.textContent=visibleStudyCards().length+(VIDEO_FLASHCARDS_DATA?.cards?.length||0);
     }
   }
 });
@@ -750,11 +750,15 @@ function loadMoreQuestions(){return requireExamUI().loadMoreQuestions();}
 function updateQuestionProgressSummary(){return requireExamUI().updateProgressSummary();}
 function renderQCard(q,sMode){return requireExamUI().renderQuestionCard(q,sMode);}
 
+// Шаблонные карточки (generated) не показываются: у сотен из них один и тот же
+// ответ, а недельные — рубрика вместо ответа (аудит C2). Колода практических
+// сценариев остаётся как есть; прогресс скрытых карточек не удаляется.
+function visibleStudyCards(){return (FLASHCARDS_DATA?.cards||[]).filter(card=>card.practice||!card.generated);}
 function requireFlashcardsUIModule(){if(typeof IPMaxFlashcardsUI==='undefined') throw new Error('Модуль учебных карточек не загружен.');return IPMaxFlashcardsUI;}
 const flashcardsUI=requireFlashcardsUIModule().create({
-  getCards:()=>Array.isArray(FLASHCARDS_DATA?.cards)?FLASHCARDS_DATA.cards:[],
+  getCards:visibleStudyCards,
   getDecks:()=>[
-    {id:'study',label:'Учебная программа',description:'Вопросы по DevOps и MLOps, включая Swfuse/devops-interview. Задания на разбор вывода команд вынесены в практические сценарии.',cards:(FLASHCARDS_DATA?.cards||[]).filter(card=>!card.practice)},
+    {id:'study',label:'Учебная программа',description:'Вопросы по DevOps и MLOps, включая Swfuse/devops-interview. Задания на разбор вывода команд вынесены в практические сценарии.',cards:visibleStudyCards().filter(card=>!card.practice)},
     {id:'video',label:'Собеседования из видео',description:(Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards.length:0)+' реальных вопросов из '+(Array.isArray(VIDEO_FLASHCARDS_DATA?.sources)?VIDEO_FLASHCARDS_DATA.sources.length:0)+' видео с техническими собеседованиями.',cards:Array.isArray(VIDEO_FLASHCARDS_DATA?.cards)?VIDEO_FLASHCARDS_DATA.cards:[]},
     {id:'practice',label:'Практические сценарии',description:'Разбор вывода команд: объясните результат, границы проверки и следующий шаг. Прежний прогресс этих заданий сохранён.',cards:(FLASHCARDS_DATA?.cards||[]).filter(card=>card.practice)}
   ],
@@ -1061,7 +1065,8 @@ function getMiniTest(week,day){
   return testId?(programTests()?.miniTests||[]).find(t=>t.id===testId):null;
 }
 function getWeeklyTest(week){return (programTests()?.weeklyTests||[]).find(t=>t.week===week);}
-function getSeniorCaseList(){return Array.isArray(SENIOR_CASES)?SENIOR_CASES:(SENIOR_CASES?.cases||[]);}
+// Кейсы-заготовки (generated) без вывода команд решить нельзя — не показываем (аудит C2).
+function getSeniorCaseList(){return (Array.isArray(SENIOR_CASES)?SENIOR_CASES:(SENIOR_CASES?.cases||[])).filter(c=>!c.generated);}
 function getSeniorCasesForDay(week,day){return getSeniorCaseList().filter(c=>c.week===week&&(!c.day||c.day===day));}
 function getStudyOverview(){
   if(typeof IPMaxStudyUI==='undefined')return null;
@@ -2791,7 +2796,7 @@ function moveQuestionBankTab(event){
 // датасетов по ссылке source (в courses.json прозы нет, тонкий режим).
 function requireChapterUI(){if(typeof IPMaxChapterUI==='undefined') throw new Error('Модуль главы не загружен.');return IPMaxChapterUI;}
 function chapterDatasets(){
-  return {studyMap:STUDY_MAP,studyTests:STUDY_TESTS,seniorCases:SENIOR_CASES,
+  return {studyMap:STUDY_MAP,studyTests:STUDY_TESTS,seniorCases:SENIOR_CASES&&{...SENIOR_CASES,cases:getSeniorCaseList()},
     labs:LABS_TASKS,externalTasks:EXTERNAL_TASKS,simulators:TS_SCENARIOS};
 }
 function getChapterPosition(){return lsGet('chapter_position',null);}

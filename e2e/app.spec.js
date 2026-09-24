@@ -135,11 +135,11 @@ test('keeps curriculum and video flashcards as separate visible decks', async ({
   await page.locator('[data-page="flashcards"]').click();
 
   await expect(page.locator('#page-flashcards')).toHaveClass(/active/);
-  await expect(page.locator('#sb-flashcards-count')).toHaveText('3434');
+  await expect(page.locator('#sb-flashcards-count')).toHaveText('2748');
   const studyDeck = page.locator('[data-flashcards-action="deck"][data-deck="study"]');
   const videoDeck = page.locator('[data-flashcards-action="deck"][data-deck="video"]');
   await expect(studyDeck).toContainText('Учебная программа');
-  await expect(studyDeck.locator('strong')).toHaveText('3015');
+  await expect(studyDeck.locator('strong')).toHaveText('2329');
   await expect(videoDeck).toContainText('Собеседования из видео');
   await expect(videoDeck.locator('strong')).toHaveText('329');
   await expect(page.locator('.study-card').first()).toHaveAttribute('data-card-id', '1000001');
@@ -1136,7 +1136,7 @@ test('flat flashcard categories preserve progress, filter independently and keep
   await page.locator('[data-page="flashcards"]').click();
   const categories = page.getByRole('group', { name: 'Категории карточек' });
   await expect(categories.getByRole('button')).toHaveCount(14);
-  const linux = categories.getByRole('button', { name: 'Linux и Bash 428', exact: true });
+  const linux = categories.getByRole('button', { name: 'Linux и Bash 400', exact: true });
   await linux.click();
   await expect(linux).toHaveAttribute('aria-pressed', 'true');
   await expect(linux).toBeFocused();
@@ -1148,12 +1148,12 @@ test('flat flashcard categories preserve progress, filter independently and keep
   await expect(search).toHaveValue('несуществующий вопрос');
   await expect(search).toBeFocused();
   await expect(page.locator('#flashcards-host .empty-state')).toBeVisible();
-  await expect(linux.locator('strong')).toHaveText('428');
+  await expect(linux.locator('strong')).toHaveText('400');
   await search.fill('');
   await page.locator('[data-flashcards-action="mode"][data-mode="all"]').click();
-  await categories.getByRole('button', { name: 'Docker и реестры образов 183', exact: true }).click();
+  await categories.getByRole('button', { name: 'Docker и реестры образов 113', exact: true }).click();
   await expect(page.locator('.study-card-meta')).toContainText('Docker и реестры образов');
-  await expect(page.locator('.study-card-meta')).toContainText('1 / 183');
+  await expect(page.locator('.study-card-meta')).toContainText('1 / 113');
   await page.locator('[data-flashcards-action="deck"][data-deck="video"]').click();
   await expect(categories.getByRole('button')).toHaveCount(13);
   await expect(categories.getByRole('button', { name: 'Все категории 329', exact: true })).toHaveAttribute('aria-pressed', 'true');

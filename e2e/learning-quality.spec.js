@@ -12,7 +12,7 @@ test.beforeEach(async ({page}) => {
 
 test('practice is a separate deck and retains previous card progress when rated', async ({page}) => {
   await page.goto('/#/flashcards');
-  await expect(page.locator('[data-deck="study"] strong')).toHaveText('3015');
+  await expect(page.locator('[data-deck="study"] strong')).toHaveText('2329');
   const practice = page.locator('[data-deck="practice"]');
   await expect(practice).toContainText('Практические сценарии');
   await expect(practice.locator('strong')).toHaveText('90');

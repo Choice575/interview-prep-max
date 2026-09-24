@@ -10635,8 +10635,10 @@
       "current": "17 кейсов без данных: evidence — «Topic/Symptom/Impact/Constraint», ожидаемые действия одинаковые у всех",
       "proposed": "скрыть до заполнения; заполнять по образцу `net-http-005` или `k8s-ingress-024`. Материал для части уже есть: 502 в Compose — `qb_dbg_002`; too many clients — флешкарта 1001456; CrashLoopBackOff — `qb_k8o_007`; «changed» в Ansible — тренажёр `ansible_pb`",
       "auditStatus": "☐",
-      "implementationStatus": "pending",
-      "sourceChecks": []
+      "implementationStatus": "done",
+      "sourceChecks": [],
+      "resolution": "В 15.11.14 17 кейсов-заготовок помечены generated: true и скрыты из учебного плана и глав; 14 связанных с ними карточек «[Ситуационная задача…]» тоже скрыты. Данные и прогресс сохранены: заполнить по образцу net-http-005 или k8s-ingress-024 и снять флаг.",
+      "sources": []
     },
     {
       "id": "audit-p28-1049",
