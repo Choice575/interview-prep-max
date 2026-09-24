@@ -156,3 +156,17 @@ test('the profile hides MLOps cards and Senior questions until the user opts in'
   await page.locator('#exam-scope-bar button').click();
   await expect(page.locator('#exam-scope-bar')).toContainText('Junior, Middle, Senior');
 });
+
+test('a long flashcard answer offers recall points that suggest the rating', async ({page}) => {
+  await page.goto('/#/flashcards');
+  await page.locator('[data-flashcards-filter="search"]').fill('Без агента: только SSH');
+  await page.locator('[data-flashcards-action="reveal"]').click();
+  const points = page.locator('.study-card-recall input');
+  await expect(points).toHaveCount(3);
+  await points.nth(0).check();
+  await expect(page.locator('.recall-hint')).toContainText('Вспомнили 1 из 3');
+  await expect(page.locator('[data-outcome="partial"]')).toHaveClass(/rate-suggested/);
+  await page.locator('.study-card-recall input').nth(1).check();
+  await page.locator('.study-card-recall input').nth(2).check();
+  await expect(page.locator('[data-outcome="pass"]')).toHaveClass(/rate-suggested/);
+});

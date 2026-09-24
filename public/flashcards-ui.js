@@ -88,6 +88,35 @@
     return summary;
   }
 
+  // Длинный ответ трудно честно оценить целиком (аудит B7): разбиваем его на
+  // 2–3 ключевых пункта, которые пользователь отмечает как вспомненные.
+  const RECALL_MIN_LENGTH = 260;
+  const RECALL_MAX_POINTS = 3;
+
+  function recallPoints(card) {
+    if (!card) return [];
+    if (Array.isArray(card.keyPoints) && card.keyPoints.length >= 2) {
+      return card.keyPoints.slice(0, RECALL_MAX_POINTS).map(String);
+    }
+    const answer = String(card.answer || '').trim();
+    // Карточки из банка хранят тезисы как «пункт; пункт. Команды: …».
+    const bank = /^([^`]+?)\. (Команды|Важно): /.exec(answer);
+    if (bank && bank[1].includes('; ')) {
+      const points = bank[1].split('; ').map(item => item.trim()).filter(item => item.length >= 8);
+      if (points.length >= 2) return points.slice(0, RECALL_MAX_POINTS);
+    }
+    if (answer.length < RECALL_MIN_LENGTH) return [];
+    const sentences = answer.split(/(?<=[.!?])\s+(?=[А-ЯЁA-Z])/u).map(item => item.trim())
+      .filter(item => item.length >= 20 && (item.match(/`/g) || []).length % 2 === 0);
+    return sentences.length >= 2 ? sentences.slice(0, RECALL_MAX_POINTS) : [];
+  }
+
+  function suggestedOutcome(recalled, total) {
+    if (!total) return null;
+    const share = recalled / total;
+    return share >= 1 ? 'pass' : share > 0 ? 'partial' : 'fail';
+  }
+
   function escapeText(value) {
     return String(value === undefined || value === null ? '' : value)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -194,12 +223,24 @@
         : escapeText(card.sourceTitle)) + '</div>'
       : '';
 
+    const points = recallPoints(card);
+    const recalled = Array.isArray(state.recalled) ? state.recalled.filter(index => index >= 0 && index < points.length) : [];
+    const suggestion = points.length ? suggestedOutcome(recalled.length, points.length) : null;
+    const rateButton = (outcome, text, primary) => '<button type="button" class="btn ' + (primary ? 'btn-primary' : 'btn-outline') +
+      (suggestion === outcome ? ' rate-suggested' : '') + '" data-flashcards-action="rate" data-outcome="' + outcome + '"' +
+      (suggestion === outcome ? ' aria-describedby="recall-hint"' : '') + '>' + text + '</button>';
+    const recall = points.length
+      ? '<fieldset class="study-card-recall"><legend>Что вы вспомнили?</legend>' +
+        points.map((point, index) => '<label><input type="checkbox" data-flashcards-recall="' + index + '"' + (recalled.includes(index) ? ' checked' : '') + '> ' + escapeText(point) + '</label>').join('') +
+        '<p class="recall-hint" id="recall-hint">' + (recalled.length
+          ? 'Вспомнили ' + recalled.length + ' из ' + points.length + ' — подсвечена подходящая оценка.'
+          : 'Отметьте пункты, которые назвали сами, — оценка подсветится.') + '</p></fieldset>'
+      : '';
     const answer = state.revealed
       ? '<div class="study-card-answer"><div class="study-card-answer-label">Ответ</div>' + AnswerUI.render(card.answer,card.shortAnswer) + '</div>' +
+        recall +
         '<div class="study-card-rates" aria-label="Оценить ответ">' +
-        '<button type="button" class="btn btn-outline" data-flashcards-action="rate" data-outcome="fail">Не знаю</button>' +
-        '<button type="button" class="btn btn-outline" data-flashcards-action="rate" data-outcome="partial">Повторить</button>' +
-        '<button type="button" class="btn btn-primary" data-flashcards-action="rate" data-outcome="pass">Знаю</button></div>'
+        rateButton('fail', 'Не знаю', false) + rateButton('partial', 'Повторить', false) + rateButton('pass', 'Знаю', true) + '</div>'
       : '<button type="button" class="btn btn-primary" data-flashcards-action="reveal">Показать ответ</button>';
 
     return deckSwitch + stats + controls + '<article class="study-card" data-card-id="' + escapeText(card.id) + '">' +
@@ -213,7 +254,7 @@
     const source = services || {};
     const env = environment || {};
     const doc = env.document || (typeof document !== 'undefined' ? document : null);
-    const state = { deck: 'study', collection: 'all', mode: DEFAULT_MODE, search: '', revealed: false, index: 0 };
+    const state = { deck: 'study', collection: 'all', mode: DEFAULT_MODE, search: '', revealed: false, index: 0, recalled: [] };
     const run = (name, ...args) => typeof source[name] === 'function' ? source[name](...args) : undefined;
 
     function currentDecks() {
@@ -236,7 +277,7 @@
       if (!host) return [];
       const focused = doc.activeElement;
       const restoreFocus = focused && host.contains && host.contains(focused);
-      const focusAttributes = restoreFocus ? ['data-flashcards-action', 'data-collection', 'data-mode', 'data-deck', 'data-flashcards-filter']
+      const focusAttributes = restoreFocus ? ['data-flashcards-action', 'data-collection', 'data-mode', 'data-deck', 'data-flashcards-filter', 'data-flashcards-recall']
         .map(name => [name, focused.getAttribute(name)]).filter(([, value]) => value !== null) : [];
       const selection = restoreFocus && focused.getAttribute('data-flashcards-filter') === 'search'
         ? [focused.selectionStart, focused.selectionEnd] : null;
@@ -245,7 +286,7 @@
       host.innerHTML = renderPage({
         decks: currentDecks(), deck: currentDeck().id, progress: run('getProgress') || {}, now: run('now'),
         collection: state.collection, mode: state.mode, search: state.search,
-        revealed: state.revealed, index: state.index
+        revealed: state.revealed, index: state.index, recalled: state.recalled
       });
       bind(host);
       if (focusAttributes.length) {
@@ -265,6 +306,7 @@
       if (!cards.length) return;
       state.index = Math.max(0, Math.min(cards.length - 1, state.index + delta));
       state.revealed = false;
+      state.recalled = [];
       render();
     }
     function rate(outcome) {
@@ -277,6 +319,7 @@
       if (cardStillVisible) state.index++;
       else state.index = Math.min(state.index, Math.max(0, remaining.length - 1));
       state.revealed = false;
+      state.recalled = [];
       render();
       return true;
     }
@@ -289,6 +332,7 @@
       }
       state.index = 0;
       state.revealed = false;
+      state.recalled = [];
       render();
     }
     function resetFilters() {
@@ -296,6 +340,7 @@
       state.mode = DEFAULT_MODE;
       state.index = 0;
       state.revealed = false;
+      state.recalled = [];
       render();
     }
     function setDeck(value) {
@@ -306,6 +351,7 @@
       state.search = '';
       state.index = 0;
       state.revealed = false;
+      state.recalled = [];
       render();
       return true;
     }
@@ -324,6 +370,15 @@
             resetFilters();
             host.querySelector('[data-flashcards-filter="search"]').focus();
           }
+        });
+      });
+      host.querySelectorAll('[data-flashcards-recall]').forEach(element => {
+        element.addEventListener('change', () => {
+          const index = Number(element.getAttribute('data-flashcards-recall'));
+          const set = new Set(state.recalled);
+          if (element.checked) set.add(index); else set.delete(index);
+          state.recalled = [...set].sort((a, b) => a - b);
+          render();
         });
       });
       host.querySelectorAll('[data-flashcards-filter]').forEach(element => {
@@ -358,5 +413,5 @@
     return out;
   }
 
-  return { cardState, isDue, filterCards, summarizeCards, todayQueue, normalizeDecks, renderPage, create, collapseConcepts, NEW_PER_DAY };
+  return { cardState, isDue, filterCards, summarizeCards, todayQueue, normalizeDecks, renderPage, create, collapseConcepts, recallPoints, suggestedOutcome, NEW_PER_DAY };
 });

@@ -1335,6 +1335,12 @@ button:disabled,[aria-disabled="true"]{cursor:not-allowed}
 .external-progress-warning,#evidence-error{padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text);line-height:1.6}
 .study-card-rates{display:flex;flex-wrap:wrap;gap:10px}
 .study-card-rates .btn{flex:1 1 30%;min-height:44px}
+.study-card-recall{border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin:0 0 14px;display:grid;gap:8px}
+.study-card-recall legend{font-size:12px;font-weight:700;color:var(--text2);padding:0 4px}
+.study-card-recall label{display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.5;cursor:pointer}
+.study-card-recall input{margin-top:3px;min-width:18px;min-height:18px}
+.recall-hint{font-size:12px;color:var(--text3);margin:0}
+.study-card-rates .rate-suggested{outline:2px solid var(--primary);outline-offset:2px}
 .study-card-nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
 @media(max-width:600px){
   .flashcards-decks{grid-template-columns:1fr}
