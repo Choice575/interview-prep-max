@@ -114,3 +114,26 @@ test('trainer-derived study cards keep source punctuation and never point at inv
     assert.ok(`${card.question} ${card.answer}`.includes(literal), `${id}: ${literal}`);
   }
 });
+
+test('template and rubric flashcards and empty senior cases are flagged as generated', () => {
+  const cards = require('./tasks/flashcards.json').cards;
+  const templates = [
+    /^К какому production-сбою приведёт ошибка/, /^Как в задаче «.*» применить навык/,
+    /^Какими диагностическими данными \(evidence\) и повторными проверками доказать/, /^К какому сбою приведёт ошибка/,
+    /^Дан вывод для «/, /^Какое безопасное действие выполнить первым/, /^Какими наблюдаемыми критериями подтвердить завершение практики/,
+    /^\[(DevOps|MLOps)[^\]]*недел/
+  ];
+  for (const card of cards) {
+    if (templates.some(pattern => pattern.test(card.question))) assert.equal(card.generated, true, `${card.id}`);
+  }
+  assert.equal(cards.filter(card => card.generated).length, 776);
+  const visibleStudy = cards.filter(card => !card.practice && !card.generated);
+  assert.equal(visibleStudy.length, 2329);
+  assert.equal(cards.filter(card => card.practice).length, 90, 'колода практических сценариев не меняется');
+
+  const cases = require('./tasks/senior_cases.json').cases;
+  const empty = cases.filter(item => item.evidence.some(line => /^Topic:/.test(line)));
+  assert.equal(empty.length, 17);
+  assert.ok(empty.every(item => item.generated === true));
+  assert.equal(cases.filter(item => item.generated).length, 17);
+});

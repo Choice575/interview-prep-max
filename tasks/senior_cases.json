@@ -633,6 +633,7 @@
     },
     {
       "id": "bash-health-011",
+      "generated": true,
       "week": 5,
       "day": 5,
       "level": "Middle+",
@@ -695,6 +696,7 @@
     },
     {
       "id": "docker-crash-012",
+      "generated": true,
       "week": 6,
       "day": 5,
       "level": "Middle+",
@@ -757,6 +759,7 @@
     },
     {
       "id": "dockerfile-root-013",
+      "generated": true,
       "week": 7,
       "day": 5,
       "level": "Middle+",
@@ -819,6 +822,7 @@
     },
     {
       "id": "compose-502-014",
+      "generated": true,
       "week": 8,
       "day": 5,
       "level": "Middle+",
@@ -1131,6 +1135,7 @@
     },
     {
       "id": "ansible-changed-019",
+      "generated": true,
       "week": 13,
       "day": 5,
       "level": "Middle",
@@ -1193,6 +1198,7 @@
     },
     {
       "id": "ansible-rolling-020",
+      "generated": true,
       "week": 14,
       "day": 5,
       "level": "Middle+",
@@ -1256,6 +1262,7 @@
     },
     {
       "id": "pg-too-many-clients-021",
+      "generated": true,
       "week": 15,
       "day": 5,
       "level": "Middle",
@@ -1319,6 +1326,7 @@
     },
     {
       "id": "pg-pitr-022",
+      "generated": true,
       "week": 16,
       "day": 5,
       "level": "Middle+",
@@ -1381,6 +1389,7 @@
     },
     {
       "id": "k8s-crashloop-023",
+      "generated": true,
       "week": 17,
       "day": 5,
       "level": "Middle+",
@@ -1815,6 +1824,7 @@
     },
     {
       "id": "capstone-v1-030",
+      "generated": true,
       "week": 24,
       "day": 5,
       "level": "Middle+",
@@ -1879,6 +1889,7 @@
     },
     {
       "id": "prod-net-timeout-031",
+      "generated": true,
       "week": 25,
       "day": 5,
       "level": "Senior-track",
@@ -1944,6 +1955,7 @@
     },
     {
       "id": "ha-edge-032",
+      "generated": true,
       "week": 26,
       "day": 5,
       "level": "Senior-track",
@@ -2009,6 +2021,7 @@
     },
     {
       "id": "pg-restore-drill-033",
+      "generated": true,
       "week": 27,
       "day": 5,
       "level": "Senior-track",
@@ -2073,6 +2086,7 @@
     },
     {
       "id": "pg-migration-lock-034",
+      "generated": true,
       "week": 28,
       "day": 5,
       "level": "Senior-track",
@@ -2136,6 +2150,7 @@
     },
     {
       "id": "k8s-upgrade-035",
+      "generated": true,
       "week": 29,
       "day": 5,
       "level": "Senior-track",
@@ -2264,6 +2279,7 @@
     },
     {
       "id": "obs-postmortem-037",
+      "generated": true,
       "week": 31,
       "day": 5,
       "level": "Senior-track",
@@ -2327,6 +2343,7 @@
     },
     {
       "id": "final-capstone-038",
+      "generated": true,
       "week": 32,
       "day": 5,
       "level": "Senior-track",
