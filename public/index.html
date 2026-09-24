@@ -404,6 +404,7 @@
     <div class="filter-row" id="ip-kind-chips">
       <button type="button" class="chip active" onclick="setInterviewKind('star',this)">🎤 Поведенческие (STAR)</button>
       <button type="button" class="chip" onclick="setInterviewKind('systemDesign',this)">🧩 Проектирование</button>
+      <button type="button" class="chip" onclick="setInterviewKind('bank',this)">📚 Вопросы банка</button>
     </div>
     <div class="ip-layout">
       <aside class="ip-side"><div class="ip-block-title">Задания</div><div id="ip-list"></div></aside>
@@ -415,8 +416,12 @@
           <div class="ip-answer-tools">
             <button type="button" class="btn btn-outline btn-sm" id="ip-dictate-btn" onclick="toggleInterviewDictation()">🎙️ Начать диктовку</button>
             <span id="ip-dictation-status" role="status" aria-live="polite"></span>
+            <button type="button" class="btn btn-outline btn-sm" id="ip-timer-btn" data-ip-action="timer">⏱ 2:00</button>
+            <button type="button" class="btn btn-outline btn-sm" id="ip-record-btn" data-ip-action="record">⏺ Записать ответ</button>
+            <span id="ip-record-status" role="status" aria-live="polite"></span>
           </div>
-          <p class="ip-privacy-note">Диктовка опциональна: браузер может передавать речь на сервер своего сервиса распознавания. Аудио не отправляется и не хранится сервером Interview Prep Max. Можно полностью работать печатью.</p>
+          <audio id="ip-record-audio" controls hidden></audio>
+          <p class="ip-privacy-note">Запись голоса хранится только в этой вкладке, чтобы вы могли её прослушать, и пропадает при переходе к другому заданию. Диктовка опциональна: браузер может передавать речь на сервер своего сервиса распознавания. Аудио не отправляется и не хранится сервером Interview Prep Max. Можно полностью работать печатью.</p>
           <button type="button" class="btn btn-ai" id="ip-ai-evaluate-btn" onclick="evaluateInterviewAnswer()">✨ Оценить ответ с AI</button>
         </section>
         <div id="ip-ai-result" aria-live="polite"></div>
@@ -578,6 +583,7 @@
   </div>
 </div>
 <script src="./version.js"></script>
+<script src="./asset-manifest.js"></script>
 <script src="./data-loader.js"></script>
 <script src="./date.js"></script>
 <script src="./storage.js"></script>
@@ -605,6 +611,7 @@
 <script src="./trainers-ui.js"></script>
 <script src="./subnet.js"></script>
 <script src="./profile-scope.js"></script>
+<script src="./command-check.js"></script>
 <script src="./answer-ui.js"></script>
 <script src="./question-bank-ui.js"></script>
 <script src="./external-tasks-ui.js"></script>

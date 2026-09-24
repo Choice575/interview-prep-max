@@ -6,19 +6,19 @@
   'use strict';
 
   // Единственный список ресурсов приложения (аудит A4.1). Его читают sw.js
-  // (офлайн-кеш) и проверки релиза; index.html обязан подключать ровно эти
+  // (офлайн-кеш), проверка офлайн-готовности в app.js и проверки релиза; index.html обязан подключать ровно эти
   // скрипты в этом порядке, иначе verify-release.js остановит релиз.
   // Сервер отдаёт весь каталог public/, поэтому отдельного списка там нет.
 
   // Порядок важен: модули регистрируют глобальные API, которые читает app.js.
   const scripts = [
-    './version.js', './data-loader.js', './date.js', './storage.js',
+    './version.js', './asset-manifest.js', './data-loader.js', './date.js', './storage.js',
     './progress.js', './coach.js', './ai-coach.js', './progress-io.js',
     './sync-merge.js', './sync-client.js', './sync-ui.js', './ai-settings-client.js',
     './ai-settings-ui.js', './offline-ui.js', './sources-ui.js', './best-practices-ui.js',
     './catalog-ui.js', './chapter-ui.js', './ai-tutor.js', './ai-tutor-ui.js',
     './router.js', './gamification.js', './gamification-ui.js', './daily.js',
-    './daily-ui.js', './trainers-ui.js', './subnet.js', './profile-scope.js', './answer-ui.js',
+    './daily-ui.js', './trainers-ui.js', './subnet.js', './profile-scope.js', './command-check.js', './answer-ui.js',
     './question-bank-ui.js', './external-tasks-ui.js', './polygon-ui.js', './interview-practice-ui.js',
     './analytics-ui.js', './home-ui.js', './exam-ui.js', './flashcards-ui.js',
     './study-ui.js', './coach-ui.js', './app.js'
@@ -27,7 +27,7 @@
   // Оболочка без скриптов: страница, стили, манифест PWA и иконки.
   const shell = [
     './', './index.html', './styles.css', './interview-prep-max.webmanifest',
-    './assets/icon-192.png', './assets/icon-512.png', './asset-manifest.js'
+    './assets/icon-192.png', './assets/icon-512.png'
   ];
 
   // Наборы данных кешируются по одному: недоступный файл не срывает установку.

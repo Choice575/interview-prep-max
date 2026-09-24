@@ -58,7 +58,6 @@ test('wires written and optional dictated interview answers into bounded AI hist
 test('registers AI Tutor modules across the complete no-bundler PWA fan-out', () => {
   const html = fs.readFileSync(path.join(root, 'public', 'index.html'), 'utf8');
   const sw = fs.readFileSync(path.join(root, 'public', 'asset-manifest.js'), 'utf8');
-  const app = fs.readFileSync(path.join(root, 'public', 'app.js'), 'utf8');
   const eslint = fs.readFileSync(path.join(root, 'eslint.config.mjs'), 'utf8');
 
   assert.ok(html.indexOf('./ai-tutor.js') > html.indexOf('./chapter-ui.js'));
@@ -66,7 +65,6 @@ test('registers AI Tutor modules across the complete no-bundler PWA fan-out', ()
   assert.ok(html.indexOf('./ai-tutor-ui.js') < html.indexOf('./app.js'));
   ['./ai-tutor.js', './ai-tutor-ui.js'].forEach(asset => {
     assert.match(sw, new RegExp(asset.replace(/[./-]/g, '\\$&')));
-    assert.match(app, new RegExp(asset.replace(/[./-]/g, '\\$&')));
     // Сервер, Dockerfile и ESLint берут весь public/, поэтому достаточно файла на месте.
     assert.ok(fs.existsSync(path.join(root, 'public', asset.slice(2))), asset);
   });

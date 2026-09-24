@@ -16,7 +16,28 @@
 
   function items(data, kind) {
     if (!data) return [];
+    if (kind === 'bank') return list(data.bank);
     return list(kind === 'star' ? data.star : data.systemDesign);
+  }
+
+  // Вопросы банка как задания «Ответы вслух» (аудит B8): ключевые пункты
+  // становятся рубрикой самопроверки, эталонный ответ открывается по кнопке.
+  function bankItems(bank) {
+    const categories = list(bank && bank.categories);
+    return categories.flatMap(category => list(category && category.questions)
+      .filter(question => question && question.id && question.q && list(question.keyPoints).length >= 2)
+      .map(question => ({
+        id: String(question.id), topic: String(category.title || ''), level: question.level || '',
+        prompt: question.q, rubric: list(question.keyPoints).slice(0, 6), answer: question.answer || '',
+        commands: list(question.commands), pitfall: question.pitfall || ''
+      })));
+  }
+
+  // Ответ вслух на собеседовании обычно укладывается в две минуты.
+  const ANSWER_SECONDS = 120;
+  function formatTimer(seconds) {
+    const value = Math.max(0, Math.round(Number(seconds) || 0));
+    return Math.floor(value / 60) + ':' + String(value % 60).padStart(2, '0');
   }
 
   function findItem(data, kind, id) {
@@ -202,6 +223,15 @@
       '</div>';
   }
 
+  function renderBankQuestion(item) {
+    if (!item) return '<div class="empty-state"><div class="icon">📚</div><p>Вопрос не найден</p></div>';
+    return '<div class="ip-card">' +
+      '<div class="ip-kicker">Вопрос банка · ' + escapeText(item.topic) + (item.level ? ' · ' + escapeText(item.level) : '') + '</div>' +
+      '<h4 class="ip-prompt">' + escapeText(item.prompt) + '</h4>' +
+      '<p class="ip-why">Ответьте вслух за две минуты: суть, как проверить на практике, типичная ошибка. Затем откройте эталон и отметьте раскрытые пункты.</p>' +
+      '</div>';
+  }
+
   function renderSystemDesign(item) {
     if (!item) return '<div class="empty-state"><div class="icon">🧩</div><p>Задание не найдено</p></div>';
     return '<div class="ip-card">' +
@@ -218,6 +248,12 @@
     if (!item) return '';
     if (kind === 'star') {
       return renderBullets('Рубрика самопроверки', item.rubric, 'ip-rubric');
+    }
+    if (kind === 'bank') {
+      return '<div class="ip-block ip-expected"><div class="ip-block-title">Эталонный ответ</div><p>' + escapeText(item.answer) + '</p></div>' +
+        renderBullets('Ключевые пункты', item.rubric, 'ip-rubric') +
+        renderBullets('Команды для проверки', item.commands, 'ip-commands') +
+        (item.pitfall ? '<div class="ip-block ip-pitfalls"><div class="ip-block-title">Частая ошибка</div><p>' + escapeText(item.pitfall) + '</p></div>' : '');
     }
     return renderBullets('Что ждут в ответе', item.expectedPoints, 'ip-expected') +
       renderBullets('Компромиссы', item.tradeoffs, 'ip-tradeoffs') +
@@ -395,6 +431,7 @@
     return {
       star: items(data, 'star').length,
       systemDesign: items(data, 'systemDesign').length,
+      bank: items(data, 'bank').length,
       topics: [...new Set(items(data, 'systemDesign').map(i => i.topic))].sort()
     };
   }
@@ -402,7 +439,7 @@
   return {
     items, findItem, buildInterviewPayload, normaliseInterviewEvaluation, buildLocalInterviewEvaluation,
     normaliseInterviewHistoryEntry, appendInterviewHistory, requestInterviewEvaluation, evaluateInterview, score, summary,
-    renderStar, renderSystemDesign, renderReference, renderRubricForm, renderInterviewEvaluation, renderScore,
-    INTERVIEW_HISTORY_LIMIT
+    renderStar, renderSystemDesign, renderBankQuestion, renderReference, renderRubricForm, renderInterviewEvaluation, renderScore,
+    bankItems, formatTimer, ANSWER_SECONDS, INTERVIEW_HISTORY_LIMIT
   };
 });
